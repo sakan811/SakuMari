@@ -2,7 +2,7 @@
 services:
   db:
     image: postgres:17-alpine
-    container_name: sakumari-db
+    container_name: ${CONTAINER_NAME_PREFIX}-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -14,13 +14,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
+    restart: always
     networks:
       - sakumari
 
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: sakumari-pgadmin
+    container_name: ${CONTAINER_NAME_PREFIX}-pgadmin
     ports:
       - "8080:80"
     environment:
@@ -31,14 +31,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    restart: unless-stopped
+    restart: always
     networks:
       - sakumari
 
   # Production app service (prod profile)
   app:
-    image: sakumari:latest
-    container_name: sakumari-app
+    image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+    container_name: ${CONTAINER_NAME_PREFIX}-app
     ports:
       - "3000:3000"
     environment:
@@ -52,7 +52,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    restart: unless-stopped
+    restart: always
     user: "nextjs:nodejs"
     networks:
       - sakumari
@@ -64,7 +64,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: sakumari-app-build
+    container_name: ${CONTAINER_NAME_PREFIX}-app-build
     ports:
       - "3001:3000"
     environment:
@@ -78,7 +78,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    restart: unless-stopped
+    restart: always
     user: "nextjs:nodejs"
     networks:
       - sakumari
@@ -88,7 +88,7 @@ services:
   # Cloudflare tunnel (prod profile only)
   cloudflared:
     image: cloudflare/cloudflared:latest
-    container_name: sakumari-cloudflared
+    container_name: ${CONTAINER_NAME_PREFIX}-cloudflared
     command:
       [
         "tunnel",
@@ -97,7 +97,7 @@ services:
         "--token",
         "${CLOUDFLARE_TUNNEL_TOKEN}",
       ]
-    restart: unless-stopped
+    restart: always
     networks:
       - sakumari
     profiles:
