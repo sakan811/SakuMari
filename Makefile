@@ -62,6 +62,9 @@ docker-up-build:
 docker-up-prod:
 	docker compose --profile prod up -d
 
+docker-up-prod-tunnel:
+	docker compose --profile prod --profile tunnel up -d
+
 docker-build-db-setup:
 	docker compose exec app-build pnpm exec prisma generate && \
 	docker compose exec app-build pnpm exec prisma migrate deploy && \

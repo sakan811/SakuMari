@@ -150,7 +150,12 @@ docker compose exec app-build pnpm exec prisma db seed
 
 ```bash
 # Edit .env with your credentials (use POSTGRES_HOST=db for Docker networking)
+
+# Production without tunnel
 docker compose --profile prod up -d
+
+# Production with Cloudflare tunnel
+docker compose --profile prod --profile tunnel up -d
 
 # Database setup (run inside Docker container)
 docker compose exec app pnpm exec prisma generate
@@ -160,7 +165,7 @@ docker compose exec app pnpm exec prisma db seed
 
 - App runs on port 3000
 - Uses pre-built image
-- Includes Cloudflare tunnel support
+- Optional Cloudflare tunnel support
 - Database setup runs inside the Docker container
 
 **Database only:**
@@ -224,7 +229,8 @@ make docker-up            # Start database and pgAdmin services
 make docker-down          # Stop all services
 make docker-clean         # Clean up Docker resources (volumes, images, orphans)
 make docker-up-build      # Build and run full stack from source
-make docker-up-prod       # Run production deployment
+make docker-up-prod       # Run production deployment (without tunnel)
+make docker-up-prod-tunnel # Run production deployment (with Cloudflare tunnel)
 make docker-build         # Build Docker image (default: sakumari:latest)
 ```
 
