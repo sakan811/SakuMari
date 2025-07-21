@@ -65,6 +65,24 @@ docker-up-prod:
 docker-up-prod-tunnel:
 	docker compose --profile prod --profile tunnel up -d
 
+docker-down-build:
+	docker compose --profile build down
+
+docker-down-prod:
+	docker compose --profile prod down
+
+docker-down-prod-tunnel:
+	docker compose --profile prod --profile tunnel down
+
+docker-clean-build:
+	docker compose --profile build down -v --remove-orphans --rmi all
+
+docker-clean-prod:
+	docker compose --profile prod down -v --remove-orphans --rmi all
+
+docker-clean-prod-tunnel:
+	docker compose --profile prod --profile tunnel down -v --remove-orphans --rmi all
+
 docker-build-db-setup:
 	docker compose exec app-build pnpm exec prisma generate && \
 	docker compose exec app-build pnpm exec prisma migrate deploy && \
