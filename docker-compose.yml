@@ -85,7 +85,7 @@ services:
     profiles:
       - build
 
-  # Cloudflare tunnel (prod profile only)
+  # Cloudflare tunnel (tunnel profile only)
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: ${CONTAINER_NAME_PREFIX}-cloudflared
@@ -101,7 +101,7 @@ services:
     networks:
       - sakumari
     profiles:
-      - prod
+      - tunnel
 
 volumes:
   postgres_data:
