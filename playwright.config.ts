@@ -54,6 +54,11 @@ export default defineConfig({
         ...devices["Desktop Firefox"],
         // Use prepared auth state
         storageState: "playwright/.auth/user.json",
+        launchOptions: {
+          env: {
+            HOME: "/root",
+          },
+        },
       },
       dependencies: ["setup"],
       testIgnore: /.*seo-metadata\.spec\.ts/,

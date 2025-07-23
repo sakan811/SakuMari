@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     let requestBody;
     try {
       requestBody = await request.json();
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     }
 
