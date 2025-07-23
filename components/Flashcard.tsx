@@ -187,7 +187,7 @@ export default function Flashcard() {
         disabled={isProcessing || !!result}
       />
 
-      <div className="mb-6 sm:mb-8 rounded-lg bg-gradient-to-br from-[#fad182] via-[#fad182] to-[#f5c55a] shadow-xl border-2 border-[#705a39] aspect-[3/4] sm:aspect-[2.5/3.5] flex flex-col justify-between p-4 sm:p-6">
+      <div className="mb-6 sm:mb-8 rounded-lg bg-gradient-to-br from-[#fad182] via-[#fad182] to-[#f5c55a] shadow-xl border-2 border-[#705a39] aspect-[5/3] sm:aspect-[2.5/3.5] flex flex-col justify-between p-4 sm:p-6">
         <div className="flex-grow flex items-center justify-center">
           <h2 className="text-6xl xs:text-7xl sm:text-8xl md:text-[10rem] lg:text-[14rem] leading-none font-bold text-[#403933] drop-shadow-sm">
             {currentKana.character}
