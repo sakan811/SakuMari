@@ -1,15 +1,31 @@
-# Common commands
+# =============================================================================
+# SakuMari Kana Flashcard App - Makefile
+# =============================================================================
+# This Makefile provides commands for development, testing, and deployment.
+
+# -----------------------------------------------------------------------------
+# Variables and Configuration
+# -----------------------------------------------------------------------------
 PNPM_PRISMA = pnpm exec prisma
 DOCKER_COMPOSE = docker compose
 DOCKER_DOWN_FLAGS = down -v --remove-orphans --rmi all
 
-# Profile definitions
+# Docker image configuration (used by docker-build command)
+IMAGE_NAME ?= sakanbeer88/sakumari
+TAG ?= latest
+
+# Docker Compose profiles (see docker-compose.yml for service definitions)
+# - build: Builds app from source code (development) - runs on port 3001
+# - prod: Uses pre-built image (production) - runs on port 3000  
+# - tunnel: Adds Cloudflare tunnel (production with external access)
 PROFILE_BUILD = --profile build
 PROFILE_PROD = --profile prod
 PROFILE_TUNNEL = --profile tunnel
 PROFILE_PROD_TUNNEL = $(PROFILE_PROD) $(PROFILE_TUNNEL)
 
-# Generic Docker functions
+# -----------------------------------------------------------------------------
+# Helper Functions (Internal Use - Called by targets below)
+# -----------------------------------------------------------------------------
 define docker-profile-up
 	$(DOCKER_COMPOSE) $(1) up -d $(2)
 endef
@@ -28,117 +44,125 @@ define docker-db-setup-exec
 	$(DOCKER_COMPOSE) exec $(1) $(PNPM_PRISMA) db seed
 endef
 
-# Default target
-help: ## Show this help message
-	@echo "SakuMari Kana Flashcard App - Available Commands:"
-	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-25s %s\n", $$1, $$2}'
-	@echo ""
-	@echo "Usage: make <target> [OPTION=value]"
-	@echo "Example: make docker-build IMAGE_NAME=myapp TAG=v1.0.0"
+# =============================================================================
+# TARGETS
+# =============================================================================
 
-dev: ## Start development server
+
+# -----------------------------------------------------------------------------
+# Development Commands
+# -----------------------------------------------------------------------------
+dev:
 	pnpm dev
 
-build: ## Build production application
+build:
 	pnpm build
 
-lint: ## Run ESLint
+lint:
 	pnpm lint
 
-format: ## Format code with Prettier
+format:
 	pnpm format
 
-test-e2e: ## Run E2E tests
+# -----------------------------------------------------------------------------
+# Testing Commands  
+# -----------------------------------------------------------------------------
+test-e2e:
 	pnpm test:e2e:build && \
 	pnpm test:e2e
 
-test-all: ## Run all tests (unit + db + cleanup)
+test-all:
 	pnpm test:run && \
 	pnpm test:db:setup && \
 	pnpm test:db && \
 	pnpm test:db:clean
 
-pre-ci: lint format test-all ## Run pre-commit checks (lint, format, tests)
+pre-ci: lint format test-all
 
-generate: ## Generate Prisma client
+# -----------------------------------------------------------------------------
+# Database Commands (Prisma ORM)
+# -----------------------------------------------------------------------------
+generate:
 	$(PNPM_PRISMA) generate
 
-migrate: ## Run database migrations
+migrate:
 	$(PNPM_PRISMA) migrate dev
 
-migrate-prod: ## Deploy migrations to production
+migrate-prod:
 	$(PNPM_PRISMA) migrate deploy
 	
-seed: ## Seed database with Kana data
+seed:
 	$(PNPM_PRISMA) db seed
 
-studio: ## Open Prisma Studio
+studio:
 	$(PNPM_PRISMA) studio
 
-reset: ## Reset database (destructive)
+reset:
 	$(PNPM_PRISMA) migrate reset
 
-setup-db: ## Setup database (generate + migrate + seed)
+setup-db:
 	$(PNPM_PRISMA) generate && \
 	$(PNPM_PRISMA) migrate dev && \
 	$(PNPM_PRISMA) db seed
 
-# Docker Compose commands
-docker-up: ## Start PostgreSQL database
+# -----------------------------------------------------------------------------
+# Docker Commands
+# -----------------------------------------------------------------------------
+
+# Basic Docker Compose (database + pgAdmin only)
+docker-up:
 	$(DOCKER_COMPOSE) up -d
 
-docker-down: ## Stop services
+docker-down:
 	$(DOCKER_COMPOSE) down
 
-docker-clean: ## Stop and remove all containers, volumes, images
+docker-clean:
 	$(DOCKER_COMPOSE) $(DOCKER_DOWN_FLAGS)
 
-# Profile-based compose commands
-docker-up-build: ## Build and run from source (port 3001)
+# Application Deployment Profiles
+docker-up-build:
 	$(call docker-profile-up,$(PROFILE_BUILD),--build)
 
-docker-up-prod: ## Production without tunnel (port 3000)
+docker-up-prod:
 	$(call docker-profile-up,$(PROFILE_PROD))
 
-docker-up-prod-tunnel: ## Production with Cloudflare tunnel
+docker-up-prod-tunnel:
 	$(call docker-profile-up,$(PROFILE_PROD_TUNNEL))
 
-docker-down-build: ## Stop build profile services
+# Stop specific profiles
+docker-down-build:
 	$(call docker-profile-down,$(PROFILE_BUILD))
 
-docker-down-prod: ## Stop prod profile services
+docker-down-prod:
 	$(call docker-profile-down,$(PROFILE_PROD))
 
-docker-down-prod-tunnel: ## Stop prod+tunnel profile services
+docker-down-prod-tunnel:
 	$(call docker-profile-down,$(PROFILE_PROD_TUNNEL))
 
-docker-clean-build: ## Clean build profile (remove all)
+# Clean specific profiles (remove containers, volumes, images)
+docker-clean-build:
 	$(call docker-profile-clean,$(PROFILE_BUILD))
 
-docker-clean-prod: ## Clean prod profile (remove all)
+docker-clean-prod:
 	$(call docker-profile-clean,$(PROFILE_PROD))
 
-docker-clean-prod-tunnel: ## Clean prod+tunnel profile (remove all)
+docker-clean-prod-tunnel:
 	$(call docker-profile-clean,$(PROFILE_PROD_TUNNEL))
 
-docker-build-db-setup: ## Setup database in build container
+# Database setup in containers
+docker-build-db-setup:
 	$(call docker-db-setup-exec,app-build)
 
-docker-db-setup: ## Setup database in prod container
+docker-db-setup:
 	$(call docker-db-setup-exec,app)
 
 # Build Docker image
-# Usage: make docker-build [IMAGE_NAME=sakumari] [TAG=latest]
-docker-build: ## Build Docker image
+docker-build:
 	docker build -t $(IMAGE_NAME):$(TAG) .
 
-# Set default values for image build
-IMAGE_NAME ?= sakanbeer88/sakumari
-TAG ?= latest
 
 # Declare all targets as phony to prevent conflicts with files of the same name
-.PHONY: help dev build lint format test-e2e test-all pre-ci generate migrate migrate-prod seed studio reset setup-db
+.PHONY: dev build lint format test-e2e test-all pre-ci generate migrate migrate-prod seed studio reset setup-db
 .PHONY: docker-up docker-down docker-clean docker-up-build docker-up-prod docker-up-prod-tunnel
 .PHONY: docker-down-build docker-down-prod docker-down-prod-tunnel docker-clean-build docker-clean-prod docker-clean-prod-tunnel
 .PHONY: docker-build-db-setup docker-db-setup docker-build
