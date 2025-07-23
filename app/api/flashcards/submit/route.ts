@@ -27,7 +27,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { kanaId, isCorrect } = await request.json();
+    let requestBody;
+    try {
+      requestBody = await request.json();
+    } catch (error) {
+      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    }
+
+    const { kanaId, isCorrect } = requestBody;
+
+    // Validate required fields
+    if (kanaId === undefined || kanaId === null) {
+      return NextResponse.json({ error: "kanaId is required" }, { status: 400 });
+    }
+
+    if (isCorrect === undefined || isCorrect === null) {
+      return NextResponse.json({ error: "isCorrect is required" }, { status: 400 });
+    }
+
+    // Validate data types
+    if (typeof isCorrect !== 'boolean') {
+      return NextResponse.json({ error: "isCorrect must be a boolean" }, { status: 400 });
+    }
 
     // Find or create KanaProgress record for this user
     const kanaProgress = await prisma.kanaProgress.upsert({
