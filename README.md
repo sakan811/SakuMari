@@ -1,6 +1,6 @@
 # SakuMari - Japanese Kana Flashcard App
 
-A web application for practicing Japanese Hiragana and Katakana characters with interactive flashcards and progress tracking.
+A web application built with **Next.js 15** and **React 19** for practicing Japanese Hiragana and Katakana characters with interactive flashcards and progress tracking.
 
 [![Web-App Test](https://github.com/sakan811/SakuMari/actions/workflows/test-app.yml/badge.svg)](https://github.com/sakan811/SakuMari/actions/workflows/test-app.yml)
 [![E2E Test](https://github.com/sakan811/SakuMari/actions/workflows/playwright.yml/badge.svg)](https://github.com/sakan811/SakuMari/actions/workflows/playwright.yml)
@@ -8,21 +8,52 @@ A web application for practicing Japanese Hiragana and Katakana characters with 
 
 ## Features
 
-- **Interactive Flashcards**: Practice Hiragana and Katakana with randomized character selection
-- **Progress Tracking**: View accuracy statistics and practice history
-- **Adaptive Learning**: Characters with lower accuracy appear more frequently
+- **Interactive Flashcards**: Practice Hiragana and Katakana with two interaction modes (typing and multiple-choice)
+- **Adaptive Learning**: Advanced weighted selection algorithm presents characters with lower accuracy more frequently
+- **Comprehensive Progress Tracking**: Detailed dashboard with accuracy statistics, attempt history, and filterable character progress
+- **User Authentication**: Secure Google OAuth integration with JWT session management
+- **Responsive Design**: Mobile-friendly interface optimized for all devices
+- **Modern Architecture**: Built with Next.js 15 App Router and React 19 Server/Client components
 
 ## Try It Live
 
 🚀 **[https://sakumari.fukudev.org/](https://sakumari.fukudev.org/)** - No setup required!
 
+## Technology Stack
+
+- **Frontend**: Next.js 15 (App Router), React 19, TypeScript
+- **Styling**: Tailwind CSS v4
+- **Database**: PostgreSQL 17 with Prisma ORM v6
+- **Authentication**: NextAuth.js v5 with Google OAuth
+- **Testing**: Vitest (unit), React Testing Library, Playwright (E2E)
+- **Deployment**: Docker with multi-stage builds, Docker Compose profiles
+- **Package Manager**: pnpm
+
+## Quick Start (Recommended)
+
+For the fastest development setup with Docker database:
+
+```bash
+# Clone and setup
+git clone https://github.com/sakan811/SakuMari.git
+cd SakuMari
+cp .env.example .env
+# Edit .env with your credentials
+
+# Start database services and setup
+docker compose up -d
+pnpm install && make setup-db && pnpm dev
+```
+
+Open <http://localhost:3000> and start developing!
+
 ## Development Setup
 
 ### Prerequisites
 
-- **Node.js** (v18 or higher)
+- **Node.js** (v20 or higher)
 - **pnpm** ([installation guide](https://pnpm.io/installation))
-- **PostgreSQL** (v14 or higher) OR **Docker** for containerized database
+- **PostgreSQL** (v17 or higher) OR **Docker** for containerized database
 
 ### Environment Variables
 
@@ -179,21 +210,32 @@ docker compose up -d
 
 ## Testing
 
+The project includes a comprehensive multi-layered testing strategy:
+
+### Test Types
+- **Unit & Integration Tests**: React components, API routes, and business logic using Vitest + React Testing Library
+- **Database Tests**: Separate SQLite test database to validate queries, constraints, and relationships
+- **End-to-End Tests**: Full user journey testing with Playwright, including authentication flows
+- **SEO Tests**: Metadata and Open Graph validation
+
+### Running Tests
+
 ```bash
 # Unit tests
 pnpm test                 # Watch mode
 pnpm run test:run         # Single run
 
-# Database tests
+# Database tests (separate SQLite test database)
 pnpm run test:db:setup    # Setup test database
 pnpm run test:db          # Run database tests
 
-# E2E tests
+# E2E tests (Playwright)
 pnpm run test:e2e:build   # Build for E2E testing
 pnpm run test:e2e         # Run E2E tests
 
 # All tests
 make test-all             # Run all tests + cleanup
+make pre-ci               # Run lint, format, and all tests (recommended before committing)
 ```
 
 ## Useful Makefile Commands
