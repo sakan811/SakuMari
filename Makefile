@@ -1,140 +1,91 @@
 # =============================================================================
 # SakuMari Kana Flashcard App - Makefile
 # =============================================================================
-# This Makefile provides commands for development, testing, and deployment.
 
-# -----------------------------------------------------------------------------
-# Variables and Configuration
-# -----------------------------------------------------------------------------
-PNPM_PRISMA = pnpm exec prisma
-DOCKER_COMPOSE = docker compose
-DOCKER_DOWN_FLAGS = down -v --remove-orphans --rmi all
+# Variables
+COMPOSE := docker compose
+DOCKER_EXEC := $(COMPOSE) exec app pnpm exec prisma
+PULL_POLICY_BUILD := PULL_POLICY=build
+PULL_POLICY_PROD := PULL_POLICY=always
 
-# Docker image configuration (used by docker-build command)
-IMAGE_NAME ?= sakanbeer88/sakumari
-TAG ?= latest
-
-# Docker pull policy configuration
-# - build: Builds app from source code (local development)
-# - always: Pulls pre-built image from registry (production)
-PULL_POLICY_BUILD = PULL_POLICY=build
-PULL_POLICY_PROD = PULL_POLICY=always
-
-# -----------------------------------------------------------------------------
-# Helper Functions (Internal Use - Called by targets below)
-# -----------------------------------------------------------------------------
-define docker-pull-policy-up
-	$(1) $(DOCKER_COMPOSE) up -d $(2)
-endef
-
-define docker-tunnel-up
-	$(1) $(DOCKER_COMPOSE) --profile tunnel up -d $(2)
-endef
-
-define docker-db-setup-exec
-	$(DOCKER_COMPOSE) exec app $(PNPM_PRISMA) generate && \
-	$(DOCKER_COMPOSE) exec app $(PNPM_PRISMA) migrate deploy && \
-	$(DOCKER_COMPOSE) exec app $(PNPM_PRISMA) db seed
+# Docker compose helper function
+define docker-up
+	$(if $(1),$(1),) $(COMPOSE) $(if $(2),--profile $(2),) up -d
 endef
 
 # =============================================================================
-# TARGETS
+# ESSENTIAL WORKFLOWS (Non-redundant with package.json)
 # =============================================================================
 
+# Multi-step workflows that add value beyond simple pnpm scripts
+test-unit: ## Run all unit and database tests
+	pnpm test:run && pnpm test:db:setup && pnpm test:db && pnpm test:db:clean
 
-# -----------------------------------------------------------------------------
-# Development Commands
-# -----------------------------------------------------------------------------
-dev:
+test-e2e-full: ## Complete E2E workflow with setup
+	pnpm test:e2e:setup && pnpm test:e2e:build && pnpm test:e2e
+
+test-all: ## Run all tests and checks (full CI workflow)
+	pnpm lint && pnpm format && $(MAKE) test-unit && $(MAKE) test-e2e-full
+
+db-setup: ## Setup database (generate + migrate + seed)
+	pnpm prisma:generate && pnpm prisma:migrate && pnpm db:seed
+
+# Docker workflows (value-added orchestration)
+docker-dev: ## Start app with database (build from source)
+	$(call docker-up,$(PULL_POLICY_BUILD))
+
+docker-prod: ## Start app with database (pull from registry)
+	$(call docker-up,$(PULL_POLICY_PROD))
+
+docker-dev-tunnel: ## Start app with tunnel (build from source)
+	$(call docker-up,$(PULL_POLICY_BUILD),tunnel)
+
+docker-prod-tunnel: ## Start app with tunnel (pull from registry)
+	$(call docker-up,$(PULL_POLICY_PROD),tunnel)
+
+docker-db-setup: ## Setup database in Docker container
+	$(DOCKER_EXEC) generate
+	$(DOCKER_EXEC) migrate deploy
+	$(DOCKER_EXEC) db seed
+
+docker-clean: ## Stop and remove all containers, volumes, and images
+	$(COMPOSE) down -v --remove-orphans --rmi all
+
+# =============================================================================
+# DEVELOPMENT ALIASES (Optional - for discoverability)
+# =============================================================================
+
+# Keep only the most commonly used commands as aliases
+dev: ## Start development server
 	pnpm dev
 
-build:
+build: ## Build production application
 	pnpm build
 
-lint:
+lint: ## Run linter
 	pnpm lint
 
-format:
+format: ## Format code
 	pnpm format
 
-# -----------------------------------------------------------------------------
-# Testing Commands  
-# -----------------------------------------------------------------------------
-test-e2e:
-	pnpm test:e2e:build && \
-	pnpm test:e2e
+# Docker core services
+docker-up: ## Start database, pgAdmin, and Portainer only
+	$(COMPOSE) up -d
 
-test-all:
-	pnpm test:run && \
-	pnpm test:db:setup && \
-	pnpm test:db && \
-	pnpm test:db:clean
+docker-down: ## Stop all services
+	$(COMPOSE) down
 
-pre-ci: lint format test-all
+docker-build: ## Build Docker image
+	docker build -t sakanbeer88/sakumari:latest .
 
-# -----------------------------------------------------------------------------
-# Database Commands (Prisma ORM)
-# -----------------------------------------------------------------------------
-generate:
-	$(PNPM_PRISMA) generate
+# =============================================================================
+# BACKWARD COMPATIBILITY
+# =============================================================================
 
-migrate:
-	$(PNPM_PRISMA) migrate dev
+pre-ci: test-all ## Run pre-commit checks (full test suite)
+setup-db: db-setup ## Setup database (alias)
 
-migrate-prod:
-	$(PNPM_PRISMA) migrate deploy
-	
-seed:
-	$(PNPM_PRISMA) db seed
-
-studio:
-	$(PNPM_PRISMA) studio
-
-reset:
-	$(PNPM_PRISMA) migrate reset
-
-setup-db:
-	$(PNPM_PRISMA) generate && \
-	$(PNPM_PRISMA) migrate dev && \
-	$(PNPM_PRISMA) db seed
-
-# -----------------------------------------------------------------------------
-# Docker Commands
-# -----------------------------------------------------------------------------
-
-# Basic Docker Compose (database + pgAdmin only)
-docker-up:
-	$(DOCKER_COMPOSE) up -d
-
-docker-down:
-	$(DOCKER_COMPOSE) down
-
-docker-clean:
-	$(DOCKER_COMPOSE) $(DOCKER_DOWN_FLAGS)
-
-# Application Deployment with Pull Policy
-docker-up-build:
-	$(call docker-pull-policy-up,$(PULL_POLICY_BUILD))
-
-docker-up-prod:
-	$(call docker-pull-policy-up,$(PULL_POLICY_PROD))
-
-docker-up-build-tunnel:
-	$(call docker-tunnel-up,$(PULL_POLICY_BUILD))
-
-docker-up-prod-tunnel:
-	$(call docker-tunnel-up,$(PULL_POLICY_PROD))
-
-# Database setup in app container
-docker-db-setup:
-	$(call docker-db-setup-exec)
-
-# Build Docker image
-docker-build:
-	docker build -t $(IMAGE_NAME):$(TAG) .
-
-
-# Declare all targets as phony to prevent conflicts with files of the same name
-.PHONY: dev build lint format test-e2e test-all pre-ci generate migrate migrate-prod seed studio reset setup-db
-.PHONY: docker-up docker-down docker-clean docker-up-build docker-up-prod docker-up-build-tunnel docker-up-prod-tunnel
-.PHONY: docker-db-setup docker-build
+.PHONY: test-unit test-e2e-full test-all db-setup 
+.PHONY: docker-dev docker-prod docker-dev-tunnel docker-prod-tunnel docker-db-setup docker-clean
+.PHONY: dev build lint format docker-up docker-down docker-build
+.PHONY: pre-ci setup-db

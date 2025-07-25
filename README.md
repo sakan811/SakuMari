@@ -42,8 +42,8 @@ cd SakuMari
 cp .env.example .env
 # Edit .env with your Google OAuth credentials
 
-docker compose up -d
-pnpm install && make setup-db && pnpm dev
+make docker-up
+pnpm install && make db-setup && pnpm dev
 ```
 
 Visit <http://localhost:3000>
@@ -95,11 +95,11 @@ NODE_ENV=development
 
 ```bash
 # Start database services
-docker compose up -d
+make docker-up
 
 # Install and setup
 pnpm install
-make setup-db  # Generate + migrate + seed
+make db-setup  # Generate + migrate + seed
 
 # Start development
 pnpm dev
@@ -115,9 +115,9 @@ pnpm dev
 ```bash
 # Ensure PostgreSQL is running locally
 pnpm install
-pnpm exec prisma generate
-pnpm exec prisma migrate dev
-pnpm exec prisma db seed
+pnpm prisma:generate
+pnpm prisma:migrate
+pnpm db:seed
 pnpm dev
 ```
 
@@ -126,16 +126,16 @@ pnpm dev
 **Development (build from source):**
 ```bash
 # Set POSTGRES_HOST=db in .env
-PULL_POLICY=build docker compose up -d
+make docker-dev
 make docker-db-setup
 ```
 
 **Production (use registry image):**
 ```bash
 # Set POSTGRES_HOST=db in .env
-docker compose up -d  # Default: PULL_POLICY=always
+make docker-prod
 # Or with Cloudflare tunnel:
-docker compose --profile tunnel up -d
+make docker-prod-tunnel
 make docker-db-setup
 ```
 
@@ -143,24 +143,29 @@ make docker-db-setup
 
 ```bash
 # Development
-pnpm dev                 # Start dev server
-pnpm build              # Build for production
+make dev                # Start dev server
+make build              # Build for production
 pnpm start              # Start production server
 
 # Code Quality
-pnpm lint               # Run ESLint
-pnpm format             # Format with Prettier
-make pre-ci             # Lint + format + all tests
+make lint               # Run ESLint
+make format             # Format with Prettier
+make test-all           # Lint + format + all tests
 
 # Database
-make setup-db           # Generate + migrate + seed
-make studio             # Open Prisma Studio
-make reset              # Reset database
+make db-setup           # Generate + migrate + seed
+pnpm prisma:studio      # Open Prisma Studio
+pnpm prisma:reset       # Reset database
 
-# Docker
-make docker-up          # Start database services
+# Docker - Core Services
+make docker-up          # Start database, pgAdmin, Portainer
 make docker-down        # Stop services
 make docker-clean       # Clean up resources
+
+# Docker - Application
+make docker-dev         # Start app (build from source)
+make docker-prod        # Start app (pull from registry)
+make docker-db-setup    # Setup database in container (generate + migrate + seed)
 ```
 
 ## Testing
@@ -170,19 +175,21 @@ Comprehensive multi-layer testing strategy:
 ```bash
 # Unit & Integration Tests
 pnpm test               # Watch mode
-pnmp test:run           # Single run
+pnpm test:run           # Single run
 
 # Database Tests (SQLite)
 pnpm test:db:setup      # Setup test DB
 pnpm test:db            # Run DB tests
 
 # End-to-End Tests (Playwright)
-make test-e2e           # Build + run E2E tests
+pnpm test:e2e:setup     # Setup E2E environment
 pnpm test:e2e:build     # Build for testing
 pnpm test:e2e           # Run E2E tests
 
-# All Tests
-make test-all           # Unit + DB + cleanup
+# Makefile Test Commands
+make test-unit          # Unit + database tests
+make test-e2e-full      # Complete E2E workflow
+make test-all           # All tests + lint + format
 ```
 
 ### E2E Test Setup (Local)
@@ -208,11 +215,13 @@ POSTGRES_HOST=localhost
 
 **Run E2E Tests:**
 ```bash
-# Setup test database (first time only)
-pnpm test:e2e:setup
+# Complete E2E workflow (setup + build + test)
+make test-e2e-full
 
-# Run tests
-make test-e2e
+# Or run individual steps:
+pnpm test:e2e:setup     # Setup test database
+pnpm test:e2e:build     # Build for testing
+pnpm test:e2e           # Run tests
 ```
 
 **Authentication:** Uses test credentials (`test@sakumari.local` / `test123`) automatically when `NODE_ENV=test`.
