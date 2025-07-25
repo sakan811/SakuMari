@@ -161,32 +161,11 @@ pnpm run dev
 
 ### Full Stack Docker Deployment
 
-**Option 1: Build from source**
+**Option 1: Build from source (Local Development)**
 
 ```bash
 # Edit .env with your credentials (use POSTGRES_HOST=db for Docker networking)
-docker compose --profile build up -d
-
-# Database setup (run inside Docker container)
-docker compose exec app-build pnpm exec prisma generate
-docker compose exec app-build pnpm exec prisma migrate deploy
-docker compose exec app-build pnpm exec prisma db seed
-```
-
-- App runs on port 3001
-- Builds from local source code
-- Database setup runs inside the Docker container
-
-**Option 2: Production deployment**
-
-```bash
-# Edit .env with your credentials (use POSTGRES_HOST=db for Docker networking)
-
-# Production without tunnel
-docker compose --profile prod up -d
-
-# Production with Cloudflare tunnel
-docker compose --profile prod --profile tunnel up -d
+PULL_POLICY=build docker compose up -d
 
 # Database setup (run inside Docker container)
 docker compose exec app pnpm exec prisma generate
@@ -195,7 +174,28 @@ docker compose exec app pnpm exec prisma db seed
 ```
 
 - App runs on port 3000
-- Uses pre-built image
+- Builds from local source code
+- Database setup runs inside the Docker container
+
+**Option 2: Production deployment**
+
+```bash
+# Edit .env with your credentials (use POSTGRES_HOST=db for Docker networking)
+
+# Production without tunnel (default: PULL_POLICY=always)
+docker compose up -d
+
+# Production with Cloudflare tunnel
+docker compose --profile tunnel up -d
+
+# Database setup (run inside Docker container)
+docker compose exec app pnpm exec prisma generate
+docker compose exec app pnpm exec prisma migrate deploy
+docker compose exec app pnpm exec prisma db seed
+```
+
+- App runs on port 3000
+- Uses pre-built image from registry
 - Optional Cloudflare tunnel support
 - Database setup runs inside the Docker container
 
@@ -270,15 +270,15 @@ make reset                # Reset database (removes all data)
 make docker-up            # Start database and pgAdmin services
 make docker-down          # Stop all services
 make docker-clean         # Clean up Docker resources (volumes, images, orphans)
-make docker-up-build      # Build and run full stack from source
-make docker-up-prod       # Run production deployment (without tunnel)
-make docker-up-prod-tunnel # Run production deployment (with Cloudflare tunnel)
+make docker-up-build      # Build and run full stack from source (PULL_POLICY=build)
+make docker-up-prod       # Run production deployment (PULL_POLICY=always)
+make docker-up-build-tunnel  # Build and run with Cloudflare tunnel
+make docker-up-prod-tunnel   # Run production with Cloudflare tunnel
 make docker-build         # Build Docker image (default: sakumari:latest)
 ```
 
 ### Docker Database Setup
 
 ```bash
-make docker-build-db-setup  # Setup database for build profile
-make docker-db-setup        # Setup database for production profile
+make docker-db-setup      # Setup database in app container
 ```
