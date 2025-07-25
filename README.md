@@ -157,6 +157,7 @@ pnpm run dev
 **Database Management:**
 
 - pgAdmin: <http://localhost:8080> (use credentials from .env)
+- Portainer: <http://localhost:9000> (Docker container management)
 - Direct PostgreSQL: `localhost:5432`
 
 ### Full Stack Docker Deployment
@@ -205,7 +206,7 @@ docker compose exec app pnpm exec prisma db seed
 docker compose up -d
 ```
 
-- Runs PostgreSQL and pgAdmin only
+- Runs PostgreSQL, pgAdmin, and Portainer only
 - Use for external app development (see "Local Development (Docker Database Only)" above)
 
 ## Testing
