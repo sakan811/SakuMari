@@ -184,3 +184,35 @@ pnpm test:e2e           # Run E2E tests
 # All Tests
 make test-all           # Unit + DB + cleanup
 ```
+
+### E2E Test Setup (Local)
+
+**One-Time Environment Setup:**
+```bash
+# 1. Start PostgreSQL (use existing Docker container)
+make docker-up
+
+# 2. Create test environment
+cp .env.example .env.test
+```
+
+Edit `.env.test` with:
+```bash
+NODE_ENV=test
+# Database (use existing Docker PostgreSQL)
+POSTGRES_DB=sakumari_test
+POSTGRES_HOST=localhost
+# Keep other POSTGRES_* variables same as .env
+# Keep AUTH_* variables same as .env
+```
+
+**Run E2E Tests:**
+```bash
+# Setup test database (first time only)
+pnpm test:e2e:setup
+
+# Run tests
+make test-e2e
+```
+
+**Authentication:** Uses test credentials (`test@sakumari.local` / `test123`) automatically when `NODE_ENV=test`.
