@@ -37,6 +37,18 @@ services:
     networks:
       - sakumari
 
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: ${CONTAINER_NAME_PREFIX}-portainer
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    restart: always
+    networks:
+      - sakumari
+
   # App service with dynamic pull policy
   app:
     image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
@@ -84,6 +96,7 @@ services:
 volumes:
   postgres_data:
   pgadmin_data:
+  portainer_data:
 
 networks:
   sakumari:
