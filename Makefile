@@ -14,34 +14,27 @@ DOCKER_DOWN_FLAGS = down -v --remove-orphans --rmi all
 IMAGE_NAME ?= sakanbeer88/sakumari
 TAG ?= latest
 
-# Docker Compose profiles (see docker-compose.yml for service definitions)
-# - build: Builds app from source code (development) - runs on port 3001
-# - prod: Uses pre-built image (production) - runs on port 3000  
-# - tunnel: Adds Cloudflare tunnel (production with external access)
-PROFILE_BUILD = --profile build
-PROFILE_PROD = --profile prod
-PROFILE_TUNNEL = --profile tunnel
-PROFILE_PROD_TUNNEL = $(PROFILE_PROD) $(PROFILE_TUNNEL)
+# Docker pull policy configuration
+# - build: Builds app from source code (local development)
+# - always: Pulls pre-built image from registry (production)
+PULL_POLICY_BUILD = PULL_POLICY=build
+PULL_POLICY_PROD = PULL_POLICY=always
 
 # -----------------------------------------------------------------------------
 # Helper Functions (Internal Use - Called by targets below)
 # -----------------------------------------------------------------------------
-define docker-profile-up
-	$(DOCKER_COMPOSE) $(1) up -d $(2)
+define docker-pull-policy-up
+	$(1) $(DOCKER_COMPOSE) up -d $(2)
 endef
 
-define docker-profile-down
-	$(DOCKER_COMPOSE) $(1) down
-endef
-
-define docker-profile-clean
-	$(DOCKER_COMPOSE) $(1) $(DOCKER_DOWN_FLAGS)
+define docker-tunnel-up
+	$(1) $(DOCKER_COMPOSE) --profile tunnel up -d $(2)
 endef
 
 define docker-db-setup-exec
-	$(DOCKER_COMPOSE) exec $(1) $(PNPM_PRISMA) generate && \
-	$(DOCKER_COMPOSE) exec $(1) $(PNPM_PRISMA) migrate deploy && \
-	$(DOCKER_COMPOSE) exec $(1) $(PNPM_PRISMA) db seed
+	$(DOCKER_COMPOSE) exec app $(PNPM_PRISMA) generate && \
+	$(DOCKER_COMPOSE) exec app $(PNPM_PRISMA) migrate deploy && \
+	$(DOCKER_COMPOSE) exec app $(PNPM_PRISMA) db seed
 endef
 
 # =============================================================================
@@ -119,42 +112,22 @@ docker-down:
 docker-clean:
 	$(DOCKER_COMPOSE) $(DOCKER_DOWN_FLAGS)
 
-# Application Deployment Profiles
+# Application Deployment with Pull Policy
 docker-up-build:
-	$(call docker-profile-up,$(PROFILE_BUILD),--build)
+	$(call docker-pull-policy-up,$(PULL_POLICY_BUILD))
 
 docker-up-prod:
-	$(call docker-profile-up,$(PROFILE_PROD))
+	$(call docker-pull-policy-up,$(PULL_POLICY_PROD))
+
+docker-up-build-tunnel:
+	$(call docker-tunnel-up,$(PULL_POLICY_BUILD))
 
 docker-up-prod-tunnel:
-	$(call docker-profile-up,$(PROFILE_PROD_TUNNEL))
+	$(call docker-tunnel-up,$(PULL_POLICY_PROD))
 
-# Stop specific profiles
-docker-down-build:
-	$(call docker-profile-down,$(PROFILE_BUILD))
-
-docker-down-prod:
-	$(call docker-profile-down,$(PROFILE_PROD))
-
-docker-down-prod-tunnel:
-	$(call docker-profile-down,$(PROFILE_PROD_TUNNEL))
-
-# Clean specific profiles (remove containers, volumes, images)
-docker-clean-build:
-	$(call docker-profile-clean,$(PROFILE_BUILD))
-
-docker-clean-prod:
-	$(call docker-profile-clean,$(PROFILE_PROD))
-
-docker-clean-prod-tunnel:
-	$(call docker-profile-clean,$(PROFILE_PROD_TUNNEL))
-
-# Database setup in containers
-docker-build-db-setup:
-	$(call docker-db-setup-exec,app-build)
-
+# Database setup in app container
 docker-db-setup:
-	$(call docker-db-setup-exec,app)
+	$(call docker-db-setup-exec)
 
 # Build Docker image
 docker-build:
@@ -163,6 +136,5 @@ docker-build:
 
 # Declare all targets as phony to prevent conflicts with files of the same name
 .PHONY: dev build lint format test-e2e test-all pre-ci generate migrate migrate-prod seed studio reset setup-db
-.PHONY: docker-up docker-down docker-clean docker-up-build docker-up-prod docker-up-prod-tunnel
-.PHONY: docker-down-build docker-down-prod docker-down-prod-tunnel docker-clean-build docker-clean-prod docker-clean-prod-tunnel
-.PHONY: docker-build-db-setup docker-db-setup docker-build
+.PHONY: docker-up docker-down docker-clean docker-up-build docker-up-prod docker-up-build-tunnel docker-up-prod-tunnel
+.PHONY: docker-db-setup docker-build
