@@ -1,22 +1,29 @@
-# Base stage
-FROM node:23-slim AS base
-
-# Install pnpm and OpenSSL
-RUN npm install -g pnpm && apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
-
-# Set working directory
+# Base stage - Use Alpine for smaller size
+FROM node:23-alpine AS base
 WORKDIR /app
 
-# Build stage
-FROM base AS builder
+# Install system dependencies (Alpine packages)
+RUN apk add --no-cache \
+    libc6-compat \
+    openssl \
+    ca-certificates \
+    && npm install -g pnpm@9.1.0
 
-# Copy package files
+# Dependencies stage - Install production dependencies with caching
+FROM base AS deps
 COPY package.json pnpm-lock.yaml ./
+# Use BuildKit cache mount for pnpm store for faster builds
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --prod --frozen-lockfile
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Build dependencies stage - Install all dependencies for building
+FROM base AS build-deps
+COPY package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
 
-# Copy source code
+# Build stage with caching
+FROM build-deps AS builder
 COPY . .
 
 # Generate Prisma client with alternative mirror
@@ -24,27 +31,35 @@ ENV PRISMA_ENGINES_MIRROR=https://registry.npmmirror.com/-/binary/prisma
 ENV PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
 RUN pnpm exec prisma generate
 
-# Build the application
-RUN pnpm build
+# Build with Next.js cache mount for faster rebuilds
+RUN --mount=type=cache,id=nextjs,target=/.next/cache \
+    pnpm build
 
-# Production stage
-FROM base AS runner
-
-# Set working directory
+# Production stage - Use Alpine for minimal size
+FROM node:23-alpine AS runner
 WORKDIR /app
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Install runtime dependencies (Alpine packages)
+RUN apk add --no-cache \
+    libc6-compat \
+    openssl \
+    ca-certificates \
+    && npm install -g pnpm@9.1.0
 
-# Copy built application and dependencies
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+# Create non-root user for security (Alpine syntax)
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+# Copy production dependencies and generated Prisma client from builder stage
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-COPY --from=builder --chown=nextjs:nodejs /app/pnpm-lock.yaml ./pnpm-lock.yaml
 
-# Switch to non-root user
+# Copy built application from builder stage
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/next.config.js ./next.config.js
+
+# Switch to non-root user for security
 USER nextjs
 
 # Expose port
@@ -53,7 +68,8 @@ EXPOSE 3000
 # Set environment variables
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-
-# Start the application
 ENV HOSTNAME="0.0.0.0"
+ENV PORT=3000
+
+# Start the application (compatible with Prisma and NextAuth.js)
 CMD ["pnpm", "start"]
