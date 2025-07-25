@@ -42,7 +42,7 @@ cd SakuMari
 cp .env.example .env
 # Edit .env with your Google OAuth credentials
 
-make docker-up
+make postgres
 pnpm install && make db-setup && pnpm dev
 ```
 
@@ -95,7 +95,7 @@ NODE_ENV=development
 
 ```bash
 # Start database services
-make docker-up
+make postgres  # Or make db-admin for pgAdmin, make db-tools for all tools
 
 # Install and setup
 pnpm install
@@ -104,11 +104,6 @@ make db-setup  # Generate + migrate + seed
 # Start development
 pnpm dev
 ```
-
-**Services:**
-- App: <http://localhost:3000>
-- pgAdmin: <http://localhost:8080>
-- Portainer: <http://localhost:9000>
 
 #### Option B: Local PostgreSQL
 
@@ -126,17 +121,17 @@ pnpm dev
 **Development (build from source):**
 ```bash
 # Set POSTGRES_HOST=db in .env
-make docker-dev
-make docker-db-setup
+make dev-up
+make db-setup-docker
 ```
 
 **Production (use registry image):**
 ```bash
 # Set POSTGRES_HOST=db in .env
-make docker-prod
+make prod-up
 # Or with Cloudflare tunnel:
-make docker-prod-tunnel
-make docker-db-setup
+make tunnel-up
+make db-setup-docker
 ```
 
 ## Development Commands
@@ -145,7 +140,7 @@ make docker-db-setup
 # Development
 make dev                # Start dev server
 make build              # Build for production
-pnpm start              # Start production server
+make install            # Install dependencies
 
 # Code Quality
 make lint               # Run ESLint
@@ -153,19 +148,24 @@ make format             # Format with Prettier
 make test-all           # Lint + format + all tests
 
 # Database
-make db-setup           # Generate + migrate + seed
-pnpm prisma:studio      # Open Prisma Studio
-pnpm prisma:reset       # Reset database
+make postgres           # Start PostgreSQL database only
+make db-admin           # Start PostgreSQL with pgAdmin
+make db-tools           # Start PostgreSQL with pgAdmin and Portainer
+make db-setup           # Generate + migrate + seed (local)
+make db-setup-docker    # Generate + migrate + seed (inside Docker container)
+make db-reset           # Reset database with fresh data
 
-# Docker - Core Services
-make docker-up          # Start database, pgAdmin, Portainer
-make docker-down        # Stop services
-make docker-clean       # Clean up resources
+# Docker Application Deployments
+make dev-up             # Start app stack with build policy (excludes tunnel)
+make prod-up            # Start app stack with always pull policy (excludes tunnel)
+make tunnel-up          # Start production stack with Cloudflare tunnel
 
-# Docker - Application
-make docker-dev         # Start app (build from source)
-make docker-prod        # Start app (pull from registry)
-make docker-db-setup    # Setup database in container (generate + migrate + seed)
+# Service Management
+make logs               # Show logs for all services
+make logs-app           # Show app logs only
+make status             # Show service status
+make down               # Stop all services
+make clean              # Stop and remove all containers, volumes, images
 ```
 
 ## Testing
@@ -187,9 +187,10 @@ pnpm test:e2e:build     # Build for testing
 pnpm test:e2e           # Run E2E tests
 
 # Makefile Test Commands
-make test-unit          # Unit + database tests
-make test-e2e-full      # Complete E2E workflow
-make test-all           # All tests + lint + format
+make test-unit          # Run unit tests
+make test-db            # Run database tests
+make test-e2e           # Run E2E tests (full workflow)
+make test-all           # Run all tests and quality checks
 ```
 
 ### E2E Test Setup (Local)
@@ -197,26 +198,33 @@ make test-all           # All tests + lint + format
 **One-Time Environment Setup:**
 ```bash
 # 1. Start PostgreSQL (use existing Docker container)
-make docker-up
+make postgres
 
 # 2. Create test environment
 cp .env.example .env.test
 ```
 
-Edit `.env.test` with:
+Edit `.env.test` to mirror your `.env` file exactly for these variables:
 ```bash
-NODE_ENV=test
-# Database (use existing Docker PostgreSQL)
-POSTGRES_DB=sakumari_test
+# PostgreSQL Database Configuration
+POSTGRES_DB=kana_flashcard
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
 POSTGRES_HOST=localhost
-# Keep other POSTGRES_* variables same as .env
-# Keep AUTH_* variables same as .env
+POSTGRES_PORT=5432
+
+# Prisma Database URLs
+POSTGRES_PRISMA_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+POSTGRES_URL_NON_POOLING=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+
+# Node Environment
+NODE_ENV=test
 ```
 
 **Run E2E Tests:**
 ```bash
 # Complete E2E workflow (setup + build + test)
-make test-e2e-full
+make test-e2e
 
 # Or run individual steps:
 pnpm test:e2e:setup     # Setup test database

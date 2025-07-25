@@ -1,91 +1,103 @@
-# =============================================================================
-# SakuMari Kana Flashcard App - Makefile
-# =============================================================================
+# SakuMari Kana Flashcard App - Development Makefile
 
-# Variables
-COMPOSE := docker compose
-DOCKER_EXEC := $(COMPOSE) exec app pnpm exec prisma
-PULL_POLICY_BUILD := PULL_POLICY=build
-PULL_POLICY_PROD := PULL_POLICY=always
-
-# Docker compose helper function
-define docker-up
-	$(if $(1),$(1),) $(COMPOSE) $(if $(2),--profile $(2),) up -d
-endef
+.DEFAULT_GOAL := help
+.PHONY: help
 
 # =============================================================================
-# ESSENTIAL WORKFLOWS (Non-redundant with package.json)
+# HELP
 # =============================================================================
 
-# Multi-step workflows that add value beyond simple pnpm scripts
-test-unit: ## Run all unit and database tests
-	pnpm test:run && pnpm test:db:setup && pnpm test:db && pnpm test:db:clean
+help: ## Show available commands
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { printf "%-20s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
-test-e2e-full: ## Complete E2E workflow with setup
-	pnpm test:e2e:setup && pnpm test:e2e:build && pnpm test:e2e
+# =============================================================================
+# DATABASE (Standalone for local development)
+# =============================================================================
 
-test-all: ## Run all tests and checks (full CI workflow)
-	pnpm lint && pnpm format && $(MAKE) test-unit && $(MAKE) test-e2e-full
+postgres: ## Start PostgreSQL database only
+	docker compose up -d db
+
+db-admin: ## Start PostgreSQL with pgAdmin
+	docker compose up -d db pgadmin
+
+db-tools: ## Start PostgreSQL with pgAdmin and Portainer
+	docker compose up -d db pgadmin portainer
 
 db-setup: ## Setup database (generate + migrate + seed)
 	pnpm prisma:generate && pnpm prisma:migrate && pnpm db:seed
 
-# Docker workflows (value-added orchestration)
-docker-dev: ## Start app with database (build from source)
-	$(call docker-up,$(PULL_POLICY_BUILD))
+db-setup-docker: ## Setup database inside Docker container (for full stack deployment)
+	docker compose exec app sh -c "pnpm prisma:generate && pnpm prisma:migrate && pnpm db:seed"
 
-docker-prod: ## Start app with database (pull from registry)
-	$(call docker-up,$(PULL_POLICY_PROD))
-
-docker-dev-tunnel: ## Start app with tunnel (build from source)
-	$(call docker-up,$(PULL_POLICY_BUILD),tunnel)
-
-docker-prod-tunnel: ## Start app with tunnel (pull from registry)
-	$(call docker-up,$(PULL_POLICY_PROD),tunnel)
-
-docker-db-setup: ## Setup database in Docker container
-	$(DOCKER_EXEC) generate
-	$(DOCKER_EXEC) migrate deploy
-	$(DOCKER_EXEC) db seed
-
-docker-clean: ## Stop and remove all containers, volumes, and images
-	$(COMPOSE) down -v --remove-orphans --rmi all
+db-reset: ## Reset database with fresh data
+	pnpm prisma:reset --force && pnpm db:seed
 
 # =============================================================================
-# DEVELOPMENT ALIASES (Optional - for discoverability)
+# DOCKER DEPLOYMENTS
 # =============================================================================
 
-# Keep only the most commonly used commands as aliases
-dev: ## Start development server
+dev-up: ## Start app stack with build policy (excludes tunnel)
+	PULL_POLICY=build docker compose up -d db pgadmin portainer app
+
+prod-up: ## Start app stack with always pull policy (excludes tunnel)
+	PULL_POLICY=always docker compose up -d db pgadmin portainer app
+
+tunnel-up: ## Start production stack with Cloudflare tunnel
+	PULL_POLICY=always docker compose --profile tunnel up -d
+
+logs: ## Show logs for all services
+	docker compose logs -f
+
+logs-app: ## Show app logs only
+	docker compose logs -f app
+
+status: ## Show service status
+	docker compose ps
+
+down: ## Stop all services
+	docker compose down
+
+clean: ## Stop and remove all containers, volumes, images
+	docker compose down --volumes --rmi all --remove-orphans
+
+# =============================================================================
+# DEVELOPMENT
+# =============================================================================
+
+dev: ## Start local development server
 	pnpm dev
 
-build: ## Build production application
+build: ## Build application for production
 	pnpm build
 
-lint: ## Run linter
+install: ## Install dependencies
+	pnpm install
+
+# =============================================================================
+# QUALITY & TESTING
+# =============================================================================
+
+lint: ## Run ESLint
 	pnpm lint
 
-format: ## Format code
+format: ## Format code with Prettier
 	pnpm format
 
-# Docker core services
-docker-up: ## Start database, pgAdmin, and Portainer only
-	$(COMPOSE) up -d
+test-unit: ## Run unit tests
+	pnpm test:run
 
-docker-down: ## Stop all services
-	$(COMPOSE) down
+test-db: ## Run database tests
+	pnpm test:db:setup && pnpm test:db
 
-docker-build: ## Build Docker image
-	docker build -t sakanbeer88/sakumari:latest .
+test-e2e: ## Run E2E tests (full workflow)
+	pnpm test:e2e:setup && pnpm test:e2e:build && pnpm test:e2e
+
+test-all: lint format test-unit test-db test-e2e ## Run all tests and quality checks
 
 # =============================================================================
-# BACKWARD COMPATIBILITY
+# PHONY DECLARATIONS
 # =============================================================================
 
-pre-ci: test-all ## Run pre-commit checks (full test suite)
-setup-db: db-setup ## Setup database (alias)
-
-.PHONY: test-unit test-e2e-full test-all db-setup 
-.PHONY: docker-dev docker-prod docker-dev-tunnel docker-prod-tunnel docker-db-setup docker-clean
-.PHONY: dev build lint format docker-up docker-down docker-build
-.PHONY: pre-ci setup-db
+.PHONY: postgres db-admin db-tools db-setup db-setup-docker db-reset dev-up prod-up tunnel-up \
+        logs logs-app status down clean dev build install lint format \
+        test-unit test-db test-e2e test-all
