@@ -200,25 +200,8 @@ make test-all           # Run all tests and quality checks
 # 1. Start PostgreSQL (use existing Docker container)
 make postgres
 
-# 2. Create test environment
-cp .env.example .env.test
-```
-
-Edit `.env.test` to mirror your `.env` file exactly for these variables:
-```bash
-# PostgreSQL Database Configuration
-POSTGRES_DB=kana_flashcard
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-
-# Prisma Database URLs
-POSTGRES_PRISMA_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-POSTGRES_URL_NON_POOLING=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-
-# Node Environment
-NODE_ENV=test
+# 2. Ensure your .env file is properly configured for local development
+# E2E tests will automatically use NODE_ENV=test
 ```
 
 **Run E2E Tests:**
@@ -232,4 +215,8 @@ pnpm test:e2e:build     # Build for testing
 pnpm test:e2e           # Run tests
 ```
 
-**Authentication:** Uses test credentials (`test@sakumari.local` / `test123`) automatically when `NODE_ENV=test`.
+**Authentication:** 
+- E2E tests automatically set `NODE_ENV=test` in Playwright configuration
+- When `NODE_ENV=test`, the app uses test credentials provider instead of Google OAuth
+- Test credentials: `test@sakumari.local` with password `test123`
+- No additional environment file needed - uses your existing `.env` with `NODE_ENV=test` override

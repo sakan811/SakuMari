@@ -52,10 +52,8 @@ const getProviders = () => {
   const { NODE_ENV } = process.env;
 
   if (NODE_ENV === "test") return [testCredentialsProvider];
-  if (NODE_ENV === "production" || NODE_ENV === "development")
-    return [googleProvider];
-
-  // Fallback to Google provider for any other environment
+  
+  // Default to Google provider for all other environments
   return [googleProvider];
 };
 
