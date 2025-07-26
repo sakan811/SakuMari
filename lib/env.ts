@@ -15,43 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { existsSync } from 'fs';
-
-function isRunningInDocker(): boolean {
-  return existsSync('/.dockerenv') || 
-         process.env.DOCKER_CONTAINER === 'true' ||
-         process.env.KUBERNETES_SERVICE_HOST !== undefined;
-}
-
-export function getDatabaseHost(): string {
-  const autoDetect = process.env.AUTO_DETECT_DB_HOST === 'true';
-  const fallbackHost = process.env.POSTGRES_HOST || 'localhost';
-  
-  if (!autoDetect) {
-    return fallbackHost;
-  }
-  
-  return isRunningInDocker() ? 'db' : 'localhost';
-}
-
-export function buildDatabaseUrl(options: {
-  user: string;
-  password: string;
-  host?: string;
-  port: string;
-  database: string;
-}): string {
-  const host = options.host || getDatabaseHost();
-  return `postgresql://${options.user}:${options.password}@${host}:${options.port}/${options.database}`;
-}
-
 export function getDatabaseUrls() {
   const user = process.env.POSTGRES_USER || 'postgres';
   const password = process.env.POSTGRES_PASSWORD || 'postgres';
+  const host = process.env.POSTGRES_HOST || 'localhost';
   const port = process.env.POSTGRES_PORT || '5432';
   const database = process.env.POSTGRES_DB || 'kana_flashcard';
   
-  const url = buildDatabaseUrl({ user, password, port, database });
+  const url = `postgresql://${user}:${password}@${host}:${port}/${database}`;
   
   return {
     POSTGRES_PRISMA_URL: url,
