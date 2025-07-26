@@ -46,14 +46,7 @@ jobs:
         run: pnpm build
 
       - name: Setup environment
-        run: |
-          cat > .env << EOF
-          POSTGRES_PRISMA_URL=postgresql://postgres:postgres@localhost:5432/postgres
-          POSTGRES_URL_NON_POOLING=postgresql://postgres:postgres@localhost:5432/postgres
-          AUTH_URL=http://localhost:3000
-          AUTH_SECRET=test-secret-for-ci
-          NODE_ENV=test
-          EOF
+        run: cp .env.example .env
 
       - name: Setup database
         env:
