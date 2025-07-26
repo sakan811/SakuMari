@@ -28,7 +28,7 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 ## Prerequisites
 
-- Node.js v20+
+- Node.js v23+
 - pnpm ([installation guide](https://pnpm.io/installation))
 - Docker & Docker Compose (recommended) OR PostgreSQL 17+
 
@@ -76,6 +76,12 @@ AUTH_URL=http://localhost:3000
 AUTH_SECRET=your_generated_secret  # Generate at https://auth-secret-gen.vercel.app/
 AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
+
+# Docker (required for containerized deployment)
+CONTAINER_NAME_PREFIX=sakumari
+DOCKER_IMAGE_NAME=your_registry/sakumari
+DOCKER_IMAGE_TAG=latest
+PULL_POLICY=build  # Use 'always' for production
 
 NODE_ENV=development
 ```
