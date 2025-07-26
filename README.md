@@ -212,7 +212,7 @@ make test-all           # Run all tests and quality checks
 # 1. Start PostgreSQL (use existing Docker container)
 make postgres
 
-# 2. Ensure your .env file is properly configured for local development
+# 2. Ensure POSTGRES_HOST=localhost in your .env file for local development
 # E2E tests will automatically use NODE_ENV=test
 ```
 
@@ -230,7 +230,8 @@ pnpm test:e2e           # Run tests
 
 **Authentication:**
 
-- E2E tests automatically set `NODE_ENV=test` in Playwright configuration
-- When `NODE_ENV=test`, the app uses test credentials provider instead of Google OAuth
+- E2E tests automatically set `NODE_ENV=test` in Playwright configuration **before server startup**
+- **Important:** `NODE_ENV=test` must be set before the Next.js server starts to trigger authentication provider switching in `lib/auth.ts`
+- When `NODE_ENV=test`, the app automatically switches from Google OAuth to test credentials provider
 - Test credentials: `test@sakumari.local` with password `test123`
-- No additional environment file needed - uses your existing `.env` with `NODE_ENV=test` override
+- No additional environment file needed - uses your existing `.env` with `NODE_ENV=test` override applied at runtime
