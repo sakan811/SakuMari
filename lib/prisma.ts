@@ -16,12 +16,20 @@
  */
 
 import { PrismaClient } from "@prisma/client";
+import { getDatabaseUrls } from "./env";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+const { POSTGRES_PRISMA_URL } = getDatabaseUrls();
 
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
+    datasources: {
+      db: {
+        url: POSTGRES_PRISMA_URL,
+      },
+    },
     log:
       process.env.NODE_ENV === "development"
         ? ["query", "error", "warn"]
