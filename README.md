@@ -67,6 +67,7 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
 POSTGRES_HOST=localhost  # Use 'db' for Docker deployment
 POSTGRES_PORT=5432
+# Optional - auto-generated from above if not provided:
 POSTGRES_PRISMA_URL=postgresql://postgres:your_password@localhost:5432/sakumari
 POSTGRES_URL_NON_POOLING=postgresql://postgres:your_password@localhost:5432/sakumari
 
@@ -78,6 +79,8 @@ AUTH_GOOGLE_SECRET=your_google_client_secret
 
 NODE_ENV=development
 ```
+
+**Database Connection:** The application now uses simplified environment configuration. The Prisma URLs are automatically generated from the basic database variables if not explicitly provided. Set `POSTGRES_HOST=localhost` for local development or `POSTGRES_HOST=db` when using Docker containers.
 
 ### 2. Google OAuth Setup
 
