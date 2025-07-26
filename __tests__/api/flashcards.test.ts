@@ -49,7 +49,7 @@ describe("Flashcards API", () => {
     test("handles database connection errors", async () => {
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
       mockPrisma.kana.findMany.mockRejectedValue(
-        new Error("Database connection failed")
+        new Error("Database connection failed"),
       );
 
       const response = await GET();
@@ -93,7 +93,7 @@ describe("Flashcards API", () => {
     test("handles database connection errors", async () => {
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
       mockPrisma.kanaProgress.upsert.mockRejectedValue(
-        new Error("Database connection failed")
+        new Error("Database connection failed"),
       );
 
       const request = new NextRequest(

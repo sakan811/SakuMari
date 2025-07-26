@@ -49,11 +49,13 @@ export default defineConfig({
         ...devices["Desktop Firefox"],
         storageState: "playwright/.auth/user.json",
         launchOptions: {
-          ...(process.env.CI ? {} : {
-            env: {
-              HOME: "/root",
-            },
-          }),
+          ...(process.env.CI
+            ? {}
+            : {
+                env: {
+                  HOME: "/root",
+                },
+              }),
         },
       },
       dependencies: ["setup"],

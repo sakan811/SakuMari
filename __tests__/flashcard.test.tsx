@@ -243,7 +243,7 @@ describe("Flashcard Component", () => {
       const submitButton = screen.getByRole("button", { name: "Submit" });
 
       fireEvent.change(input, { target: { value: "a" } });
-      
+
       // First click should work
       fireEvent.click(submitButton);
       expect(submitAnswer).toHaveBeenCalledTimes(1);
@@ -269,7 +269,7 @@ describe("Flashcard Component", () => {
 
       const input = screen.getByPlaceholderText("Type romaji equivalent...");
       fireEvent.change(input, { target: { value: "a" } });
-      
+
       // First Enter should work
       fireEvent.keyPress(input, { key: "Enter", code: "Enter", charCode: 13 });
       expect(submitAnswer).toHaveBeenCalledTimes(1);
@@ -355,7 +355,7 @@ describe("Flashcard Component", () => {
       const { unmount } = render(<Flashcard />);
 
       const input = screen.getByPlaceholderText("Type romaji equivalent...");
-      
+
       // Enter empty text and trigger an error
       fireEvent.change(input, { target: { value: "" } });
       fireEvent.click(screen.getByRole("button", { name: "Submit" }));

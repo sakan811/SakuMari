@@ -35,7 +35,7 @@ describe("Middleware", () => {
       }
       return NextResponse.next();
     });
-    
+
     // Make auth return our mock middleware
     vi.mocked(auth).mockReturnValue(mockAuthMiddleware);
   });
@@ -54,7 +54,7 @@ describe("Middleware", () => {
       mockAuthMiddleware(mockRequest);
 
       expect(mockRedirect).toHaveBeenCalledWith(
-        new URL("/", "http://localhost:3000/hiragana")
+        new URL("/", "http://localhost:3000/hiragana"),
       );
     });
 
@@ -71,7 +71,7 @@ describe("Middleware", () => {
       mockAuthMiddleware(mockRequest);
 
       expect(mockRedirect).toHaveBeenCalledWith(
-        new URL("/", "http://localhost:3000/katakana")
+        new URL("/", "http://localhost:3000/katakana"),
       );
     });
 
@@ -88,7 +88,7 @@ describe("Middleware", () => {
       mockAuthMiddleware(mockRequest);
 
       expect(mockRedirect).toHaveBeenCalledWith(
-        new URL("/", "http://localhost:3000/dashboard")
+        new URL("/", "http://localhost:3000/dashboard"),
       );
     });
 
@@ -105,7 +105,7 @@ describe("Middleware", () => {
       mockAuthMiddleware(mockRequest);
 
       expect(mockRedirect).toHaveBeenCalledWith(
-        new URL("/", "http://localhost:3000/api/flashcards")
+        new URL("/", "http://localhost:3000/api/flashcards"),
       );
     });
 
@@ -122,7 +122,7 @@ describe("Middleware", () => {
       mockAuthMiddleware(mockRequest);
 
       expect(mockRedirect).toHaveBeenCalledWith(
-        new URL("/", "http://localhost:3000/api/stats")
+        new URL("/", "http://localhost:3000/api/stats"),
       );
     });
   });
