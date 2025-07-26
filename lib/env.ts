@@ -16,14 +16,14 @@
  */
 
 export function getDatabaseUrls() {
-  const user = process.env.POSTGRES_USER || 'postgres';
-  const password = process.env.POSTGRES_PASSWORD || 'postgres';
-  const host = process.env.POSTGRES_HOST || 'localhost';
-  const port = process.env.POSTGRES_PORT || '5432';
-  const database = process.env.POSTGRES_DB || 'kana_flashcard';
-  
+  const user = process.env.POSTGRES_USER || "postgres";
+  const password = process.env.POSTGRES_PASSWORD || "postgres";
+  const host = process.env.POSTGRES_HOST || "localhost";
+  const port = process.env.POSTGRES_PORT || "5432";
+  const database = process.env.POSTGRES_DB || "kana_flashcard";
+
   const url = `postgresql://${user}:${password}@${host}:${port}/${database}`;
-  
+
   return {
     POSTGRES_PRISMA_URL: url,
     POSTGRES_URL_NON_POOLING: url,

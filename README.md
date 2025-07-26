@@ -128,6 +128,7 @@ pnpm dev
 #### Option C: Full Docker Deployment
 
 **Development (build from source):**
+
 ```bash
 # Set POSTGRES_HOST=db in .env
 make dev-up
@@ -135,6 +136,7 @@ make db-setup-docker
 ```
 
 **Production (use registry image):**
+
 ```bash
 # Set POSTGRES_HOST=db in .env
 make prod-up
@@ -205,6 +207,7 @@ make test-all           # Run all tests and quality checks
 ### E2E Test Setup (Local)
 
 **One-Time Environment Setup:**
+
 ```bash
 # 1. Start PostgreSQL (use existing Docker container)
 make postgres
@@ -214,6 +217,7 @@ make postgres
 ```
 
 **Run E2E Tests:**
+
 ```bash
 # Complete E2E workflow (setup + build + test)
 make test-e2e
@@ -224,7 +228,8 @@ pnpm test:e2e:build     # Build for testing
 pnpm test:e2e           # Run tests
 ```
 
-**Authentication:** 
+**Authentication:**
+
 - E2E tests automatically set `NODE_ENV=test` in Playwright configuration
 - When `NODE_ENV=test`, the app uses test credentials provider instead of Google OAuth
 - Test credentials: `test@sakumari.local` with password `test123`
