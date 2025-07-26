@@ -1,5 +1,5 @@
 {
-  "name": "kana-flashcard-app",
+  "name": "sakumari",
   "version": "1.0.0",
   "description": "A **Japanese Kana Flashcard** Web App for **practicing** Japanese Kana, specifically Hiragana and Katakana.",
   "main": "index.js",
