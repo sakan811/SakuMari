@@ -43,22 +43,32 @@ WORKDIR /app
 RUN apk add --no-cache \
     libc6-compat \
     openssl \
-    ca-certificates \
-    && npm install -g pnpm@9.1.0
+    ca-certificates
+
+# Install pnpm for package management
+RUN npm install -g pnpm@9.1.0
 
 # Create non-root user for security (Alpine syntax)
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nextjs -u 1001
 
-# Copy production dependencies and application files
+# Copy production dependencies from deps stage
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-COPY --from=builder --chown=nextjs:nodejs /app/next.config.js ./next.config.js
+COPY --from=deps --chown=nextjs:nodejs /app/package.json ./package.json
 
-# Copy generated Prisma client from builder stage (pnpm structure)
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.pnpm ./node_modules/.pnpm
+# Install Prisma CLI in production
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm add --prod --save-exact prisma@latest
+
+# Copy standalone build output
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+
+# Copy generated Prisma client from builder stage
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+
 
 # Switch to non-root user for security
 USER nextjs
@@ -71,5 +81,5 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 
-# Start the application using Next.js production server
-CMD ["pnpm", "start"]
+# Start the application using standalone server
+CMD ["node", "server.js"]
