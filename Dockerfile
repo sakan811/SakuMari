@@ -52,22 +52,21 @@ RUN npm install -g pnpm@9.1.0
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nextjs -u 1001
 
-# Copy production dependencies from deps stage
+# Copy production dependencies and package.json
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=deps --chown=nextjs:nodejs /app/package.json ./package.json
 
-# Install Prisma CLI in production
+# Copy prisma directory first
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+
+# Install Prisma CLI and generate client
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm add --prod --save-exact prisma@latest
+    pnpm add --save-exact prisma@latest && \
+    pnpm exec prisma generate
 
 # Copy standalone build output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-
-# Copy generated Prisma client from builder stage
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
 
 # Switch to non-root user for security
