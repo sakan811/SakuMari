@@ -33,6 +33,9 @@ __tests__/db/generated/
 __tests__/db/migrations/
 /__tests__/db/test.db-journal
 
+# Prisma generated client
+/generated/
+
 # Playwright
 node_modules/
 /test-results/

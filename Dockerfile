@@ -1,5 +1,5 @@
-# Base stage with pnpm setup
-FROM node:23-alpine AS base
+# Build stage
+FROM node:23-alpine AS build
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -10,34 +10,28 @@ RUN apk add --no-cache \
     openssl \
     ca-certificates
 
-# Production dependencies stage
-FROM base AS prod-deps
 WORKDIR /usr/src/app
+
+# Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Install only production dependencies + prisma CLI (needed for DB operations)
+# Install all dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile --prod && \
-    pnpm add prisma@6.12.0
+    pnpm install --frozen-lockfile
 
-# Build stage with all dependencies
-FROM base AS build
-COPY . /usr/src/app
-WORKDIR /usr/src/app
+# Copy source code
+COPY . .
 
-# Install all dependencies (needed for build process)
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-
-# Generate Prisma client with alternative mirror
+# Generate Prisma client with custom output path
 ENV PRISMA_ENGINES_MIRROR=https://registry.npmmirror.com/-/binary/prisma
 ENV PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
 RUN pnpm exec prisma generate
 
-# Build application with Next.js cache mount
+# Build application
 RUN --mount=type=cache,id=nextjs,target=/.next/cache \
     pnpm build
 
-# Production stage - Use Alpine for minimal size
+# Production stage
 FROM node:23-alpine AS runner
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -53,19 +47,22 @@ RUN apk add --no-cache \
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nextjs -u 1001
 
-# Set working directory
-WORKDIR /prod/app
+WORKDIR /usr/src/app
 
-# Copy package files and production-only node_modules
-COPY --from=prod-deps --chown=nextjs:nodejs /usr/src/app/package.json ./package.json
-COPY --from=prod-deps --chown=nextjs:nodejs /usr/src/app/node_modules ./node_modules
+# Copy package files
+COPY --from=build --chown=nextjs:nodejs /usr/src/app/package.json ./package.json
+COPY --from=build --chown=nextjs:nodejs /usr/src/app/pnpm-lock.yaml ./pnpm-lock.yaml
 
-# Ensure node_modules/.bin is in PATH for npx commands
-ENV PATH="/prod/app/node_modules/.bin:$PATH"
+# Install only production dependencies
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile --prod
 
-# Copy built application and Prisma files
-COPY --from=build --chown=nextjs:nodejs /usr/src/app/.next ./.next
+# Copy Prisma schema and generated client
 COPY --from=build --chown=nextjs:nodejs /usr/src/app/prisma ./prisma
+COPY --from=build --chown=nextjs:nodejs /usr/src/app/generated ./generated
+
+# Copy built application
+COPY --from=build --chown=nextjs:nodejs /usr/src/app/.next ./.next
 
 # Switch to non-root user for security
 USER nextjs
