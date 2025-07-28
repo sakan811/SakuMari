@@ -23,11 +23,8 @@ db-admin: ## Start PostgreSQL with pgAdmin
 db-tools: ## Start PostgreSQL with pgAdmin and Portainer
 	docker compose up -d db pgadmin portainer
 
-db-setup: ## Setup database (generate + migrate + seed)
-	pnpm prisma:generate && pnpm prisma:migrate && pnpm db:seed
-
-db-setup-docker: ## Setup database inside Docker container (for full stack deployment)
-	docker compose exec app sh -c "pnpm prisma:generate && pnpm prisma:migrate && pnpm db:seed"
+db-setup: ## Setup database using automated script (recommended)
+	./scripts/setup-database.sh
 
 db-reset: ## Reset database with fresh data
 	pnpm prisma:reset --force && pnpm db:seed
@@ -98,6 +95,6 @@ test-all: lint format test-unit test-db test-e2e ## Run all tests and quality ch
 # PHONY DECLARATIONS
 # =============================================================================
 
-.PHONY: postgres db-admin db-tools db-setup db-setup-docker db-reset dev-up prod-up tunnel-up \
+.PHONY: postgres db-admin db-tools db-setup db-reset dev-up prod-up tunnel-up \
         logs logs-app status down clean dev build install lint format \
         test-unit test-db test-e2e test-all

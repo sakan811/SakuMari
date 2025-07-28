@@ -43,7 +43,7 @@ cp .env.example .env
 # Edit .env with your Google OAuth credentials
 
 make postgres
-pnpm install && make db-setup && pnpm dev
+pnpm install && ./scripts/setup-database.sh && pnpm dev
 ```
 
 Visit <http://localhost:3000>
@@ -108,7 +108,7 @@ make postgres  # Or make db-admin for pgAdmin, make db-tools for all tools
 
 # Install and setup
 pnpm install
-make db-setup  # Generate + migrate + seed
+./scripts/setup-database.sh  # Automated database setup (recommended)
 
 # Start development
 pnpm dev
@@ -119,30 +119,40 @@ pnpm dev
 ```bash
 # Ensure PostgreSQL is running locally
 pnpm install
+./scripts/setup-database.sh  # Automated setup (recommended)
+
+# OR manual setup:
 pnpm prisma:generate
 pnpm prisma:migrate
 pnpm db:seed
+
 pnpm dev
 ```
 
 #### Option C: Full Docker Deployment
 
+**Important:** Database setup must be done manually outside of containers.
+
 **Development (build from source):**
 
 ```bash
-# Set POSTGRES_HOST=db in .env
+# Set POSTGRES_HOST=db in .env for container, then start services
 make dev-up
-make db-setup-docker
+
+# Setup database from local machine (required)
+./scripts/setup-database.sh
 ```
 
 **Production (use registry image):**
 
 ```bash
-# Set POSTGRES_HOST=db in .env
+# Set POSTGRES_HOST=db in .env for container, then start services
 make prod-up
 # Or with Cloudflare tunnel:
 make tunnel-up
-make db-setup-docker
+
+# Setup database from local machine (required)
+./scripts/setup-database.sh
 ```
 
 ## Development Commands
@@ -162,9 +172,11 @@ make test-all           # Lint + format + all tests
 make postgres           # Start PostgreSQL database only
 make db-admin           # Start PostgreSQL with pgAdmin
 make db-tools           # Start PostgreSQL with pgAdmin and Portainer
-make db-setup           # Generate + migrate + seed (local)
-make db-setup-docker    # Generate + migrate + seed (inside Docker container)
-make db-reset           # Reset database with fresh data
+./scripts/setup-database.sh  # Automated database setup (recommended)
+# OR manual setup:
+pnpm prisma:generate    # Generate Prisma client
+pnpm prisma:migrate     # Run database migrations
+pnpm db:seed           # Seed database with Kana data
 
 # Docker Application Deployments
 make dev-up             # Start app stack with build policy (excludes tunnel)
