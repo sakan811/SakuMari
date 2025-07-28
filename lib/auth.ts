@@ -58,7 +58,7 @@ const getProviders = () => {
 };
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma as any),
   providers: getProviders(),
   session: {
     strategy: "jwt",
