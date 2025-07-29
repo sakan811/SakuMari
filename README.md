@@ -46,6 +46,8 @@ make postgres
 pnpm install && ./scripts/setup-database.sh && pnpm dev
 ```
 
+The `./scripts/setup-database.sh` script automatically handles Prisma generation, migration, and seeding - no manual database setup required.
+
 Visit <http://localhost:3000>
 
 ## Installation & Setup
@@ -81,12 +83,12 @@ AUTH_GOOGLE_SECRET=your_google_client_secret
 CONTAINER_NAME_PREFIX=sakumari
 DOCKER_IMAGE_NAME=your_registry/sakumari
 DOCKER_IMAGE_TAG=latest
-PULL_POLICY=build  # Use 'always' for production
+PULL_POLICY=build  # Use 'build' for development or 'always' for production
 
 NODE_ENV=development
 ```
 
-**Database Connection:** The application now uses simplified environment configuration. The Prisma URLs are automatically generated from the basic database variables if not explicitly provided. Set `POSTGRES_HOST=localhost` for local development or `POSTGRES_HOST=db` when using Docker containers.
+**Database Connection:** The application now uses simplified environment configuration. The POSTGRES_PRISMA_URL and POSTGRES_URL_NON_POOLING are automatically generated from basic database variables if not explicitly provided. Set `POSTGRES_HOST=localhost` for local development or `POSTGRES_HOST=db` when using Docker containers.
 
 ### 2. Google OAuth Setup
 
@@ -244,6 +246,6 @@ pnpm test:e2e           # Run tests
 
 - E2E tests automatically set `NODE_ENV=test` in Playwright configuration **before server startup**
 - **Important:** `NODE_ENV=test` must be set before the Next.js server starts to trigger authentication provider switching in `lib/auth.ts`
-- When `NODE_ENV=test`, the app automatically switches from Google OAuth to test credentials provider
+- The test credentials provider automatically switches when NODE_ENV=test, replacing Google OAuth with test credentials
 - Test credentials: `test@sakumari.local` with password `test123`
 - No additional environment file needed - uses your existing `.env` with `NODE_ENV=test` override applied at runtime
