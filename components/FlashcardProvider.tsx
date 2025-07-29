@@ -161,24 +161,29 @@ export function FlashcardProvider({
   const selectRandomKana = (data: KanaWithAccuracy[]) => {
     if (!data.length) return;
 
-    // Calculate weights (inverse of accuracy)
-    const totalWeight = data.reduce(
-      (sum, kana) => sum + (1 - kana.accuracy),
-      0,
-    );
+    // Calculate weights (inverse of accuracy) with minimum weight to prevent zero weights
+    const weights = data.map((kana) => Math.max(1 - kana.accuracy, 0.01));
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+    
     let randomVal = Math.random() * totalWeight;
+    let selectedKana = null;
 
     // Select kana based on weighted probability
-    for (const kana of data) {
-      const weight = 1 - kana.accuracy;
-      randomVal -= weight;
-
+    for (let i = 0; i < data.length; i++) {
+      randomVal -= weights[i];
       if (randomVal <= 0) {
-        setCurrentKana(kana);
-        generateChoices(kana, data);
+        selectedKana = data[i];
         break;
       }
     }
+
+    // Fallback: if no kana was selected (shouldn't happen), select the last one
+    if (!selectedKana) {
+      selectedKana = data[data.length - 1];
+    }
+
+    setCurrentKana(selectedKana);
+    generateChoices(selectedKana, data);
   };
 
   // Submit answer and update accuracy
