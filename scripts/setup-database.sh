@@ -5,6 +5,9 @@
 
 set -e
 
+# Ensure script has execute permissions
+chmod +x "$0" 2>/dev/null || true
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
