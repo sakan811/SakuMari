@@ -49,6 +49,9 @@ WORKDIR /usr/src/app
 # Copy standalone application
 COPY --from=build --chown=nextjs:nodejs /usr/src/app/.next/standalone ./
 
+# Copy static assets (required for Next.js standalone mode)
+COPY --from=build --chown=nextjs:nodejs /usr/src/app/.next/static ./.next/static
+
 # Copy Prisma schema and generated client for database operations
 COPY --from=build --chown=nextjs:nodejs /usr/src/app/prisma ./prisma
 COPY --from=build --chown=nextjs:nodejs /usr/src/app/generated ./generated
