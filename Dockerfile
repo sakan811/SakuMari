@@ -33,9 +33,6 @@ RUN --mount=type=cache,id=nextjs,target=/.next/cache \
 
 # Production stage
 FROM node:23-alpine AS runner
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
 
 # Install runtime dependencies (Alpine packages)
 RUN apk add --no-cache \
@@ -49,20 +46,12 @@ RUN addgroup -g 1001 -S nodejs && \
 
 WORKDIR /usr/src/app
 
-# Copy package files
-COPY --from=build --chown=nextjs:nodejs /usr/src/app/package.json ./package.json
-COPY --from=build --chown=nextjs:nodejs /usr/src/app/pnpm-lock.yaml ./pnpm-lock.yaml
+# Copy standalone application
+COPY --from=build --chown=nextjs:nodejs /usr/src/app/.next/standalone ./
 
-# Install only production dependencies
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile --prod
-
-# Copy Prisma schema and generated client
+# Copy Prisma schema and generated client for database operations
 COPY --from=build --chown=nextjs:nodejs /usr/src/app/prisma ./prisma
 COPY --from=build --chown=nextjs:nodejs /usr/src/app/generated ./generated
-
-# Copy built application
-COPY --from=build --chown=nextjs:nodejs /usr/src/app/.next ./.next
 
 # Switch to non-root user for security
 USER nextjs
@@ -74,6 +63,7 @@ EXPOSE 3000
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
-# Start the application using pnpm start
-CMD ["pnpm", "start"]
+# Start the application using the standalone server
+CMD ["node", "server.js"]
