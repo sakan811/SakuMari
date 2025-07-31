@@ -19,11 +19,11 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 ## Technology Stack
 
-- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS v4
+- **Frontend**: Next.js 15 (standalone output), React 19, TypeScript, Tailwind CSS v4
 - **Backend**: Node.js 23, Prisma ORM v6, NextAuth.js v5
 - **Database**: PostgreSQL 17
 - **Testing**: Vitest, React Testing Library, Playwright
-- **Deployment**: Docker, Docker Compose
+- **Deployment**: Docker, Docker Compose (optimized with Next.js standalone)
 - **Package Manager**: pnpm
 
 ## Prerequisites
@@ -89,6 +89,8 @@ NODE_ENV=development
 ```
 
 **Database Connection:** The application now uses simplified environment configuration. The POSTGRES_PRISMA_URL and POSTGRES_URL_NON_POOLING are automatically generated from basic database variables if not explicitly provided. Set `POSTGRES_HOST=localhost` for local development or `POSTGRES_HOST=db` when using Docker containers.
+
+**Build Optimization:** The application uses Next.js standalone output mode for optimized Docker deployments. This creates a self-contained `.next/standalone` directory with minimal dependencies, reducing container size and improving startup performance.
 
 ### 2. Google OAuth Setup
 
@@ -162,7 +164,7 @@ make tunnel-up
 ```bash
 # Development
 make dev                # Start dev server
-make build              # Build for production
+make build              # Build for production (includes standalone output optimization)
 make install            # Install dependencies
 
 # Code Quality
