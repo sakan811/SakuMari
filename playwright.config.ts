@@ -73,7 +73,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: "NODE_ENV=test PORT=3000 HOSTNAME=0.0.0.0 node .next/standalone/server.js",
+    command: "next start",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     env: {
