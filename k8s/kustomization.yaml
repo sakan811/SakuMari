@@ -7,7 +7,6 @@ namespace: sakumari
 # Resources to deploy
 resources:
   - namespace.yaml
-  - configmap.yaml
   - postgres.yaml
   - pgadmin.yaml
   - portainer.yaml
@@ -15,21 +14,21 @@ resources:
   - ingress.yaml
   - cloudflare-tunnel.yaml
 
-# Generate secrets from .env file
 secretGenerator:
   - name: sakumari-secrets
     envs:
-      - ../.env
+      - ./.env
     options:
       labels:
         app: sakumari
         environment: production
 
-# Common labels applied to all resources
-commonLabels:
-  app.kubernetes.io/name: sakumari
-  app.kubernetes.io/version: "1.0"
-  app.kubernetes.io/managed-by: kustomize
+# Labels applied to all resources
+labels:
+  - pairs:
+      app.kubernetes.io/name: sakumari
+      app.kubernetes.io/version: "1.0"
+      app.kubernetes.io/managed-by: kustomize
 
 # Images to use (can be overridden per environment)
 images:

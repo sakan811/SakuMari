@@ -32,11 +32,7 @@ spec:
         app: pgadmin
         environment: production
     spec:
-      securityContext:
-        runAsUser: 5050
-        runAsGroup: 5050
-        fsGroup: 5050
-        runAsNonRoot: true
+      # securityContext removed for compatibility
       containers:
       - name: pgadmin
         image: dpage/pgadmin4:latest
@@ -45,8 +41,8 @@ spec:
         env:
         - name: PGADMIN_DEFAULT_EMAIL
           valueFrom:
-            configMapKeyRef:
-              name: sakumari-config
+            secretKeyRef:
+              name: sakumari-secrets
               key: PGADMIN_DEFAULT_EMAIL
         - name: PGADMIN_DEFAULT_PASSWORD
           valueFrom:
@@ -56,7 +52,7 @@ spec:
         - name: PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION
           value: "True"
         - name: PGADMIN_CONFIG_LOGIN_BANNER
-          value: "SakuMari Database Administration"
+          value: "'SakuMari Database Administration'"
         volumeMounts:
         - name: pgadmin-storage
           mountPath: /var/lib/pgadmin
@@ -67,11 +63,7 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "500m"
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
+        # securityContext removed for compatibility
       volumes:
       - name: pgadmin-storage
         persistentVolumeClaim:
