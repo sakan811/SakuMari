@@ -1,9 +1,11 @@
 name: sakumari
-# Core services (always running)
+# Local development services only
+# Production deployment uses Kubernetes (see k8s/ directory)
 services:
+  # PostgreSQL database for local development
   db:
     image: postgres:17-alpine
-    container_name: ${CONTAINER_NAME_PREFIX}-db
+    container_name: ${CONTAINER_NAME_PREFIX:-sakumari}-db
     ports:
       - "5432:5432"
     env_file: ./.env
@@ -18,9 +20,10 @@ services:
     networks:
       - sakumari
 
+  # pgAdmin for database management
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: ${CONTAINER_NAME_PREFIX}-pgadmin
+    container_name: ${CONTAINER_NAME_PREFIX:-sakumari}-pgadmin
     ports:
       - "8080:80"
     env_file: ./.env
@@ -33,26 +36,12 @@ services:
     networks:
       - sakumari
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: ${CONTAINER_NAME_PREFIX}-portainer
-    ports:
-      - "9000:9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    restart: always
-    networks:
-      - sakumari
-
-  # App service with dynamic pull policy
+  # SakuMari application (local development build)
   app:
-    image: ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-    pull_policy: ${PULL_POLICY:-always}
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ${CONTAINER_NAME_PREFIX}-app
+    container_name: ${CONTAINER_NAME_PREFIX:-sakumari}-app
     ports:
       - "3000:3000"
     env_file: ./.env
@@ -64,28 +53,9 @@ services:
     networks:
       - sakumari
 
-  # Cloudflare tunnel (tunnel profile only)
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: ${CONTAINER_NAME_PREFIX}-cloudflared
-    command:
-      [
-        "tunnel",
-        "--no-autoupdate",
-        "run",
-        "--token",
-        "${CLOUDFLARE_TUNNEL_TOKEN}",
-      ]
-    restart: always
-    networks:
-      - sakumari
-    profiles:
-      - tunnel
-
 volumes:
   postgres_data:
   pgadmin_data:
-  portainer_data:
 
 networks:
   sakumari:

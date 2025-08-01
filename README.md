@@ -23,7 +23,7 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 - **Backend**: Node.js 23, Prisma ORM v6, NextAuth.js v5
 - **Database**: PostgreSQL 17
 - **Testing**: Vitest, React Testing Library, Playwright
-- **Deployment**: Docker, Docker Compose (optimized with Next.js standalone)
+- **Deployment**: Docker, Docker Compose, Kubernetes (Kustomize)
 - **Package Manager**: pnpm
 
 ## Prerequisites
@@ -193,7 +193,43 @@ make logs-app           # Show app logs only
 make status             # Show service status
 make down               # Stop all services
 make clean              # Stop and remove all containers, volumes, images
+
+# Kubernetes Deployments
+make k8s-deploy         # Deploy to Kubernetes using Kustomize
+make k8s-status         # Show Kubernetes deployment status  
+make k8s-logs           # Show application logs in Kubernetes
+make k8s-secrets        # Show generated secrets (with hash suffixes)
+make k8s-port-forward   # Port forward to database for setup
+make k8s-db-setup       # Setup database in Kubernetes
+make k8s-clean          # Delete Kubernetes namespace and all resources
 ```
+
+## Kubernetes Deployment
+
+For production-ready Kubernetes deployments with enterprise features:
+
+**✨ Features:**
+- **Kustomize-based**: Secure secret management from `.env` files
+- **No hardcoded secrets**: Safe for public repositories
+- **Single replica deployment**: Starts with 1 replica, auto-scales to max 3 based on CPU/memory
+- **Security hardened**: Non-root containers, dropped capabilities, minimal privileges
+- **Multiple services**: App, PostgreSQL, pgAdmin, Portainer, Cloudflare tunnel
+- **Ingress options**: NGINX ingress OR Cloudflare tunnel for self-hosting
+
+**🚀 Quick Deploy:**
+```bash
+# Setup secrets (one-time)
+cp .env.example .env  # Edit with your actual values
+
+# Deploy to Kubernetes
+kubectl apply -k k8s/
+
+# Setup database (in another terminal or background the port-forward)
+kubectl port-forward -n sakumari svc/postgres-service 5432:5432 &
+pnpm prisma migrate deploy && pnpm db:seed
+```
+
+**📖 Full Documentation:** [k8s/README.md](k8s/README.md)
 
 ## Testing
 
