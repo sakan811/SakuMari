@@ -58,6 +58,31 @@ clean: ## Stop and remove all containers, volumes, images
 	docker compose down --volumes --rmi all --remove-orphans
 
 # =============================================================================
+# KUBERNETES DEPLOYMENTS
+# =============================================================================
+
+k8s-deploy: ## Deploy to Kubernetes using Kustomize
+	cd k8s && kubectl apply -k .
+
+k8s-status: ## Show Kubernetes deployment status
+	kubectl get all -n sakumari
+
+k8s-logs: ## Show application logs in Kubernetes
+	kubectl logs -n sakumari deployment/sakumari-app -f
+
+k8s-secrets: ## Show generated secrets (with hash suffixes)
+	kubectl get secrets -n sakumari
+
+k8s-port-forward: ## Port forward to database for setup
+	kubectl port-forward -n sakumari svc/postgres-service 5432:5432
+
+k8s-db-setup: ## Setup database in Kubernetes (run from project root, k8s-port-forward first)
+	pnpm prisma migrate deploy && pnpm db:seed
+
+k8s-clean: ## Delete Kubernetes namespace and all resources
+	kubectl delete namespace sakumari
+
+# =============================================================================
 # DEVELOPMENT
 # =============================================================================
 
@@ -96,5 +121,6 @@ test-all: lint format test-unit test-db test-e2e ## Run all tests and quality ch
 # =============================================================================
 
 .PHONY: postgres db-admin db-tools db-setup db-reset dev-up prod-up tunnel-up \
-        logs logs-app status down clean dev build install lint format \
+        logs logs-app status down clean k8s-deploy k8s-status k8s-logs k8s-secrets \
+        k8s-port-forward k8s-db-setup k8s-clean dev build install lint format \
         test-unit test-db test-e2e test-all
