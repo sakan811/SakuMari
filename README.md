@@ -218,18 +218,23 @@ For production-ready Kubernetes deployments with enterprise features:
 
 **🚀 Quick Deploy:**
 ```bash
-# Setup secrets (one-time)
-cp .env.example .env  # Edit with your actual values
+# Setup secrets from root .env file
+cp .env k8s/.env  # Edit k8s/.env with your values if needed
 
-# Deploy to Kubernetes
-kubectl apply -k k8s/
+# Deploy to Kubernetes (Kustomize generates secrets from k8s/.env)
+cd k8s && kubectl apply -k .
 
-# Setup database (in another terminal or background the port-forward)
+# Setup database (requires separate terminal for port-forward)
 kubectl port-forward -n sakumari svc/postgres-service 5432:5432 &
-pnpm prisma migrate deploy && pnpm db:seed
+cd .. && pnpm prisma migrate deploy && pnpm db:seed
+
+# Or use Makefile commands
+make k8s-deploy
+make k8s-port-forward &  # In separate terminal
+make k8s-db-setup
 ```
 
-**📖 Full Documentation:** [k8s/README.md](k8s/README.md)
+**📖 Full Documentation:** [k8s/README.md](/k8s/README.md)
 
 ## Testing
 

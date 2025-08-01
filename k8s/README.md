@@ -15,27 +15,29 @@ This directory contains production-ready Kubernetes manifests for the SakuMari K
 
 ## Prerequisites
 
-1. **Kubernetes cluster** with:
-   - NGINX Ingress Controller
-   - cert-manager for SSL certificates
-   - Metrics server for HPA (Horizontal Pod Autoscaler)
-   - Storage classes: `fast-ssd` for database storage
+1. **Kubernetes cluster** (tested with minikube):
+   - NGINX Ingress Controller (optional - Cloudflare tunnel can be used instead)
+   - cert-manager for SSL certificates (if using NGINX ingress)
+   - Default storage class (fast-ssd commented out for minikube compatibility)
 
-2. **Container registry** with the SakuMari application image
+2. **Container registry access** to pull `sakanbeer88/sakumari:latest` image
 
-3. **DNS configuration** pointing to your cluster:
+3. **DNS configuration** (if using ingress):
    - `sakumari.fukudev.org` → Main application
-   - `sakumari-pgadmin.fukudev.org` → Database administration
+   - `sakumari-pgadmin.fukudev.org` → Database administration  
    - `sakumari-portainer.fukudev.org` → Container management
 
 ## Deployment Steps
 
 ### 1. Setup Secrets
 
-**Create secrets from template:**
+**Create local .env file:**
 ```bash
-# Copy the environment template from root directory
-cp ../.env.example ../.env
+# Copy from root directory (if .env already exists)
+cp ../.env ./.env
+
+# OR create from template
+cp ../.env.example ./.env
 
 # Edit .env with your actual secret values
 # DO NOT commit the .env file to version control
@@ -55,35 +57,37 @@ CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token
 
 This project uses **Kustomize** for deployment management. All secrets are generated from your `.env` file.
 
-**Deploy with NGINX Ingress (Traditional):**
+**Standard Deployment:**
 ```bash
-# Deploy all components including ingress
+# Deploy all components (ingress + tunnel included)
 kubectl apply -k .
-```
 
-**Deploy with Cloudflare Tunnel Only (Self-hosting):**
-```bash
-# Deploy without ingress (tunnel handles external access)
-kubectl apply -k . --selector='!app.kubernetes.io/component=ingress'
+# Or use Makefile
+make k8s-deploy
 ```
 
 **Alternative: Deploy specific components:**
 ```bash
-# Deploy core components only
+# Deploy core components only (manual)
 kubectl apply -f namespace.yaml
-kubectl apply -f configmap.yaml
-kubectl apply -k . --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply -f postgres.yaml
+kubectl apply -f app.yaml
+# ... etc
 ```
 
 ### 3. Verify Deployment
 ```bash
 # Check all resources
 kubectl get all -n sakumari
+# Or use Makefile
+make k8s-status
 
 # Check secrets (will have generated hash suffix)
 kubectl get secrets -n sakumari
+# Or use Makefile  
+make k8s-secrets
 
-# Check pod status  
+# Check pod status and wait for ready
 kubectl get pods -n sakumari -w
 ```
 
@@ -94,12 +98,15 @@ After PostgreSQL is running, initialize the database:
 ```bash
 # Port forward to access database (in background or separate terminal)
 kubectl port-forward -n sakumari svc/postgres-service 5432:5432 &
+# Or use Makefile
+make k8s-port-forward &
 
 # Run database migrations from project root directory (where package.json is located)
 # If you're in k8s/ directory, go back to root first
 cd ..
-pnpm prisma migrate deploy
-pnpm db:seed
+pnpm prisma migrate deploy && pnpm db:seed
+# Or use Makefile
+make k8s-db-setup
 ```
 
 ### 5. Monitor Health
@@ -110,50 +117,55 @@ kubectl get pods -n sakumari -w
 
 # View logs
 kubectl logs -n sakumari deployment/sakumari-app -f
+# Or use Makefile
+make k8s-logs
 
-# Check health endpoint
-curl https://sakumari.fukudev.org/api/health
+# Note: Health probes are currently disabled due to Docker image compatibility
+# Health endpoint /api/health exists in source code but not in current Docker image
 ```
 
 ## Security Features
 
-- **Non-root containers**: All services run as non-root users
-- **Read-only root filesystem**: App containers have read-only root filesystems
-- **Security context**: Comprehensive security context with dropped capabilities
-- **Network policies**: Cluster IP services with ingress-only external access
-- **SSL/TLS**: Automatic certificate management with cert-manager
-- **Security headers**: XSS protection, content type, and frame options
-- **Rate limiting**: Built-in request rate limiting
+- **Network isolation**: Cluster IP services with controlled external access
+- **Secret management**: Kustomize-generated secrets from .env files
+- **SSL/TLS**: Automatic certificate management with cert-manager (if using ingress)
+- **Cloudflare protection**: DDoS protection and WAF when using tunnel
+- **No hardcoded secrets**: All sensitive data managed through .env files
+
+**Note**: Advanced security contexts (non-root, read-only filesystem, dropped capabilities) 
+are currently disabled for maximum compatibility across different Kubernetes environments.
+These can be re-enabled in production by uncommenting the securityContext sections.
 
 ## Scaling
 
 The application includes:
-- **Manual scaling**: 3 replicas by default
-- **Auto-scaling**: HPA scales 3-10 pods based on CPU (70%) and memory (80%)
+- **Single replica**: Starts with 1 replica by default
+- **Auto-scaling**: HPA scales 1-3 pods based on CPU and memory usage
 - **Rolling updates**: Zero-downtime deployments with rolling update strategy
 
 Scale manually:
 ```bash
-kubectl scale deployment sakumari-app -n sakumari --replicas=5
+kubectl scale deployment sakumari-app -n sakumari --replicas=3
 ```
 
 ## Storage
 
-- **PostgreSQL**: 20Gi persistent volume with fast SSD storage class
-- **pgAdmin**: 2Gi persistent volume for configuration storage
-- **Application**: Stateless with read-only root filesystem
+- **PostgreSQL**: 20Gi persistent volume with default storage class (fast-ssd commented out for compatibility)
+- **pgAdmin**: 2Gi persistent volume for configuration storage  
+- **Portainer**: 2Gi persistent volume for data storage
+- **Application**: Stateless containers
 
 ## Monitoring
 
 ### Service Access
 
 **pgAdmin (Database Management):**
-- URL: https://sakumari-pgadmin.fukudev.org
-- Email: admin@sakumari.local
-- Password: (from secret.yaml PGADMIN_DEFAULT_PASSWORD)
+- URL: https://sakumari-pgadmin.fukudev.org (if using ingress/tunnel)
+- Email: (from .env PGADMIN_DEFAULT_EMAIL)
+- Password: (from .env PGADMIN_DEFAULT_PASSWORD)
 
 **Portainer (Container Management):**
-- URL: https://sakumari-portainer.fukudev.org
+- URL: https://sakumari-portainer.fukudev.org (if using ingress/tunnel)
 - Username: admin (set on first login)
 - Password: (set on first login)
 

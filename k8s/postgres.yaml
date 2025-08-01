@@ -12,7 +12,7 @@ spec:
   resources:
     requests:
       storage: 20Gi  # Increased for production
-  storageClassName: fast-ssd  # Use fast storage class for production
+  # storageClassName: fast-ssd  # Use default storage class for minikube
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -35,10 +35,7 @@ spec:
         app: postgres
         environment: production
     spec:
-      securityContext:
-        runAsUser: 999
-        runAsGroup: 999
-        fsGroup: 999
+      # securityContext removed for compatibility
       containers:
       - name: postgres
         image: postgres:17-alpine
@@ -47,13 +44,13 @@ spec:
         env:
         - name: POSTGRES_DB
           valueFrom:
-            configMapKeyRef:
-              name: sakumari-config
+            secretKeyRef:
+              name: sakumari-secrets
               key: POSTGRES_DB
         - name: POSTGRES_USER
           valueFrom:
-            configMapKeyRef:
-              name: sakumari-config
+            secretKeyRef:
+              name: sakumari-secrets
               key: POSTGRES_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
