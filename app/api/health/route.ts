@@ -3,10 +3,10 @@
  * Returns 200 OK with basic system status information
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     // Check database connectivity
     await prisma.$queryRaw`SELECT 1`;
@@ -38,7 +38,7 @@ export async function GET(_request: NextRequest) {
 }
 
 // Support HEAD requests for basic connectivity checks
-export async function HEAD(_request: NextRequest) {
+export async function HEAD() {
   try {
     await prisma.$queryRaw`SELECT 1`;
     return new NextResponse(null, { status: 200 });
