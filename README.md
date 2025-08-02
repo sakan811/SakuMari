@@ -23,7 +23,7 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 - **Backend**: Node.js 23, Prisma ORM v6, NextAuth.js v5
 - **Database**: PostgreSQL 17
 - **Testing**: Vitest, React Testing Library, Playwright
-- **Deployment**: Docker, Docker Compose, Kubernetes (Kustomize)
+- **Deployment**: Docker (docker/), Docker Compose, Kubernetes (Kustomize)
 - **Package Manager**: pnpm
 
 ## Prerequisites
@@ -140,19 +140,10 @@ pnpm dev
 
 ```bash
 # Set POSTGRES_HOST=db in .env for container, then start services
-make dev-up
+make dev-up  # Uses docker/Dockerfile (production mode)
 
-# Setup database from local machine (required)
-./scripts/setup-database.sh
-```
-
-**Production (use registry image):**
-
-```bash
-# Set POSTGRES_HOST=db in .env for container, then start services
-make prod-up
-# Or with Cloudflare tunnel:
-make tunnel-up
+# OR for testing with NODE_ENV=test override:
+make dev-up-test  # Uses docker/Dockerfile.test (test mode for E2E testing)
 
 # Setup database from local machine (required)
 ./scripts/setup-database.sh
@@ -182,9 +173,8 @@ pnpm prisma:migrate     # Run database migrations
 pnpm db:seed           # Seed database with Kana data
 
 # Docker Application Deployments
-make dev-up             # Start app stack with build policy (excludes tunnel)
-make prod-up            # Start app stack with always pull policy (excludes tunnel)
-make tunnel-up          # Start production stack with Cloudflare tunnel
+make dev-up             # Start app stack for development (builds with docker/Dockerfile)
+make dev-up-test        # Start app stack for testing (builds with docker/Dockerfile.test using NODE_ENV=test)
 
 # Service Management
 make logs               # Show logs for all services
@@ -260,34 +250,32 @@ make test-e2e           # Run E2E tests (full workflow)
 make test-all           # Run all tests and quality checks
 ```
 
-### E2E Test Setup (Local)
+### E2E Test Setup (Containerized)
 
-**One-Time Environment Setup:**
+**E2E Testing with Docker:**
 
-```bash
-# 1. Start PostgreSQL (use existing Docker container)
-make postgres
-
-# 2. Ensure POSTGRES_HOST=localhost in your .env file for local development
-# E2E tests will automatically use NODE_ENV=test
-```
-
-**Run E2E Tests:**
+E2E tests run against a containerized application using the test Dockerfile for authentic testing conditions.
 
 ```bash
-# Complete E2E workflow (setup + build + test)
+# Complete E2E workflow (containerized)
 make test-e2e
 
 # Or run individual steps:
-pnpm test:e2e:setup     # Setup test database
-pnpm test:e2e:build     # Build for testing
-pnpm test:e2e           # Run tests
+pnpm test:e2e:infra     # Start PostgreSQL and pgAdmin containers
+pnpm test:e2e:db        # Setup test database (runs on host against container DB)
+pnpm test:e2e:app       # Build and start app container with NODE_ENV=test
+pnpm test:e2e           # Run Playwright tests against container
 ```
 
-**Authentication:**
+**Environment Configuration:**
 
-- E2E tests automatically set `NODE_ENV=test` in Playwright configuration **before server startup**
-- **Important:** `NODE_ENV=test` must be set before the Next.js server starts to trigger authentication provider switching in `lib/auth.ts`
-- The test credentials provider automatically switches when NODE_ENV=test, replacing Google OAuth with test credentials
-- Test credentials: `test@sakumari.local` with password `test123`
-- No additional environment file needed - uses your existing `.env` with `NODE_ENV=test` override applied at runtime
+- **Database**: Uses `POSTGRES_HOST=db` in .env for container networking
+- **App Container**: Built with `docker/Dockerfile.test` which sets `NODE_ENV=test` at build time
+- **Test Authentication**: Container automatically uses test credentials provider when NODE_ENV=test
+- **Test Credentials**: `test@sakumari.local` with password `test123`
+- **Database Setup**: Runs from host using localhost connection via setup-database.sh script
+
+**Architecture:**
+- Database and pgAdmin run in containers with port forwarding
+- App runs in container built with test environment
+- Playwright tests run on host targeting containerized app at localhost:3000

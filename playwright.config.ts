@@ -71,15 +71,4 @@ export default defineConfig({
       testIgnore: /.*seo-metadata\.spec\.ts/,
     },
   ],
-
-  webServer: {
-    command: "next start",
-    url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
-    env: {
-      NODE_ENV: "test",
-      PORT: "3000",
-      HOSTNAME: "0.0.0.0",
-    },
-  },
 });

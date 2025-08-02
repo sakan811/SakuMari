@@ -15,10 +15,10 @@ help: ## Show available commands
 # =============================================================================
 
 postgres: ## Start PostgreSQL database only
-	docker compose up -d db
+	docker compose -f docker/docker-compose.yml up -d db
 
 db-admin: ## Start PostgreSQL with pgAdmin
-	docker compose up -d db pgadmin
+	docker compose -f docker/docker-compose.yml up -d db pgadmin
 
 db-setup: ## Setup database using automated script (recommended)
 	./scripts/setup-database.sh
@@ -31,22 +31,25 @@ db-reset: ## Reset database with fresh data
 # =============================================================================
 
 dev-up: ## Start app stack for development (builds app locally)
-	PULL_POLICY=build docker compose up -d db pgadmin app
+	docker compose -f docker/docker-compose.yml up -d db pgadmin app --build
+
+dev-up-test: ## Start app stack for testing (builds with NODE_ENV=test)
+	DOCKERFILE=Dockerfile.test docker compose -f docker/docker-compose.yml up -d db pgadmin app --build
 
 logs: ## Show logs for all services
-	docker compose logs -f
+	docker compose -f docker/docker-compose.yml logs -f
 
 logs-app: ## Show app logs only
-	docker compose logs -f app
+	docker compose -f docker/docker-compose.yml logs -f app
 
 status: ## Show service status
-	docker compose ps
+	docker compose -f docker/docker-compose.yml ps
 
 down: ## Stop all services
-	docker compose down
+	docker compose -f docker/docker-compose.yml down
 
 clean: ## Stop and remove all containers, volumes, images
-	docker compose down --volumes --rmi all --remove-orphans
+	docker compose -f docker/docker-compose.yml down --volumes --rmi all --remove-orphans
 
 # =============================================================================
 # KUBERNETES DEPLOYMENTS
@@ -123,8 +126,8 @@ test-unit: ## Run unit tests
 test-db: ## Run database tests
 	pnpm test:db:setup && pnpm test:db
 
-test-e2e: ## Run E2E tests (full workflow)
-	pnpm test:e2e:infra && pnpm test:e2e:db && pnpm test:e2e
+test-e2e: ## Run E2E tests (full workflow against Docker container)
+	pnpm test:e2e:infra && pnpm test:e2e:db && pnpm test:e2e:app && pnpm test:e2e
 
 test-all: lint format test-unit test-db test-e2e ## Run all tests and quality checks
 
@@ -132,7 +135,7 @@ test-all: lint format test-unit test-db test-e2e ## Run all tests and quality ch
 # PHONY DECLARATIONS
 # =============================================================================
 
-.PHONY: postgres db-admin db-setup db-reset dev-up \
+.PHONY: postgres db-admin db-setup db-reset dev-up dev-up-test \
         logs logs-app status down clean k8s-deploy k8s-status k8s-pods k8s-logs \
         k8s-logs-db k8s-logs-tunnel k8s-secrets k8s-port-forward k8s-db-setup \
         k8s-restart-app k8s-restart-db k8s-describe k8s-events k8s-clean \
