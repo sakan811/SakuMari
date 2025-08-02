@@ -24,32 +24,32 @@ db-setup: ## Setup database using automated script (recommended)
 	./scripts/setup-database.sh
 
 db-reset: ## Reset database with fresh data
-	pnpm prisma:reset && pnpm db:seed
+	pnpm run prisma:reset && pnpm run db:seed
 
 # =============================================================================
 # DOCKER DEPLOYMENTS
 # =============================================================================
 
 dev-up: ## Start app stack for development (builds app locally)
-	docker compose -f docker/docker-compose.yml up -d db pgadmin app --build
+	pnpm run docker:dev
 
 dev-up-test: ## Start app stack for testing (builds with NODE_ENV=test)
-	DOCKERFILE=Dockerfile.test docker compose -f docker/docker-compose.yml up -d db pgadmin app --build
+	pnpm run docker:dev-test
 
 logs: ## Show logs for all services
-	docker compose -f docker/docker-compose.yml logs -f
+	pnpm run docker:logs
 
 logs-app: ## Show app logs only
-	docker compose -f docker/docker-compose.yml logs -f app
+	pnpm run docker:logs-app
 
 status: ## Show service status
-	docker compose -f docker/docker-compose.yml ps
+	pnpm run docker:status
 
 down: ## Stop all services
-	docker compose -f docker/docker-compose.yml down
+	pnpm run docker:down
 
 clean: ## Stop and remove all containers, volumes, images
-	docker compose -f docker/docker-compose.yml down --volumes --rmi all --remove-orphans
+	pnpm run docker:clean
 
 # =============================================================================
 # KUBERNETES DEPLOYMENTS
@@ -80,7 +80,7 @@ k8s-port-forward: ## Port forward to database for setup
 	kubectl port-forward -n sakumari svc/postgres-service 5432:5432
 
 k8s-db-setup: ## Setup database in Kubernetes (run from project root, requires k8s-port-forward first)
-	pnpm prisma:generate && npx prisma migrate deploy && pnpm db:seed
+	pnpm run prisma:generate && npx prisma migrate deploy && pnpm run db:seed
 
 k8s-restart-app: ## Restart application deployment
 	kubectl rollout restart deployment/sakumari-app -n sakumari
@@ -102,10 +102,10 @@ k8s-clean: ## Delete Kubernetes namespace and all resources (WARNING: destroys a
 # =============================================================================
 
 dev: ## Start local development server
-	pnpm dev
+	pnpm run dev
 
 build: ## Build application for production
-	pnpm build
+	pnpm run build
 
 install: ## Install dependencies
 	pnpm install
@@ -115,19 +115,19 @@ install: ## Install dependencies
 # =============================================================================
 
 lint: ## Run ESLint
-	pnpm lint
+	pnpm run lint
 
 format: ## Format code with Prettier
-	pnpm format
+	pnpm run format
 
 test-unit: ## Run unit tests
-	pnpm test:run
+	pnpm run test:run
 
 test-db: ## Run database tests
-	pnpm test:db:setup && pnpm test:db
+	pnpm run test:db:setup && pnpm run test:db
 
 test-e2e: ## Run E2E tests (full workflow against Docker container)
-	pnpm test:e2e:infra && pnpm test:e2e:db && pnpm test:e2e:app && pnpm test:e2e
+	pnpm run test:e2e:infra && pnpm run test:e2e:db && pnpm run test:e2e:app && pnpm run test:e2e
 
 test-all: lint format test-unit test-db test-e2e ## Run all tests and quality checks
 

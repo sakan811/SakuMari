@@ -27,34 +27,54 @@ const googleProvider = Google({
   clientSecret: process.env.AUTH_GOOGLE_SECRET!,
 });
 
-// Test credentials provider for development and testing
-const testCredentialsProvider = Credentials({
-  id: "test-credentials",
-  name: "Test User",
+// Credentials provider for E2E testing only
+const credentialsProvider = Credentials({
+  id: "credentials",
+  name: "Email & Password",
   credentials: {
+    email: { label: "Email", type: "email" },
     password: { label: "Password", type: "password" },
   },
-  authorize: (credentials) => {
-    if (credentials?.password === "test123") {
+  authorize: async (credentials) => {
+    if (!credentials?.email || !credentials?.password) {
+      return null;
+    }
+
+    const email = credentials.email as string;
+    const password = credentials.password as string;
+
+    // Simple test credentials for E2E testing
+    const testEmail = process.env.CREDS_TEST_EMAIL || "test@sakumari.local";
+    const testPassword = process.env.CREDS_TEST_PASSWORD || "TestPassword123!";
+
+    if (email === testEmail && password === testPassword) {
       return {
-        id: "test-user-e2e",
-        email: "test@sakumari.local",
+        id: "test-user-credentials",
+        email: testEmail,
         name: "Test User",
         image: null,
       };
     }
+
     return null;
   },
 });
 
-// Determine which providers to use based on environment
+// Configure authentication providers
 const getProviders = () => {
-  const { NODE_ENV } = process.env;
+  const providers: any[] = [googleProvider];
+  
+  // Add credentials provider only when explicitly enabled for E2E testing
+  if (process.env.CREDS_PROVIDER === "true") {
+    providers.push(credentialsProvider);
+  }
+  
+  return providers;
+};
 
-  if (NODE_ENV === "test") return [testCredentialsProvider];
-
-  // Default to Google provider for all other environments
-  return [googleProvider];
+// Helper function to check if credentials provider is enabled
+export const isCredentialsProviderEnabled = () => {
+  return process.env.CREDS_PROVIDER === "true";
 };
 
 export const { handlers, auth, signIn, signOut } = NextAuth({

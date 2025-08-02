@@ -10,12 +10,16 @@ setup("authenticate", async ({ page }) => {
   // Wait for the signin page to load
   await page.waitForLoadState("networkidle");
 
-  // The test credentials provider should be the only option when NODE_ENV=test
-  // Look for the "Sign in with Test User" form/button
+  // The custom credentials provider should be available when AUTH_CUSTOM_ENABLED=true or NODE_ENV=test
+  // Look for the "Sign in with Custom User" form/button
   await page.waitForSelector("form", { timeout: 10000 });
 
-  // Fill the password field (test credentials provider expects "test123")
-  await page.fill('input[name="password"]', "test123");
+  // Fill the username and password fields (custom credentials provider)
+  const customUsername = process.env.AUTH_CUSTOM_USERNAME || "test@sakumari.local";
+  const customPassword = process.env.AUTH_CUSTOM_PASSWORD || "test123";
+  
+  await page.fill('input[name="username"]', customUsername);
+  await page.fill('input[name="password"]', customPassword);
 
   // Submit the form
   await page.click('button[type="submit"]');
