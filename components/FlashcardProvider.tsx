@@ -90,6 +90,11 @@ export function FlashcardProvider({
       }
       let data = await response.json();
 
+      // Ensure data is an array before filtering
+      if (!Array.isArray(data)) {
+        throw new Error("Invalid data format received");
+      }
+
       // Filter by kana type if specified
       if (kanaType) {
         data = data.filter((kana: KanaWithAccuracy) => {

@@ -1,7 +1,7 @@
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import FlashcardApp from "../components/FlashcardApp";
-import { mockApiResponse, mockKana, mockSession } from "./utils/test-helpers";
+import { mockKana, mockSession } from "./utils/test-helpers";
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -12,12 +12,26 @@ vi.mock("next-auth/react", () => ({
 }));
 
 describe("Integration Tests", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   test("complete practice workflow", async () => {
     // Mock the initial flashcards fetch
-    mockFetch
-      .mockResolvedValueOnce(mockApiResponse([mockKana.basic]))
-      // Mock the submit endpoint
-      .mockResolvedValueOnce(mockApiResponse({ success: true }));
+    mockFetch.mockImplementation((url) => {
+      if (url === "/api/flashcards") {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [mockKana.basic]
+        });
+      } else if (url === "/api/flashcards/submit") {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ success: true })
+        });
+      }
+      return Promise.reject(new Error(`Unexpected URL: ${url}`));
+    });
 
     render(<FlashcardApp kanaType="hiragana" />);
 
@@ -41,7 +55,11 @@ describe("Integration Tests", () => {
   });
 
   test("handles authentication errors", async () => {
-    mockFetch.mockResolvedValue(mockApiResponse(null, false));
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 401,
+      json: async () => ({ error: "Unauthorized" })
+    });
 
     render(<FlashcardApp kanaType="hiragana" />);
 
