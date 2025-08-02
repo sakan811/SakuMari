@@ -212,7 +212,7 @@ async function seed() {
     console.log(`Added ${hiragana.length + katakana.length} kana characters.`);
 
     // Create test user for e2e tests
-    if (process.env.NODE_ENV === "test") {
+    if (process.env.NODE_ENV === "test" || process.env.CREDS_PROVIDER === "true") {
       console.log("Creating test user for e2e tests...");
       await prisma.user.upsert({
         where: { id: "test-user-e2e" },

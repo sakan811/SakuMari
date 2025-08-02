@@ -49,7 +49,7 @@ const credentialsProvider = Credentials({
 
     if (email === testEmail && password === testPassword) {
       return {
-        id: "test-user-credentials",
+        id: "test-user-e2e",
         email: testEmail,
         name: "Test User",
         image: null,
