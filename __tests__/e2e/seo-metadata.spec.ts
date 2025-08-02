@@ -120,7 +120,7 @@ test.describe("SEO Metadata E2E Tests", () => {
 
       // Should show sign-in prompt
       await expect(
-        page.getByRole("button", { name: "Sign In with Google" }),
+        page.getByRole("button", { name: "Sign In" }),
       ).toBeVisible();
     });
 
@@ -152,7 +152,7 @@ test.describe("SEO Metadata E2E Tests", () => {
 
       // Should show sign-in prompt
       await expect(
-        page.getByRole("button", { name: "Sign In with Google" }),
+        page.getByRole("button", { name: "Sign In" }),
       ).toBeVisible();
     });
 
@@ -184,7 +184,7 @@ test.describe("SEO Metadata E2E Tests", () => {
 
       // Should show sign-in prompt
       await expect(
-        page.getByRole("button", { name: "Sign In with Google" }),
+        page.getByRole("button", { name: "Sign In" }),
       ).toBeVisible();
     });
   });
