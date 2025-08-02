@@ -20,27 +20,24 @@ postgres: ## Start PostgreSQL database only
 db-admin: ## Start PostgreSQL with pgAdmin
 	docker compose up -d db pgadmin
 
-db-tools: ## Start PostgreSQL with pgAdmin and Portainer
-	docker compose up -d db pgadmin portainer
-
 db-setup: ## Setup database using automated script (recommended)
 	./scripts/setup-database.sh
 
 db-reset: ## Reset database with fresh data
-	pnpm prisma:reset --force && pnpm db:seed
+	pnpm prisma:reset && pnpm db:seed
 
 # =============================================================================
 # DOCKER DEPLOYMENTS
 # =============================================================================
 
-dev-up: ## Start app stack with build policy (excludes tunnel)
-	PULL_POLICY=build docker compose up -d db pgadmin portainer app
+dev-up: ## Start app stack for development (builds app locally)
+	docker compose up -d db pgadmin app
 
-prod-up: ## Start app stack with always pull policy (excludes tunnel)
-	PULL_POLICY=always docker compose up -d db pgadmin portainer app
+prod-up: ## Start app stack for production (builds app locally)
+	docker compose up -d db pgadmin app
 
-tunnel-up: ## Start production stack with Cloudflare tunnel
-	PULL_POLICY=always docker compose --profile tunnel up -d
+tunnel-up: ## Start production stack (tunnel configuration not implemented in compose)
+	docker compose up -d db pgadmin app
 
 logs: ## Show logs for all services
 	docker compose logs -f
@@ -86,7 +83,7 @@ k8s-port-forward: ## Port forward to database for setup
 	kubectl port-forward -n sakumari svc/postgres-service 5432:5432
 
 k8s-db-setup: ## Setup database in Kubernetes (run from project root, requires k8s-port-forward first)
-	pnpm prisma migrate deploy && pnpm db:seed
+	pnpm prisma:generate && npx prisma migrate deploy && pnpm db:seed
 
 k8s-restart-app: ## Restart application deployment
 	kubectl rollout restart deployment/sakumari-app -n sakumari
