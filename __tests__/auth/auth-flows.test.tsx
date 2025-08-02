@@ -60,14 +60,14 @@ describe("Authentication Flow Tests", () => {
     test("shows sign-in button when user is not authenticated", () => {
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
-      expect(screen.getByText("Sign In with Google")).toBeInTheDocument();
+      expect(screen.getByText("Sign In")).toBeInTheDocument();
       expect(screen.queryByText("Sign Out")).not.toBeInTheDocument();
     });
 
     test("calls signIn when sign-in button is clicked", () => {
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
-      const signInButton = screen.getByText("Sign In with Google");
+      const signInButton = screen.getByText("Sign In");
       fireEvent.click(signInButton);
 
       expect(mockSignIn).toHaveBeenCalledWith("google");
@@ -120,7 +120,7 @@ describe("Authentication Flow Tests", () => {
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
       expect(screen.getByText("Sign Out")).toBeInTheDocument();
-      expect(screen.queryByText("Sign In with Google")).not.toBeInTheDocument();
+      expect(screen.queryByText("Sign In")).not.toBeInTheDocument();
     });
 
     test("displays user avatar when image is available", () => {
