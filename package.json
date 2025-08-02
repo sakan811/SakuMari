@@ -23,6 +23,8 @@
     "test:db:watch": "vitest --config vitest.config.db.mts",
     "test:db:clean": "cross-env NODE_ENV=test && (rm -f __tests__/db/test.db || del __tests__\\db\\test.db 2>nul || true)",
     "test:e2e": "npx playwright test",
+    "test:e2e:setup": "pnpm test:e2e:infra && pnpm test:e2e:db",
+    "test:e2e:build": "pnpm test:e2e:app",
     "test:e2e:infra": "docker compose -f docker/docker-compose.yml up -d db pgadmin",
     "test:e2e:app": "cross-env NODE_ENV=test DOCKERFILE=Dockerfile.test docker compose -f docker/docker-compose.yml up -d app --build",
     "test:e2e:db": "cross-env NODE_ENV=test ./scripts/setup-database.sh",
@@ -30,7 +32,10 @@
     "docker:dev-test": "DOCKERFILE=Dockerfile.test docker compose -f docker/docker-compose.yml up -d db pgadmin app --build",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
     "docker:logs": "docker compose -f docker/docker-compose.yml logs -f",
-    "docker:build-test": "DOCKERFILE=Dockerfile.test docker compose -f docker/docker-compose.yml build app"
+    "docker:build-test": "DOCKERFILE=Dockerfile.test docker compose -f docker/docker-compose.yml build app",
+    "docker:clean": "docker compose -f docker/docker-compose.yml down --volumes --rmi all --remove-orphans",
+    "docker:status": "docker compose -f docker/docker-compose.yml ps",
+    "docker:logs-app": "docker compose -f docker/docker-compose.yml logs -f app"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

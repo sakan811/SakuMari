@@ -30,12 +30,9 @@ ENV PRISMA_ENGINES_MIRROR=https://registry.npmmirror.com/-/binary/prisma
 ENV PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
 RUN pnpm exec prisma generate
 
-# Override NODE_ENV to test for build time to enable test auth provider
-ENV NODE_ENV=test
-
 # Build application with test environment
 RUN --mount=type=cache,id=nextjs,target=/.next/cache \
-    pnpm build
+    NODE_ENV=test pnpm build
 
 # Production stage
 FROM node:23-alpine AS runner

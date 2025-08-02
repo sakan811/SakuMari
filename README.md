@@ -43,10 +43,10 @@ cp .env.example .env
 # Edit .env with your Google OAuth credentials
 
 make postgres
-pnpm install && ./scripts/setup-database.sh && pnpm dev
+make install && make db-setup && make dev
 ```
 
-The `./scripts/setup-database.sh` script automatically handles Prisma generation, migration, and seeding - no manual database setup required.
+The `make db-setup` command automatically handles Prisma generation, migration, and seeding - no manual database setup required.
 
 Visit <http://localhost:3000>
 
@@ -79,6 +79,11 @@ AUTH_SECRET=your_generated_secret  # Generate at https://auth-secret-gen.vercel.
 AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
 
+# Custom Credentials (optional - for testing in any environment)
+AUTH_CUSTOM_ENABLED=false
+AUTH_CUSTOM_USERNAME=test@sakumari.local
+AUTH_CUSTOM_PASSWORD=test123
+
 # Docker (required for containerized deployment)
 CONTAINER_NAME_PREFIX=sakumari
 DOCKER_IMAGE_NAME=your_registry/sakumari
@@ -91,7 +96,9 @@ NODE_ENV=development
 
 **Build Optimization:** The application uses Next.js standalone output mode for optimized Docker deployments. This creates a self-contained `.next/standalone` directory with minimal dependencies, reducing container size and improving startup performance.
 
-### 2. Google OAuth Setup
+### 2. Authentication Setup
+
+#### Google OAuth (Production)
 
 1. Visit [Google Cloud Console](https://console.cloud.google.com/)
 2. Create project → APIs & Services → OAuth consent screen
@@ -101,35 +108,49 @@ NODE_ENV=development
 
 [Detailed OAuth guide](https://developers.google.com/identity/protocols/oauth2)
 
+#### Custom Credentials (Testing/Development)
+
+For testing or development environments, you can enable custom username/password authentication:
+
+1. Set `AUTH_CUSTOM_ENABLED=true` in your `.env` file
+2. Configure `AUTH_CUSTOM_USERNAME` and `AUTH_CUSTOM_PASSWORD` (optional - defaults provided)
+3. Both Google OAuth and custom credentials will be available on the sign-in page
+
+**Use Cases:**
+- E2E testing in production environments
+- Local development without Google OAuth setup
+- Automated testing scenarios
+
 ### 3. Choose Your Setup Method
 
 #### Option A: Docker Database + Local Development (Recommended)
 
 ```bash
 # Start database services
-make postgres  # Or make db-admin for pgAdmin, make db-tools for all tools
+make postgres  # Or make db-admin for pgAdmin
 
 # Install and setup
-pnpm install
-./scripts/setup-database.sh  # Automated database setup (recommended)
+make install
+make db-setup  # Automated database setup (recommended)
 
 # Start development
-pnpm dev
+make dev
 ```
 
 #### Option B: Local PostgreSQL
 
 ```bash
 # Ensure PostgreSQL is running locally
-pnpm install
-./scripts/setup-database.sh  # Automated setup (recommended)
+make install
+make db-setup  # Automated setup (recommended)
 
 # OR manual setup:
+make install
 pnpm prisma:generate
 pnpm prisma:migrate
 pnpm db:seed
 
-pnpm dev
+make dev
 ```
 
 #### Option C: Full Docker Deployment
@@ -146,7 +167,7 @@ make dev-up  # Uses docker/Dockerfile (production mode)
 make dev-up-test  # Uses docker/Dockerfile.test (test mode for E2E testing)
 
 # Setup database from local machine (required)
-./scripts/setup-database.sh
+make db-setup
 ```
 
 ## Development Commands
@@ -165,12 +186,11 @@ make test-all           # Lint + format + all tests
 # Database
 make postgres           # Start PostgreSQL database only
 make db-admin           # Start PostgreSQL with pgAdmin
-make db-tools           # Start PostgreSQL with pgAdmin and Portainer
-./scripts/setup-database.sh  # Automated database setup (recommended)
+make db-setup          # Automated database setup (recommended)
 # OR manual setup:
-pnpm prisma:generate    # Generate Prisma client
-pnpm prisma:migrate     # Run database migrations
-pnpm db:seed           # Seed database with Kana data
+pnpm run prisma:generate    # Generate Prisma client
+pnpm run prisma:migrate     # Run database migrations
+pnpm run db:seed           # Seed database with Kana data
 
 # Docker Application Deployments
 make dev-up             # Start app stack for development (builds with docker/Dockerfile)
@@ -215,7 +235,7 @@ cd k8s && kubectl apply -k .
 
 # Setup database (requires separate terminal for port-forward)
 kubectl port-forward -n sakumari svc/postgres-service 5432:5432 &
-cd .. && pnpm prisma migrate deploy && pnpm db:seed
+cd .. && pnpm run prisma:generate && npx prisma migrate deploy && pnpm run db:seed
 
 # Or use Makefile commands
 make k8s-deploy
@@ -231,22 +251,22 @@ Comprehensive multi-layer testing strategy:
 
 ```bash
 # Unit & Integration Tests
-pnpm test               # Watch mode
-pnpm test:run           # Single run
+make test-unit          # Run unit tests
+pnpm run test               # Watch mode (alternative)
+pnpm run test:run           # Single run (alternative)
 
 # Database Tests (SQLite)
-pnpm test:db:setup      # Setup test DB
-pnpm test:db            # Run DB tests
+make test-db            # Run database tests (includes setup)
+pnpm run test:db:setup      # Setup test DB (alternative)
+pnpm run test:db            # Run DB tests (alternative)
 
 # End-to-End Tests (Playwright)
-pnpm test:e2e:setup     # Setup E2E environment
-pnpm test:e2e:build     # Build for testing
-pnpm test:e2e           # Run E2E tests
+make test-e2e           # Run E2E tests (full containerized workflow)
+pnpm run test:e2e:setup     # Setup E2E environment (alternative)
+pnpm run test:e2e:app       # Build for testing (alternative)
+pnpm run test:e2e           # Run E2E tests (alternative)
 
-# Makefile Test Commands
-make test-unit          # Run unit tests
-make test-db            # Run database tests
-make test-e2e           # Run E2E tests (full workflow)
+# Comprehensive Testing
 make test-all           # Run all tests and quality checks
 ```
 
@@ -261,19 +281,26 @@ E2E tests run against a containerized application using the test Dockerfile for 
 make test-e2e
 
 # Or run individual steps:
-pnpm test:e2e:infra     # Start PostgreSQL and pgAdmin containers
-pnpm test:e2e:db        # Setup test database (runs on host against container DB)
-pnpm test:e2e:app       # Build and start app container with NODE_ENV=test
-pnpm test:e2e           # Run Playwright tests against container
+pnpm run test:e2e:infra     # Start PostgreSQL and pgAdmin containers
+pnpm run test:e2e:db        # Setup test database (runs on host against container DB)
+pnpm run test:e2e:app       # Build and start app container with NODE_ENV=test
+pnpm run test:e2e           # Run Playwright tests against container
 ```
 
 **Environment Configuration:**
 
 - **Database**: Uses `POSTGRES_HOST=db` in .env for container networking
 - **App Container**: Built with `docker/Dockerfile.test` which sets `NODE_ENV=test` at build time
-- **Test Authentication**: Container automatically uses test credentials provider when NODE_ENV=test
-- **Test Credentials**: `test@sakumari.local` with password `test123`
+- **Test Authentication**: 
+  - **Legacy**: Container automatically uses test credentials when NODE_ENV=test
+  - **New**: Set `AUTH_CUSTOM_ENABLED=true` to enable custom credentials in any environment
+- **Test Credentials**: Configurable via `AUTH_CUSTOM_USERNAME` and `AUTH_CUSTOM_PASSWORD` (defaults: `test@sakumari.local`/`test123`)
 - **Database Setup**: Runs from host using localhost connection via setup-database.sh script
+
+**Flexible E2E Testing:**
+- **Production Testing**: Enable custom credentials with `AUTH_CUSTOM_ENABLED=true` 
+- **Any Environment**: E2E tests can now run against production builds
+- **No Build Changes**: No need to rebuild with special test Dockerfile for custom credentials
 
 **Architecture:**
 - Database and pgAdmin run in containers with port forwarding
