@@ -170,9 +170,6 @@ make dev
 # Set POSTGRES_HOST=db in .env for container, then start services
 make dev-up  # Uses docker/Dockerfile (production mode)
 
-# OR for testing with NODE_ENV=test override:
-make dev-up-test  # Uses docker/Dockerfile.test (test mode for E2E testing)
-
 # Setup database from local machine (required)
 make db-setup
 ```
@@ -201,7 +198,6 @@ pnpm run db:seed           # Seed database with Kana data
 
 # Docker Application Deployments
 make dev-up             # Start app stack for development (builds with docker/Dockerfile)
-make dev-up-test        # Start app stack for testing (builds with docker/Dockerfile.test using NODE_ENV=test)
 
 # Service Management
 make logs               # Show logs for all services
@@ -268,48 +264,46 @@ pnpm run test:db:setup      # Setup test DB (alternative)
 pnpm run test:db            # Run DB tests (alternative)
 
 # End-to-End Tests (Playwright)
-make test-e2e           # Run E2E tests (full containerized workflow)
-pnpm run test:e2e:infra     # Start PostgreSQL and pgAdmin containers (alternative)
-pnpm run test:e2e:app       # Build for testing (alternative)
-pnpm run test:e2e           # Run E2E tests (alternative)
+make test-e2e           # Run E2E tests (simplified: database + Playwright webServer)
+pnpm run test:e2e:setup     # Setup E2E environment (start database only)
+pnpm run test:e2e:build     # Build app with CREDS_PROVIDER=true
+pnpm run test:e2e           # Run E2E tests (Playwright manages app)
 
 # Comprehensive Testing
 make test-all           # Run all tests and quality checks
 ```
 
-### E2E Test Setup (Containerized)
+### E2E Test Setup (Simplified)
 
-**E2E Testing with Docker:**
+**E2E Testing with Playwright webServer:**
 
-E2E tests run against a containerized application using the test Dockerfile for authentic testing conditions.
+E2E tests use Playwright's webServer configuration to manage the Next.js application, with only the database running in Docker.
 
 ```bash
-# Complete E2E workflow (containerized)
+# Complete E2E workflow (simplified)
 make test-e2e
 
 # Or run individual steps:
-pnpm run test:e2e:infra     # Start PostgreSQL and pgAdmin containers
-pnpm run test:e2e:db        # Setup test database (runs on host against container DB)
-pnpm run test:e2e:app       # Build and start app container with NODE_ENV=test
-pnpm run test:e2e           # Run Playwright tests against container
+pnpm run test:e2e:setup     # Start PostgreSQL database container
+pnpm run test:e2e:build     # Build app with CREDS_PROVIDER=true
+pnpm run test:e2e           # Run Playwright tests (webServer manages app)
 ```
 
 **Environment Configuration:**
 
-- **Database**: Uses `POSTGRES_HOST=db` in .env for container networking
-- **App Container**: Built with `docker/Dockerfile.test` which sets `NODE_ENV=test` at build time
-- **Test Authentication**: 
-  - **Legacy**: Container automatically uses test credentials when NODE_ENV=test
-  - **New**: Set `CREDS_PROVIDER=true` to enable custom credentials in any environment
+- **Database**: Docker container with `POSTGRES_HOST=localhost` for host connection
+- **Application**: Standard Next.js build with `CREDS_PROVIDER=true` for authentication
+- **Playwright webServer**: Automatically starts/stops Next.js app during testing
 - **Test Credentials**: Configurable via `CREDS_TEST_EMAIL` and `CREDS_TEST_PASSWORD` (defaults: `test@sakumari.local`/`TestPassword123!`)
 - **Database Setup**: Runs from host using localhost connection via setup-database.sh script
 
-**Flexible E2E Testing:**
-- **Production Testing**: Enable custom credentials with `CREDS_PROVIDER=true` 
-- **Any Environment**: E2E tests can now run against production builds
-- **No Build Changes**: No need to rebuild with special test Dockerfile for custom credentials
+**Benefits:**
+- **Faster setup**: No complex container orchestration
+- **Standard workflow**: Uses familiar `next build` and `next start` commands
+- **Reliable**: Playwright manages app lifecycle with proper health checks
+- **CI-optimized**: Uses standard GitHub Actions patterns
 
 **Architecture:**
-- Database and pgAdmin run in containers with port forwarding
-- App runs in container built with test environment
-- Playwright tests run on host targeting containerized app at localhost:3000
+- Database runs in Docker container with port forwarding
+- Next.js app managed by Playwright webServer configuration
+- Tests run against locally managed application at localhost:3000

@@ -46,8 +46,7 @@ services:
       - "3000:3000"
     env_file: ../.env
     environment:
-      # Override NODE_ENV for E2E testing when using test dockerfile
-      NODE_ENV: ${NODE_ENV:-production}
+      CREDS_PROVIDER: ${CREDS_PROVIDER:-false}
     depends_on:
       db:
         condition: service_healthy

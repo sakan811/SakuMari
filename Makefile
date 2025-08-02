@@ -35,25 +35,23 @@ db-reset: ## Reset database with fresh data
 # =============================================================================
 
 dev-up: ## Start app stack for development (builds app locally)
-	pnpm run docker:dev
+	docker compose -f $(DOCKER_COMPOSE_FILE) up -d db pgadmin app --build
 
-dev-up-test: ## Start app stack for testing (builds with NODE_ENV=test)
-	pnpm run docker:dev-test
 
 logs: ## Show logs for all services
-	pnpm run docker:logs
+	docker compose -f $(DOCKER_COMPOSE_FILE) logs -f
 
 logs-app: ## Show app logs only
-	pnpm run docker:logs-app
+	docker compose -f $(DOCKER_COMPOSE_FILE) logs -f app
 
 status: ## Show service status
-	pnpm run docker:status
+	docker compose -f $(DOCKER_COMPOSE_FILE) ps
 
 down: ## Stop all services
-	pnpm run docker:down
+	docker compose -f $(DOCKER_COMPOSE_FILE) down
 
 clean: ## Stop and remove all containers, volumes, images
-	pnpm run docker:clean
+	docker compose -f $(DOCKER_COMPOSE_FILE) down --volumes --rmi all --remove-orphans
 
 # =============================================================================
 # KUBERNETES DEPLOYMENTS
@@ -130,8 +128,14 @@ test-unit: ## Run unit tests
 test-db: ## Run database tests
 	pnpm run test:db:setup && pnpm run test:db
 
-test-e2e: ## Run E2E tests (full workflow against Docker container)
-	pnpm run test:e2e:infra && pnpm run test:e2e:db && pnpm run test:e2e:app && pnpm run test:e2e
+test-e2e: ## Run E2E tests (simplified: database + Playwright webServer)
+	pnpm run test:e2e:setup && pnpm run test:e2e:build && pnpm run test:e2e
+
+test-e2e-setup: ## Setup E2E testing environment (database only)
+	pnpm run test:e2e:setup
+
+test-e2e-clean: ## Clean up E2E testing environment
+	docker compose -f $(DOCKER_COMPOSE_FILE) down --volumes
 
 test-all: lint format test-unit test-db test-e2e ## Run all tests and quality checks
 
@@ -139,8 +143,8 @@ test-all: lint format test-unit test-db test-e2e ## Run all tests and quality ch
 # PHONY DECLARATIONS
 # =============================================================================
 
-.PHONY: postgres db-admin db-setup db-reset dev-up dev-up-test \
+.PHONY: postgres db-admin db-setup db-reset dev-up \
         logs logs-app status down clean k8s-deploy k8s-status k8s-pods k8s-logs \
         k8s-logs-db k8s-logs-tunnel k8s-secrets k8s-port-forward k8s-db-setup \
         k8s-restart-app k8s-restart-db k8s-describe k8s-events k8s-clean \
-        dev build install lint format test-unit test-db test-e2e test-all
+        dev build install lint format test-unit test-db test-e2e test-e2e-setup test-e2e-clean test-all
