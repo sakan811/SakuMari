@@ -80,13 +80,20 @@ AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
 
 # Custom Credentials (optional - for testing in any environment)
-AUTH_CUSTOM_ENABLED=false
-AUTH_CUSTOM_USERNAME=test@sakumari.local
-AUTH_CUSTOM_PASSWORD=test123
+CREDS_PROVIDER=false
+CREDS_TEST_EMAIL=test@sakumari.local
+CREDS_TEST_PASSWORD=TestPassword123!
+
+# pgAdmin Configuration
+PGADMIN_DEFAULT_EMAIL=admin@admin.com
+PGADMIN_DEFAULT_PASSWORD=admin
+
+# Cloudflare Tunnel Configuration (optional)
+CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token
 
 # Docker (required for containerized deployment)
 CONTAINER_NAME_PREFIX=sakumari
-DOCKER_IMAGE_NAME=your_registry/sakumari
+DOCKER_IMAGE_NAME=sakanbeer88/sakumari
 DOCKER_IMAGE_TAG=latest
 
 NODE_ENV=development
@@ -112,8 +119,8 @@ NODE_ENV=development
 
 For testing or development environments, you can enable custom username/password authentication:
 
-1. Set `AUTH_CUSTOM_ENABLED=true` in your `.env` file
-2. Configure `AUTH_CUSTOM_USERNAME` and `AUTH_CUSTOM_PASSWORD` (optional - defaults provided)
+1. Set `CREDS_PROVIDER=true` in your `.env` file
+2. Configure `CREDS_TEST_EMAIL` and `CREDS_TEST_PASSWORD` (optional - defaults provided)
 3. Both Google OAuth and custom credentials will be available on the sign-in page
 
 **Use Cases:**
@@ -146,9 +153,9 @@ make db-setup  # Automated setup (recommended)
 
 # OR manual setup:
 make install
-pnpm prisma:generate
-pnpm prisma:migrate
-pnpm db:seed
+pnpm run prisma:generate
+pnpm run prisma:migrate
+pnpm run db:seed
 
 make dev
 ```
@@ -262,7 +269,7 @@ pnpm run test:db            # Run DB tests (alternative)
 
 # End-to-End Tests (Playwright)
 make test-e2e           # Run E2E tests (full containerized workflow)
-pnpm run test:e2e:setup     # Setup E2E environment (alternative)
+pnpm run test:e2e:infra     # Start PostgreSQL and pgAdmin containers (alternative)
 pnpm run test:e2e:app       # Build for testing (alternative)
 pnpm run test:e2e           # Run E2E tests (alternative)
 
@@ -293,12 +300,12 @@ pnpm run test:e2e           # Run Playwright tests against container
 - **App Container**: Built with `docker/Dockerfile.test` which sets `NODE_ENV=test` at build time
 - **Test Authentication**: 
   - **Legacy**: Container automatically uses test credentials when NODE_ENV=test
-  - **New**: Set `AUTH_CUSTOM_ENABLED=true` to enable custom credentials in any environment
-- **Test Credentials**: Configurable via `AUTH_CUSTOM_USERNAME` and `AUTH_CUSTOM_PASSWORD` (defaults: `test@sakumari.local`/`test123`)
+  - **New**: Set `CREDS_PROVIDER=true` to enable custom credentials in any environment
+- **Test Credentials**: Configurable via `CREDS_TEST_EMAIL` and `CREDS_TEST_PASSWORD` (defaults: `test@sakumari.local`/`TestPassword123!`)
 - **Database Setup**: Runs from host using localhost connection via setup-database.sh script
 
 **Flexible E2E Testing:**
-- **Production Testing**: Enable custom credentials with `AUTH_CUSTOM_ENABLED=true` 
+- **Production Testing**: Enable custom credentials with `CREDS_PROVIDER=true` 
 - **Any Environment**: E2E tests can now run against production builds
 - **No Build Changes**: No need to rebuild with special test Dockerfile for custom credentials
 
