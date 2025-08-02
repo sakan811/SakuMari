@@ -31,13 +31,7 @@ db-reset: ## Reset database with fresh data
 # =============================================================================
 
 dev-up: ## Start app stack for development (builds app locally)
-	docker compose up -d db pgadmin app
-
-prod-up: ## Start app stack for production (builds app locally)
-	docker compose up -d db pgadmin app
-
-tunnel-up: ## Start production stack (tunnel configuration not implemented in compose)
-	docker compose up -d db pgadmin app
+	PULL_POLICY=build docker compose up -d db pgadmin app
 
 logs: ## Show logs for all services
 	docker compose logs -f

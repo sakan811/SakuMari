@@ -69,7 +69,7 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
 POSTGRES_HOST=localhost  # Use 'db' for Docker deployment
 POSTGRES_PORT=5432
-# Optional - auto-generated from above if not provided:
+# Required for Prisma
 POSTGRES_PRISMA_URL=postgresql://postgres:your_password@localhost:5432/sakumari
 POSTGRES_URL_NON_POOLING=postgresql://postgres:your_password@localhost:5432/sakumari
 
@@ -83,7 +83,6 @@ AUTH_GOOGLE_SECRET=your_google_client_secret
 CONTAINER_NAME_PREFIX=sakumari
 DOCKER_IMAGE_NAME=your_registry/sakumari
 DOCKER_IMAGE_TAG=latest
-PULL_POLICY=build  # Use 'build' for development or 'always' for production
 
 NODE_ENV=development
 ```
