@@ -46,15 +46,15 @@ setup("authenticate", async ({ page }) => {
   const testEmail = process.env.CREDS_TEST_EMAIL || "test@sakumari.local";
   const testPassword = process.env.CREDS_TEST_PASSWORD || "TestPassword123!";
   
-  console.log(`Using credentials: ${testEmail} / ${testPassword}`);
+  console.log(`Using credentials: ${testEmail} / [REDACTED PASSWORD]`);
   
   await page.fill('input[name="email"]', testEmail);
   await page.fill('input[name="password"]', testPassword);
 
   // Verify form values
   const emailValue = await page.inputValue('input[name="email"]');
-  const passwordValue = await page.inputValue('input[name="password"]');
-  console.log(`Form values filled: email="${emailValue}", password="${passwordValue.substring(0, 3)}..."`);
+  await page.inputValue('input[name="password"]'); // Verify password field is filled
+  console.log(`Form values filled: email="${emailValue}", password="***REDACTED***"`);
 
   // Look for the credentials provider submit button specifically
   console.log("Looking for credentials submit button...");
