@@ -1,5 +1,5 @@
 module.exports = {
-  output: 'standalone',
+  output: "standalone",
   eslint: {
     dirs: ["app"],
   },

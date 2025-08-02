@@ -26,7 +26,7 @@ describe("Health API Route", () => {
     test("returns healthy status when database is connected", async () => {
       // Mock successful database query
       mockPrisma.$queryRaw.mockResolvedValue([1]);
-      
+
       // Mock environment variables through vitest config
       const request = new NextRequest("http://localhost/api/health", {
         method: "GET",
@@ -47,15 +47,17 @@ describe("Health API Route", () => {
 
       // Verify timestamp is a valid ISO string
       expect(new Date(data.timestamp)).toBeInstanceOf(Date);
-      
+
       // Verify uptime is a positive number
       expect(data.uptime).toBeGreaterThan(0);
     });
 
     test("returns unhealthy status when database connection fails", async () => {
       // Mock failed database query
-      mockPrisma.$queryRaw.mockRejectedValue(new Error("Database connection failed"));
-      
+      mockPrisma.$queryRaw.mockRejectedValue(
+        new Error("Database connection failed"),
+      );
+
       // Mock environment variables through vitest config
       const request = new NextRequest("http://localhost/api/health", {
         method: "GET",
@@ -76,7 +78,7 @@ describe("Health API Route", () => {
 
       // Verify timestamp is a valid ISO string
       expect(new Date(data.timestamp)).toBeInstanceOf(Date);
-      
+
       // Verify uptime is a positive number
       expect(data.uptime).toBeGreaterThan(0);
     });
@@ -114,7 +116,7 @@ describe("Health API Route", () => {
       expect(data).toHaveProperty("environment");
       expect(data).toHaveProperty("database", "connected");
       expect(data).toHaveProperty("version");
-      
+
       // Check data types
       expect(typeof data.status).toBe("string");
       expect(typeof data.timestamp).toBe("string");
@@ -142,7 +144,7 @@ describe("Health API Route", () => {
       expect(data).toHaveProperty("environment");
       expect(data).toHaveProperty("database", "disconnected");
       expect(data).toHaveProperty("error");
-      
+
       // Check data types
       expect(typeof data.status).toBe("string");
       expect(typeof data.timestamp).toBe("string");
@@ -171,7 +173,9 @@ describe("Health API Route", () => {
 
     test("returns 503 status when database connection fails", async () => {
       // Mock failed database query
-      mockPrisma.$queryRaw.mockRejectedValue(new Error("Database connection failed"));
+      mockPrisma.$queryRaw.mockRejectedValue(
+        new Error("Database connection failed"),
+      );
 
       const request = new NextRequest("http://localhost/api/health", {
         method: "HEAD",

@@ -24,7 +24,7 @@ This directory contains production-ready Kubernetes manifests for the SakuMari K
 
 3. **DNS configuration** (if using ingress):
    - `sakumari.fukudev.org` → Main application
-   - `sakumari-pgadmin.fukudev.org` → Database administration  
+   - `sakumari-pgadmin.fukudev.org` → Database administration
    - `sakumari-portainer.fukudev.org` → Container management
 
 ## Deployment Steps
@@ -32,6 +32,7 @@ This directory contains production-ready Kubernetes manifests for the SakuMari K
 ### 1. Setup Secrets
 
 **Create local .env file:**
+
 ```bash
 # Copy from root directory (if .env already exists)
 cp ../.env ./.env
@@ -44,6 +45,7 @@ cp ../.env.example ./.env
 ```
 
 **Required values in .env:**
+
 ```bash
 POSTGRES_PASSWORD=your-secure-database-password
 AUTH_SECRET=your-nextauth-secret-32-chars-min
@@ -58,6 +60,7 @@ CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token
 This project uses **Kustomize** for deployment management. All secrets are generated from your `.env` file.
 
 **Standard Deployment:**
+
 ```bash
 # Deploy all components (ingress + tunnel included)
 kubectl apply -k .
@@ -67,6 +70,7 @@ make k8s-deploy
 ```
 
 **Alternative: Deploy specific components:**
+
 ```bash
 # Deploy core components only (manual)
 kubectl apply -f namespace.yaml
@@ -76,6 +80,7 @@ kubectl apply -f app.yaml
 ```
 
 ### 3. Verify Deployment
+
 ```bash
 # Check all resources
 kubectl get all -n sakumari
@@ -84,7 +89,7 @@ make k8s-status
 
 # Check secrets (will have generated hash suffix)
 kubectl get secrets -n sakumari
-# Or use Makefile  
+# Or use Makefile
 make k8s-secrets
 
 # Check pod status and wait for ready
@@ -132,18 +137,20 @@ make k8s-logs
 - **Cloudflare protection**: DDoS protection and WAF when using tunnel
 - **No hardcoded secrets**: All sensitive data managed through .env files
 
-**Note**: Advanced security contexts (non-root, read-only filesystem, dropped capabilities) 
+**Note**: Advanced security contexts (non-root, read-only filesystem, dropped capabilities)
 are currently disabled for maximum compatibility across different Kubernetes environments.
 These can be re-enabled in production by uncommenting the securityContext sections.
 
 ## Scaling
 
 The application includes:
+
 - **Single replica**: Starts with 1 replica by default
 - **Auto-scaling**: HPA scales 1-3 pods based on CPU and memory usage
 - **Rolling updates**: Zero-downtime deployments with rolling update strategy
 
 Scale manually:
+
 ```bash
 kubectl scale deployment sakumari-app -n sakumari --replicas=3
 ```
@@ -151,7 +158,7 @@ kubectl scale deployment sakumari-app -n sakumari --replicas=3
 ## Storage
 
 - **PostgreSQL**: 20Gi persistent volume with default storage class (fast-ssd commented out for compatibility)
-- **pgAdmin**: 2Gi persistent volume for configuration storage  
+- **pgAdmin**: 2Gi persistent volume for configuration storage
 - **Portainer**: 2Gi persistent volume for data storage
 - **Application**: Stateless containers
 
@@ -160,11 +167,13 @@ kubectl scale deployment sakumari-app -n sakumari --replicas=3
 ### Service Access
 
 **pgAdmin (Database Management):**
+
 - URL: https://sakumari-pgadmin.fukudev.org (if using ingress/tunnel)
 - Email: (from .env PGADMIN_DEFAULT_EMAIL)
 - Password: (from .env PGADMIN_DEFAULT_PASSWORD)
 
 **Portainer (Container Management):**
+
 - URL: https://sakumari-portainer.fukudev.org (if using ingress/tunnel)
 - Username: admin (set on first login)
 - Password: (set on first login)
@@ -185,6 +194,7 @@ The Cloudflare tunnel provides secure access to your services without exposing p
 ### Configuration
 
 The tunnel configuration in `cloudflare-tunnel.yaml` routes traffic to internal Kubernetes services:
+
 - Routes external requests through Cloudflare's network
 - Terminates SSL at Cloudflare edge
 - Provides DDoS protection and CDN benefits

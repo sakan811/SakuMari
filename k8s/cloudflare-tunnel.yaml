@@ -19,43 +19,43 @@ spec:
     spec:
       # securityContext removed for compatibility
       containers:
-      - name: cloudflared
-        image: cloudflare/cloudflared:latest
-        args:
-        - tunnel
-        - --no-autoupdate
-        - run
-        - --token-file
-        - /etc/cloudflared-token/token
-        volumeMounts:
-        - name: tunnel-token
-          mountPath: /etc/cloudflared-token
-          readOnly: true
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "50m"
-          limits:
-            memory: "128Mi"
-            cpu: "200m"
-        # securityContext removed for compatibility
-        livenessProbe:
-          httpGet:
-            path: /ready
-            port: 20241
-          initialDelaySeconds: 10
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 20241
-          initialDelaySeconds: 10
-          periodSeconds: 10
+        - name: cloudflared
+          image: cloudflare/cloudflared:latest
+          args:
+            - tunnel
+            - --no-autoupdate
+            - run
+            - --token-file
+            - /etc/cloudflared-token/token
+          volumeMounts:
+            - name: tunnel-token
+              mountPath: /etc/cloudflared-token
+              readOnly: true
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          # securityContext removed for compatibility
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 20241
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 20241
+            initialDelaySeconds: 10
+            periodSeconds: 10
       volumes:
-      - name: tunnel-token
-        secret:
-          secretName: sakumari-secrets
-          items:
-          - key: CLOUDFLARE_TUNNEL_TOKEN
-            path: token
+        - name: tunnel-token
+          secret:
+            secretName: sakumari-secrets
+            items:
+              - key: CLOUDFLARE_TUNNEL_TOKEN
+                path: token
       restartPolicy: Always

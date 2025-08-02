@@ -120,16 +120,16 @@ test.describe("Authentication Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // Wait for sign-in button to appear
-    await expect(
-      page.getByRole("button", { name: "Sign In" }),
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Should show welcome message for unauthenticated users
     await expect(page.getByText("🌸 SakuMari 🌸")).toBeVisible();
     await expect(
-      page.getByText("Sign in with your Google account").or(
-        page.getByText("Welcome to SakuMari")
-      ),
+      page
+        .getByText("Sign in with your Google account")
+        .or(page.getByText("Welcome to SakuMari")),
     ).toBeVisible();
   });
 
@@ -143,16 +143,16 @@ test.describe("Authentication Flow", () => {
     // Wait for logout to complete
     await page.waitForTimeout(10000);
     await page.reload();
-    await expect(
-      page.getByRole("button", { name: "Sign In" }),
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Try to access protected route
     await page.goto("/hiragana");
 
     // Should show sign in prompt on the hiragana page or redirect to home
-    await expect(
-      page.getByRole("button", { name: "Sign In" }),
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible({
+      timeout: 5000,
+    });
   });
 });

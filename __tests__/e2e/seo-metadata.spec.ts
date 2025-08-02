@@ -119,9 +119,7 @@ test.describe("SEO Metadata E2E Tests", () => {
       await expect(page).toHaveTitle(/SakuMari.*Master Japanese Kana/);
 
       // Should show sign-in prompt
-      await expect(
-        page.getByRole("button", { name: "Sign In" }),
-      ).toBeVisible();
+      await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible();
     });
 
     test("should redirect to home for OpenGraph tags", async ({ page }) => {
@@ -151,9 +149,7 @@ test.describe("SEO Metadata E2E Tests", () => {
       await expect(page).toHaveTitle(/SakuMari.*Master Japanese Kana/);
 
       // Should show sign-in prompt
-      await expect(
-        page.getByRole("button", { name: "Sign In" }),
-      ).toBeVisible();
+      await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible();
     });
 
     test("should redirect to home for OpenGraph tags", async ({ page }) => {
@@ -183,9 +179,7 @@ test.describe("SEO Metadata E2E Tests", () => {
       await expect(page).toHaveTitle(/SakuMari.*Master Japanese Kana/);
 
       // Should show sign-in prompt
-      await expect(
-        page.getByRole("button", { name: "Sign In" }),
-      ).toBeVisible();
+      await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible();
     });
   });
 

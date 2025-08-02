@@ -54,7 +54,7 @@ services:
     user: "nextjs:nodejs"
     networks:
       - sakumari
-      
+
 volumes:
   postgres_data:
   pgadmin_data:

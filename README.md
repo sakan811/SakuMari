@@ -124,6 +124,7 @@ For testing or development environments, you can enable custom username/password
 3. Both Google OAuth and custom credentials will be available on the sign-in page
 
 **Use Cases:**
+
 - E2E testing in production environments
 - Local development without Google OAuth setup
 - Automated testing scenarios
@@ -208,7 +209,7 @@ make clean              # Stop and remove all containers, volumes, images
 
 # Kubernetes Deployments
 make k8s-deploy         # Deploy to Kubernetes using Kustomize
-make k8s-status         # Show Kubernetes deployment status  
+make k8s-status         # Show Kubernetes deployment status
 make k8s-logs           # Show application logs in Kubernetes
 make k8s-secrets        # Show generated secrets (with hash suffixes)
 make k8s-port-forward   # Port forward to database for setup
@@ -221,6 +222,7 @@ make k8s-clean          # Delete Kubernetes namespace and all resources
 For production-ready Kubernetes deployments with enterprise features:
 
 **✨ Features:**
+
 - **Kustomize-based**: Secure secret management from `.env` files
 - **No hardcoded secrets**: Safe for public repositories
 - **Single replica deployment**: Starts with 1 replica, auto-scales to max 3 based on CPU/memory
@@ -229,6 +231,7 @@ For production-ready Kubernetes deployments with enterprise features:
 - **Ingress options**: NGINX ingress OR Cloudflare tunnel for self-hosting
 
 **🚀 Quick Deploy:**
+
 ```bash
 # Setup secrets from root .env file
 cp .env k8s/.env  # Edit k8s/.env with your values if needed
@@ -298,12 +301,14 @@ pnpm run test:e2e           # Run Playwright tests (webServer manages app)
 - **Database Setup**: Runs from host using localhost connection via setup-database.sh script
 
 **Benefits:**
+
 - **Faster setup**: No complex container orchestration
 - **Standard workflow**: Uses familiar `next build` and `next start` commands
 - **Reliable**: Playwright manages app lifecycle with proper health checks
 - **CI-optimized**: Uses standard GitHub Actions patterns
 
 **Architecture:**
+
 - Database runs in Docker container with port forwarding
 - Next.js app managed by Playwright webServer configuration
 - Tests run against locally managed application at localhost:3000
