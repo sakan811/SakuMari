@@ -22,9 +22,9 @@
     "test:db": "vitest run --config vitest.config.db.mts",
     "test:db:watch": "vitest --config vitest.config.db.mts",
     "test:db:clean": "cross-env NODE_ENV=test && (rm -f __tests__/db/test.db || del __tests__\\db\\test.db 2>nul || true)",
-    "test:e2e": "cross-env NODE_ENV=test npx playwright test ",
-    "test:e2e:build": "cross-env NODE_ENV=test PULL_POLICY=build docker compose up -d db pgadmin app",
-    "test:e2e:setup": "cross-env NODE_ENV=test PRISMA_ENGINES_MIRROR=https://registry.npmmirror.com/-/binary/prisma PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm exec prisma generate && cross-env NODE_ENV=test pnpm exec prisma migrate deploy && cross-env NODE_ENV=test pnpm exec prisma db seed"
+    "test:e2e": "cross-env NODE_ENV=test npx playwright test",
+    "test:e2e:infra": "PULL_POLICY=build docker compose up -d db pgadmin app",
+    "test:e2e:db": "cross-env NODE_ENV=test ./scripts/setup-database.sh"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

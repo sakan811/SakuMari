@@ -32,7 +32,15 @@ rm -f "$PROJECT_ROOT/.env.local.bak"
 # Export environment variables from .env.local
 export $(grep -v '^#' "$PROJECT_ROOT/.env.local" | xargs)
 
+# Handle NODE_ENV for E2E testing
+if [ "$NODE_ENV" = "test" ]; then
+    echo "🧪 Test environment detected - using Prisma mirror for faster downloads"
+    export PRISMA_ENGINES_MIRROR=https://registry.npmmirror.com/-/binary/prisma
+    export PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
+fi
+
 echo "🔗 Database connection: $POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB"
+echo "🌍 Environment: ${NODE_ENV:-development}"
 
 cd "$PROJECT_ROOT"
 

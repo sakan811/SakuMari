@@ -124,7 +124,7 @@ test-db: ## Run database tests
 	pnpm test:db:setup && pnpm test:db
 
 test-e2e: ## Run E2E tests (full workflow)
-	pnpm test:e2e:setup && pnpm test:e2e:build && pnpm test:e2e
+	pnpm test:e2e:infra && pnpm test:e2e:db && pnpm test:e2e
 
 test-all: lint format test-unit test-db test-e2e ## Run all tests and quality checks
 
@@ -132,7 +132,7 @@ test-all: lint format test-unit test-db test-e2e ## Run all tests and quality ch
 # PHONY DECLARATIONS
 # =============================================================================
 
-.PHONY: postgres db-admin db-tools db-setup db-reset dev-up prod-up tunnel-up \
+.PHONY: postgres db-admin db-setup db-reset dev-up \
         logs logs-app status down clean k8s-deploy k8s-status k8s-pods k8s-logs \
         k8s-logs-db k8s-logs-tunnel k8s-secrets k8s-port-forward k8s-db-setup \
         k8s-restart-app k8s-restart-db k8s-describe k8s-events k8s-clean \
