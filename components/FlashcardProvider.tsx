@@ -169,7 +169,7 @@ export function FlashcardProvider({
     // Calculate weights (inverse of accuracy) with minimum weight to prevent zero weights
     const weights = data.map((kana) => Math.max(1 - kana.accuracy, 0.01));
     const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-    
+
     let randomVal = Math.random() * totalWeight;
     let selectedKana = null;
 

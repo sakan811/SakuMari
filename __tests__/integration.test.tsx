@@ -22,12 +22,12 @@ describe("Integration Tests", () => {
       if (url === "/api/flashcards") {
         return Promise.resolve({
           ok: true,
-          json: async () => [mockKana.basic]
+          json: async () => [mockKana.basic],
         });
       } else if (url === "/api/flashcards/submit") {
         return Promise.resolve({
           ok: true,
-          json: async () => ({ success: true })
+          json: async () => ({ success: true }),
         });
       }
       return Promise.reject(new Error(`Unexpected URL: ${url}`));
@@ -58,7 +58,7 @@ describe("Integration Tests", () => {
     mockFetch.mockResolvedValue({
       ok: false,
       status: 401,
-      json: async () => ({ error: "Unauthorized" })
+      json: async () => ({ error: "Unauthorized" }),
     });
 
     render(<FlashcardApp kanaType="hiragana" />);

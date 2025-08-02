@@ -34,40 +34,40 @@ spec:
     spec:
       # securityContext removed for compatibility
       containers:
-      - name: pgadmin
-        image: dpage/pgadmin4:latest
-        ports:
-        - containerPort: 80
-        env:
-        - name: PGADMIN_DEFAULT_EMAIL
-          valueFrom:
-            secretKeyRef:
-              name: sakumari-secrets
-              key: PGADMIN_DEFAULT_EMAIL
-        - name: PGADMIN_DEFAULT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: sakumari-secrets
-              key: PGADMIN_DEFAULT_PASSWORD
-        - name: PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION
-          value: "True"
-        - name: PGADMIN_CONFIG_LOGIN_BANNER
-          value: "'SakuMari Database Administration'"
-        volumeMounts:
-        - name: pgadmin-storage
-          mountPath: /var/lib/pgadmin
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "100m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        # securityContext removed for compatibility
+        - name: pgadmin
+          image: dpage/pgadmin4:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: PGADMIN_DEFAULT_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: sakumari-secrets
+                  key: PGADMIN_DEFAULT_EMAIL
+            - name: PGADMIN_DEFAULT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sakumari-secrets
+                  key: PGADMIN_DEFAULT_PASSWORD
+            - name: PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION
+              value: "True"
+            - name: PGADMIN_CONFIG_LOGIN_BANNER
+              value: "'SakuMari Database Administration'"
+          volumeMounts:
+            - name: pgadmin-storage
+              mountPath: /var/lib/pgadmin
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          # securityContext removed for compatibility
       volumes:
-      - name: pgadmin-storage
-        persistentVolumeClaim:
-          claimName: pgadmin-pvc
+        - name: pgadmin-storage
+          persistentVolumeClaim:
+            claimName: pgadmin-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -81,7 +81,7 @@ spec:
   selector:
     app: pgadmin
   ports:
-  - port: 80
-    targetPort: 80
-    name: http
+    - port: 80
+      targetPort: 80
+      name: http
   type: ClusterIP
