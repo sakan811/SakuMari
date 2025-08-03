@@ -68,8 +68,8 @@ CREDS_TEST_EMAIL=test@sakumari.local
 CREDS_TEST_PASSWORD=TestPassword123!
 
 # Admin Interfaces
-PGADMIN_DEFAULT_EMAIL=admin@sakumari.local
-PGADMIN_DEFAULT_PASSWORD=your-pgadmin-password
+DBGATE_DEFAULT_EMAIL=admin@sakumari.local
+DBGATE_DEFAULT_PASSWORD=your-dbgate-password
 
 # Cloudflare Tunnel (if using tunnel instead of ingress)
 CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token

@@ -54,22 +54,44 @@ Visit <http://localhost:3000>
 
 ### 1. Environment Configuration
 
-Create `.env` from the example and configure:
+**Important:** Different deployment methods use different `.env` file locations for security and configuration isolation.
+
+#### Quick Setup
 
 ```bash
+# Create base environment file for local development and Docker
 cp .env.example .env
+# Edit .env with your values
 ```
 
-**Required environment variables:**
+#### Environment File Usage by Deployment Method
+
+| Deployment Method | Environment File Location | Purpose |
+|------------------|---------------------------|---------|
+| **Local Development** | Root `.env` | Development server configuration |
+| **Docker Compose** | Root `.env` | Container orchestration via `env_file: ../.env` |
+| **Kubernetes** | `k8s/.env` | Kustomize secret generation (isolated from root) |
+
+#### Why Separate k8s/.env?
+
+**Security & Configuration Isolation:**
+- **Root `.env`**: Contains localhost-specific configuration (`POSTGRES_HOST=localhost`)
+- **k8s/.env**: Contains Kubernetes-specific configuration (`POSTGRES_HOST=postgres-service`)
+- **Secret Management**: Kustomize generates secrets from `k8s/.env` without exposing them in git
+- **Environment Separation**: Different authentication URLs and database hosts per environment
+
+#### Base Environment Variables (Root .env)
+
+For **local development** and **Docker deployments**, configure the root `.env` file:
 
 ```bash
-# Database
+# Database (Local Development & Docker)
 POSTGRES_DB=sakumari
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
-POSTGRES_HOST=localhost  # Use 'db' for Docker deployment
+POSTGRES_HOST=localhost  # For local dev. Use 'db' for Docker containers
 POSTGRES_PORT=5432
-# Required for Prisma
+# Required for Prisma (auto-generated if not provided)
 POSTGRES_PRISMA_URL=postgresql://postgres:your_password@localhost:5432/sakumari
 POSTGRES_URL_NON_POOLING=postgresql://postgres:your_password@localhost:5432/sakumari
 
@@ -84,14 +106,10 @@ CREDS_PROVIDER=false
 CREDS_TEST_EMAIL=test@sakumari.local
 CREDS_TEST_PASSWORD=TestPassword123!
 
-# pgAdmin Configuration
-PGADMIN_DEFAULT_EMAIL=admin@admin.com
-PGADMIN_DEFAULT_PASSWORD=admin
-
 # Cloudflare Tunnel Configuration (optional)
 CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token
 
-# Docker (required for containerized deployment)
+# Docker Configuration
 CONTAINER_NAME_PREFIX=sakumari
 DOCKER_IMAGE_NAME=sakanbeer88/sakumari
 DOCKER_IMAGE_TAG=latest
@@ -99,7 +117,30 @@ DOCKER_IMAGE_TAG=latest
 NODE_ENV=development
 ```
 
-**Database Connection:** The application now uses simplified environment configuration. The POSTGRES_PRISMA_URL and POSTGRES_URL_NON_POOLING are automatically generated from basic database variables if not explicitly provided. Set `POSTGRES_HOST=localhost` for local development or `POSTGRES_HOST=db` when using Docker containers.
+#### Kubernetes Environment Setup
+
+For **Kubernetes deployments**, you need a separate `k8s/.env` file with Kubernetes-specific values:
+
+```bash
+# Setup Kubernetes environment (after configuring root .env)
+cp .env k8s/.env
+
+# Edit k8s/.env with Kubernetes-specific values:
+# - POSTGRES_HOST=postgres-service  (Kubernetes service name)
+# - AUTH_URL=https://your-domain.com  (Production URL)
+# - NODE_ENV=production
+```
+
+**Key Kubernetes Differences:**
+- `POSTGRES_HOST=postgres-service` (instead of `localhost`)
+- `AUTH_URL=https://your-production-domain.com` (instead of localhost)
+- `NODE_ENV=production` (instead of development)
+
+**Database Connection Notes:**
+- **Local Development**: Set `POSTGRES_HOST=localhost` in root `.env`
+- **Docker Containers**: Change to `POSTGRES_HOST=db` in root `.env` when app runs in Docker
+- **Kubernetes**: Use `POSTGRES_HOST=postgres-service` in `k8s/.env`
+- **Auto-generation**: POSTGRES_PRISMA_URL and POSTGRES_URL_NON_POOLING are automatically generated from basic variables if not explicitly provided
 
 **Build Optimization:** The application uses Next.js standalone output mode for optimized Docker deployments. This creates a self-contained `.next/standalone` directory with minimal dependencies, reducing container size and improving startup performance.
 
@@ -135,7 +176,7 @@ For testing or development environments, you can enable custom username/password
 
 ```bash
 # Start database services
-make postgres  # Or make db-admin for pgAdmin
+make postgres  # Or make db-admin for DBGate
 
 # Install and setup
 make install
@@ -190,7 +231,7 @@ make test-all           # Lint + format + all tests
 
 # Database
 make postgres           # Start PostgreSQL database only
-make db-admin           # Start PostgreSQL with pgAdmin
+make db-admin           # Start PostgreSQL with DBGate
 make db-setup          # Automated database setup (recommended)
 # OR manual setup:
 pnpm run prisma:generate    # Generate Prisma client
@@ -234,13 +275,14 @@ For production-ready Kubernetes deployments with enterprise features:
 **🚀 Quick Deploy:**
 
 ```bash
-# Setup secrets from root .env file
-cp .env k8s/.env  # Edit k8s/.env with your values if needed
+# 1. Setup Kubernetes-specific environment (see Environment Configuration section above)
+cp .env k8s/.env
+# Edit k8s/.env with Kubernetes values: POSTGRES_HOST=postgres-service, AUTH_URL=https://your-domain.com, NODE_ENV=production
 
-# Deploy to Kubernetes (Kustomize generates secrets from k8s/.env)
+# 2. Deploy to Kubernetes (Kustomize generates secrets from k8s/.env)
 cd k8s && kubectl apply -k .
 
-# Setup database (requires separate terminal for port-forward)
+# 3. Setup database (requires separate terminal for port-forward)
 kubectl port-forward -n sakumari svc/postgres-service 5432:5432 &
 cd .. && pnpm run prisma:generate && npx prisma migrate deploy && pnpm run db:seed
 

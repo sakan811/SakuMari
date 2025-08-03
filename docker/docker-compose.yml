@@ -20,15 +20,26 @@ services:
     networks:
       - sakumari
 
-  # pgAdmin for database management
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: ${CONTAINER_NAME_PREFIX:-sakumari}-pgadmin
+  # DBGate for database management
+  dbgate:
+    image: dbgate/dbgate:latest
+    container_name: ${CONTAINER_NAME_PREFIX:-sakumari}-dbgate
     ports:
-      - "8080:80"
-    env_file: ../.env
+      - "8080:3000"
+    environment:
+      CONNECTIONS: |
+        {
+          "sakumari-db": {
+            "server": "db",
+            "port": 5432,
+            "user": "${POSTGRES_USER:-postgres}",
+            "password": "${POSTGRES_PASSWORD}",
+            "database": "${POSTGRES_DB:-sakumari}",
+            "engine": "postgres@dbgate-plugin-postgres"
+          }
+        }
     volumes:
-      - pgadmin_data:/var/lib/pgadmin
+      - dbgate_data:/root/.dbgate
     depends_on:
       db:
         condition: service_healthy
@@ -57,7 +68,7 @@ services:
 
 volumes:
   postgres_data:
-  pgadmin_data:
+  dbgate_data:
 
 networks:
   sakumari:

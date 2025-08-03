@@ -76,7 +76,7 @@ next-env.d.ts
 *.sqlite
 *.sqlite3
 postgres_data/
-pgadmin_data/
+dbgate_data/
 data/
 
 # Docker
