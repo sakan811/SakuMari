@@ -1,13 +1,4 @@
 # Cloudflare Tunnel Configuration
-# 
-# This deployment uses token-based tunnel configuration.
-# Route configuration must be set up in Cloudflare Dashboard:
-# 
-# Required routes:
-# - sakumari.fukudev.org → sakumari-app-service:3000
-# - sakumari-dbgate.fukudev.org → dbgate-service:3000
-# - sakumari-dashboard.fukudev.org → kubernetes-dashboard.kubernetes-dashboard:443
-#
 apiVersion: apps/v1
 kind: Deployment
 metadata:
