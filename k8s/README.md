@@ -4,28 +4,26 @@ This directory contains production-ready Kubernetes manifests for the SakuMari K
 
 ## Architecture
 
-- **Application**: Next.js app with 1 replica and autoscaling (1-3 pods)
-- **Database**: PostgreSQL 17 with persistent storage
-- **Management**: pgAdmin for database administration
-- **Container Management**: Portainer for Docker/Kubernetes management
-- **Tunnel**: Cloudflare tunnel for secure self-hosting exposure
-- **Ingress**: NGINX with SSL/TLS termination and security headers (alternative to tunnel)
-- **Storage**: Fast SSD storage classes for optimal performance
+- **Application**: Next.js app with single replica (right-sized for personal use)
+- **Database**: PostgreSQL 17 with minimal persistent storage (1Gi)
+- **Database Management**: DbGate for lightweight database administration (200Mi storage)
+- **Cluster Management**: Official Kubernetes Dashboard for monitoring and management
+- **Tunnel**: Cloudflare tunnel for secure external access (simplified networking)
+- **Storage**: Standard storage classes (cost-effective)
 - **Secrets**: Kustomize secretGenerator from .env file (secure for open-source)
 
 ## Prerequisites
 
 1. **Kubernetes cluster** (tested with minikube):
-   - NGINX Ingress Controller (optional - Cloudflare tunnel can be used instead)
-   - cert-manager for SSL certificates (if using NGINX ingress)
-   - Default storage class (fast-ssd commented out for minikube compatibility)
+   - Default storage class (standard storage for cost efficiency)
+   - No additional ingress controller required (uses Cloudflare tunnel)
 
 2. **Container registry access** to pull `sakanbeer88/sakumari:latest` image
 
-3. **DNS configuration** (if using ingress):
+3. **DNS configuration** (Cloudflare tunnel):
    - `sakumari.fukudev.org` → Main application
-   - `sakumari-pgadmin.fukudev.org` → Database administration
-   - `sakumari-portainer.fukudev.org` → Container management
+   - `sakumari-dbgate.fukudev.org` → Database administration
+   - `sakumari-dashboard.fukudev.org` → Kubernetes Dashboard
 
 ## Deployment Steps
 
@@ -47,12 +45,37 @@ cp ../.env.example ./.env
 **Required values in .env:**
 
 ```bash
+# Database Configuration (Kubernetes-specific)
+POSTGRES_HOST=postgres-service  # Must use Kubernetes service name
+POSTGRES_PORT=5432
+POSTGRES_DB=sakumari
+POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your-secure-database-password
+
+# Database URLs (update host to postgres-service)
+POSTGRES_PRISMA_URL=postgresql://postgres:your-secure-database-password@postgres-service:5432/sakumari
+POSTGRES_URL_NON_POOLING=postgresql://postgres:your-secure-database-password@postgres-service:5432/sakumari
+
+# Authentication (Production)
+AUTH_URL=https://sakumari.fukudev.org  # Must match your production domain
 AUTH_SECRET=your-nextauth-secret-32-chars-min
 AUTH_GOOGLE_ID=your-google-oauth-client-id
 AUTH_GOOGLE_SECRET=your-google-oauth-client-secret
+
+# Credentials Provider (E2E Testing and Development)
+CREDS_PROVIDER=true  # Enable for E2E testing
+CREDS_TEST_EMAIL=test@sakumari.local
+CREDS_TEST_PASSWORD=TestPassword123!
+
+# Admin Interfaces
+PGADMIN_DEFAULT_EMAIL=admin@sakumari.local
 PGADMIN_DEFAULT_PASSWORD=your-pgadmin-password
+
+# Cloudflare Tunnel (if using tunnel instead of ingress)
 CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token
+
+# Application Environment
+NODE_ENV=production
 ```
 
 ### 2. Deploy to Kubernetes
@@ -125,8 +148,7 @@ kubectl logs -n sakumari deployment/sakumari-app -f
 # Or use Makefile
 make k8s-logs
 
-# Note: Health probes are currently disabled due to Docker image compatibility
-# Health endpoint /api/health exists in source code but not in current Docker image
+# Health endpoint /api/health is enabled with comprehensive database connectivity checks
 ```
 
 ## Security Features
@@ -137,46 +159,74 @@ make k8s-logs
 - **Cloudflare protection**: DDoS protection and WAF when using tunnel
 - **No hardcoded secrets**: All sensitive data managed through .env files
 
-**Note**: Advanced security contexts (non-root, read-only filesystem, dropped capabilities)
-are currently disabled for maximum compatibility across different Kubernetes environments.
-These can be re-enabled in production by uncommenting the securityContext sections.
+**Security Contexts**: All services run with hardened security contexts including:
+- Non-root user execution with specific UIDs/GIDs
+- Dropped capabilities (ALL capabilities removed)
+- SecComp runtime default profile
+- Privilege escalation prevention
+
+**Portainer Security Warning**: Portainer requires Docker socket access (`/var/run/docker.sock`) 
+which creates a significant security risk in production environments. This grants the container 
+access to the host Docker daemon, potentially allowing privilege escalation. Consider using 
+alternative container management solutions (kubectl, lens, k9s) for production deployments.
 
 ## Scaling
 
-The application includes:
+The application uses:
 
-- **Single replica**: Starts with 1 replica by default
-- **Auto-scaling**: HPA scales 1-3 pods based on CPU and memory usage
+- **Single replica**: Optimized for personal/small-scale use
+- **Manual scaling**: Scale replicas manually if increased load is needed
 - **Rolling updates**: Zero-downtime deployments with rolling update strategy
 
-Scale manually:
+Scale manually if needed:
 
 ```bash
-kubectl scale deployment sakumari-app -n sakumari --replicas=3
+kubectl scale deployment sakumari-app -n sakumari --replicas=2
 ```
 
 ## Storage
 
-- **PostgreSQL**: 20Gi persistent volume with default storage class (fast-ssd commented out for compatibility)
-- **pgAdmin**: 2Gi persistent volume for configuration storage
-- **Portainer**: 2Gi persistent volume for data storage
+- **PostgreSQL**: 1Gi persistent volume (right-sized for flashcard data)
+- **DbGate**: 200Mi persistent volume for configuration storage
+- **Kubernetes Dashboard**: No persistent storage (stateless)
 - **Application**: Stateless containers
 
 ## Monitoring
 
 ### Service Access
 
-**pgAdmin (Database Management):**
+**DbGate (Database Management):**
 
-- URL: https://sakumari-pgadmin.fukudev.org (if using ingress/tunnel)
-- Email: (from .env PGADMIN_DEFAULT_EMAIL)
-- Password: (from .env PGADMIN_DEFAULT_PASSWORD)
+- URL: https://sakumari-dbgate.fukudev.org (via Cloudflare tunnel)
+- Pre-configured connection to PostgreSQL database
+- No additional authentication required (secured via tunnel)
 
-**Portainer (Container Management):**
+**Kubernetes Dashboard:**
 
-- URL: https://sakumari-portainer.fukudev.org (if using ingress/tunnel)
-- Username: admin (set on first login)
-- Password: (set on first login)
+- URL: https://sakumari-dashboard.fukudev.org (via Cloudflare tunnel)
+- Authentication: Bearer token (see setup instructions below)
+
+#### Kubernetes Dashboard Setup
+
+1. **Get the bearer token:**
+```bash
+kubectl -n kubernetes-dashboard create token admin-user
+```
+
+2. **Access the dashboard:**
+- Open https://sakumari-dashboard.fukudev.org
+- Select "Token" authentication method
+- Paste the bearer token from step 1
+- Click "Sign in"
+
+**Alternative local access (port-forward):**
+```bash
+# Start port-forward in background
+kubectl proxy &
+
+# Access locally at:
+# http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+```
 
 ## Cloudflare Tunnel Setup (Self-hosting)
 
@@ -188,8 +238,8 @@ The Cloudflare tunnel provides secure access to your services without exposing p
 2. **Cloudflare Tunnel** created via dashboard or CLI
 3. **DNS Records** configured in Cloudflare:
    - `sakumari.fukudev.org` → CNAME to `{tunnel-id}.cfargotunnel.com`
-   - `sakumari-pgadmin.fukudev.org` → CNAME to `{tunnel-id}.cfargotunnel.com`
-   - `sakumari-portainer.fukudev.org` → CNAME to `{tunnel-id}.cfargotunnel.com`
+   - `sakumari-dbgate.fukudev.org` → CNAME to `{tunnel-id}.cfargotunnel.com`
+   - `sakumari-dashboard.fukudev.org` → CNAME to `{tunnel-id}.cfargotunnel.com`
 
 ### Configuration
 

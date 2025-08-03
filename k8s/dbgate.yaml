@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dbgate-pvc
+  namespace: sakumari
+  labels:
+    app: dbgate
+    environment: production
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi # Much smaller than pgAdmin
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbgate
+  namespace: sakumari
+  labels:
+    app: dbgate
+    environment: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dbgate
+  template:
+    metadata:
+      labels:
+        app: dbgate
+        environment: production
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: dbgate
+          image: dbgate/dbgate:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: CONNECTIONS
+              value: |
+                {
+                  "sakumari-db": {
+                    "server": "postgres-service",
+                    "port": 5432,
+                    "user": "postgres",
+                    "password": "${POSTGRES_PASSWORD}",
+                    "database": "sakumari",
+                    "engine": "postgres@dbgate-plugin-postgres"
+                  }
+                }
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sakumari-secrets
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: dbgate-storage
+              mountPath: /root/.dbgate
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      volumes:
+        - name: dbgate-storage
+          persistentVolumeClaim:
+            claimName: dbgate-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbgate-service
+  namespace: sakumari
+  labels:
+    app: dbgate
+    environment: production
+spec:
+  selector:
+    app: dbgate
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: http
+  type: ClusterIP

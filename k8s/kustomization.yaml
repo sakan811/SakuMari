@@ -8,10 +8,9 @@ namespace: sakumari
 resources:
   - namespace.yaml
   - postgres.yaml
-  - pgadmin.yaml
-  - portainer.yaml
+  - dbgate.yaml
+  - kubernetes-dashboard.yaml
   - app.yaml
-  - ingress.yaml
   - cloudflare-tunnel.yaml
 
 secretGenerator:
