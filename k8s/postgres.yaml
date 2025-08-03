@@ -11,7 +11,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 20Gi # Increased for production
+      storage: 1Gi # Right-sized for flashcard app
   # storageClassName: fast-ssd  # Use default storage class for minikube
 ---
 apiVersion: apps/v1
@@ -35,7 +35,8 @@ spec:
         app: postgres
         environment: production
     spec:
-      # securityContext removed for compatibility
+      securityContext:
+        runAsNonRoot: true
       containers:
         - name: postgres
           image: postgres:17-alpine
@@ -62,18 +63,6 @@ spec:
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
-          livenessProbe:
-            exec:
-              command:
-                - pg_isready
-                - -U
-                - $(POSTGRES_USER)
-                - -d
-                - $(POSTGRES_DB)
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
           readinessProbe:
             exec:
               command:
@@ -82,17 +71,18 @@ spec:
                 - $(POSTGRES_USER)
                 - -d
                 - $(POSTGRES_DB)
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            timeoutSeconds: 5
-            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 10
           resources:
             requests:
-              memory: "512Mi"
-              cpu: "250m"
+              memory: "128Mi"
+              cpu: "100m"
             limits:
-              memory: "2Gi"
-              cpu: "1000m"
+              memory: "256Mi"
+              cpu: "500m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
