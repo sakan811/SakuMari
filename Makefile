@@ -21,8 +21,8 @@ help: ## Show available commands
 postgres: ## Start PostgreSQL database only
 	docker compose -f $(DOCKER_COMPOSE_FILE) up -d db
 
-db-admin: ## Start PostgreSQL with pgAdmin
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d db pgadmin
+db-admin: ## Start PostgreSQL with DBGate
+	docker compose -f $(DOCKER_COMPOSE_FILE) up -d db dbgate
 
 db-setup: ## Setup database using automated script (recommended)
 	./scripts/setup-database.sh
@@ -35,7 +35,7 @@ db-reset: ## Reset database with fresh data
 # =============================================================================
 
 dev-up: ## Start app stack for development (builds app locally)
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d db pgadmin app --build
+	docker compose -f $(DOCKER_COMPOSE_FILE) up -d db dbgate app --build
 
 
 logs: ## Show logs for all services
