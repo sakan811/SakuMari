@@ -13,7 +13,7 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 - **Interactive Flashcards**: Practice with typing or multiple-choice modes
 - **Adaptive Learning**: Weighted algorithm presents difficult characters more frequently
 - **Progress Tracking**: Detailed dashboard with accuracy statistics and character-specific progress
-- **Google OAuth**: Secure authentication with JWT session management
+- **Authentication**: NextAuth.js v5 with Google OAuth and optional custom credentials for testing
 - **Responsive Design**: Mobile-optimized interface for all devices
 - **Modern Stack**: Next.js 15 App Router with React 19 Server/Client components
 
@@ -23,7 +23,7 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 - **Backend**: Node.js 23, Prisma ORM v6, NextAuth.js v5
 - **Database**: PostgreSQL 17
 - **Testing**: Vitest, React Testing Library, Playwright
-- **Deployment**: Docker (docker/), Docker Compose, Kubernetes (Kustomize)
+- **Deployment**: Docker (docker/ directory), Docker Compose, Kubernetes (Kustomize)
 - **Package Manager**: pnpm
 
 ## Prerequisites
@@ -226,8 +226,9 @@ For production-ready Kubernetes deployments with enterprise features:
 - **Kustomize-based**: Secure secret management from `.env` files
 - **No hardcoded secrets**: Safe for public repositories
 - **Single replica deployment**: Starts with 1 replica, auto-scales to max 3 based on CPU/memory
+- **Health monitoring**: Built-in /api/health endpoint for Kubernetes liveness/readiness probes
 - **Security hardened**: Non-root containers, dropped capabilities, minimal privileges
-- **Multiple services**: App, PostgreSQL, pgAdmin, Portainer, Cloudflare tunnel
+- **Multiple services**: App, PostgreSQL, DBGate, Kubernetes Dashboard, Cloudflare tunnel
 - **Ingress options**: NGINX ingress OR Cloudflare tunnel for self-hosting
 
 **🚀 Quick Deploy:**
