@@ -22,7 +22,7 @@ import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
 import { useState } from "react";
 
-function HomePage() {
+export default function HomePage() {
   const { data: session, status } = useSession();
   const [activeTab, setActiveTab] = useState<"flashcards" | "dashboard">(
     "flashcards",
@@ -131,8 +131,4 @@ function HomePage() {
       </div>
     </div>
   );
-}
-
-export default function HomeClient() {
-  return <HomePage />;
 }

@@ -19,7 +19,7 @@ describe("Integration Tests", () => {
   test("complete practice workflow", async () => {
     // Mock the initial flashcards fetch
     mockFetch.mockImplementation((url) => {
-      if (url === "/api/flashcards") {
+      if (url === "/api/stats") {
         return Promise.resolve({
           ok: true,
           json: async () => [mockKana.basic],

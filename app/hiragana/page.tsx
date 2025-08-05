@@ -16,7 +16,7 @@
  */
 
 import { Metadata } from "next";
-import HiraganaClient from "./HiraganaClient";
+import FlashcardApp from "@/components/FlashcardApp";
 
 export const metadata: Metadata = {
   title: "Hiragana Practice | SakuMari",
@@ -47,5 +47,5 @@ export const metadata: Metadata = {
 };
 
 export default function HiraganaPage() {
-  return <HiraganaClient />;
+  return <FlashcardApp kanaType="hiragana" />;
 }

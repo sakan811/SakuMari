@@ -16,7 +16,7 @@
  */
 
 import { Metadata } from "next";
-import KatakanaClient from "./KatakanaClient";
+import FlashcardApp from "@/components/FlashcardApp";
 
 export const metadata: Metadata = {
   title: "Katakana Practice",
@@ -47,5 +47,5 @@ export const metadata: Metadata = {
 };
 
 export default function KatakanaPage() {
-  return <KatakanaClient />;
+  return <FlashcardApp kanaType="katakana" />;
 }
