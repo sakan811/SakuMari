@@ -16,7 +16,7 @@
  */
 
 import { Metadata } from "next";
-import DashboardClient from "./DashboardClient";
+import Dashboard from "@/components/Dashboard";
 
 export const metadata: Metadata = {
   title: "Dashboard - Your Progress",
@@ -32,5 +32,5 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardPage() {
-  return <DashboardClient />;
+  return <Dashboard />;
 }

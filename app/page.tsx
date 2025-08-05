@@ -16,7 +16,6 @@
  */
 
 import { Metadata } from "next";
-import HomeClient from "./HomeClient";
 
 export const metadata: Metadata = {
   description:
@@ -49,6 +48,9 @@ export const metadata: Metadata = {
   },
 };
 
+// Move the HomePage component content directly here 
+import HomePage from "@/components/HomePage";
+
 export default function Home() {
-  return <HomeClient />;
+  return <HomePage />;
 }

@@ -27,36 +27,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let requestBody;
-    try {
-      requestBody = await request.json();
-    } catch {
-      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-    }
+    const requestBody = await request.json().catch(() => {
+      throw new Error("Invalid JSON");
+    });
 
     const { kanaId, isCorrect } = requestBody;
 
-    // Validate required fields
-    if (kanaId === undefined || kanaId === null) {
-      return NextResponse.json(
-        { error: "kanaId is required" },
-        { status: 400 },
-      );
+    // Validate required fields and types
+    if (!kanaId) {
+      return NextResponse.json({ error: "kanaId is required" }, { status: 400 });
     }
-
-    if (isCorrect === undefined || isCorrect === null) {
-      return NextResponse.json(
-        { error: "isCorrect is required" },
-        { status: 400 },
-      );
-    }
-
-    // Validate data types
     if (typeof isCorrect !== "boolean") {
-      return NextResponse.json(
-        { error: "isCorrect must be a boolean" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "isCorrect must be a boolean" }, { status: 400 });
     }
 
     // Find or create KanaProgress record for this user

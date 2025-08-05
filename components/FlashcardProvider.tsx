@@ -84,7 +84,7 @@ export function FlashcardProvider({
   const fetchKanaData = async () => {
     setLoadingKana(true);
     try {
-      const response = await fetch("/api/flashcards");
+      const response = await fetch("/api/stats");
       if (!response.ok) {
         throw new Error("Failed to fetch kana data");
       }
