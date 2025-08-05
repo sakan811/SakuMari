@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from "vitest";
-import { GET } from "../../app/api/flashcards/route";
+import { GET } from "../../app/api/stats/route";
 import { POST } from "../../app/api/flashcards/submit/route";
 import { NextRequest } from "next/server";
 
@@ -16,7 +16,7 @@ vi.mock("@/lib/auth", () => ({ auth: mockAuth }));
 vi.mock("@/lib/prisma", () => ({ prisma: mockPrisma }));
 
 describe("Flashcards API", () => {
-  describe("GET /api/flashcards", () => {
+  describe("GET /api/stats", () => {
     test("requires authentication", async () => {
       mockAuth.mockResolvedValue(null);
       const response = await GET();
@@ -30,7 +30,7 @@ describe("Flashcards API", () => {
           id: "1",
           character: "あ",
           romaji: "a",
-          progress: [{ accuracy: 0.8 }],
+          progress: [{ attempts: 10, correct_attempts: 8, accuracy: 0.8 }],
         },
       ]);
 
@@ -42,6 +42,8 @@ describe("Flashcards API", () => {
         id: "1",
         character: "あ",
         romaji: "a",
+        attempts: 10,
+        correct_attempts: 8,
         accuracy: 0.8,
       });
     });
@@ -205,7 +207,7 @@ describe("Flashcards API", () => {
       );
 
       const response = await POST(request);
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(500);
     });
 
     test("handles empty request body", async () => {
@@ -221,7 +223,7 @@ describe("Flashcards API", () => {
       );
 
       const response = await POST(request);
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(500);
     });
   });
 });

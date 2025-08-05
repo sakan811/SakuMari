@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { GET } from "@/app/api/flashcards/route";
+import { GET } from "@/app/api/stats/route";
 import { POST } from "@/app/api/flashcards/submit/route";
 import { NextRequest } from "next/server";
 
@@ -21,7 +21,7 @@ describe("API Authentication", () => {
     vi.clearAllMocks();
   });
 
-  describe("GET /api/flashcards", () => {
+  describe("GET /api/stats", () => {
     test("returns 401 for unauthenticated requests", async () => {
       mockAuth.mockResolvedValue(null);
 
