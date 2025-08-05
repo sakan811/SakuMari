@@ -25,7 +25,7 @@ db-admin: ## Start PostgreSQL with DBGate
 	docker compose -f $(DOCKER_COMPOSE_FILE) up -d db dbgate
 
 db-setup: ## Setup database using automated script (recommended)
-	./scripts/setup-database.sh
+	chmod +x scripts/setup-database.sh && ./scripts/setup-database.sh
 
 db-reset: ## Reset database with fresh data
 	pnpm run prisma:reset && pnpm run db:seed
@@ -36,7 +36,6 @@ db-reset: ## Reset database with fresh data
 
 dev-up: ## Start app stack for development (builds app locally)
 	docker compose -f $(DOCKER_COMPOSE_FILE) up -d db dbgate app --build
-
 
 logs: ## Show logs for all services
 	docker compose -f $(DOCKER_COMPOSE_FILE) logs -f
