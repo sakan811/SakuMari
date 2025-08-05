@@ -7,11 +7,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { useSession } from "next-auth/react";
 
-// Import page components
-import HomeClient from "../../app/HomeClient";
-import HiraganaClient from "../../app/hiragana/HiraganaClient";
-import KatakanaClient from "../../app/katakana/KatakanaClient";
-import DashboardClient from "../../app/dashboard/DashboardClient";
+// Import actual components
+import HomePage from "../../components/HomePage";
+import FlashcardApp from "../../components/FlashcardApp";
+import Dashboard from "../../components/Dashboard";
 
 // Mock next-auth
 vi.mock("next-auth/react");
@@ -32,6 +31,12 @@ vi.mock("../../components/FlashcardApp", () => ({
 
 vi.mock("../../components/Dashboard", () => ({
   default: () => <div data-testid="dashboard">Dashboard</div>,
+}));
+
+vi.mock("../../components/FlashcardProvider", () => ({
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="flashcard-provider">{children}</div>
+  ),
 }));
 
 vi.mock("next/link", () => ({
@@ -59,7 +64,7 @@ describe("SEO Integration Tests", () => {
 
   describe("Page Rendering with SEO Structure", () => {
     it("should render home page with proper semantic structure", () => {
-      render(<HomeClient />);
+      render(<HomePage />);
 
       // Check for main heading
       const mainHeading = screen.getByRole("heading", { level: 1 });
@@ -78,21 +83,21 @@ describe("SEO Integration Tests", () => {
     });
 
     it("should render Hiragana page with proper content structure", () => {
-      render(<HiraganaClient />);
+      render(<FlashcardApp kanaType="hiragana" />);
 
       const flashcardApp = screen.getByTestId("flashcard-app");
       expect(flashcardApp).toHaveAttribute("data-kana-type", "hiragana");
     });
 
     it("should render Katakana page with proper content structure", () => {
-      render(<KatakanaClient />);
+      render(<FlashcardApp kanaType="katakana" />);
 
       const flashcardApp = screen.getByTestId("flashcard-app");
       expect(flashcardApp).toHaveAttribute("data-kana-type", "katakana");
     });
 
     it("should render Dashboard page with proper content structure", () => {
-      render(<DashboardClient />);
+      render(<Dashboard />);
 
       expect(screen.getByTestId("dashboard")).toBeInTheDocument();
     });
@@ -100,7 +105,7 @@ describe("SEO Integration Tests", () => {
 
   describe("Content Quality for SEO", () => {
     it("should have descriptive link text for better SEO", () => {
-      render(<HomeClient />);
+      render(<HomePage />);
 
       // Check that links have descriptive text, not just "click here"
       const hiraganaLink = screen.getByRole("link", {
@@ -115,7 +120,7 @@ describe("SEO Integration Tests", () => {
     });
 
     it("should have proper heading hierarchy", () => {
-      render(<HomeClient />);
+      render(<HomePage />);
 
       // Check heading levels are properly structured for SEO
       const h1 = screen.getByRole("heading", { level: 1 });
@@ -126,7 +131,7 @@ describe("SEO Integration Tests", () => {
     });
 
     it("should include Japanese characters for language-specific SEO", () => {
-      render(<HomeClient />);
+      render(<HomePage />);
 
       // Check that actual Japanese characters are included for better language SEO
       expect(screen.getByText(/ひらがな/)).toBeInTheDocument(); // Hiragana
@@ -138,7 +143,7 @@ describe("SEO Integration Tests", () => {
 
   describe("User Experience and SEO Alignment", () => {
     it("should provide clear value proposition for SEO", () => {
-      render(<HomeClient />);
+      render(<HomePage />);
 
       // Check for clear value proposition that aligns with meta descriptions
       expect(
@@ -148,7 +153,7 @@ describe("SEO Integration Tests", () => {
     });
 
     it("should have consistent navigation structure", () => {
-      render(<HomeClient />);
+      render(<HomePage />);
 
       // Check navigation consistency for better user experience and SEO
       expect(screen.getByTestId("header")).toBeInTheDocument();
@@ -172,7 +177,7 @@ describe("SEO Integration Tests", () => {
 
   describe("Accessibility and SEO Alignment", () => {
     it("should have accessible content that also benefits SEO", () => {
-      render(<HomeClient />);
+      render(<HomePage />);
 
       // Check for alt text equivalents in content structure
       const practiceCards = screen.getAllByRole("link");
@@ -191,7 +196,7 @@ describe("SEO Integration Tests", () => {
     });
 
     it("should use semantic HTML structure", () => {
-      render(<HomeClient />);
+      render(<HomePage />);
 
       // Check for proper semantic structure
       expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
@@ -204,24 +209,24 @@ describe("SEO Integration Tests", () => {
 
   describe("Component Integration", () => {
     it("should maintain component functionality after SEO separation", () => {
-      // Test that all client components render without errors
-      expect(() => render(<HomeClient />)).not.toThrow();
-      expect(() => render(<HiraganaClient />)).not.toThrow();
-      expect(() => render(<KatakanaClient />)).not.toThrow();
-      expect(() => render(<DashboardClient />)).not.toThrow();
+      // Test that all components render without errors
+      expect(() => render(<HomePage />)).not.toThrow();
+      expect(() => render(<FlashcardApp kanaType="hiragana" />)).not.toThrow();
+      expect(() => render(<FlashcardApp kanaType="katakana" />)).not.toThrow();
+      expect(() => render(<Dashboard />)).not.toThrow();
     });
 
     it("should pass correct props between server and client components", () => {
-      // Hiragana client should get correct kana type
-      const { unmount } = render(<HiraganaClient />);
+      // Hiragana component should get correct kana type
+      const { unmount } = render(<FlashcardApp kanaType="hiragana" />);
       expect(screen.getByTestId("flashcard-app")).toHaveAttribute(
         "data-kana-type",
         "hiragana",
       );
       unmount();
 
-      // Katakana client should get correct kana type
-      render(<KatakanaClient />);
+      // Katakana component should get correct kana type
+      render(<FlashcardApp kanaType="katakana" />);
       expect(screen.getByTestId("flashcard-app")).toHaveAttribute(
         "data-kana-type",
         "katakana",
