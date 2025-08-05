@@ -56,6 +56,7 @@ const SKIP_DIRS = [
   "coverage",
   "out",
   ".git",
+  "generated",
   "scripts", // Skip the scripts directory to avoid modifying this file
 ];
 
