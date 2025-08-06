@@ -37,12 +37,13 @@ type InteractionMode = "typing" | "multiple-choice";
 type FlashcardContextType = {
   currentKana: KanaWithAccuracy | null;
   loadingKana: boolean;
-  submitAnswer: (answer: string) => void;
+  submitAnswer: (answer: string) => Promise<void>;
   result: "correct" | "incorrect" | null;
   nextCard: () => void;
   interactionMode: InteractionMode;
   setInteractionMode: (mode: InteractionMode) => void;
   choices: string[];
+  isSubmitting: boolean;
 };
 
 const FlashcardContext = createContext<FlashcardContextType | undefined>(
@@ -71,6 +72,7 @@ export function FlashcardProvider({
   const [interactionMode, setInteractionMode] =
     useState<InteractionMode>("typing");
   const [choices, setChoices] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const hasFetched = useRef(false);
 
   // Prevent double fetch in React strict mode
@@ -193,14 +195,16 @@ export function FlashcardProvider({
 
   // Submit answer and update accuracy
   const submitAnswer = async (answer: string) => {
-    if (!currentKana) return;
+    if (!currentKana || isSubmitting) return;
 
-    const isCorrect =
-      answer.trim().toLowerCase() === currentKana.romaji.toLowerCase();
-    setResult(isCorrect ? "correct" : "incorrect");
+    setIsSubmitting(true);
 
     try {
-      await fetch("/api/flashcards/submit", {
+      const isCorrect =
+        answer.trim().toLowerCase() === currentKana.romaji.toLowerCase();
+
+      // Submit to API first
+      const response = await fetch("/api/flashcards/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -211,8 +215,19 @@ export function FlashcardProvider({
           interactionMode, // Track which mode was used
         }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Only set result after successful API submission
+      setResult(isCorrect ? "correct" : "incorrect");
     } catch (error) {
       console.error("Error submitting answer:", error);
+      // Show error state but still allow user to continue
+      setResult("incorrect");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -231,6 +246,7 @@ export function FlashcardProvider({
     interactionMode,
     setInteractionMode,
     choices,
+    isSubmitting,
   };
 
   return (

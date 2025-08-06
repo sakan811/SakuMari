@@ -34,6 +34,7 @@ export default function Flashcard() {
     interactionMode,
     setInteractionMode,
     choices,
+    isSubmitting,
   } = useFlashcard();
 
   // Typing mode state
@@ -44,25 +45,7 @@ export default function Flashcard() {
 
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Helper function to safely set timeout
-  const setSafeTimeout = (callback: () => void, delay: number) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(callback, delay);
-  };
 
   // Focus input when component mounts, when card changes, or after result is cleared
   useEffect(() => {
@@ -71,30 +54,27 @@ export default function Flashcard() {
       !loadingKana &&
       currentKana &&
       !result &&
-      !isProcessing &&
+      !isSubmitting &&
       interactionMode === "typing"
     ) {
       inputRef.current.focus();
     }
-  }, [currentKana, loadingKana, result, isProcessing, interactionMode]);
+  }, [currentKana, loadingKana, result, isSubmitting, interactionMode]);
 
   // Handle Enter key when result is shown
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "Enter" && result && !isProcessing) {
-        setIsProcessing(true);
+      if (e.key === "Enter" && result && !isSubmitting) {
         nextCard();
         setAnswer("");
         setSelectedChoice(null);
         setError("");
-        // Allow a brief delay before enabling the next action
-        setSafeTimeout(() => setIsProcessing(false), 500);
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [result, nextCard, isProcessing]);
+  }, [result, nextCard, isSubmitting]);
 
   // Clear state when switching modes
   useEffect(() => {
@@ -103,9 +83,9 @@ export default function Flashcard() {
     setError("");
   }, [interactionMode]);
 
-  const handleSubmit = (e?: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (isProcessing) return;
+    if (isSubmitting) return;
 
     let userAnswer: string;
 
@@ -125,33 +105,25 @@ export default function Flashcard() {
       userAnswer = choices[selectedChoice];
     }
 
-    setIsProcessing(true);
     setError(""); // Clear any previous errors
-
-    submitAnswer(userAnswer);
-
-    // Allow a brief delay before enabling the next action
-    setSafeTimeout(() => setIsProcessing(false), 500);
+    await submitAnswer(userAnswer);
   };
 
   const handleNextCard = () => {
-    setIsProcessing(true);
     nextCard();
     setAnswer("");
     setSelectedChoice(null);
     setError("");
-    // Allow a brief delay before enabling the next action
-    setSafeTimeout(() => setIsProcessing(false), 500);
   };
 
   const handleModeChange = (mode: InteractionMode) => {
-    if (isProcessing || result) return;
+    if (isSubmitting || result) return;
     setInteractionMode(mode);
     // State will be cleared by useEffect
   };
 
   const handleChoiceSelect = (index: number) => {
-    if (isProcessing || result) return;
+    if (isSubmitting || result) return;
     setSelectedChoice(index);
     setError("");
   };
@@ -184,7 +156,7 @@ export default function Flashcard() {
       <ModeSelector
         currentMode={interactionMode}
         onModeChange={handleModeChange}
-        disabled={isProcessing || !!result}
+        disabled={isSubmitting || !!result}
       />
 
       <div className="mb-6 sm:mb-8 rounded-lg bg-gradient-to-br from-[#fad182] via-[#fad182] to-[#f5c55a] shadow-xl border-2 border-[#705a39] aspect-[5/3] sm:aspect-[2.5/3.5] flex flex-col justify-between p-4 sm:p-6">
@@ -238,7 +210,7 @@ export default function Flashcard() {
                   className={`mb-1 sm:mb-2 rounded-md border-2 ${
                     error ? "border-[#ae0d13]" : "border-[#705a39]"
                   } px-3 sm:px-4 py-2 text-sm sm:text-base focus:border-[#d1622b] focus:outline-none bg-white text-[#403933] placeholder-[#705a39]`}
-                  disabled={isProcessing}
+                  disabled={isSubmitting}
                   autoFocus
                 />
                 {error && (
@@ -254,7 +226,7 @@ export default function Flashcard() {
                   choices={choices}
                   selectedChoice={selectedChoice}
                   onChoiceSelect={handleChoiceSelect}
-                  disabled={isProcessing}
+                  disabled={isSubmitting}
                   error={error}
                 />
               </div>
@@ -262,27 +234,27 @@ export default function Flashcard() {
 
             <button
               onClick={handleSubmit}
-              disabled={isProcessing}
+              disabled={isSubmitting}
               className={`rounded-md px-3 sm:px-4 py-2 text-sm sm:text-base font-medium text-white transition-all duration-200 border-2 ${
-                isProcessing
+                isSubmitting
                   ? "bg-[#705a39] cursor-not-allowed border-[#705a39]"
                   : "bg-[#d1622b] hover:bg-[#ae0d13] border-[#d1622b] hover:border-[#ae0d13] shadow-lg hover:shadow-xl transform hover:scale-105"
               }`}
             >
-              {isProcessing ? "Submitting..." : "Submit"}
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           </div>
         ) : (
           <button
             onClick={handleNextCard}
-            disabled={isProcessing}
+            disabled={isSubmitting}
             className={`rounded-md px-3 sm:px-4 py-2 text-sm sm:text-base font-medium text-white transition-all duration-200 border-2 ${
-              isProcessing
+              isSubmitting
                 ? "bg-[#705a39] cursor-not-allowed border-[#705a39]"
                 : "bg-[#d1622b] hover:bg-[#ae0d13] border-[#d1622b] hover:border-[#ae0d13] shadow-lg hover:shadow-xl transform hover:scale-105"
             }`}
           >
-            {isProcessing ? "Loading..." : "Next Card"}
+            {isSubmitting ? "Loading..." : "Next Card"}
           </button>
         )}
       </div>
