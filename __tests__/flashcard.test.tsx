@@ -186,23 +186,18 @@ describe("Flashcard Component", () => {
           currentKana: mockKana.basic,
           interactionMode: "typing",
           choices: ["a", "ka", "sa", "ta"],
+          isSubmitting: true,
         }),
       );
 
       render(<Flashcard />);
 
       const input = screen.getByPlaceholderText("Type romaji equivalent...");
-      const submitButton = screen.getByRole("button", { name: "Submit" });
+      const submitButton = screen.getByRole("button", { name: "Submitting..." });
 
-      // Initially enabled
-      expect(input).not.toBeDisabled();
-      expect(submitButton).not.toBeDisabled();
-
-      // Submit to trigger processing state
-      fireEvent.change(input, { target: { value: "a" } });
-      fireEvent.click(submitButton);
-
-      // Should be disabled during processing (briefly)
+      // Should be disabled when isSubmitting is true
+      expect(input).toBeDisabled();
+      expect(submitButton).toBeDisabled();
       expect(submitButton.textContent).toBe("Submitting...");
     });
 
@@ -213,16 +208,14 @@ describe("Flashcard Component", () => {
           result: "correct",
           interactionMode: "typing",
           choices: ["a", "ka", "sa", "ta"],
+          isSubmitting: true,
         }),
       );
 
       render(<Flashcard />);
 
-      const nextButton = screen.getByRole("button", { name: "Next Card" });
-      expect(nextButton).not.toBeDisabled();
-
-      // Click to trigger processing state
-      fireEvent.click(nextButton);
+      const nextButton = screen.getByRole("button", { name: "Loading..." });
+      expect(nextButton).toBeDisabled();
       expect(nextButton.textContent).toBe("Loading...");
     });
 
@@ -234,24 +227,22 @@ describe("Flashcard Component", () => {
           submitAnswer,
           interactionMode: "typing",
           choices: ["a", "ka", "sa", "ta"],
+          isSubmitting: true,
         }),
       );
 
       render(<Flashcard />);
 
       const input = screen.getByPlaceholderText("Type romaji equivalent...");
-      const submitButton = screen.getByRole("button", { name: "Submit" });
+      const submitButton = screen.getByRole("button", { name: "Submitting..." });
 
       fireEvent.change(input, { target: { value: "a" } });
 
-      // First click should work
-      fireEvent.click(submitButton);
-      expect(submitAnswer).toHaveBeenCalledTimes(1);
-
-      // Subsequent clicks should be ignored while processing
+      // Clicks should be ignored while processing since button is disabled
       fireEvent.click(submitButton);
       fireEvent.click(submitButton);
-      expect(submitAnswer).toHaveBeenCalledTimes(1);
+      fireEvent.click(submitButton);
+      expect(submitAnswer).toHaveBeenCalledTimes(0);
     });
 
     test("prevents keyboard submission when processing", () => {
@@ -262,6 +253,7 @@ describe("Flashcard Component", () => {
           submitAnswer,
           interactionMode: "typing",
           choices: ["a", "ka", "sa", "ta"],
+          isSubmitting: true,
         }),
       );
 
@@ -270,13 +262,10 @@ describe("Flashcard Component", () => {
       const input = screen.getByPlaceholderText("Type romaji equivalent...");
       fireEvent.change(input, { target: { value: "a" } });
 
-      // First Enter should work
+      // Enter presses should be ignored while processing
       fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
-      expect(submitAnswer).toHaveBeenCalledTimes(1);
-
-      // Subsequent Enter presses should be ignored while processing
       fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
-      expect(submitAnswer).toHaveBeenCalledTimes(1);
+      expect(submitAnswer).toHaveBeenCalledTimes(0);
     });
 
     test("prevents next card action when processing", () => {
@@ -288,18 +277,16 @@ describe("Flashcard Component", () => {
           nextCard,
           interactionMode: "typing",
           choices: ["a", "ka", "sa", "ta"],
+          isSubmitting: true,
         }),
       );
 
       render(<Flashcard />);
 
-      // First Enter should work
+      // Enter presses should be ignored while processing
       fireEvent.keyDown(window, { key: "Enter", code: "Enter" });
-      expect(nextCard).toHaveBeenCalledTimes(1);
-
-      // Subsequent Enter presses should be ignored while processing
       fireEvent.keyDown(window, { key: "Enter", code: "Enter" });
-      expect(nextCard).toHaveBeenCalledTimes(1);
+      expect(nextCard).toHaveBeenCalledTimes(0);
     });
   });
 

@@ -18,6 +18,10 @@ export const mockFlashcardProvider = (overrides = {}) => ({
   submitAnswer: vi.fn(),
   result: null,
   nextCard: vi.fn(),
+  interactionMode: "typing",
+  setInteractionMode: vi.fn(),
+  choices: [],
+  isSubmitting: false,
   ...overrides,
 });
 
