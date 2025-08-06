@@ -35,10 +35,16 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields and types
     if (!kanaId) {
-      return NextResponse.json({ error: "kanaId is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "kanaId is required" },
+        { status: 400 },
+      );
     }
     if (typeof isCorrect !== "boolean") {
-      return NextResponse.json({ error: "isCorrect must be a boolean" }, { status: 400 });
+      return NextResponse.json(
+        { error: "isCorrect must be a boolean" },
+        { status: 400 },
+      );
     }
 
     // Find or create KanaProgress record for this user

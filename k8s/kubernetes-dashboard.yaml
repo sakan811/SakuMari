@@ -73,7 +73,12 @@ rules:
   # Allow Dashboard to get, update and delete Dashboard exclusive secrets.
   - apiGroups: [""]
     resources: ["secrets"]
-    resourceNames: ["kubernetes-dashboard-key-holder", "kubernetes-dashboard-certs", "kubernetes-dashboard-csrf"]
+    resourceNames:
+      [
+        "kubernetes-dashboard-key-holder",
+        "kubernetes-dashboard-certs",
+        "kubernetes-dashboard-csrf",
+      ]
     verbs: ["get", "update", "delete"]
     # Allow Dashboard to get and update 'kubernetes-dashboard-settings' config map.
   - apiGroups: [""]
@@ -87,7 +92,14 @@ rules:
     verbs: ["proxy"]
   - apiGroups: [""]
     resources: ["services/proxy"]
-    resourceNames: ["heapster", "http:heapster:", "https:heapster:", "dashboard-metrics-scraper", "http:dashboard-metrics-scraper"]
+    resourceNames:
+      [
+        "heapster",
+        "http:heapster:",
+        "https:heapster:",
+        "dashboard-metrics-scraper",
+        "http:dashboard-metrics-scraper",
+      ]
     verbs: ["get"]
 ---
 kind: ClusterRole
@@ -254,8 +266,8 @@ spec:
             initialDelaySeconds: 30
             timeoutSeconds: 30
           volumeMounts:
-          - mountPath: /tmp
-            name: tmp-volume
+            - mountPath: /tmp
+              name: tmp-volume
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -296,6 +308,6 @@ roleRef:
   kind: ClusterRole
   name: cluster-admin
 subjects:
-- kind: ServiceAccount
-  name: admin-user
-  namespace: kubernetes-dashboard
+  - kind: ServiceAccount
+    name: admin-user
+    namespace: kubernetes-dashboard

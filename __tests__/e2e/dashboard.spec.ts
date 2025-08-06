@@ -55,13 +55,17 @@ test.describe("Dashboard Features", () => {
     await page.getByTestId("filter-hiragana").click();
 
     // Filter should be active
-    await expect(page.getByTestId("filter-hiragana")).toHaveClass(/bg-\[#d1622b\]/);
+    await expect(page.getByTestId("filter-hiragana")).toHaveClass(
+      /bg-\[#d1622b\]/,
+    );
 
     // Click Katakana filter
     await page.getByTestId("filter-katakana").click();
 
     // Filter should be active
-    await expect(page.getByTestId("filter-katakana")).toHaveClass(/bg-\[#d1622b\]/);
+    await expect(page.getByTestId("filter-katakana")).toHaveClass(
+      /bg-\[#d1622b\]/,
+    );
 
     // Click All filter
     await page.getByTestId("filter-all").click();
@@ -84,7 +88,9 @@ test.describe("Dashboard Features", () => {
 
     // Should show sort indicator (either up or down arrow)
     await expect(
-      page.getByTestId("sort-character").getByText("↑")
+      page
+        .getByTestId("sort-character")
+        .getByText("↑")
         .or(page.getByTestId("sort-character").getByText("↓")),
     ).toBeVisible();
 
@@ -93,7 +99,9 @@ test.describe("Dashboard Features", () => {
 
     // Should show sort indicator (arrow should change or remain)
     await expect(
-      page.getByTestId("sort-character").getByText("↑")
+      page
+        .getByTestId("sort-character")
+        .getByText("↑")
         .or(page.getByTestId("sort-character").getByText("↓")),
     ).toBeVisible();
   });
@@ -129,6 +137,8 @@ test.describe("Dashboard Features", () => {
 
     // Should be able to interact with filters
     await page.getByTestId("filter-hiragana").click();
-    await expect(page.getByTestId("filter-hiragana")).toHaveClass(/bg-\[#d1622b\]/);
+    await expect(page.getByTestId("filter-hiragana")).toHaveClass(
+      /bg-\[#d1622b\]/,
+    );
   });
 });

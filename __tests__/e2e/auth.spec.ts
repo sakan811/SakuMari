@@ -126,7 +126,9 @@ test.describe("Authentication Flow", () => {
 
     // Should show welcome message for unauthenticated users
     await expect(page.getByText("🌸 SakuMari 🌸")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Welcome to SakuMari!", level: 2 })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Welcome to SakuMari!", level: 2 }),
+    ).toBeVisible();
   });
 
   test("should handle unauthenticated access to protected routes", async ({

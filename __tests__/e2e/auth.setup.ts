@@ -7,7 +7,9 @@ setup("authenticate", async ({ page }) => {
   // Check if CREDS_PROVIDER is enabled
   const credsProvider = process.env.CREDS_PROVIDER === "true";
   if (!credsProvider) {
-    throw new Error("E2E tests require CREDS_PROVIDER=true to be set in environment variables");
+    throw new Error(
+      "E2E tests require CREDS_PROVIDER=true to be set in environment variables",
+    );
   }
 
   // Navigate to home page

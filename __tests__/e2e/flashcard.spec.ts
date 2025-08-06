@@ -2,10 +2,7 @@ import { test, expect } from "@playwright/test";
 
 // Helper function to wait for kana to load
 async function waitForKanaLoad(page: any, timeout = 10000) {
-  await page.waitForSelector(
-    '[data-testid="current-kana"]',
-    { timeout },
-  );
+  await page.waitForSelector('[data-testid="current-kana"]', { timeout });
 }
 
 // Helper function to expect either result
