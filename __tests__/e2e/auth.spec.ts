@@ -96,9 +96,9 @@ test.describe("Authentication Flow", () => {
     await expect(page.getByText("Your Progress")).toBeVisible();
 
     // Should show filter buttons
-    await expect(page.getByText("All")).toBeVisible();
-    await expect(page.getByText("Hiragana")).toBeVisible();
-    await expect(page.getByText("Katakana")).toBeVisible();
+    await expect(page.getByTestId("filter-all")).toBeVisible();
+    await expect(page.getByTestId("filter-hiragana")).toBeVisible();
+    await expect(page.getByTestId("filter-katakana")).toBeVisible();
   });
 
   test("should logout successfully", async ({ page }) => {
@@ -126,7 +126,7 @@ test.describe("Authentication Flow", () => {
 
     // Should show welcome message for unauthenticated users
     await expect(page.getByText("🌸 SakuMari 🌸")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Welcome to SakuMari!" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Welcome to SakuMari!", level: 2 })).toBeVisible();
   });
 
   test("should handle unauthenticated access to protected routes", async ({
