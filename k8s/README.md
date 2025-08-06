@@ -7,7 +7,7 @@ This directory contains production-ready Kubernetes manifests for the SakuMari K
 - **Application**: Next.js app with single replica (right-sized for personal use)
 - **Database**: PostgreSQL 17 with minimal persistent storage (1Gi)
 - **Database Management**: DbGate for lightweight database administration (200Mi storage)
-- **Cluster Management**: Official Kubernetes Dashboard for monitoring and management
+- **Cluster Management**: Official Kubernetes Dashboard installed via Helm for monitoring and management
 - **Tunnel**: Cloudflare tunnel for secure external access (simplified networking)
 - **Storage**: Standard storage classes (cost-effective)
 - **Secrets**: Kustomize secretGenerator from .env file (secure for open-source)
@@ -23,7 +23,6 @@ This directory contains production-ready Kubernetes manifests for the SakuMari K
 3. **DNS configuration** (Cloudflare tunnel):
    - `sakumari.fukudev.org` → Main application
    - `sakumari-dbgate.fukudev.org` → Database administration
-   - `sakumari-dashboard.fukudev.org` → Kubernetes Dashboard
 
 ## Deployment Steps
 
@@ -88,12 +87,11 @@ This project uses **Kustomize** for deployment management. All secrets are gener
 # Deploy main application components
 kubectl apply -k .
 
-# Deploy Kubernetes Dashboard separately
-kubectl apply -k . -f dashboard-kustomization.yaml
+# Install Kubernetes Dashboard using official Helm chart
+make k8s-dashboard-install
 
-# Or use Makefile
+# Or use Makefile shortcut
 make k8s-deploy
-make k8s-dashboard-deploy
 ```
 
 **Alternative: Deploy specific components:**
@@ -206,35 +204,40 @@ kubectl scale deployment sakumari-app -n sakumari --replicas=2
 - Pre-configured connection to PostgreSQL database
 - No additional authentication required (secured via tunnel)
 
-**Kubernetes Dashboard:**
+**Kubernetes Dashboard (Official Helm Installation):**
 
-- URL: https://sakumari-dashboard.fukudev.org (via Cloudflare tunnel or ingress)
-- Authentication: Bearer token or skip login (if enabled)
+- Installation: Uses official Helm chart from kubernetes.github.io/dashboard/
+- Authentication: Bearer token only (as per official documentation)
+- Access: Local port-forward (recommended method)
 
-#### Dashboard Access
+#### Dashboard Installation & Access
 
-**Option 1: Web Access (Recommended)**
+**Install Dashboard:**
+```bash
+# Install using official Helm chart
+make k8s-dashboard-install
+
+# Or manually:
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+```
+
+**Access Dashboard:**
 ```bash
 # Get bearer token for authentication
-kubectl -n kubernetes-dashboard create token admin-user
+make k8s-dashboard-token
 
-# Access at: https://sakumari-dashboard.fukudev.org
-# Select "Token" and paste the bearer token
+# Start port-forward to dashboard (access at https://localhost:8443)
+make k8s-dashboard-port-forward
+
+# Or manually:
+kubectl -n kubernetes-dashboard create token kubernetes-dashboard
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
 ```
 
-**Option 2: Local Port-Forward**
+**Uninstall Dashboard (if needed):**
 ```bash
-# Start port-forward to dashboard service
-kubectl port-forward -n kubernetes-dashboard svc/kubernetes-dashboard 8443:443
-
-# Access at: https://localhost:8443
-# Accept self-signed certificate warning
-```
-
-**Option 3: Kubectl Proxy (Alternative)**
-```bash
-kubectl proxy
-# Access at: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+make k8s-dashboard-uninstall
 ```
 
 ## Cloudflare Tunnel Setup (Self-hosting)
@@ -248,7 +251,6 @@ The Cloudflare tunnel provides secure access to your services without exposing p
 3. **DNS Records** configured in Cloudflare:
    - `sakumari.fukudev.org` → CNAME to `{tunnel-id}.cfargotunnel.com`
    - `sakumari-dbgate.fukudev.org` → CNAME to `{tunnel-id}.cfargotunnel.com`
-   - `sakumari-dashboard.fukudev.org` → CNAME to `{tunnel-id}.cfargotunnel.com`
 
 ### Configuration
 
