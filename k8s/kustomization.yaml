@@ -9,7 +9,6 @@ resources:
   - namespace.yaml
   - postgres.yaml
   - dbgate.yaml
-  - kubernetes-dashboard.yaml
   - app.yaml
   - cloudflare-tunnel.yaml
 

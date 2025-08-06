@@ -278,18 +278,21 @@ For production-ready Kubernetes deployments with enterprise features:
 **🚀 Quick Deploy:**
 
 ```bash
-# 1. Setup Kubernetes-specific environment (see Environment Configuration section above)
+# 1. Create the sakumari namespace
+kubectl create namespace sakumari
+
+# 2. Setup Kubernetes-specific environment (see Environment Configuration section above)
 cp .env k8s/.env
 # Edit k8s/.env with Kubernetes values: POSTGRES_HOST=postgres-service, AUTH_URL=https://your-domain.com, NODE_ENV=production
 
-# 2. Deploy to Kubernetes (Kustomize generates secrets from k8s/.env)
+# 3. Deploy to Kubernetes (Kustomize generates secrets from k8s/.env)
 cd k8s && kubectl apply -k .
 
-# 3. Setup database (requires separate terminal for port-forward)
+# 4. Setup database (requires separate terminal for port-forward)
 kubectl port-forward -n sakumari svc/postgres-service 5432:5432 &
 cd .. && pnpm run prisma:generate && npx prisma migrate deploy && pnpm run db:seed
 
-# Or use Makefile commands
+# Or use Makefile commands (namespace creation is handled automatically)
 make k8s-deploy
 make k8s-port-forward &  # In separate terminal
 make k8s-db-setup

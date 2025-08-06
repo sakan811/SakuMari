@@ -59,6 +59,15 @@ clean: ## Stop and remove all containers, volumes, images
 k8s-deploy: ## Deploy to Kubernetes using Kustomize
 	cd k8s && kubectl apply -k .
 
+k8s-dashboard-deploy: ## Deploy Kubernetes Dashboard separately
+	cd k8s && kubectl apply -k . -f dashboard-kustomization.yaml
+
+k8s-dashboard-token: ## Get bearer token for dashboard access
+	kubectl -n kubernetes-dashboard create token admin-user
+
+k8s-dashboard-port-forward: ## Port forward to dashboard (access at https://localhost:8443)
+	kubectl port-forward -n kubernetes-dashboard svc/kubernetes-dashboard 8443:443
+
 k8s-status: ## Show Kubernetes deployment status
 	kubectl get all -n $(K8S_NAMESPACE)
 
@@ -143,7 +152,8 @@ test-all: lint format test-unit test-db test-e2e ## Run all tests and quality ch
 # =============================================================================
 
 .PHONY: postgres db-admin db-setup db-reset dev-up \
-        logs logs-app status down clean k8s-deploy k8s-status k8s-pods k8s-logs \
-        k8s-logs-db k8s-logs-tunnel k8s-secrets k8s-port-forward k8s-db-setup \
-        k8s-restart-app k8s-restart-db k8s-describe k8s-events k8s-clean \
+        logs logs-app status down clean k8s-deploy k8s-dashboard-deploy k8s-dashboard-token \
+        k8s-dashboard-port-forward k8s-status k8s-pods k8s-logs k8s-logs-db k8s-logs-tunnel \
+        k8s-secrets k8s-port-forward k8s-db-setup k8s-restart-app k8s-restart-db \
+        k8s-describe k8s-events k8s-clean \
         dev build install lint format test-unit test-db test-e2e test-e2e-setup test-e2e-clean test-all
