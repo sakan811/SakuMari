@@ -85,11 +85,15 @@ This project uses **Kustomize** for deployment management. All secrets are gener
 **Standard Deployment:**
 
 ```bash
-# Deploy all components (ingress + tunnel included)
+# Deploy main application components
 kubectl apply -k .
+
+# Deploy Kubernetes Dashboard separately
+kubectl apply -k . -f dashboard-kustomization.yaml
 
 # Or use Makefile
 make k8s-deploy
+make k8s-dashboard-deploy
 ```
 
 **Alternative: Deploy specific components:**
@@ -204,32 +208,33 @@ kubectl scale deployment sakumari-app -n sakumari --replicas=2
 
 **Kubernetes Dashboard:**
 
-- URL: https://sakumari-dashboard.fukudev.org (via Cloudflare tunnel)
-- Authentication: Bearer token (see setup instructions below)
+- URL: https://sakumari-dashboard.fukudev.org (via Cloudflare tunnel or ingress)
+- Authentication: Bearer token or skip login (if enabled)
 
-#### Kubernetes Dashboard Setup
+#### Dashboard Access
 
-1. **Get the bearer token:**
-
+**Option 1: Web Access (Recommended)**
 ```bash
+# Get bearer token for authentication
 kubectl -n kubernetes-dashboard create token admin-user
+
+# Access at: https://sakumari-dashboard.fukudev.org
+# Select "Token" and paste the bearer token
 ```
 
-2. **Access the dashboard:**
-
-- Open https://sakumari-dashboard.fukudev.org
-- Select "Token" authentication method
-- Paste the bearer token from step 1
-- Click "Sign in"
-
-**Alternative local access (port-forward):**
-
+**Option 2: Local Port-Forward**
 ```bash
-# Start port-forward in background
-kubectl proxy &
+# Start port-forward to dashboard service
+kubectl port-forward -n kubernetes-dashboard svc/kubernetes-dashboard 8443:443
 
-# Access locally at:
-# http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+# Access at: https://localhost:8443
+# Accept self-signed certificate warning
+```
+
+**Option 3: Kubectl Proxy (Alternative)**
+```bash
+kubectl proxy
+# Access at: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 ```
 
 ## Cloudflare Tunnel Setup (Self-hosting)
