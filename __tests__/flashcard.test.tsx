@@ -116,7 +116,7 @@ describe("Flashcard Component", () => {
 
       const input = screen.getByPlaceholderText("Type romaji equivalent...");
       fireEvent.change(input, { target: { value: "a" } });
-      fireEvent.keyPress(input, { key: "Enter", code: "Enter", charCode: 13 });
+      fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
 
       expect(submitAnswer).toHaveBeenCalledWith("a");
     });
@@ -271,11 +271,11 @@ describe("Flashcard Component", () => {
       fireEvent.change(input, { target: { value: "a" } });
 
       // First Enter should work
-      fireEvent.keyPress(input, { key: "Enter", code: "Enter", charCode: 13 });
+      fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
       expect(submitAnswer).toHaveBeenCalledTimes(1);
 
       // Subsequent Enter presses should be ignored while processing
-      fireEvent.keyPress(input, { key: "Enter", code: "Enter", charCode: 13 });
+      fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
       expect(submitAnswer).toHaveBeenCalledTimes(1);
     });
 

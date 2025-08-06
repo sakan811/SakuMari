@@ -47,60 +47,54 @@ test.describe("Dashboard Features", () => {
     await page.goto("/dashboard");
 
     // Should show filter buttons
-    await expect(page.getByText("All")).toBeVisible();
-    await expect(page.getByText("Hiragana")).toBeVisible();
-    await expect(page.getByText("Katakana")).toBeVisible();
+    await expect(page.getByTestId("filter-all")).toBeVisible();
+    await expect(page.getByTestId("filter-hiragana")).toBeVisible();
+    await expect(page.getByTestId("filter-katakana")).toBeVisible();
 
     // Click Hiragana filter
-    await page.getByText("Hiragana").click();
+    await page.getByTestId("filter-hiragana").click();
 
     // Filter should be active
-    await expect(page.getByText("Hiragana")).toHaveClass(/bg-\[#d1622b\]/);
+    await expect(page.getByTestId("filter-hiragana")).toHaveClass(/bg-\[#d1622b\]/);
 
     // Click Katakana filter
-    await page.getByText("Katakana").click();
+    await page.getByTestId("filter-katakana").click();
 
     // Filter should be active
-    await expect(page.getByText("Katakana")).toHaveClass(/bg-\[#d1622b\]/);
+    await expect(page.getByTestId("filter-katakana")).toHaveClass(/bg-\[#d1622b\]/);
 
     // Click All filter
-    await page.getByText("All").click();
+    await page.getByTestId("filter-all").click();
 
     // Filter should be active
-    await expect(page.getByText("All")).toHaveClass(/bg-\[#d1622b\]/);
+    await expect(page.getByTestId("filter-all")).toHaveClass(/bg-\[#d1622b\]/);
   });
 
   test("should sort character data", async ({ page }) => {
     await page.goto("/dashboard");
 
     // Should show sortable headers
-    await expect(page.getByText("Character").nth(2)).toBeVisible();
-    await expect(page.getByText("Romaji")).toBeVisible();
-    await expect(page.getByText("Attempts").nth(1)).toBeVisible();
-    await expect(page.getByText("Accuracy").nth(1)).toBeVisible();
+    await expect(page.getByTestId("sort-character")).toBeVisible();
+    await expect(page.getByTestId("sort-romaji")).toBeVisible();
+    await expect(page.getByTestId("sort-attempts")).toBeVisible();
+    await expect(page.getByTestId("sort-accuracy")).toBeVisible();
 
     // Click character header to sort
-    await page.getByText("Character").nth(2).click();
+    await page.getByTestId("sort-character").click();
 
     // Should show sort indicator (either up or down arrow)
     await expect(
-      page
-        .locator("text=Character")
-        .locator("..")
-        .getByText("↑")
-        .or(page.locator("text=Character").locator("..").getByText("↓")),
+      page.getByTestId("sort-character").getByText("↑")
+        .or(page.getByTestId("sort-character").getByText("↓")),
     ).toBeVisible();
 
     // Click again to reverse sort
-    await page.getByText("Character").nth(2).click();
+    await page.getByTestId("sort-character").click();
 
     // Should show sort indicator (arrow should change or remain)
     await expect(
-      page
-        .locator("text=Character")
-        .locator("..")
-        .getByText("↑")
-        .or(page.locator("text=Character").locator("..").getByText("↓")),
+      page.getByTestId("sort-character").getByText("↑")
+        .or(page.getByTestId("sort-character").getByText("↓")),
     ).toBeVisible();
   });
 
@@ -129,12 +123,12 @@ test.describe("Dashboard Features", () => {
     await expect(page.getByText("Your Progress")).toBeVisible();
 
     // Filter buttons should be visible and functional
-    await expect(page.getByText("All")).toBeVisible();
-    await expect(page.getByText("Hiragana")).toBeVisible();
-    await expect(page.getByText("Katakana")).toBeVisible();
+    await expect(page.getByTestId("filter-all")).toBeVisible();
+    await expect(page.getByTestId("filter-hiragana")).toBeVisible();
+    await expect(page.getByTestId("filter-katakana")).toBeVisible();
 
     // Should be able to interact with filters
-    await page.getByText("Hiragana").click();
-    await expect(page.getByText("Hiragana")).toHaveClass(/bg-\[#d1622b\]/);
+    await page.getByTestId("filter-hiragana").click();
+    await expect(page.getByTestId("filter-hiragana")).toHaveClass(/bg-\[#d1622b\]/);
   });
 });
