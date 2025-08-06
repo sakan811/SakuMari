@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
 };
 
-// Move the HomePage component content directly here 
+// Move the HomePage component content directly here
 import HomePage from "@/components/HomePage";
 
 export default function Home() {

@@ -160,14 +160,15 @@ make k8s-logs
 - **No hardcoded secrets**: All sensitive data managed through .env files
 
 **Security Contexts**: All services run with hardened security contexts including:
+
 - Non-root user execution with specific UIDs/GIDs
 - Dropped capabilities (ALL capabilities removed)
 - SecComp runtime default profile
 - Privilege escalation prevention
 
-**Portainer Security Warning**: Portainer requires Docker socket access (`/var/run/docker.sock`) 
-which creates a significant security risk in production environments. This grants the container 
-access to the host Docker daemon, potentially allowing privilege escalation. Consider using 
+**Portainer Security Warning**: Portainer requires Docker socket access (`/var/run/docker.sock`)
+which creates a significant security risk in production environments. This grants the container
+access to the host Docker daemon, potentially allowing privilege escalation. Consider using
 alternative container management solutions (kubectl, lens, k9s) for production deployments.
 
 ## Scaling
@@ -209,17 +210,20 @@ kubectl scale deployment sakumari-app -n sakumari --replicas=2
 #### Kubernetes Dashboard Setup
 
 1. **Get the bearer token:**
+
 ```bash
 kubectl -n kubernetes-dashboard create token admin-user
 ```
 
 2. **Access the dashboard:**
+
 - Open https://sakumari-dashboard.fukudev.org
 - Select "Token" authentication method
 - Paste the bearer token from step 1
 - Click "Sign in"
 
 **Alternative local access (port-forward):**
+
 ```bash
 # Start port-forward in background
 kubectl proxy &

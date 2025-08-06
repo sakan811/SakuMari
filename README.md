@@ -66,15 +66,16 @@ cp .env.example .env
 
 #### Environment File Usage by Deployment Method
 
-| Deployment Method | Environment File Location | Purpose |
-|------------------|---------------------------|---------|
-| **Local Development** | Root `.env` | Development server configuration |
-| **Docker Compose** | Root `.env` | Container orchestration via `env_file: ../.env` |
-| **Kubernetes** | `k8s/.env` | Kustomize secret generation (isolated from root) |
+| Deployment Method     | Environment File Location | Purpose                                          |
+| --------------------- | ------------------------- | ------------------------------------------------ |
+| **Local Development** | Root `.env`               | Development server configuration                 |
+| **Docker Compose**    | Root `.env`               | Container orchestration via `env_file: ../.env`  |
+| **Kubernetes**        | `k8s/.env`                | Kustomize secret generation (isolated from root) |
 
 #### Why Separate k8s/.env?
 
 **Security & Configuration Isolation:**
+
 - **Root `.env`**: Contains localhost-specific configuration (`POSTGRES_HOST=localhost`)
 - **k8s/.env**: Contains Kubernetes-specific configuration (`POSTGRES_HOST=postgres-service`)
 - **Secret Management**: Kustomize generates secrets from `k8s/.env` without exposing them in git
@@ -132,11 +133,13 @@ cp .env k8s/.env
 ```
 
 **Key Kubernetes Differences:**
+
 - `POSTGRES_HOST=postgres-service` (instead of `localhost`)
 - `AUTH_URL=https://your-production-domain.com` (instead of localhost)
 - `NODE_ENV=production` (instead of development)
 
 **Database Connection Notes:**
+
 - **Local Development**: Set `POSTGRES_HOST=localhost` in root `.env`
 - **Docker Containers**: Change to `POSTGRES_HOST=db` in root `.env` when app runs in Docker
 - **Kubernetes**: Use `POSTGRES_HOST=postgres-service` in `k8s/.env`
