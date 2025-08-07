@@ -59,21 +59,6 @@ clean: ## Stop and remove all containers, volumes, images
 k8s-deploy: ## Deploy to Kubernetes using Kustomize
 	cd k8s && kubectl apply -k .
 
-k8s-dashboard-install: ## Install Kubernetes Dashboard using official Helm chart
-	helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
-	helm repo update
-	helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
-
-k8s-dashboard-token: ## Get bearer token for dashboard access
-	kubectl -n kubernetes-dashboard create token kubernetes-dashboard
-
-k8s-dashboard-port-forward: ## Port forward to dashboard (access at https://localhost:8443)
-	kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
-
-k8s-dashboard-uninstall: ## Uninstall Kubernetes Dashboard
-	helm uninstall kubernetes-dashboard -n kubernetes-dashboard
-	kubectl delete namespace kubernetes-dashboard
-
 k8s-status: ## Show Kubernetes deployment status
 	kubectl get all -n $(K8S_NAMESPACE)
 
@@ -158,8 +143,8 @@ test-all: lint format test-unit test-db test-e2e ## Run all tests and quality ch
 # =============================================================================
 
 .PHONY: postgres db-admin db-setup db-reset dev-up \
-        logs logs-app status down clean k8s-deploy k8s-dashboard-install k8s-dashboard-token \
-        k8s-dashboard-port-forward k8s-dashboard-uninstall k8s-status k8s-pods k8s-logs k8s-logs-db k8s-logs-tunnel \
+        logs logs-app status down clean k8s-deploy \
+        k8s-status k8s-pods k8s-logs k8s-logs-db k8s-logs-tunnel \
         k8s-secrets k8s-port-forward k8s-db-setup k8s-restart-app k8s-restart-db \
         k8s-describe k8s-events k8s-clean \
         dev build install lint format test-unit test-db test-e2e test-e2e-setup test-e2e-clean test-all
