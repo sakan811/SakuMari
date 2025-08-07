@@ -190,9 +190,16 @@ For production-ready Kubernetes deployments:
 # Setup Kubernetes environment
 cp .env k8s/.env
 # Edit k8s/.env: set POSTGRES_HOST=postgres-service, AUTH_URL=https://your-domain.com
+# Keep POSTGRES_HOST=localhost in main .env for database setup
 
-# Deploy
+# Deploy and wait for pods to be ready
 make k8s-deploy
+make k8s-status
+
+# Port-forward database (run in separate terminal and keep running)
+kubectl port-forward -n sakumari svc/postgres-service 5432:5432
+
+# Setup database (run in main terminal while port-forward is active)
 make k8s-db-setup
 
 # Management (parameterized commands)
