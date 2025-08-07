@@ -79,7 +79,7 @@ k8s-restart: ## Restart deployment (usage: make k8s-restart SERVICE=sakumari-app
 	$(call k8s_restart,$(or $(SERVICE),sakumari-app))
 
 k8s-db-setup: ## Setup database in Kubernetes (requires: kubectl port-forward -n sakumari svc/postgres-service 5432:5432)
-	pnpm run prisma:generate && npx prisma migrate deploy && pnpm run db:seed
+	pnpm run prisma:generate && pnpm run prisma:migrate:deploy && pnpm run db:seed
 
 k8s-clean: ## Delete Kubernetes namespace and all resources (WARNING: destroys all data)
 	kubectl delete namespace $(K8S_NAMESPACE)

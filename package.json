@@ -13,6 +13,7 @@
     "format": "npx prettier . --write",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate dev",
+    "prisma:migrate:deploy": "npx prisma migrate deploy",
     "prisma:reset": "npx prisma migrate reset",
     "prisma:studio": "npx prisma studio",
     "db:seed": "npx prisma db seed",
