@@ -32,14 +32,18 @@ spec:
         app: dbgate
         environment: production
     spec:
-      securityContext:
-        runAsNonRoot: true
+      # securityContext removed for compatibility - DBGate may run as root
       containers:
         - name: dbgate
           image: dbgate/dbgate:latest
           ports:
             - containerPort: 3000
           env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sakumari-secrets
+                  key: POSTGRES_PASSWORD
             - name: CONNECTIONS
               value: |
                 {
@@ -47,16 +51,11 @@ spec:
                     "server": "postgres-service",
                     "port": 5432,
                     "user": "postgres",
-                    "password": "${POSTGRES_PASSWORD}",
+                    "passwordMode": "askUser",
                     "database": "sakumari",
                     "engine": "postgres@dbgate-plugin-postgres"
                   }
                 }
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: sakumari-secrets
-                  key: POSTGRES_PASSWORD
           volumeMounts:
             - name: dbgate-storage
               mountPath: /root/.dbgate

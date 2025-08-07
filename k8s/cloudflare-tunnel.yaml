@@ -40,12 +40,7 @@ spec:
               memory: "128Mi"
               cpu: "200m"
           # securityContext removed for compatibility
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: 2000
-            initialDelaySeconds: 10
-            periodSeconds: 10
+          # readinessProbe removed - cloudflared doesn't expose standard health endpoints
       volumes:
         - name: tunnel-token
           secret:

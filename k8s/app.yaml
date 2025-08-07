@@ -22,8 +22,7 @@ spec:
         app: sakumari-app
         environment: production
     spec:
-      securityContext:
-        runAsNonRoot: true
+      securityContext: {}
       containers:
         - name: app
           image: sakanbeer88/sakumari:latest
