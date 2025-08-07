@@ -7,7 +7,6 @@ This directory contains production-ready Kubernetes manifests for the SakuMari K
 - **Application**: Next.js app with single replica (right-sized for personal use)
 - **Database**: PostgreSQL 17 with minimal persistent storage (1Gi)
 - **Database Management**: DbGate for lightweight database administration (200Mi storage)
-- **Cluster Management**: Official Kubernetes Dashboard installed via Helm for monitoring and management
 - **Tunnel**: Cloudflare tunnel for secure external access (simplified networking)
 - **Storage**: Standard storage classes (cost-effective)
 - **Secrets**: Kustomize secretGenerator from .env file (secure for open-source)
@@ -86,9 +85,6 @@ This project uses **Kustomize** for deployment management. All secrets are gener
 ```bash
 # Deploy main application components
 kubectl apply -k .
-
-# Install Kubernetes Dashboard using official Helm chart
-make k8s-dashboard-install
 
 # Or use Makefile shortcut
 make k8s-deploy
@@ -191,7 +187,6 @@ kubectl scale deployment sakumari-app -n sakumari --replicas=2
 
 - **PostgreSQL**: 1Gi persistent volume (right-sized for flashcard data)
 - **DbGate**: 200Mi persistent volume for configuration storage
-- **Kubernetes Dashboard**: No persistent storage (stateless)
 - **Application**: Stateless containers
 
 ## Monitoring
@@ -203,42 +198,6 @@ kubectl scale deployment sakumari-app -n sakumari --replicas=2
 - URL: https://sakumari-dbgate.fukudev.org (via Cloudflare tunnel)
 - Pre-configured connection to PostgreSQL database
 - No additional authentication required (secured via tunnel)
-
-**Kubernetes Dashboard (Official Helm Installation):**
-
-- Installation: Uses official Helm chart from kubernetes.github.io/dashboard/
-- Authentication: Bearer token only (as per official documentation)
-- Access: Local port-forward (recommended method)
-
-#### Dashboard Installation & Access
-
-**Install Dashboard:**
-```bash
-# Install using official Helm chart
-make k8s-dashboard-install
-
-# Or manually:
-helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
-helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
-```
-
-**Access Dashboard:**
-```bash
-# Get bearer token for authentication
-make k8s-dashboard-token
-
-# Start port-forward to dashboard (access at https://localhost:8443)
-make k8s-dashboard-port-forward
-
-# Or manually:
-kubectl -n kubernetes-dashboard create token kubernetes-dashboard
-kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
-```
-
-**Uninstall Dashboard (if needed):**
-```bash
-make k8s-dashboard-uninstall
-```
 
 ## Cloudflare Tunnel Setup (Self-hosting)
 
