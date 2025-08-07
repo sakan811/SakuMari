@@ -173,7 +173,7 @@ make clean              # Clean up containers and volumes
 
 ### Docker Deployment
 
-For production deployments using Docker:
+Quick way to test the complete application stack in an isolated environment:
 
 ```bash
 # Set POSTGRES_HOST=db in .env for containers
