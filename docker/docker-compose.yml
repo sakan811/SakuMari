@@ -26,18 +26,6 @@ services:
     container_name: ${CONTAINER_NAME_PREFIX:-sakumari}-dbgate
     ports:
       - "8080:3000"
-    environment:
-      CONNECTIONS: |
-        {
-          "sakumari-db": {
-            "server": "db",
-            "port": 5432,
-            "user": "${POSTGRES_USER:-postgres}",
-            "password": "${POSTGRES_PASSWORD}",
-            "database": "${POSTGRES_DB:-sakumari}",
-            "engine": "postgres@dbgate-plugin-postgres"
-          }
-        }
     volumes:
       - dbgate_data:/root/.dbgate
     depends_on:
