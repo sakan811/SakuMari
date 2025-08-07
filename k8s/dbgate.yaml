@@ -44,18 +44,6 @@ spec:
                 secretKeyRef:
                   name: sakumari-secrets
                   key: POSTGRES_PASSWORD
-            - name: CONNECTIONS
-              value: |
-                {
-                  "sakumari-db": {
-                    "server": "postgres-service",
-                    "port": 5432,
-                    "user": "postgres",
-                    "passwordMode": "askUser",
-                    "database": "sakumari",
-                    "engine": "postgres@dbgate-plugin-postgres"
-                  }
-                }
           volumeMounts:
             - name: dbgate-storage
               mountPath: /root/.dbgate

@@ -71,6 +71,9 @@ k8s-logs: ## Show application logs in Kubernetes
 k8s-logs-db: ## Show database logs in Kubernetes
 	kubectl logs -n $(K8S_NAMESPACE) deployment/postgres -f
 
+k8s-logs-dbgate: ## Show dbgate logs in Kubernetes
+	kubectl logs -n $(K8S_NAMESPACE) deployment/dbgate -f
+
 k8s-logs-tunnel: ## Show Cloudflare tunnel logs
 	kubectl logs -n $(K8S_NAMESPACE) deployment/cloudflare-tunnel -f
 
@@ -88,6 +91,9 @@ k8s-restart-app: ## Restart application deployment
 
 k8s-restart-db: ## Restart database deployment
 	kubectl rollout restart deployment/postgres -n $(K8S_NAMESPACE)
+
+k8s-restart-dbgate: ## Restart dbgate deployment
+	kubectl rollout restart deployment/dbgate -n $(K8S_NAMESPACE)
 
 k8s-describe: ## Describe all pods for troubleshooting
 	kubectl describe pods -n $(K8S_NAMESPACE)
