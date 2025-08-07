@@ -37,7 +37,8 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 git clone https://github.com/sakan811/SakuMari.git
 cd SakuMari
 cp .env.example .env
-# Edit .env with your authentication credentials
+# REQUIRED: Generate AUTH_SECRET at https://auth-secret-gen.vercel.app/
+# Edit .env with your authentication credentials including AUTH_SECRET
 
 make postgres
 make install && make db-setup && make dev
@@ -59,7 +60,7 @@ Essential environment variables:
 
 ```bash
 # Database
-POSTGRES_DB=sakumari
+POSTGRES_DB=sakumari  # Required - defaults to 'kana_flashcard' if not set
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
 POSTGRES_HOST=localhost  # Use 'db' for Docker containers
@@ -67,7 +68,7 @@ POSTGRES_PORT=5432
 
 # Authentication
 AUTH_URL=http://localhost:3000
-AUTH_SECRET=your_generated_secret  # Generate at https://auth-secret-gen.vercel.app/
+AUTH_SECRET=your_generated_secret  # REQUIRED - Generate at https://auth-secret-gen.vercel.app/
 AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
 
@@ -189,7 +190,10 @@ For production-ready Kubernetes deployments:
 ```bash
 # Setup Kubernetes environment
 cp .env k8s/.env
-# Edit k8s/.env: set POSTGRES_HOST=postgres-service, AUTH_URL=https://your-domain.com
+# REQUIRED: Edit k8s/.env with production values:
+#   POSTGRES_HOST=postgres-service  # Kubernetes service name
+#   AUTH_URL=https://your-domain.com  # Your production domain
+#   AUTH_SECRET=your_generated_secret  # Required for JWT tokens
 # Keep POSTGRES_HOST=localhost in main .env for database setup
 
 # Deploy and wait for pods to be ready
