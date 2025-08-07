@@ -272,7 +272,7 @@ For production-ready Kubernetes deployments with enterprise features:
 - **Single replica deployment**: Starts with 1 replica, auto-scales to max 3 based on CPU/memory
 - **Health monitoring**: Built-in /api/health endpoint for Kubernetes liveness/readiness probes
 - **Security hardened**: Non-root containers, dropped capabilities, minimal privileges
-- **Multiple services**: App, PostgreSQL, DBGate, Kubernetes Dashboard, Cloudflare tunnel
+- **Multiple services**: App, PostgreSQL, DBGate, Cloudflare tunnel
 - **Ingress options**: NGINX ingress OR Cloudflare tunnel for self-hosting
 
 **🚀 Quick Deploy:**
