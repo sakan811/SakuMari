@@ -19,11 +19,10 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 ## Technology Stack
 
-- **Frontend**: Next.js 15 (standalone output), React 19, TypeScript, Tailwind CSS v4
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS v4
 - **Backend**: Node.js 23, Prisma ORM v6, NextAuth.js v5
 - **Database**: PostgreSQL 17
 - **Testing**: Vitest, React Testing Library, Playwright
-- **Deployment**: Docker (docker/ directory), Docker Compose, Kubernetes (Kustomize)
 - **Package Manager**: pnpm
 
 ## Prerequisites
@@ -34,67 +33,37 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 ## Quick Start
 
-**Fastest setup with Docker:**
-
 ```bash
 git clone https://github.com/sakan811/SakuMari.git
 cd SakuMari
 cp .env.example .env
-# Edit .env with your Google OAuth credentials
+# Edit .env with your authentication credentials
 
 make postgres
 make install && make db-setup && make dev
 ```
 
-The `make db-setup` command automatically handles Prisma generation, migration, and seeding - no manual database setup required.
-
 Visit <http://localhost:3000>
 
 ## Installation & Setup
 
-### 1. Environment Configuration
+### 1. Environment Setup
 
-**Important:** Different deployment methods use different `.env` file locations for security and configuration isolation.
-
-#### Quick Setup
+Create and configure your environment file:
 
 ```bash
-# Create base environment file for local development and Docker
 cp .env.example .env
-# Edit .env with your values
 ```
 
-#### Environment File Usage by Deployment Method
-
-| Deployment Method     | Environment File Location | Purpose                                          |
-| --------------------- | ------------------------- | ------------------------------------------------ |
-| **Local Development** | Root `.env`               | Development server configuration                 |
-| **Docker Compose**    | Root `.env`               | Container orchestration via `env_file: ../.env`  |
-| **Kubernetes**        | `k8s/.env`                | Kustomize secret generation (isolated from root) |
-
-#### Why Separate k8s/.env?
-
-**Security & Configuration Isolation:**
-
-- **Root `.env`**: Contains localhost-specific configuration (`POSTGRES_HOST=localhost`)
-- **k8s/.env**: Contains Kubernetes-specific configuration (`POSTGRES_HOST=postgres-service`)
-- **Secret Management**: Kustomize generates secrets from `k8s/.env` without exposing them in git
-- **Environment Separation**: Different authentication URLs and database hosts per environment
-
-#### Base Environment Variables (Root .env)
-
-For **local development** and **Docker deployments**, configure the root `.env` file:
+Essential environment variables:
 
 ```bash
-# Database (Local Development & Docker)
+# Database
 POSTGRES_DB=sakumari
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
-POSTGRES_HOST=localhost  # For local dev. Use 'db' for Docker containers
+POSTGRES_HOST=localhost  # Use 'db' for Docker containers
 POSTGRES_PORT=5432
-# Required for Prisma (auto-generated if not provided)
-POSTGRES_PRISMA_URL=postgresql://postgres:your_password@localhost:5432/sakumari
-POSTGRES_URL_NON_POOLING=postgresql://postgres:your_password@localhost:5432/sakumari
 
 # Authentication
 AUTH_URL=http://localhost:3000
@@ -102,54 +71,17 @@ AUTH_SECRET=your_generated_secret  # Generate at https://auth-secret-gen.vercel.
 AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
 
-# Custom Credentials (optional - for testing in any environment)
+# Optional: Custom credentials for testing
 CREDS_PROVIDER=false
 CREDS_TEST_EMAIL=test@sakumari.local
 CREDS_TEST_PASSWORD=TestPassword123!
 
-# Cloudflare Tunnel Configuration (optional)
-CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token
-
-# Docker Configuration
-CONTAINER_NAME_PREFIX=sakumari
-DOCKER_IMAGE_NAME=sakanbeer88/sakumari
-DOCKER_IMAGE_TAG=latest
-
 NODE_ENV=development
 ```
 
-#### Kubernetes Environment Setup
-
-For **Kubernetes deployments**, you need a separate `k8s/.env` file with Kubernetes-specific values:
-
-```bash
-# Setup Kubernetes environment (after configuring root .env)
-cp .env k8s/.env
-
-# Edit k8s/.env with Kubernetes-specific values:
-# - POSTGRES_HOST=postgres-service  (Kubernetes service name)
-# - AUTH_URL=https://your-domain.com  (Production URL)
-# - NODE_ENV=production
-```
-
-**Key Kubernetes Differences:**
-
-- `POSTGRES_HOST=postgres-service` (instead of `localhost`)
-- `AUTH_URL=https://your-production-domain.com` (instead of localhost)
-- `NODE_ENV=production` (instead of development)
-
-**Database Connection Notes:**
-
-- **Local Development**: Set `POSTGRES_HOST=localhost` in root `.env`
-- **Docker Containers**: Change to `POSTGRES_HOST=db` in root `.env` when app runs in Docker
-- **Kubernetes**: Use `POSTGRES_HOST=postgres-service` in `k8s/.env`
-- **Auto-generation**: POSTGRES_PRISMA_URL and POSTGRES_URL_NON_POOLING are automatically generated from basic variables if not explicitly provided
-
-**Build Optimization:** The application uses Next.js standalone output mode for optimized Docker deployments. This creates a self-contained `.next/standalone` directory with minimal dependencies, reducing container size and improving startup performance.
-
 ### 2. Authentication Setup
 
-#### Google OAuth (Production)
+#### Google OAuth (Recommended)
 
 1. Visit [Google Cloud Console](https://console.cloud.google.com/)
 2. Create project → APIs & Services → OAuth consent screen
@@ -157,207 +89,109 @@ cp .env k8s/.env
 4. Add redirect URI: `http://localhost:3000/api/auth/callback/google`
 5. Copy Client ID and Secret to `.env`
 
-[Detailed OAuth guide](https://developers.google.com/identity/protocols/oauth2)
+#### Custom Credentials (Optional)
 
-#### Custom Credentials (Testing/Development)
+For testing without Google OAuth:
 
-For testing or development environments, you can enable custom username/password authentication:
+1. Set `CREDS_PROVIDER=true` in `.env`
+2. Configure `CREDS_TEST_EMAIL` and `CREDS_TEST_PASSWORD`
+3. Both OAuth and custom credentials will be available
 
-1. Set `CREDS_PROVIDER=true` in your `.env` file
-2. Configure `CREDS_TEST_EMAIL` and `CREDS_TEST_PASSWORD` (optional - defaults provided)
-3. Both Google OAuth and custom credentials will be available on the sign-in page
+### 3. Database & Development Setup
 
-**Use Cases:**
-
-- E2E testing in production environments
-- Local development without Google OAuth setup
-- Automated testing scenarios
-
-### 3. Choose Your Setup Method
-
-#### Option A: Docker Database + Local Development (Recommended)
+**Recommended: Docker Database + Local Development**
 
 ```bash
-# Start database services
-make postgres  # Or make db-admin for DBGate
+# Start database
+make postgres
 
-# Install and setup
+# Install dependencies and setup database
 make install
-make db-setup  # Automated database setup (recommended)
+make db-setup  # Handles Prisma generation, migrations, and seeding
 
-# Start development
+# Start development server
 make dev
 ```
 
-#### Option B: Local PostgreSQL
+**Alternative: Local PostgreSQL**
 
 ```bash
 # Ensure PostgreSQL is running locally
 make install
-make db-setup  # Automated setup (recommended)
-
-# OR manual setup:
-make install
-pnpm run prisma:generate
-pnpm run prisma:migrate
-pnpm run db:seed
-
+make db-setup
 make dev
 ```
 
-#### Option C: Full Docker Deployment
-
-**Important:** Database setup must be done manually outside of containers.
-
-**Development (build from source):**
-
-```bash
-# Set POSTGRES_HOST=db in .env for container, then start services
-make dev-up  # Uses docker/Dockerfile (production mode)
-
-# Setup database from local machine (required)
-make db-setup
-```
+Visit <http://localhost:3000>
 
 ## Development Commands
 
+### Essential Commands
+
 ```bash
-# Development
-make dev                # Start dev server
-make build              # Build for production (includes standalone output optimization)
+# Core development
+make dev                # Start development server
+make build              # Build for production
 make install            # Install dependencies
 
-# Code Quality
+# Database
+make postgres           # Start PostgreSQL database
+make db-setup           # Complete database setup (recommended)
+
+# Code quality
 make lint               # Run ESLint
 make format             # Format with Prettier
-make test-all           # Lint + format + all tests
-
-# Database
-make postgres           # Start PostgreSQL database only
-make db-admin           # Start PostgreSQL with DBGate
-make db-setup          # Automated database setup (recommended)
-# OR manual setup:
-pnpm run prisma:generate    # Generate Prisma client
-pnpm run prisma:migrate     # Run database migrations
-pnpm run db:seed           # Seed database with Kana data
-
-# Docker Application Deployments
-make dev-up             # Start app stack for development (builds with docker/Dockerfile)
-
-# Service Management
-make logs               # Show logs for all services
-make logs-app           # Show app logs only
-make status             # Show service status
-make down               # Stop all services
-make clean              # Stop and remove all containers, volumes, images
-
-# Kubernetes Deployments
-make k8s-deploy         # Deploy to Kubernetes using Kustomize
-make k8s-status         # Show Kubernetes deployment status
-make k8s-logs           # Show application logs in Kubernetes
-make k8s-secrets        # Show generated secrets (with hash suffixes)
-make k8s-port-forward   # Port forward to database for setup
-make k8s-db-setup       # Setup database in Kubernetes
-make k8s-clean          # Delete Kubernetes namespace and all resources
+make test-all           # Run all tests and quality checks
 ```
 
-## Kubernetes Deployment
-
-For production-ready Kubernetes deployments with enterprise features:
-
-**✨ Features:**
-
-- **Kustomize-based**: Secure secret management from `.env` files
-- **No hardcoded secrets**: Safe for public repositories
-- **Single replica deployment**: Starts with 1 replica, auto-scales to max 3 based on CPU/memory
-- **Health monitoring**: Built-in /api/health endpoint for Kubernetes liveness/readiness probes
-- **Security hardened**: Non-root containers, dropped capabilities, minimal privileges
-- **Multiple services**: App, PostgreSQL, DBGate, Cloudflare tunnel
-- **Ingress options**: NGINX ingress OR Cloudflare tunnel for self-hosting
-
-**🚀 Quick Deploy:**
+### Testing
 
 ```bash
-# 1. Create the sakumari namespace
-kubectl create namespace sakumari
+# Run all tests
+make test-all
 
-# 2. Setup Kubernetes-specific environment (see Environment Configuration section above)
+# Individual test types
+make test-unit          # Unit tests
+make test-db            # Database tests
+make test-e2e           # End-to-end tests
+```
+
+### Advanced Commands
+
+```bash
+# Docker deployment
+make dev-up             # Full Docker stack
+
+# Service management
+make status             # Show service status
+make logs               # Show logs
+make down               # Stop services
+make clean              # Clean up containers and volumes
+```
+
+## Production Deployment
+
+### Docker Deployment
+
+For production deployments using Docker:
+
+```bash
+# Set POSTGRES_HOST=db in .env for containers
+make dev-up
+make db-setup  # Setup database from host
+```
+
+### Kubernetes Deployment
+
+For production-ready Kubernetes deployments:
+
+```bash
+# Setup Kubernetes environment
 cp .env k8s/.env
-# Edit k8s/.env with Kubernetes values: POSTGRES_HOST=postgres-service, AUTH_URL=https://your-domain.com, NODE_ENV=production
+# Edit k8s/.env: set POSTGRES_HOST=postgres-service, AUTH_URL=https://your-domain.com
 
-# 3. Deploy to Kubernetes (Kustomize generates secrets from k8s/.env)
-cd k8s && kubectl apply -k .
-
-# 4. Setup database (requires separate terminal for port-forward)
-kubectl port-forward -n sakumari svc/postgres-service 5432:5432 &
-cd .. && pnpm run prisma:generate && npx prisma migrate deploy && pnpm run db:seed
-
-# Or use Makefile commands (namespace creation is handled automatically)
+# Deploy
 make k8s-deploy
 make k8s-port-forward &  # In separate terminal
 make k8s-db-setup
 ```
-
-**📖 Full Documentation:** [k8s/README.md](/k8s/README.md)
-
-## Testing
-
-Comprehensive multi-layer testing strategy:
-
-```bash
-# Unit & Integration Tests
-make test-unit          # Run unit tests
-pnpm run test               # Watch mode (alternative)
-pnpm run test:run           # Single run (alternative)
-
-# Database Tests (SQLite)
-make test-db            # Run database tests (includes setup)
-pnpm run test:db:setup      # Setup test DB (alternative)
-pnpm run test:db            # Run DB tests (alternative)
-
-# End-to-End Tests (Playwright)
-make test-e2e           # Run E2E tests (simplified: database + Playwright webServer)
-pnpm run test:e2e:setup     # Setup E2E environment (start database only)
-pnpm run test:e2e:build     # Build app with CREDS_PROVIDER=true
-pnpm run test:e2e           # Run E2E tests (Playwright manages app)
-
-# Comprehensive Testing
-make test-all           # Run all tests and quality checks
-```
-
-### E2E Test Setup (Simplified)
-
-**E2E Testing with Playwright webServer:**
-
-E2E tests use Playwright's webServer configuration to manage the Next.js application, with only the database running in Docker.
-
-```bash
-# Complete E2E workflow (simplified)
-make test-e2e
-
-# Or run individual steps:
-pnpm run test:e2e:setup     # Start PostgreSQL database container
-pnpm run test:e2e:build     # Build app with CREDS_PROVIDER=true
-pnpm run test:e2e           # Run Playwright tests (webServer manages app)
-```
-
-**Environment Configuration:**
-
-- **Database**: Docker container with `POSTGRES_HOST=localhost` for host connection
-- **Application**: Standard Next.js build with `CREDS_PROVIDER=true` for authentication
-- **Playwright webServer**: Automatically starts/stops Next.js app during testing
-- **Test Credentials**: Configurable via `CREDS_TEST_EMAIL` and `CREDS_TEST_PASSWORD` (defaults: `test@sakumari.local`/`TestPassword123!`)
-- **Database Setup**: Runs from host using localhost connection via setup-database.sh script
-
-**Benefits:**
-
-- **Faster setup**: No complex container orchestration
-- **Standard workflow**: Uses familiar `next build` and `next start` commands
-- **Reliable**: Playwright manages app lifecycle with proper health checks
-- **CI-optimized**: Uses standard GitHub Actions patterns
-
-**Architecture:**
-
-- Database runs in Docker container with port forwarding
-- Next.js app managed by Playwright webServer configuration
-- Tests run against locally managed application at localhost:3000
