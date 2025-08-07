@@ -1,8 +1,18 @@
 # SakuMari Kana Flashcard App - Development Makefile
 
-# Load configuration constants
+# Configuration constants
 DOCKER_COMPOSE_FILE := docker/docker-compose.yml
+DOCKER_COMPOSE_CMD := docker compose -f $(DOCKER_COMPOSE_FILE)
 K8S_NAMESPACE := sakumari
+
+# Reusable functions
+define k8s_logs
+	kubectl logs -n $(K8S_NAMESPACE) deployment/$(1) -f
+endef
+
+define k8s_restart
+	kubectl rollout restart deployment/$(1) -n $(K8S_NAMESPACE)
+endef
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -19,10 +29,10 @@ help: ## Show available commands
 # =============================================================================
 
 postgres: ## Start PostgreSQL database only
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d db
+	$(DOCKER_COMPOSE_CMD) up -d db
 
 db-admin: ## Start PostgreSQL with DBGate
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d db dbgate
+	$(DOCKER_COMPOSE_CMD) up -d db dbgate
 
 db-setup: ## Setup database using automated script (recommended)
 	chmod +x scripts/setup-database.sh && ./scripts/setup-database.sh
@@ -35,22 +45,22 @@ db-reset: ## Reset database with fresh data
 # =============================================================================
 
 dev-up: ## Start app stack for development (builds app locally)
-	docker compose -f $(DOCKER_COMPOSE_FILE) up -d db dbgate app --build
+	$(DOCKER_COMPOSE_CMD) up -d db dbgate app --build
 
 logs: ## Show logs for all services
-	docker compose -f $(DOCKER_COMPOSE_FILE) logs -f
+	$(DOCKER_COMPOSE_CMD) logs -f
 
 logs-app: ## Show app logs only
-	docker compose -f $(DOCKER_COMPOSE_FILE) logs -f app
+	$(DOCKER_COMPOSE_CMD) logs -f app
 
 status: ## Show service status
-	docker compose -f $(DOCKER_COMPOSE_FILE) ps
+	$(DOCKER_COMPOSE_CMD) ps
 
 down: ## Stop all services
-	docker compose -f $(DOCKER_COMPOSE_FILE) down
+	$(DOCKER_COMPOSE_CMD) down
 
 clean: ## Stop and remove all containers, volumes, images
-	docker compose -f $(DOCKER_COMPOSE_FILE) down --volumes --rmi all --remove-orphans
+	$(DOCKER_COMPOSE_CMD) down --volumes --rmi all --remove-orphans
 
 # =============================================================================
 # KUBERNETES DEPLOYMENTS
@@ -62,44 +72,14 @@ k8s-deploy: ## Deploy to Kubernetes using Kustomize
 k8s-status: ## Show Kubernetes deployment status
 	kubectl get all -n $(K8S_NAMESPACE)
 
-k8s-pods: ## Show pod status and watch for changes
-	kubectl get pods -n $(K8S_NAMESPACE) -w
+k8s-logs: ## Show logs for service (usage: make k8s-logs SERVICE=sakumari-app)
+	$(call k8s_logs,$(or $(SERVICE),sakumari-app))
 
-k8s-logs: ## Show application logs in Kubernetes
-	kubectl logs -n $(K8S_NAMESPACE) deployment/sakumari-app -f
+k8s-restart: ## Restart deployment (usage: make k8s-restart SERVICE=sakumari-app)
+	$(call k8s_restart,$(or $(SERVICE),sakumari-app))
 
-k8s-logs-db: ## Show database logs in Kubernetes
-	kubectl logs -n $(K8S_NAMESPACE) deployment/postgres -f
-
-k8s-logs-dbgate: ## Show dbgate logs in Kubernetes
-	kubectl logs -n $(K8S_NAMESPACE) deployment/dbgate -f
-
-k8s-logs-tunnel: ## Show Cloudflare tunnel logs
-	kubectl logs -n $(K8S_NAMESPACE) deployment/cloudflare-tunnel -f
-
-k8s-secrets: ## Show generated secrets (with hash suffixes)
-	kubectl get secrets -n $(K8S_NAMESPACE)
-
-k8s-port-forward: ## Port forward to database for setup
-	kubectl port-forward -n $(K8S_NAMESPACE) svc/postgres-service 5432:5432
-
-k8s-db-setup: ## Setup database in Kubernetes (run from project root, requires k8s-port-forward first)
+k8s-db-setup: ## Setup database in Kubernetes (requires: kubectl port-forward -n sakumari svc/postgres-service 5432:5432)
 	pnpm run prisma:generate && npx prisma migrate deploy && pnpm run db:seed
-
-k8s-restart-app: ## Restart application deployment
-	kubectl rollout restart deployment/sakumari-app -n $(K8S_NAMESPACE)
-
-k8s-restart-db: ## Restart database deployment
-	kubectl rollout restart deployment/postgres -n $(K8S_NAMESPACE)
-
-k8s-restart-dbgate: ## Restart dbgate deployment
-	kubectl rollout restart deployment/dbgate -n $(K8S_NAMESPACE)
-
-k8s-describe: ## Describe all pods for troubleshooting
-	kubectl describe pods -n $(K8S_NAMESPACE)
-
-k8s-events: ## Show recent events in namespace
-	kubectl get events -n $(K8S_NAMESPACE) --sort-by=.metadata.creationTimestamp
 
 k8s-clean: ## Delete Kubernetes namespace and all resources (WARNING: destroys all data)
 	kubectl delete namespace $(K8S_NAMESPACE)
@@ -140,7 +120,7 @@ test-e2e-setup: ## Setup E2E testing environment (database only)
 	pnpm run test:e2e:setup
 
 test-e2e-clean: ## Clean up E2E testing environment
-	docker compose -f $(DOCKER_COMPOSE_FILE) down --volumes
+	$(DOCKER_COMPOSE_CMD) down --volumes
 
 test-all: lint format test-unit test-db test-e2e ## Run all tests and quality checks
 
@@ -148,9 +128,6 @@ test-all: lint format test-unit test-db test-e2e ## Run all tests and quality ch
 # PHONY DECLARATIONS
 # =============================================================================
 
-.PHONY: postgres db-admin db-setup db-reset dev-up \
-        logs logs-app status down clean k8s-deploy \
-        k8s-status k8s-pods k8s-logs k8s-logs-db k8s-logs-tunnel \
-        k8s-secrets k8s-port-forward k8s-db-setup k8s-restart-app k8s-restart-db \
-        k8s-describe k8s-events k8s-clean \
+.PHONY: postgres db-admin db-setup db-reset dev-up logs logs-app status down clean \
+        k8s-deploy k8s-status k8s-logs k8s-restart k8s-db-setup k8s-clean \
         dev build install lint format test-unit test-db test-e2e test-e2e-setup test-e2e-clean test-all

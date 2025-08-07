@@ -136,7 +136,7 @@ make install            # Install dependencies
 
 # Database
 make postgres           # Start PostgreSQL database
-make db-setup           # Complete database setup (recommended)
+make db-setup           # Complete database setup (automated script)
 
 # Code quality
 make lint               # Run ESLint
@@ -164,7 +164,8 @@ make dev-up             # Full Docker stack
 
 # Service management
 make status             # Show service status
-make logs               # Show logs
+make logs               # Show logs for all services
+make logs-app           # Show app logs only
 make down               # Stop services
 make clean              # Clean up containers and volumes
 ```
@@ -192,6 +193,11 @@ cp .env k8s/.env
 
 # Deploy
 make k8s-deploy
-make k8s-port-forward &  # In separate terminal
 make k8s-db-setup
+
+# Management (parameterized commands)
+make k8s-status                    # Show deployment status
+make k8s-logs SERVICE=sakumari-app # Show app logs
+make k8s-logs SERVICE=postgres     # Show database logs
+make k8s-restart SERVICE=sakumari-app # Restart app deployment
 ```
