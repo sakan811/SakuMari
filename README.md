@@ -25,15 +25,11 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 - **Testing**: Vitest, React Testing Library, Playwright
 - **Package Manager**: pnpm
 
-## Setup
+## Project Overview
 
-### Prerequisites
+SakuMari is a modern web application for learning Japanese Hiragana and Katakana characters through interactive flashcards with adaptive learning and comprehensive progress tracking.
 
-- Node.js v23+
-- pnpm ([installation guide](https://pnpm.io/installation))
-- Docker & Docker Compose (recommended)
-
-### Quick Start
+## Quick Start
 
 ```bash
 # Clone and setup
@@ -52,10 +48,50 @@ pnpm install && pnpm run db:setup && pnpm run dev
 
 Visit <http://localhost:3000>
 
-### Environment Configuration
+## Development Workflow
 
-Essential variables in `.env`:
+### Essential Commands
 
+```bash
+pnpm run dev          # Start development server
+pnpm run build        # Build for production
+pnpm run docker:db    # Start PostgreSQL database
+pnpm run db:setup     # Complete database setup
+pnpm run lint         # Run ESLint
+pnpm run test:all     # Run all tests and quality checks
+```
+
+### Testing
+
+```bash
+pnpm run test:all      # All tests and quality checks
+pnpm run test:run      # Unit tests only
+pnpm run test:e2e:full # End-to-end tests
+```
+
+### Docker Testing
+
+To test the complete application stack in isolation:
+
+```bash
+# Update .env: set POSTGRES_HOST=db for containers
+pnpm run docker:dev-up    # Start full stack
+pnpm run db:setup         # Setup database from host
+```
+
+Services available at:
+- App: <http://localhost:3000>
+- Database Admin: <http://localhost:8080> (DBGate)
+
+Cleanup: `pnpm run docker:clean`
+
+## Configuration
+
+### Environment Variables
+
+Configure essential variables in `.env`:
+
+#### Database Configuration
 ```bash
 # Database (default values work for Docker setup)
 POSTGRES_DB=sakumari
@@ -63,17 +99,38 @@ POSTGRES_HOST=localhost
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_PORT=5432
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/sakumari
 POSTGRES_PRISMA_URL=postgresql://postgres:postgres@localhost:5432/sakumari
 POSTGRES_URL_NON_POOLING=postgresql://postgres:postgres@localhost:5432/sakumari
+```
 
+#### Authentication Configuration
+```bash
 # Authentication (required)
-AUTH_SECRET=your_generated_secret  # REQUIRED - Generate at link above
+AUTH_SECRET=your_generated_secret  # REQUIRED - Generate at https://auth-secret-gen.vercel.app/
 AUTH_GOOGLE_ID=your_google_client_id      # For Google OAuth
 AUTH_GOOGLE_SECRET=your_google_client_secret
 
 # Optional: Enable credentials provider for testing
 CREDS_PROVIDER=false
+CREDS_TEST_EMAIL=test@sakumari.local    # Optional - Test email (only used if CREDS_PROVIDER=true)
+CREDS_TEST_PASSWORD=TestPassword123!    # Optional - Test password (only used if CREDS_PROVIDER=true)
+```
+
+#### Production Configuration
+```bash
+# Authentication Base URL
+AUTH_URL=https://yourdomain.com          # REQUIRED - Base URL for authentication callbacks
+
+# Docker image settings
+DOCKER_IMAGE_NAME=sakanbeer88/sakumari  # REQUIRED - Docker image name
+DOCKER_IMAGE_TAG=latest                 # REQUIRED - Docker image tag
+CONTAINER_NAME_PREFIX=sakumari          # REQUIRED - Container name prefix
+
+# Cloudflare tunnel for secure external access
+CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token-here  # REQUIRED - Cloudflare tunnel token
+
+# Node.js environment
+NODE_ENV=production                     # REQUIRED - Set to production for deployment
 ```
 
 ### Authentication Setup
@@ -109,111 +166,54 @@ After setup, verify everything works:
 - App: Visit <http://localhost:3000> and create/login to account
 - Health check: Visit <http://localhost:3000/api/health>
 
-## Development
+## Testing
 
-### Essential Commands
+End-to-end (E2E) tests are written using Playwright to ensure the application's core functionalities work as expected across different browsers.
+
+### Running E2E Tests
+
+To run the E2E tests locally, you'll need to set up the environment and run the test suite:
+
+1.  **Setup Environment and Build**:
+    This command starts the database, runs database migrations, seeds the database, and builds the application for production.
+
+    ```bash
+    pnpm run test:e2e:full
+    ```
+
+2.  **Run Tests Only** (if environment is already set up):
+    If you have already run the setup and build process, you can run the tests directly:
+
+    ```bash
+    pnpm run test:e2e
+    ```
+
+### Test Execution Details
+
+*   **Headless Mode**: By default, tests run in a headless browser (no visible browser window).
+*   **UI Mode**: For debugging purposes, you can run tests in UI mode to see the browser in action. This can be enabled by setting the `headed` flag:
+    ```bash
+    pnpm run test:e2e -- --headed
+    ```
+*   **Authentication**: The E2E tests use a dedicated authentication setup. They require `CREDS_PROVIDER=true` in the environment and will use the test credentials defined by `CREDS_TEST_EMAIL` and `CREDS_TEST_PASSWORD` (defaults: `test@sakumari.local` / `TestPassword123!`). Playwright automatically handles the login process and saves the authentication state for subsequent tests.
+*   **Web Server**: Playwright automatically starts and manages a Next.js production server on `http://localhost:3000` for the duration of the tests.
+*   **Report**: HTML reports are generated by default and can be viewed after test execution.
+
+### Cleaning Up Test Environment
+
+To stop the database and clean up resources created during the E2E test setup:
 
 ```bash
-pnpm run dev          # Start development server
-pnpm run build        # Build for production
-pnpm run docker:db    # Start PostgreSQL database
-pnpm run db:setup     # Complete database setup
-pnpm run lint         # Run ESLint
-pnpm run test:all     # Run all tests and quality checks
+pnpm run test:e2e:clean
 ```
 
-### Testing
-
-```bash
-pnpm run test:all      # All tests and quality checks
-pnpm run test:run      # Unit tests only
-pnpm run test:e2e:full # End-to-end tests
-```
-
-## Docker Testing
-
-To test the complete application stack in isolation:
-
-```bash
-# Update .env: set POSTGRES_HOST=db for containers
-pnpm run docker:dev-up    # Start full stack
-pnpm run db:setup         # Setup database from host
-```
-
-Services available at:
-- App: <http://localhost:3000>
-- Database Admin: <http://localhost:8080> (DBGate)
-
-Cleanup: `pnpm run docker:clean`
-
-## Production Deployment
+## Deployment
 
 Deploy SakuMari using Kubernetes with Cloudflare tunnel for secure remote access.
 
 ### Environment Setup
 
-Configure production variables in `.env`:
-
-```bash
-# ========================================
-# DATABASE CONFIGURATION
-# ========================================
-
-# PostgreSQL Database Configuration
-POSTGRES_DB=sakumari                    # REQUIRED - Database name
-POSTGRES_USER=postgres                  # REQUIRED - Database user
-POSTGRES_PASSWORD=your_secure_password  # REQUIRED - Database password
-POSTGRES_PORT=5432                      # REQUIRED - Database port
-POSTGRES_HOST=localhost                 # REQUIRED - Database host (use 'db' for Kubernetes)
-
-# Database URLs (automatically generated from above)
-POSTGRES_PRISMA_URL=postgresql://postgres:your_secure_password@localhost:5432/sakumari
-POSTGRES_URL_NON_POOLING=postgresql://postgres:your_secure_password@localhost:5432/sakumari
-
-# ========================================
-# AUTHENTICATION CONFIGURATION
-# ========================================
-
-# Authentication Base URL
-AUTH_URL=https://yourdomain.com          # REQUIRED - Base URL for authentication callbacks
-
-# Authentication Secrets
-AUTH_SECRET=your-random-secret-here     # REQUIRED - Generate at https://auth-secret-gen.vercel.app/
-AUTH_GOOGLE_ID=your-google-client-id    # REQUIRED - Google OAuth client ID
-AUTH_GOOGLE_SECRET=your-google-client-secret  # REQUIRED - Google OAuth client secret
-
-# ========================================
-# CREDENTIALS PROVIDER (OPTIONAL)
-# ========================================
-
-# Enable credentials provider for E2E testing
-CREDS_PROVIDER=false                    # OPTIONAL - Enable email/password authentication
-CREDS_TEST_EMAIL=test@sakumari.local    # OPTIONAL - Test email (only used if CREDS_PROVIDER=true)
-CREDS_TEST_PASSWORD=TestPassword123!    # OPTIONAL - Test password (only used if CREDS_PROVIDER=true)
-
-# ========================================
-# DOCKER CONFIGURATION
-# ========================================
-
-# Docker image settings
-DOCKER_IMAGE_NAME=sakanbeer88/sakumari  # REQUIRED - Docker image name
-DOCKER_IMAGE_TAG=latest                 # REQUIRED - Docker image tag
-CONTAINER_NAME_PREFIX=sakumari          # REQUIRED - Container name prefix
-
-# ========================================
-# CLOUDFLARE TUNNEL CONFIGURATION
-# ========================================
-
-# Cloudflare tunnel for secure external access
-CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token-here  # REQUIRED - Cloudflare tunnel token
-
-# ========================================
-# APPLICATION CONFIGURATION
-# ========================================
-
-# Node.js environment
-NODE_ENV=production                     # REQUIRED - Set to production for deployment
-```
+Configure production variables in `.env` (see Configuration section above for details).
 
 ### Kubernetes Deployment
 
@@ -242,4 +242,3 @@ pnpm run k8s:down
 
 # Clean up (remove namespace and resources)
 pnpm run k8s:clean
-```
