@@ -116,6 +116,27 @@ pnpm run k8s:down
 
 ## E2E Test Setup
 
+**Environment Configuration**: Ensure your `.env` file is configured for local testing:
+
+```bash
+# Database - Use localhost for E2E tests
+POSTGRES_HOST=localhost
+POSTGRES_DB=sakumari
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_PORT=5432
+
+# Required for test authentication
+CREDS_PROVIDER=true
+CREDS_TEST_EMAIL=test@sakumari.local
+CREDS_TEST_PASSWORD=TestPassword123!
+
+# Other required variables
+AUTH_SECRET=your_generated_secret_here
+```
+
+**Test Commands**:
+
 ```bash
 # Full E2E test workflow
 pnpm run test:e2e:full
@@ -126,5 +147,3 @@ pnpm run test:e2e
 # Clean up test environment
 pnpm run test:e2e:clean
 ```
-
-**Requirements**: Set `CREDS_PROVIDER=true` in `.env` for test authentication.
