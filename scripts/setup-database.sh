@@ -52,8 +52,3 @@ rm -f "$PROJECT_ROOT/.env.local"
 
 echo ""
 echo "✅ Database setup completed successfully!"
-echo ""
-echo "📊 You can now:"
-echo "   - View data with: npx prisma studio"
-echo "   - Run the app with: pnpm dev"
-echo "   - Start Docker services with: make postgres"

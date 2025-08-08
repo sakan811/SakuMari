@@ -40,8 +40,8 @@ cp .env.example .env
 # REQUIRED: Generate AUTH_SECRET at https://auth-secret-gen.vercel.app/
 # Edit .env with your authentication credentials including AUTH_SECRET
 
-make postgres
-make install && make db-setup && make dev
+pnpm run docker:db
+pnpm install && pnpm run db:setup && pnpm run dev
 ```
 
 Visit <http://localhost:3000>
@@ -104,23 +104,23 @@ For testing without Google OAuth:
 
 ```bash
 # Start database
-make postgres
+pnpm run docker:db
 
 # Install dependencies and setup database
-make install
-make db-setup  # Handles Prisma generation, migrations, and seeding
+pnpm install
+pnpm run db:setup  # Handles Prisma generation, migrations, and seeding
 
 # Start development server
-make dev
+pnpm run dev
 ```
 
 **Alternative: Local PostgreSQL**
 
 ```bash
 # Ensure PostgreSQL is running locally
-make install
-make db-setup
-make dev
+pnpm install
+pnpm run db:setup
+pnpm run dev
 ```
 
 Visit <http://localhost:3000>
@@ -131,44 +131,44 @@ Visit <http://localhost:3000>
 
 ```bash
 # Core development
-make dev                # Start development server
-make build              # Build for production
-make install            # Install dependencies
+pnpm run dev                # Start development server
+pnpm run build              # Build for production
+pnpm install            # Install dependencies
 
 # Database
-make postgres           # Start PostgreSQL database
-make db-setup           # Complete database setup (automated script)
+pnpm run docker:db           # Start PostgreSQL database
+pnpm run db:setup           # Complete database setup (automated script)
 
 # Code quality
-make lint               # Run ESLint
-make format             # Format with Prettier
-make test-all           # Run all tests and quality checks
+pnpm run lint               # Run ESLint
+pnpm run format             # Format with Prettier
+pnpm run test:all           # Run all tests and quality checks
 ```
 
 ### Testing
 
 ```bash
 # Run all tests
-make test-all
+pnpm run test:all
 
 # Individual test types
-make test-unit          # Unit tests
-make test-db            # Database tests
-make test-e2e           # End-to-end tests
+pnpm run test:run          # Unit tests
+pnpm run test:db:full            # Database tests
+pnpm run test:e2e:full           # End-to-end tests
 ```
 
 ### Advanced Commands
 
 ```bash
 # Docker deployment
-make dev-up             # Full Docker stack
+pnpm run dev-up             # Full Docker stack
 
 # Service management
-make status             # Show service status
-make logs               # Show logs for all services
-make logs-app           # Show app logs only
-make down               # Stop services
-make clean              # Clean up containers and volumes
+pnpm run docker:status  # Show service status
+pnpm run docker:logs    # Show logs for all services
+pnpm run docker:logs-app # Show app logs only
+pnpm run docker:down    # Stop services
+pnpm run docker:clean   # Clean up containers and volumes
 ```
 
 ## Deployment
@@ -179,7 +179,6 @@ Quick way to test the complete application stack in an isolated environment:
 
 ```bash
 # Set POSTGRES_HOST=db in .env for containers
-make dev-up
-make db-setup  # Setup database from host
+pnpm run dev-up
+pnpm run db:setup  # Setup database from host
 ```
-
