@@ -181,13 +181,11 @@ NODE_ENV=production
 ### Deployment
 
 ```bash
-# Build and deploy
-docker build -f docker/Dockerfile -t sakumari:latest .
+# Deploy
 pnpm run docker:prod-up
 
 # Setup database
-docker compose -f docker/docker-compose.prod.yml exec app npx prisma migrate deploy
-docker compose -f docker/docker-compose.prod.yml exec app npx prisma db seed
+pnpm run db:setup
 ```
 
 ### Access Services
