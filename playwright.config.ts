@@ -2,8 +2,10 @@ import { defineConfig, devices } from "@playwright/test";
 
 // Set environment variables for E2E testing
 process.env.CREDS_PROVIDER = "true";
-process.env.CREDS_TEST_EMAIL = process.env.CREDS_TEST_EMAIL || "test@sakumari.local";
-process.env.CREDS_TEST_PASSWORD = process.env.CREDS_TEST_PASSWORD || "TestPassword123!";
+process.env.CREDS_TEST_EMAIL =
+  process.env.CREDS_TEST_EMAIL || "test@sakumari.local";
+process.env.CREDS_TEST_PASSWORD =
+  process.env.CREDS_TEST_PASSWORD || "TestPassword123!";
 
 export default defineConfig({
   testDir: "./__tests__/e2e",

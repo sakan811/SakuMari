@@ -46,7 +46,6 @@ export default function Flashcard() {
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-
   // Focus input when component mounts, when card changes, or after result is cleared
   useEffect(() => {
     if (

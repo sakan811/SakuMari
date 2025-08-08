@@ -193,7 +193,9 @@ describe("Flashcard Component", () => {
       render(<Flashcard />);
 
       const input = screen.getByPlaceholderText("Type romaji equivalent...");
-      const submitButton = screen.getByRole("button", { name: "Submitting..." });
+      const submitButton = screen.getByRole("button", {
+        name: "Submitting...",
+      });
 
       // Should be disabled when isSubmitting is true
       expect(input).toBeDisabled();
@@ -234,7 +236,9 @@ describe("Flashcard Component", () => {
       render(<Flashcard />);
 
       const input = screen.getByPlaceholderText("Type romaji equivalent...");
-      const submitButton = screen.getByRole("button", { name: "Submitting..." });
+      const submitButton = screen.getByRole("button", {
+        name: "Submitting...",
+      });
 
       fireEvent.change(input, { target: { value: "a" } });
 
