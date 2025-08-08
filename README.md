@@ -37,7 +37,7 @@ POSTGRES_PORT=5432
 AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
 
-# Optional - Enable test credentials
+# E2E test credentials only
 CREDS_PROVIDER=true
 CREDS_TEST_EMAIL=test@sakumari.local
 CREDS_TEST_PASSWORD=TestPassword123!
@@ -126,7 +126,7 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_PORT=5432
 
-# Required for test authentication
+# Required for E2E test authentication only
 CREDS_PROVIDER=true
 CREDS_TEST_EMAIL=test@sakumari.local
 CREDS_TEST_PASSWORD=TestPassword123!
