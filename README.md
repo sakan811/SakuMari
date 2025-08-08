@@ -171,7 +171,7 @@ make down               # Stop services
 make clean              # Clean up containers and volumes
 ```
 
-## Production Deployment
+## Deployment
 
 ### Docker Deployment
 
@@ -183,32 +183,3 @@ make dev-up
 make db-setup  # Setup database from host
 ```
 
-### Kubernetes Deployment
-
-For production-ready Kubernetes deployments:
-
-```bash
-# Setup Kubernetes environment
-cp .env k8s/.env
-# REQUIRED: Edit k8s/.env with production values:
-#   POSTGRES_HOST=postgres-service  # Kubernetes service name
-#   AUTH_URL=https://your-domain.com  # Your production domain
-#   AUTH_SECRET=your_generated_secret  # Required for JWT tokens
-# Keep POSTGRES_HOST=localhost in main .env for database setup
-
-# Deploy and wait for pods to be ready
-make k8s-deploy
-make k8s-status
-
-# Port-forward database (run in separate terminal and keep running)
-kubectl port-forward -n sakumari svc/postgres-service 5432:5432
-
-# Setup database (run in main terminal while port-forward is active)
-make k8s-db-setup
-
-# Management (parameterized commands)
-make k8s-status                    # Show deployment status
-make k8s-logs SERVICE=sakumari-app # Show app logs
-make k8s-logs SERVICE=postgres     # Show database logs
-make k8s-restart SERVICE=sakumari-app # Restart app deployment
-```
