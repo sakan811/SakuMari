@@ -92,12 +92,14 @@ Production deployment with persistent storage:
 ### Setup Steps
 
 1. **Copy environment file to Kubernetes directory**:
+
 ```bash
 # Copy .env file to k8s directory (required for deployment)
 cp .env k8s/.env
 ```
 
 2. **Deploy all services**:
+
 ```bash
 # Deploy all Kubernetes resources
 pnpm run k8s:up
@@ -109,24 +111,28 @@ pnpm run k8s:status
 3. **Database setup** (requires two terminals):
 
 **Terminal 1** - Port-forward database:
+
 ```bash
 # Port-forward database service (keep running)
 kubectl port-forward svc/postgres-service 5432:5432 -n sakumari
 ```
 
 **Terminal 2** - Run database setup:
+
 ```bash
 # Setup database (run in separate terminal)
 pnpm run db:setup
 ```
 
 4. **Access application**:
+
 ```bash
 # Port-forward app service for local access
 kubectl port-forward svc/sakumari-app-service 3000:3000 -n sakumari
 ```
 
 5. **Monitor deployment**:
+
 ```bash
 # View application logs
 pnpm run k8s:logs
@@ -136,6 +142,7 @@ pnpm run k8s:down
 ```
 
 **Production Environment**: Update `.env` with production values before copying to k8s/:
+
 - `POSTGRES_HOST=postgres-service`
 - `AUTH_URL=https://yourdomain.com`
 - `NODE_ENV=production`

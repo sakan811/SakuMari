@@ -164,7 +164,9 @@ describe("Dashboard Component", () => {
       },
     ];
 
-    mockFetch.mockResolvedValue(mockApiResponse(mockStatsWithDifferentCorrectAttempts));
+    mockFetch.mockResolvedValue(
+      mockApiResponse(mockStatsWithDifferentCorrectAttempts),
+    );
     render(<Dashboard />);
 
     await waitFor(() => screen.getByText("Your Progress"));

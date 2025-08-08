@@ -66,7 +66,12 @@ export default function Dashboard() {
   }, []);
 
   const handleSort = (
-    column: "character" | "romaji" | "attempts" | "correct_attempts" | "accuracy",
+    column:
+      | "character"
+      | "romaji"
+      | "attempts"
+      | "correct_attempts"
+      | "accuracy",
   ) => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
