@@ -8,237 +8,123 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 🚀 **[Try it live](https://sakumari.fukudev.org/)** - No setup required!
 
-## Features
+## Google OAuth Setup
 
-- **Interactive Flashcards**: Practice with typing or multiple-choice modes
-- **Adaptive Learning**: Weighted algorithm presents difficult characters more frequently
-- **Progress Tracking**: Detailed dashboard with accuracy statistics and character-specific progress
-- **Authentication**: NextAuth.js v5 with Google OAuth and optional custom credentials for testing
-- **Responsive Design**: Mobile-optimized interface for all devices
-- **Modern Stack**: Next.js 15 App Router with React 19 Server/Client components
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create/select a project > "APIs & Services" > "Credentials"
+3. Create "OAuth client ID" (configure consent screen if prompted)
+4. Set authorized redirect URIs:
+   - Development: `http://localhost:3000/api/auth/callback/google`
+   - Production: `https://yourdomain.com/api/auth/callback/google`
+5. Copy Client ID and Secret to `.env` file
 
-## Technology Stack
+## Environment Setup
 
-- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS v4
-- **Backend**: Node.js 23, Prisma ORM v6, NextAuth.js v5
-- **Database**: PostgreSQL 17
-- **Testing**: Vitest, React Testing Library, Playwright
-- **Package Manager**: pnpm
-
-## Project Overview
-
-SakuMari is a modern web application for learning Japanese Hiragana and Katakana characters through interactive flashcards with adaptive learning and comprehensive progress tracking.
-
-## Quick Start
+Copy `.env.example` to `.env` and configure:
 
 ```bash
-# Clone and setup
-git clone https://github.com/sakan811/SakuMari.git
-cd SakuMari
-cp .env.example .env
+# Required - Generate at https://auth-secret-gen.vercel.app/
+AUTH_SECRET=your_generated_secret_here
 
-# Configure environment
-# REQUIRED: Generate AUTH_SECRET at https://auth-secret-gen.vercel.app/
-# Add AUTH_SECRET to .env file
-
-# Setup and run
-pnpm run docker:db
-pnpm install && pnpm run db:setup && pnpm run dev
-```
-
-Visit <http://localhost:3000>
-
-## Development Workflow
-
-### Essential Commands
-
-```bash
-pnpm run dev          # Start development server
-pnpm run build        # Build for production
-pnpm run docker:db    # Start PostgreSQL database
-pnpm run db:setup     # Complete database setup
-pnpm run lint         # Run ESLint
-pnpm run test:all     # Run all tests and quality checks
-```
-
-### Testing
-
-```bash
-pnpm run test:all      # All tests and quality checks
-pnpm run test:run      # Unit tests only
-pnpm run test:e2e:full # End-to-end tests
-```
-
-### Docker Testing
-
-To test the complete application stack in isolation:
-
-```bash
-# Update .env: set POSTGRES_HOST=db for containers
-pnpm run docker:dev-up    # Start full stack
-pnpm run db:setup         # Setup database from host
-```
-
-Services available at:
-- App: <http://localhost:3000>
-- Database Admin: <http://localhost:8080> (DBGate)
-
-Cleanup: `pnpm run docker:clean`
-
-## Configuration
-
-### Environment Variables
-
-Configure essential variables in `.env`:
-
-#### Database Configuration
-```bash
 # Database (default values work for Docker setup)
 POSTGRES_DB=sakumari
-POSTGRES_HOST=localhost
+POSTGRES_HOST=localhost  # Use 'db' for Docker
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_PORT=5432
-POSTGRES_PRISMA_URL=postgresql://postgres:postgres@localhost:5432/sakumari
-POSTGRES_URL_NON_POOLING=postgresql://postgres:postgres@localhost:5432/sakumari
-```
 
-#### Authentication Configuration
-```bash
-# Authentication (required)
-AUTH_SECRET=your_generated_secret  # REQUIRED - Generate at https://auth-secret-gen.vercel.app/
-AUTH_GOOGLE_ID=your_google_client_id      # For Google OAuth
+# Google OAuth
+AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
 
-# Optional: Enable credentials provider for testing
-CREDS_PROVIDER=false
-CREDS_TEST_EMAIL=test@sakumari.local    # Optional - Test email (only used if CREDS_PROVIDER=true)
-CREDS_TEST_PASSWORD=TestPassword123!    # Optional - Test password (only used if CREDS_PROVIDER=true)
+# Optional - Enable test credentials
+CREDS_PROVIDER=true
+CREDS_TEST_EMAIL=test@sakumari.local
+CREDS_TEST_PASSWORD=TestPassword123!
 ```
 
-#### Production Configuration
+## Local Development Setup
+
 ```bash
-# Authentication Base URL
-AUTH_URL=https://yourdomain.com          # REQUIRED - Base URL for authentication callbacks
+# Clone and install
+git clone https://github.com/sakan811/SakuMari.git
+cd SakuMari
+pnpm install
 
-# Docker image settings
-DOCKER_IMAGE_NAME=sakanbeer88/sakumari  # REQUIRED - Docker image name
-DOCKER_IMAGE_TAG=latest                 # REQUIRED - Docker image tag
-CONTAINER_NAME_PREFIX=sakumari          # REQUIRED - Container name prefix
+# Start database
+pnpm run docker:db
 
-# Cloudflare tunnel for secure external access
-CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token-here  # REQUIRED - Cloudflare tunnel token
+# Setup database
+pnpm run db:setup
 
-# Node.js environment
-NODE_ENV=production                     # REQUIRED - Set to production for deployment
+# Start development server
+pnpm run dev
 ```
 
-### Authentication Setup
+Visit http://localhost:3000
 
-**Google OAuth (Recommended)**
+## Docker Compose Setup
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Select or create a project
-3. Navigate to "APIs & Services" > "Credentials"
-4. Click "Create Credentials" > "OAuth client ID"
-5. If prompted, configure the OAuth consent screen first:
-   - Choose "External" user type for testing
-   - Fill in required app information
-   - Add your email to test users
-6. For application type, select "Web application"
-7. Set authorized redirect URIs:
-   - Development: `http://localhost:3000/api/auth/callback/google`
-   - Production: `https://yourdomain.com/api/auth/callback/google`
-8. Copy the Client ID and Client Secret to your `.env` file:
-   ```bash
-   AUTH_GOOGLE_ID=your_client_id_here
-   AUTH_GOOGLE_SECRET=your_client_secret_here
-   ```
-
-**Custom Credentials (Testing)**
-
-Set `CREDS_PROVIDER=true` in `.env` to enable test login (test@sakumari.local / TestPassword123!)
-
-### Verification
-
-After setup, verify everything works:
-- Database: `pnpm run docker:status` shows `db` service running
-- App: Visit <http://localhost:3000> and create/login to account
-- Health check: Visit <http://localhost:3000/api/health>
-
-## Testing
-
-End-to-end (E2E) tests are written using Playwright to ensure the application's core functionalities work as expected across different browsers.
-
-### Running E2E Tests
-
-To run the E2E tests locally, you'll need to set up the environment and run the test suite:
-
-1.  **Setup Environment and Build**:
-    This command starts the database, runs database migrations, seeds the database, and builds the application for production.
-
-    ```bash
-    pnpm run test:e2e:full
-    ```
-
-2.  **Run Tests Only** (if environment is already set up):
-    If you have already run the setup and build process, you can run the tests directly:
-
-    ```bash
-    pnpm run test:e2e
-    ```
-
-### Test Execution Details
-
-*   **Headless Mode**: By default, tests run in a headless browser (no visible browser window).
-*   **UI Mode**: For debugging purposes, you can run tests in UI mode to see the browser in action. This can be enabled by setting the `headed` flag:
-    ```bash
-    pnpm run test:e2e -- --headed
-    ```
-*   **Authentication**: The E2E tests use a dedicated authentication setup. They require `CREDS_PROVIDER=true` in the environment and will use the test credentials defined by `CREDS_TEST_EMAIL` and `CREDS_TEST_PASSWORD` (defaults: `test@sakumari.local` / `TestPassword123!`). Playwright automatically handles the login process and saves the authentication state for subsequent tests.
-*   **Web Server**: Playwright automatically starts and manages a Next.js production server on `http://localhost:3000` for the duration of the tests.
-*   **Report**: HTML reports are generated by default and can be viewed after test execution.
-
-### Cleaning Up Test Environment
-
-To stop the database and clean up resources created during the E2E test setup:
+For isolated testing environment:
 
 ```bash
-pnpm run test:e2e:clean
+# Update .env for Docker
+POSTGRES_HOST=db
+
+# Start full stack
+pnpm run docker:dev-up
+
+# Setup database
+pnpm run db:setup
+
+# Access services
+# App: http://localhost:3000
+# DB Admin: http://localhost:8080
+
+# Stop services
+pnpm run docker:down
 ```
 
-## Deployment
+## Kubernetes Deployment
 
-Deploy SakuMari using Kubernetes with Cloudflare tunnel for secure remote access.
-
-### Environment Setup
-
-Configure production variables in `.env` (see Configuration section above for details).
-
-### Kubernetes Deployment
+Production deployment with persistent storage:
 
 ```bash
-# Deploy
+# Deploy all services
 pnpm run k8s:up
 
 # Setup database
 pnpm run db:setup
-```
-
-### Kubernetes Management
-
-```bash
-# View logs
-pnpm run k8s:logs
-
-# View app logs only
-pnpm run k8s:logs-app
 
 # Check status
 pnpm run k8s:status
 
-# Stop services
-pnpm run k8s:down
+# View logs
+pnpm run k8s:logs
 
-# Clean up (remove namespace and resources)
-pnpm run k8s:clean
+# Access locally (port-forward)
+kubectl port-forward svc/sakumari-app-service 3000:3000 -n sakumari
+
+# Stop deployment
+pnpm run k8s:down
+```
+
+**Production Environment**: Update `.env` with production values:
+- `POSTGRES_HOST=sakumari-postgres-service`
+- `AUTH_URL=https://yourdomain.com`
+- `NODE_ENV=production`
+
+## E2E Test Setup
+
+```bash
+# Full E2E test workflow
+pnpm run test:e2e:full
+
+# Run tests only (if already set up)
+pnpm run test:e2e
+
+# Clean up test environment
+pnpm run test:e2e:clean
+```
+
+**Requirements**: Set `CREDS_PROVIDER=true` in `.env` for test authentication.
