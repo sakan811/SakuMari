@@ -111,7 +111,7 @@ pnpm run k8s:status
 **Terminal 1** - Port-forward database:
 ```bash
 # Port-forward database service (keep running)
-kubectl port-forward svc/sakumari-postgres-service 5432:5432 -n sakumari
+kubectl port-forward svc/postgres-service 5432:5432 -n sakumari
 ```
 
 **Terminal 2** - Run database setup:
