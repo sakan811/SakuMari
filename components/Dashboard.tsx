@@ -35,7 +35,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "hiragana" | "katakana">("all");
   const [sortColumn, setSortColumn] = useState<
-    "character" | "romaji" | "attempts" | "accuracy"
+    "character" | "romaji" | "attempts" | "correct_attempts" | "accuracy"
   >("accuracy");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -66,7 +66,7 @@ export default function Dashboard() {
   }, []);
 
   const handleSort = (
-    column: "character" | "romaji" | "attempts" | "accuracy",
+    column: "character" | "romaji" | "attempts" | "correct_attempts" | "accuracy",
   ) => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -107,6 +107,10 @@ export default function Dashboard() {
       case "attempts":
         aValue = a.attempts;
         bValue = b.attempts;
+        break;
+      case "correct_attempts":
+        aValue = a.correct_attempts;
+        bValue = b.correct_attempts;
         break;
       case "accuracy":
         aValue = a.accuracy;
@@ -330,6 +334,20 @@ export default function Dashboard() {
                           </div>
                         </th>
                         <th
+                          data-testid="sort-correct-attempts"
+                          className="pb-2 sm:pb-3 pt-2 text-xs sm:text-sm font-semibold text-[#403933] cursor-pointer hover:text-[#d1622b] select-none transition-colors duration-200 px-1 sm:px-0"
+                          onClick={() => handleSort("correct_attempts")}
+                        >
+                          <div className="flex items-center gap-1">
+                            Correct Attempts
+                            {sortColumn === "correct_attempts" && (
+                              <span className="text-[#d1622b] text-sm sm:text-lg">
+                                {sortDirection === "asc" ? "↑" : "↓"}
+                              </span>
+                            )}
+                          </div>
+                        </th>
+                        <th
                           data-testid="sort-accuracy"
                           className="pb-2 sm:pb-3 pt-2 text-xs sm:text-sm font-semibold text-[#403933] cursor-pointer hover:text-[#d1622b] select-none transition-colors duration-200 px-1 sm:px-0"
                           onClick={() => handleSort("accuracy")}
@@ -359,6 +377,9 @@ export default function Dashboard() {
                           </td>
                           <td className="py-2 sm:py-3 text-[#403933] font-medium text-xs sm:text-base px-1 sm:px-0">
                             {kana.attempts}
+                          </td>
+                          <td className="py-2 sm:py-3 text-[#403933] font-medium text-xs sm:text-base px-1 sm:px-0">
+                            {kana.correct_attempts}
                           </td>
                           <td className="py-2 sm:py-3 px-1 sm:px-0">
                             <div className="flex items-center">

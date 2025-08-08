@@ -81,6 +81,7 @@ test.describe("Dashboard Features", () => {
     await expect(page.getByTestId("sort-character")).toBeVisible();
     await expect(page.getByTestId("sort-romaji")).toBeVisible();
     await expect(page.getByTestId("sort-attempts")).toBeVisible();
+    await expect(page.getByTestId("sort-correct-attempts")).toBeVisible();
     await expect(page.getByTestId("sort-accuracy")).toBeVisible();
 
     // Click character header to sort
@@ -103,6 +104,28 @@ test.describe("Dashboard Features", () => {
         .getByTestId("sort-character")
         .getByText("↑")
         .or(page.getByTestId("sort-character").getByText("↓")),
+    ).toBeVisible();
+
+    // Test sorting by correct_attempts column
+    await page.getByTestId("sort-correct-attempts").click();
+
+    // Should show sort indicator (either up or down arrow)
+    await expect(
+      page
+        .getByTestId("sort-correct-attempts")
+        .getByText("↑")
+        .or(page.getByTestId("sort-correct-attempts").getByText("↓")),
+    ).toBeVisible();
+
+    // Click again to reverse sort
+    await page.getByTestId("sort-correct-attempts").click();
+
+    // Should show sort indicator (arrow should change or remain)
+    await expect(
+      page
+        .getByTestId("sort-correct-attempts")
+        .getByText("↑")
+        .or(page.getByTestId("sort-correct-attempts").getByText("↓")),
     ).toBeVisible();
   });
 

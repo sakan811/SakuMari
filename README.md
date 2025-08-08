@@ -173,7 +173,7 @@ pnpm run docker:clean   # Clean up containers and volumes
 
 ## Deployment
 
-### Docker Deployment
+### Docker Testing Environment
 
 Quick way to test the complete application stack in an isolated environment:
 
@@ -181,4 +181,65 @@ Quick way to test the complete application stack in an isolated environment:
 # Set POSTGRES_HOST=db in .env for containers
 pnpm run dev-up
 pnpm run db:setup  # Setup database from host
+```
+
+### Production Deployment
+
+#### Prerequisites
+
+- Docker & Docker Compose v2+
+- Domain configured with Cloudflare
+- Server with 1GB+ RAM
+
+#### Environment Setup
+
+```bash
+cp .env.example .env.prod
+```
+
+Configure essential variables in `.env.prod`:
+
+```bash
+# Database
+POSTGRES_DB=sakumari
+POSTGRES_USER=sakumari_user
+POSTGRES_PASSWORD=your_secure_password
+POSTGRES_HOST=db
+
+# Authentication
+AUTH_URL=https://yourdomain.com
+AUTH_SECRET=your_generated_secret  # Generate at https://auth-secret-gen.vercel.app/
+AUTH_GOOGLE_ID=your_google_client_id
+AUTH_GOOGLE_SECRET=your_google_client_secret
+
+# Cloudflare
+CLOUDFLARE_TUNNEL_TOKEN=your_tunnel_token
+
+NODE_ENV=production
+```
+
+#### Google OAuth Setup
+
+1. Visit [Google Cloud Console](https://console.cloud.google.com/) → Create OAuth client
+2. Add redirect URI: `https://yourdomain.com/api/auth/callback/google`
+3. Copy credentials to `.env.prod`
+
+#### Cloudflare Tunnel
+
+1. Create tunnel in Cloudflare dashboard
+2. Configure DNS: CNAME `yourdomain.com` → tunnel domain  
+3. Copy tunnel token to `CLOUDFLARE_TUNNEL_TOKEN`
+
+#### Deploy
+
+```bash
+cd docker
+docker compose -f docker-compose.prod.yml --env-file ../.env.prod up -d
+pnpm run db:setup  # Setup database
+```
+
+#### Verify
+
+```bash
+curl https://yourdomain.com/api/health
 ```
