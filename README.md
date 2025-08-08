@@ -155,27 +155,64 @@ Deploy SakuMari using Kubernetes with Cloudflare tunnel for secure remote access
 Configure production variables in `.env`:
 
 ```bash
-# Database (container configuration)
-POSTGRES_HOST=db
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=your_secure_password
-POSTGRES_DB=sakumari
-DATABASE_URL=postgresql://postgres:your_secure_password@db:5432/sakumari
+# ========================================
+# DATABASE CONFIGURATION
+# ========================================
 
-# Authentication (required)
-AUTH_SECRET=your_production_secret
-AUTH_GOOGLE_ID=your_google_client_id
-AUTH_GOOGLE_SECRET=your_google_client_secret
+# PostgreSQL Database Configuration
+POSTGRES_DB=sakumari                    # REQUIRED - Database name
+POSTGRES_USER=postgres                  # REQUIRED - Database user
+POSTGRES_PASSWORD=your_secure_password  # REQUIRED - Database password
+POSTGRES_PORT=5432                      # REQUIRED - Database port
+POSTGRES_HOST=localhost                 # REQUIRED - Database host (use 'db' for Kubernetes)
 
-# Cloudflare tunnel (required for external access)
-CLOUDFLARE_TUNNEL_TOKEN=your_tunnel_token
+# Database URLs (automatically generated from above)
+POSTGRES_PRISMA_URL=postgresql://postgres:your_secure_password@localhost:5432/sakumari
+POSTGRES_URL_NON_POOLING=postgresql://postgres:your_secure_password@localhost:5432/sakumari
 
-# Docker configuration
-DOCKER_IMAGE_NAME=sakanbeer88/sakumari
-DOCKER_IMAGE_TAG=latest
-CONTAINER_NAME_PREFIX=sakumari
+# ========================================
+# AUTHENTICATION CONFIGURATION
+# ========================================
 
-NODE_ENV=production
+# Authentication Base URL
+AUTH_URL=https://yourdomain.com          # REQUIRED - Base URL for authentication callbacks
+
+# Authentication Secrets
+AUTH_SECRET=your-random-secret-here     # REQUIRED - Generate at https://auth-secret-gen.vercel.app/
+AUTH_GOOGLE_ID=your-google-client-id    # REQUIRED - Google OAuth client ID
+AUTH_GOOGLE_SECRET=your-google-client-secret  # REQUIRED - Google OAuth client secret
+
+# ========================================
+# CREDENTIALS PROVIDER (OPTIONAL)
+# ========================================
+
+# Enable credentials provider for E2E testing
+CREDS_PROVIDER=false                    # OPTIONAL - Enable email/password authentication
+CREDS_TEST_EMAIL=test@sakumari.local    # OPTIONAL - Test email (only used if CREDS_PROVIDER=true)
+CREDS_TEST_PASSWORD=TestPassword123!    # OPTIONAL - Test password (only used if CREDS_PROVIDER=true)
+
+# ========================================
+# DOCKER CONFIGURATION
+# ========================================
+
+# Docker image settings
+DOCKER_IMAGE_NAME=sakanbeer88/sakumari  # REQUIRED - Docker image name
+DOCKER_IMAGE_TAG=latest                 # REQUIRED - Docker image tag
+CONTAINER_NAME_PREFIX=sakumari          # REQUIRED - Container name prefix
+
+# ========================================
+# CLOUDFLARE TUNNEL CONFIGURATION
+# ========================================
+
+# Cloudflare tunnel for secure external access
+CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token-here  # REQUIRED - Cloudflare tunnel token
+
+# ========================================
+# APPLICATION CONFIGURATION
+# ========================================
+
+# Node.js environment
+NODE_ENV=production                     # REQUIRED - Set to production for deployment
 ```
 
 ### Kubernetes Deployment
