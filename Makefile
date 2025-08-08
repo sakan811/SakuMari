@@ -3,16 +3,6 @@
 # Configuration constants
 DOCKER_COMPOSE_FILE := docker/docker-compose.yml
 DOCKER_COMPOSE_CMD := docker compose -f $(DOCKER_COMPOSE_FILE)
-K8S_NAMESPACE := sakumari
-
-# Reusable functions
-define k8s_logs
-	kubectl logs -n $(K8S_NAMESPACE) deployment/$(1) -f
-endef
-
-define k8s_restart
-	kubectl rollout restart deployment/$(1) -n $(K8S_NAMESPACE)
-endef
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -62,27 +52,6 @@ down: ## Stop all services
 clean: ## Stop and remove all containers, volumes, images
 	$(DOCKER_COMPOSE_CMD) down --volumes --rmi all --remove-orphans
 
-# =============================================================================
-# KUBERNETES DEPLOYMENTS
-# =============================================================================
-
-k8s-deploy: ## Deploy to Kubernetes using Kustomize
-	cd k8s && kubectl apply -k .
-
-k8s-status: ## Show Kubernetes deployment status
-	kubectl get all -n $(K8S_NAMESPACE)
-
-k8s-logs: ## Show logs for service (usage: make k8s-logs SERVICE=sakumari-app)
-	$(call k8s_logs,$(or $(SERVICE),sakumari-app))
-
-k8s-restart: ## Restart deployment (usage: make k8s-restart SERVICE=sakumari-app)
-	$(call k8s_restart,$(or $(SERVICE),sakumari-app))
-
-k8s-db-setup: ## Setup database in Kubernetes (requires: kubectl port-forward -n sakumari svc/postgres-service 5432:5432)
-	pnpm run prisma:generate && pnpm run prisma:migrate:deploy && pnpm run db:seed
-
-k8s-clean: ## Delete Kubernetes namespace and all resources (WARNING: destroys all data)
-	kubectl delete namespace $(K8S_NAMESPACE)
 
 # =============================================================================
 # DEVELOPMENT
@@ -129,5 +98,4 @@ test-all: lint format test-unit test-db test-e2e ## Run all tests and quality ch
 # =============================================================================
 
 .PHONY: postgres db-admin db-setup db-reset dev-up logs logs-app status down clean \
-        k8s-deploy k8s-status k8s-logs k8s-restart k8s-db-setup k8s-clean \
         dev build install lint format test-unit test-db test-e2e test-e2e-setup test-e2e-clean test-all

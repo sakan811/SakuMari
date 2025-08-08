@@ -1,6 +1,6 @@
 name: sakumari
-# Local development services only
-# Production deployment uses Kubernetes (see k8s/ directory)
+# Docker services for local development and testing
+# Complete isolated stack for validation and demonstrations
 services:
   # PostgreSQL database for local development
   db:

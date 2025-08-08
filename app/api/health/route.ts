@@ -16,7 +16,7 @@
  */
 
 /**
- * Health check API endpoint for Kubernetes liveness and readiness probes
+ * Health check API endpoint with database connectivity verification
  * Returns 200 OK with basic system status information
  */
 
