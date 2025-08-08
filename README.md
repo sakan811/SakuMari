@@ -25,221 +25,193 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 - **Testing**: Vitest, React Testing Library, Playwright
 - **Package Manager**: pnpm
 
-## Prerequisites
+## Setup
+
+### Prerequisites
 
 - Node.js v23+
 - pnpm ([installation guide](https://pnpm.io/installation))
-- Docker & Docker Compose (recommended) OR PostgreSQL 17+
+- Docker & Docker Compose (recommended)
 
-## Quick Start
+### Quick Start
 
 ```bash
+# Clone and setup
 git clone https://github.com/sakan811/SakuMari.git
 cd SakuMari
 cp .env.example .env
-# REQUIRED: Generate AUTH_SECRET at https://auth-secret-gen.vercel.app/
-# Edit .env with your authentication credentials including AUTH_SECRET
 
+# Configure environment
+# REQUIRED: Generate AUTH_SECRET at https://auth-secret-gen.vercel.app/
+# Add AUTH_SECRET to .env file
+
+# Setup and run
 pnpm run docker:db
 pnpm install && pnpm run db:setup && pnpm run dev
 ```
 
 Visit <http://localhost:3000>
 
-## Installation & Setup
+### Environment Configuration
 
-### 1. Environment Setup
-
-Create and configure your environment file:
+Essential variables in `.env`:
 
 ```bash
-cp .env.example .env
-```
-
-Essential environment variables:
-
-```bash
-# Database
-POSTGRES_DB=sakumari  # Required - defaults to 'kana_flashcard' if not set
+# Database (default values work for Docker setup)
+POSTGRES_DB=sakumari
+POSTGRES_HOST=localhost
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=your_password
-POSTGRES_HOST=localhost  # Use 'db' for Docker containers
+POSTGRES_PASSWORD=postgres
 POSTGRES_PORT=5432
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/sakumari
+POSTGRES_PRISMA_URL=postgresql://postgres:postgres@localhost:5432/sakumari
+POSTGRES_URL_NON_POOLING=postgresql://postgres:postgres@localhost:5432/sakumari
 
-# Authentication
-AUTH_URL=http://localhost:3000
-AUTH_SECRET=your_generated_secret  # REQUIRED - Generate at https://auth-secret-gen.vercel.app/
-AUTH_GOOGLE_ID=your_google_client_id
+# Authentication (required)
+AUTH_SECRET=your_generated_secret  # REQUIRED - Generate at link above
+AUTH_GOOGLE_ID=your_google_client_id      # For Google OAuth
 AUTH_GOOGLE_SECRET=your_google_client_secret
 
-# Optional: Custom credentials for testing
+# Optional: Enable credentials provider for testing
 CREDS_PROVIDER=false
-CREDS_TEST_EMAIL=test@sakumari.local
-CREDS_TEST_PASSWORD=TestPassword123!
-
-NODE_ENV=development
 ```
 
-### 2. Authentication Setup
+### Authentication Setup
 
-#### Google OAuth (Recommended)
+**Google OAuth (Recommended)**
 
-1. Visit [Google Cloud Console](https://console.cloud.google.com/)
-2. Create project → APIs & Services → OAuth consent screen
-3. Create credentials → OAuth client ID → Web application
-4. Add redirect URI: `http://localhost:3000/api/auth/callback/google`
-5. Copy Client ID and Secret to `.env`
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Select or create a project
+3. Navigate to "APIs & Services" > "Credentials"
+4. Click "Create Credentials" > "OAuth client ID"
+5. If prompted, configure the OAuth consent screen first:
+   - Choose "External" user type for testing
+   - Fill in required app information
+   - Add your email to test users
+6. For application type, select "Web application"
+7. Set authorized redirect URIs:
+   - Development: `http://localhost:3000/api/auth/callback/google`
+   - Production: `https://yourdomain.com/api/auth/callback/google`
+8. Copy the Client ID and Client Secret to your `.env` file:
+   ```bash
+   AUTH_GOOGLE_ID=your_client_id_here
+   AUTH_GOOGLE_SECRET=your_client_secret_here
+   ```
 
-#### Custom Credentials (Optional)
+**Custom Credentials (Testing)**
 
-For testing without Google OAuth:
+Set `CREDS_PROVIDER=true` in `.env` to enable test login (test@sakumari.local / TestPassword123!)
 
-1. Set `CREDS_PROVIDER=true` in `.env`
-2. Configure `CREDS_TEST_EMAIL` and `CREDS_TEST_PASSWORD`
-3. Both OAuth and custom credentials will be available
+### Verification
 
-### 3. Database & Development Setup
+After setup, verify everything works:
+- Database: `pnpm run docker:status` shows `db` service running
+- App: Visit <http://localhost:3000> and create/login to account
+- Health check: Visit <http://localhost:3000/api/health>
 
-**Recommended: Docker Database + Local Development**
-
-```bash
-# Start database
-pnpm run docker:db
-
-# Install dependencies and setup database
-pnpm install
-pnpm run db:setup  # Handles Prisma generation, migrations, and seeding
-
-# Start development server
-pnpm run dev
-```
-
-**Alternative: Local PostgreSQL**
-
-```bash
-# Ensure PostgreSQL is running locally
-pnpm install
-pnpm run db:setup
-pnpm run dev
-```
-
-Visit <http://localhost:3000>
-
-## Development Commands
+## Development
 
 ### Essential Commands
 
 ```bash
-# Core development
-pnpm run dev                # Start development server
-pnpm run build              # Build for production
-pnpm install            # Install dependencies
-
-# Database
-pnpm run docker:db           # Start PostgreSQL database
-pnpm run db:setup           # Complete database setup (automated script)
-
-# Code quality
-pnpm run lint               # Run ESLint
-pnpm run format             # Format with Prettier
-pnpm run test:all           # Run all tests and quality checks
+pnpm run dev          # Start development server
+pnpm run build        # Build for production
+pnpm run docker:db    # Start PostgreSQL database
+pnpm run db:setup     # Complete database setup
+pnpm run lint         # Run ESLint
+pnpm run test:all     # Run all tests and quality checks
 ```
 
 ### Testing
 
 ```bash
-# Run all tests
-pnpm run test:all
-
-# Individual test types
-pnpm run test:run          # Unit tests
-pnpm run test:db:full            # Database tests
-pnpm run test:e2e:full           # End-to-end tests
+pnpm run test:all      # All tests and quality checks
+pnpm run test:run      # Unit tests only
+pnpm run test:e2e:full # End-to-end tests
 ```
 
-### Advanced Commands
+## Docker Testing
+
+To test the complete application stack in isolation:
 
 ```bash
-# Docker deployment
-pnpm run dev-up             # Full Docker stack
-
-# Service management
-pnpm run docker:status  # Show service status
-pnpm run docker:logs    # Show logs for all services
-pnpm run docker:logs-app # Show app logs only
-pnpm run docker:down    # Stop services
-pnpm run docker:clean   # Clean up containers and volumes
+# Update .env: set POSTGRES_HOST=db for containers
+pnpm run docker:dev-up    # Start full stack
+pnpm run db:setup         # Setup database from host
 ```
 
-## Deployment
+Services available at:
+- App: <http://localhost:3000>
+- Database Admin: <http://localhost:8080> (DBGate)
 
-### Docker Testing Environment
+Cleanup: `pnpm run docker:clean`
 
-Quick way to test the complete application stack in an isolated environment:
+## Production Deployment
 
-```bash
-# Set POSTGRES_HOST=db in .env for containers
-pnpm run dev-up
-pnpm run db:setup  # Setup database from host
-```
+Deploy SakuMari using Docker with Cloudflare tunnel for secure remote access.
 
-### Production Deployment
+### Environment Setup
 
-#### Prerequisites
-
-- Docker & Docker Compose v2+
-- Domain configured with Cloudflare
-- Server with 1GB+ RAM
-
-#### Environment Setup
+Configure production variables in `.env`:
 
 ```bash
-cp .env.example .env.prod
-```
-
-Configure essential variables in `.env.prod`:
-
-```bash
-# Database
-POSTGRES_DB=sakumari
-POSTGRES_USER=sakumari_user
-POSTGRES_PASSWORD=your_secure_password
+# Database (container configuration)
 POSTGRES_HOST=db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_secure_password
+POSTGRES_DB=sakumari
+DATABASE_URL=postgresql://postgres:your_secure_password@db:5432/sakumari
 
-# Authentication
-AUTH_URL=https://yourdomain.com
-AUTH_SECRET=your_generated_secret  # Generate at https://auth-secret-gen.vercel.app/
+# Authentication (required)
+AUTH_SECRET=your_production_secret
 AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
 
-# Cloudflare
+# Cloudflare tunnel (required for external access)
 CLOUDFLARE_TUNNEL_TOKEN=your_tunnel_token
+
+# Docker configuration
+DOCKER_IMAGE_NAME=sakanbeer88/sakumari
+DOCKER_IMAGE_TAG=latest
+CONTAINER_NAME_PREFIX=sakumari
 
 NODE_ENV=production
 ```
 
-#### Google OAuth Setup
-
-1. Visit [Google Cloud Console](https://console.cloud.google.com/) → Create OAuth client
-2. Add redirect URI: `https://yourdomain.com/api/auth/callback/google`
-3. Copy credentials to `.env.prod`
-
-#### Cloudflare Tunnel
-
-1. Create tunnel in Cloudflare dashboard
-2. Configure DNS: CNAME `yourdomain.com` → tunnel domain  
-3. Copy tunnel token to `CLOUDFLARE_TUNNEL_TOKEN`
-
-#### Deploy
+### Deployment
 
 ```bash
-cd docker
-docker compose -f docker-compose.prod.yml --env-file ../.env.prod up -d
-pnpm run db:setup  # Setup database
+# Build and deploy
+docker build -f docker/Dockerfile -t sakumari:latest .
+pnpm run docker:prod-up
+
+# Setup database
+docker compose -f docker/docker-compose.prod.yml exec app npx prisma migrate deploy
+docker compose -f docker/docker-compose.prod.yml exec app npx prisma db seed
 ```
 
-#### Verify
+### Access Services
+
+- **Application**: https://sakumari.example.com (via Cloudflare tunnel)
+- **Health Check**: https://sakumari.example.com/api/health
+- **Database Admin**: Start DBGate temporarily:
+  ```bash
+  pnpm run docker:prod-up && docker compose -f docker/docker-compose.yml up -d dbgate
+  # Access at http://localhost:8080
+  ```
+
+### Management
 
 ```bash
-curl https://yourdomain.com/api/health
+# View logs
+pnpm run docker:prod-logs
+
+# Check status
+pnpm run docker:prod-status
+
+# Stop services
+pnpm run docker:prod-down
+
+# Clean up (remove containers, volumes, and images)
+pnpm run docker:prod-clean
 ```
