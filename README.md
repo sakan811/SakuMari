@@ -148,7 +148,7 @@ Cleanup: `pnpm run docker:clean`
 
 ## Production Deployment
 
-Deploy SakuMari using Docker with Cloudflare tunnel for secure remote access.
+Deploy SakuMari using Kubernetes with Cloudflare tunnel for secure remote access.
 
 ### Environment Setup
 
@@ -178,38 +178,31 @@ CONTAINER_NAME_PREFIX=sakumari
 NODE_ENV=production
 ```
 
-### Deployment
+### Kubernetes Deployment
 
 ```bash
 # Deploy
-pnpm run docker:prod-up
+pnpm run k8s:up
 
 # Setup database
 pnpm run db:setup
 ```
 
-### Access Services
-
-- **Application**: https://sakumari.example.com (via Cloudflare tunnel)
-- **Health Check**: https://sakumari.example.com/api/health
-- **Database Admin**: Start DBGate temporarily:
-  ```bash
-  pnpm run docker:prod-up && docker compose -f docker/docker-compose.yml up -d dbgate
-  # Access at http://localhost:8080
-  ```
-
-### Management
+### Kubernetes Management
 
 ```bash
 # View logs
-pnpm run docker:prod-logs
+pnpm run k8s:logs
+
+# View app logs only
+pnpm run k8s:logs-app
 
 # Check status
-pnpm run docker:prod-status
+pnpm run k8s:status
 
 # Stop services
-pnpm run docker:prod-down
+pnpm run k8s:down
 
-# Clean up (remove containers, volumes, and images)
-pnpm run docker:prod-clean
+# Clean up (remove namespace and resources)
+pnpm run k8s:clean
 ```
