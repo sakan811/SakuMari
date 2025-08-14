@@ -19,6 +19,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import TipsButton from "./TipsButton";
+import TipsModal from "./TipsModal";
 
 type KanaStats = {
   id: string;
@@ -38,6 +40,7 @@ export default function Dashboard() {
     "character" | "romaji" | "attempts" | "correct_attempts" | "accuracy"
   >("accuracy");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
 
   const fetchStats = async () => {
     try {
@@ -409,6 +412,13 @@ export default function Dashboard() {
           </div>
         </>
       )}
+      
+      {/* Tips Feature */}
+      <TipsButton onOpenTips={() => setIsTipsModalOpen(true)} />
+      <TipsModal
+        isOpen={isTipsModalOpen}
+        onClose={() => setIsTipsModalOpen(false)}
+      />
     </div>
   );
 }
