@@ -4,7 +4,7 @@
 [![E2E Test](https://github.com/sakan811/SakuMari/actions/workflows/playwright.yml/badge.svg)](https://github.com/sakan811/SakuMari/actions/workflows/playwright.yml)
 [![Docker CI](https://github.com/sakan811/SakuMari/actions/workflows/docker-ci.yml/badge.svg)](https://github.com/sakan811/SakuMari/actions/workflows/docker-ci.yml)
 
-A modern web application for learning Japanese Hiragana and Katakana characters through interactive flashcards with adaptive learning and comprehensive progress tracking.
+A modern web application for learning Japanese Hiragana and Katakana characters through interactive flashcards with adaptive learning, comprehensive progress tracking, and AI-powered personalized learning tips.
 
 🚀 **[Try it live](https://sakumari.fukudev.org/)** - No setup required!
 
@@ -36,6 +36,10 @@ POSTGRES_PORT=5432
 # Google OAuth
 AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
+
+# AI Learning Tips
+GEMINI_API_KEY=your_gemini_api_key_here
+MODEL_NAME=gemini-2.5-flash-lite
 
 # E2E test credentials only
 CREDS_PROVIDER=true

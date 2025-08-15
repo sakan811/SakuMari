@@ -94,7 +94,7 @@ Total practice attempts: ${userProgress.reduce((sum, p) => sum + p.attempts, 0)}
       : '';
 
     const genAI = await createGeminiClient();
-    const model = genAI.getGenerativeModel({ model: "gemma-3-27b-it" });
+    const model = genAI.getGenerativeModel({ model: process.env.MODEL_NAME });
 
     const systemPrompt = `You are a helpful Japanese language learning assistant specializing in Hiragana and Katakana (kana). 
 
