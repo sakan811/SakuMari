@@ -24,6 +24,9 @@ Object.defineProperty(window, "matchMedia", {
   }),
 });
 
+// Mock scrollIntoView
+Element.prototype.scrollIntoView = () => {};
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();
