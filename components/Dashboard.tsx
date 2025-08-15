@@ -163,16 +163,24 @@ export default function Dashboard() {
 
   return (
     <div className="bg-gradient-to-br from-[#fad182] to-[#f5c55a] min-h-screen">
-      <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 px-4">
+      <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 px-4 pt-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-[#403933] drop-shadow-sm">
           Dashboard
         </h1>
-        <Link
-          href="/"
-          className="rounded-lg bg-[#d1622b] px-4 sm:px-6 py-2 sm:py-3 text-white hover:bg-[#ae0d13] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-[#d1622b] hover:border-[#ae0d13] font-medium text-center text-sm sm:text-base"
-        >
-          Back to Home
-        </Link>
+        <div className="flex gap-2 sm:gap-3">
+          <button
+            onClick={() => setIsTipsModalOpen(true)}
+            className="rounded-lg bg-gradient-to-br from-[#d1622b]/80 to-[#ae0d13]/80 hover:from-[#d1622b] hover:to-[#ae0d13] px-4 sm:px-6 py-2 sm:py-3 text-white transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-white/20 hover:border-white/40 font-medium text-center text-sm sm:text-base backdrop-blur-sm"
+          >
+            💡 Tips
+          </button>
+          <Link
+            href="/"
+            className="rounded-lg bg-[#d1622b] px-4 sm:px-6 py-2 sm:py-3 text-white hover:bg-[#ae0d13] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-[#d1622b] hover:border-[#ae0d13] font-medium text-center text-sm sm:text-base"
+          >
+            Back to Home
+          </Link>
+        </div>
       </div>
 
       {error ? (
@@ -413,8 +421,7 @@ export default function Dashboard() {
         </>
       )}
       
-      {/* Tips Feature */}
-      <TipsButton onOpenTips={() => setIsTipsModalOpen(true)} />
+      {/* Tips Modal */}
       <TipsModal
         isOpen={isTipsModalOpen}
         onClose={() => setIsTipsModalOpen(false)}

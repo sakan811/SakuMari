@@ -112,27 +112,27 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-2xl h-[80vh] bg-white rounded-lg shadow-2xl border-2 border-[#705a39] overflow-hidden">
+      <div className="w-full max-w-2xl h-[80vh] bg-white rounded-lg shadow-2xl border-2 border-[#705a39] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#d1622b] to-[#ae0d13] text-white">
-          <div className="flex items-center gap-3">
-            <div className="text-2xl">💡</div>
-            <div>
-              <h2 className="text-lg font-bold">Kana Learning Tips</h2>
-              <p className="text-sm opacity-90">Ask questions about Japanese kana</p>
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#d1622b] to-[#ae0d13] text-white flex-shrink-0">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="text-2xl flex-shrink-0">💡</div>
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold truncate">Kana Learning Tips</h2>
+              <p className="text-sm opacity-90 truncate">Ask questions about Japanese kana</p>
             </div>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-white/20 rounded-full transition-colors"
+            className="p-2 hover:bg-white/20 rounded-full transition-colors flex-shrink-0 ml-2"
             aria-label="Close tips modal"
           >
             <div className="w-6 h-6 text-xl leading-none">×</div>
           </button>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 h-[calc(80vh-140px)] bg-gradient-to-br from-[#fad182]/10 to-[#f5c55a]/10">
+        {/* Messages Display Area */}
+        <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-br from-[#fad182]/10 to-[#f5c55a]/10 min-h-0">
           {messages.length === 0 && (
             <div className="text-center text-[#705a39] py-8">
               <div className="text-4xl mb-4">🌸</div>
@@ -145,35 +145,49 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
           )}
 
           {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`mb-4 flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`max-w-[80%] rounded-lg p-3 ${
-                  message.type === "user"
-                    ? "bg-[#d1622b] text-white rounded-br-none"
-                    : "bg-white border-2 border-[#705a39]/20 text-[#403933] rounded-bl-none shadow-sm"
-                }`}
-              >
-                <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                  {message.content}
+            <div key={message.id} className="mb-4">
+              {message.type === "user" ? (
+                <div className="flex justify-between gap-4">
+                  <div className="w-1/2"></div>
+                  <div className="w-1/2">
+                    <div className="bg-[#d1622b] text-white rounded-lg rounded-br-none p-3 shadow-sm">
+                      <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                        {message.content}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex justify-between gap-4">
+                  <div className="w-1/2">
+                    <div className="bg-white border-2 border-[#705a39]/20 text-[#403933] rounded-lg rounded-bl-none p-3 shadow-sm">
+                      <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                        {message.content}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-1/2"></div>
+                </div>
+              )}
             </div>
           ))}
 
           {isLoading && (
-            <div className="flex justify-start mb-4">
-              <div className="bg-white border-2 border-[#705a39]/20 rounded-lg rounded-bl-none p-3 shadow-sm">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse" style={{ animationDelay: "0.2s" }}></div>
-                    <div className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse" style={{ animationDelay: "0.4s" }}></div>
+            <div className="mb-4">
+              <div className="flex justify-between gap-4">
+                <div className="w-1/2">
+                  <div className="bg-white border-2 border-[#705a39]/20 rounded-lg rounded-bl-none p-3 shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse" style={{ animationDelay: "0.2s" }}></div>
+                        <div className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse" style={{ animationDelay: "0.4s" }}></div>
+                      </div>
+                      <span className="text-xs text-[#705a39]">Thinking...</span>
+                    </div>
                   </div>
-                  <span className="text-xs text-[#705a39]">Thinking...</span>
                 </div>
+                <div className="w-1/2"></div>
               </div>
             </div>
           )}
@@ -187,31 +201,37 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
-        <form onSubmit={handleSubmit} className="p-4 border-t-2 border-[#705a39]/20 bg-white">
-          <div className="flex gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask about kana learning techniques..."
-              className="flex-1 p-3 border-2 border-[#705a39]/30 rounded-lg focus:border-[#d1622b] focus:outline-none text-sm"
-              disabled={isLoading}
-              maxLength={500}
-            />
-            <button
-              type="submit"
-              disabled={!inputValue.trim() || isLoading}
-              className="px-6 py-3 bg-[#d1622b] text-white rounded-lg hover:bg-[#ae0d13] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-            >
-              {isLoading ? "..." : "Ask"}
-            </button>
-          </div>
+        {/* Input Area */}
+        <div className="p-4 border-t-2 border-[#705a39]/20 bg-white flex-shrink-0">
+          <form onSubmit={handleSubmit}>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="Ask about kana learning techniques..."
+                  className="w-full p-3 border-2 border-[#705a39]/30 rounded-lg focus:border-[#d1622b] focus:outline-none text-sm"
+                  disabled={isLoading}
+                  maxLength={500}
+                />
+              </div>
+              <div>
+                <button
+                  type="submit"
+                  disabled={!inputValue.trim() || isLoading}
+                  className="px-6 py-3 bg-[#d1622b] text-white rounded-lg hover:bg-[#ae0d13] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                >
+                  {isLoading ? "..." : "Ask"}
+                </button>
+              </div>
+            </div>
+          </form>
           <div className="text-xs text-[#705a39]/70 mt-2">
             Ask questions about Japanese kana learning techniques and strategies.
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
