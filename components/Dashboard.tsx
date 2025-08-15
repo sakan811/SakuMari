@@ -420,7 +420,7 @@ export default function Dashboard() {
           </div>
         </>
       )}
-      
+
       {/* Tips Modal */}
       <TipsModal
         isOpen={isTipsModalOpen}

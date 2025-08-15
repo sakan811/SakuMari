@@ -55,7 +55,7 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!inputValue.trim() || isLoading) return;
 
     const userMessage: TipMessage = {
@@ -65,7 +65,7 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
       timestamp: new Date().toISOString(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
     setError(null);
@@ -92,9 +92,10 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
         timestamp: data.timestamp,
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Something went wrong";
+      const errorMessage =
+        error instanceof Error ? error.message : "Something went wrong";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -119,7 +120,9 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
             <div className="text-2xl flex-shrink-0">💡</div>
             <div className="min-w-0">
               <h2 className="text-lg font-bold truncate">Kana Learning Tips</h2>
-              <p className="text-sm opacity-90 truncate">Ask questions about Japanese kana</p>
+              <p className="text-sm opacity-90 truncate">
+                Ask questions about Japanese kana
+              </p>
             </div>
           </div>
           <button
@@ -136,10 +139,15 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
           {messages.length === 0 && (
             <div className="text-center text-[#705a39] py-8">
               <div className="text-4xl mb-4">🌸</div>
-              <h3 className="text-lg font-semibold mb-2">Welcome to Kana Learning Tips!</h3>
-              <p className="text-sm">Ask me anything about learning Japanese hiragana and katakana.</p>
+              <h3 className="text-lg font-semibold mb-2">
+                Welcome to Kana Learning Tips!
+              </h3>
+              <p className="text-sm">
+                Ask me anything about learning Japanese hiragana and katakana.
+              </p>
               <div className="mt-4 text-xs text-[#705a39]/80">
-                Example: "How can I memorize hiragana faster?" or "Tips for katakana practice?"
+                Example: "How can I memorize hiragana faster?" or "Tips for
+                katakana practice?"
               </div>
             </div>
           )}
@@ -180,10 +188,18 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
                     <div className="flex items-center gap-2">
                       <div className="flex gap-1">
                         <div className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse" style={{ animationDelay: "0.2s" }}></div>
-                        <div className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse" style={{ animationDelay: "0.4s" }}></div>
+                        <div
+                          className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse"
+                          style={{ animationDelay: "0.2s" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse"
+                          style={{ animationDelay: "0.4s" }}
+                        ></div>
                       </div>
-                      <span className="text-xs text-[#705a39]">Thinking...</span>
+                      <span className="text-xs text-[#705a39]">
+                        Thinking...
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -229,7 +245,8 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
             </div>
           </form>
           <div className="text-xs text-[#705a39]/70 mt-2">
-            Ask questions about Japanese kana learning techniques and strategies.
+            Ask questions about Japanese kana learning techniques and
+            strategies.
           </div>
         </div>
       </div>

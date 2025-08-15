@@ -24,7 +24,9 @@ describe("TipsButton", () => {
     const mockOnOpenTips = vi.fn();
     render(<TipsButton onOpenTips={mockOnOpenTips} />);
 
-    const button = screen.getByRole("button", { name: "Get Japanese kana learning tips" });
+    const button = screen.getByRole("button", {
+      name: "Get Japanese kana learning tips",
+    });
     expect(button).toBeTruthy();
     expect(button.textContent).toBe("💡");
   });
@@ -46,7 +48,7 @@ describe("TipsButton", () => {
     render(<TipsButton onOpenTips={mockOnOpenTips} />);
 
     const button = screen.getByRole("button");
-    
+
     // Tooltip should not be visible initially
     expect(screen.queryByText("Get learning tips")).toBeNull();
 
@@ -74,7 +76,9 @@ describe("TipsButton", () => {
     render(<TipsButton onOpenTips={mockOnOpenTips} />);
 
     const button = screen.getByRole("button");
-    expect(button.getAttribute("aria-label")).toBe("Get Japanese kana learning tips");
+    expect(button.getAttribute("aria-label")).toBe(
+      "Get Japanese kana learning tips",
+    );
   });
 
   test("tooltip has correct styling and arrow", () => {
@@ -101,14 +105,14 @@ describe("TipsButton", () => {
     render(<TipsButton onOpenTips={mockOnOpenTips} />);
 
     const button = screen.getByRole("button");
-    
+
     // Rapid hover/unhover
     fireEvent.mouseEnter(button);
     expect(screen.getByText("Get learning tips")).toBeTruthy();
-    
+
     fireEvent.mouseLeave(button);
     expect(screen.queryByText("Get learning tips")).toBeNull();
-    
+
     fireEvent.mouseEnter(button);
     expect(screen.getByText("Get learning tips")).toBeTruthy();
   });
@@ -118,11 +122,11 @@ describe("TipsButton", () => {
     render(<TipsButton onOpenTips={mockOnOpenTips} />);
 
     const button = screen.getByRole("button");
-    
+
     // Hover and verify tooltip stays visible
     fireEvent.mouseEnter(button);
     expect(screen.getByText("Get learning tips")).toBeTruthy();
-    
+
     // Tooltip should remain visible while hovering
     expect(screen.getByText("Get learning tips")).toBeTruthy();
   });

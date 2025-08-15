@@ -35,7 +35,7 @@ export default function TipsButton({ onOpenTips }: TipsButtonProps) {
           <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#403933]"></div>
         </div>
       )}
-      
+
       {/* Tips Button */}
       <button
         onClick={onOpenTips}
