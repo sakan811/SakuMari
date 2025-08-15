@@ -19,15 +19,20 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+interface ConversationMessage {
+  role: string;
+  content: string;
+}
+
 // Initialize Gemini AI client
 async function createGeminiClient() {
   const { GoogleGenerativeAI } = await import("@google/generative-ai");
   const apiKey = process.env.GEMINI_API_KEY;
-  
+
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY environment variable not configured");
   }
-  
+
   return new GoogleGenerativeAI(apiKey);
 }
 
@@ -41,10 +46,14 @@ export async function POST(request: Request) {
 
     const { userQuery, conversationHistory = [] } = await request.json();
 
-    if (!userQuery || typeof userQuery !== "string" || userQuery.trim().length === 0) {
+    if (
+      !userQuery ||
+      typeof userQuery !== "string" ||
+      userQuery.trim().length === 0
+    ) {
       return NextResponse.json(
         { error: "Please provide a question about Japanese kana learning" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -52,8 +61,10 @@ export async function POST(request: Request) {
     const maxLength = 500;
     if (userQuery.length > maxLength) {
       return NextResponse.json(
-        { error: `Question too long. Please keep it under ${maxLength} characters.` },
-        { status: 400 }
+        {
+          error: `Question too long. Please keep it under ${maxLength} characters.`,
+        },
+        { status: 400 },
       );
     }
 
@@ -66,32 +77,39 @@ export async function POST(request: Request) {
         kana: true,
       },
       orderBy: {
-        accuracy: 'asc', // Show struggling characters first
+        accuracy: "asc", // Show struggling characters first
       },
     });
 
     // Prepare user progress context
     const strugglingKana = userProgress
-      .filter(p => p.attempts > 0 && p.accuracy < 0.7)
-      .map(p => `${p.kana.character} (${p.kana.romaji}): ${Math.round(p.accuracy * 100)}% accuracy, ${p.attempts} attempts`)
+      .filter((p) => p.attempts > 0 && p.accuracy < 0.7)
+      .map(
+        (p) =>
+          `${p.kana.character} (${p.kana.romaji}): ${Math.round(p.accuracy * 100)}% accuracy, ${p.attempts} attempts`,
+      )
       .slice(0, 10);
-    
+
     const masteredKana = userProgress
-      .filter(p => p.attempts > 5 && p.accuracy >= 0.9)
-      .map(p => `${p.kana.character} (${p.kana.romaji}): ${Math.round(p.accuracy * 100)}% accuracy`)
+      .filter((p) => p.attempts > 5 && p.accuracy >= 0.9)
+      .map(
+        (p) =>
+          `${p.kana.character} (${p.kana.romaji}): ${Math.round(p.accuracy * 100)}% accuracy`,
+      )
       .slice(0, 5);
 
     const progressContext = `
 User Progress Context:
-${strugglingKana.length > 0 ? `Characters needing help: ${strugglingKana.join(', ')}` : 'No struggling characters identified.'}
-${masteredKana.length > 0 ? `Well-mastered characters: ${masteredKana.join(', ')}` : 'No mastered characters yet.'}
+${strugglingKana.length > 0 ? `Characters needing help: ${strugglingKana.join(", ")}` : "No struggling characters identified."}
+${masteredKana.length > 0 ? `Well-mastered characters: ${masteredKana.join(", ")}` : "No mastered characters yet."}
 Total practice attempts: ${userProgress.reduce((sum, p) => sum + p.attempts, 0)}
 `;
 
     // Format conversation history for context
-    const conversationContext = conversationHistory.length > 0 
-      ? `\n\nPrevious conversation:\n${conversationHistory.map((msg: any) => `${msg.role}: ${msg.content}`).join('\n')}`
-      : '';
+    const conversationContext =
+      conversationHistory.length > 0
+        ? `\n\nPrevious conversation:\n${conversationHistory.map((msg: ConversationMessage) => `${msg.role}: ${msg.content}`).join("\n")}`
+        : "";
 
     const genAI = await createGeminiClient();
     const model = genAI.getGenerativeModel({ model: process.env.MODEL_NAME });
@@ -120,29 +138,31 @@ User question: ${userQuery}`;
 
     if (!text || text.trim().length === 0) {
       return NextResponse.json(
-        { error: "Unable to generate learning tips at this time. Please try again." },
-        { status: 500 }
+        {
+          error:
+            "Unable to generate learning tips at this time. Please try again.",
+        },
+        { status: 500 },
       );
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       tip: text.trim(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error("Error generating kana learning tips:", error);
-    
+
     if (error instanceof Error && error.message.includes("GEMINI_API_KEY")) {
       return NextResponse.json(
         { error: "AI service not configured. Please contact support." },
-        { status: 503 }
+        { status: 503 },
       );
     }
-    
+
     return NextResponse.json(
       { error: "Unable to generate learning tips. Please try again later." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
