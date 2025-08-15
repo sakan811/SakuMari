@@ -18,6 +18,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface TipsModalProps {
   isOpen: boolean;
@@ -169,8 +170,8 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
                 <div className="flex justify-between gap-4">
                   <div className="w-1/2">
                     <div className="bg-white border-2 border-[#705a39]/20 text-[#403933] rounded-lg rounded-bl-none p-3 shadow-sm">
-                      <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                        {message.content}
+                      <div className="text-sm leading-relaxed [&>h1]:text-lg [&>h1]:font-bold [&>h1]:mb-2 [&>h1]:text-[#403933] [&>h2]:text-base [&>h2]:font-bold [&>h2]:mb-2 [&>h2]:text-[#403933] [&>h3]:text-sm [&>h3]:font-bold [&>h3]:mb-1 [&>h3]:text-[#403933] [&>p]:mb-2 [&>p]:text-[#403933] [&>strong]:font-bold [&>strong]:text-[#403933] [&>em]:italic [&>em]:text-[#403933] [&>code]:text-[#d1622b] [&>code]:bg-[#fad182]/20 [&>code]:px-1 [&>code]:py-0.5 [&>code]:rounded [&>code]:font-mono [&>code]:text-xs [&>ul]:mb-2 [&>ul]:pl-4 [&>ol]:mb-2 [&>ol]:pl-4 [&>li]:mb-1 [&>li]:text-[#403933] [&>pre]:bg-[#fad182]/20 [&>pre]:p-2 [&>pre]:rounded [&>pre]:overflow-x-auto [&>pre]:mb-2 [&>blockquote]:border-l-4 [&>blockquote]:border-[#d1622b] [&>blockquote]:pl-3 [&>blockquote]:italic [&>blockquote]:text-[#403933]/80">
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
                     </div>
                   </div>
