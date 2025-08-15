@@ -37,7 +37,7 @@ const mockGetGenerativeModel = vi.fn();
 const mockGoogleGenerativeAI = vi.fn();
 
 vi.mock("@google/generative-ai", () => ({
-  GoogleGenerativeAI: mockGoogleGenerativeAI
+  GoogleGenerativeAI: mockGoogleGenerativeAI,
 }));
 
 describe("Tips API Route", async () => {
@@ -50,20 +50,20 @@ describe("Tips API Route", async () => {
     // Set default environment variables
     process.env.GEMINI_API_KEY = "test-api-key";
     process.env.MODEL_NAME = "gemini-2.5-flash-lite";
-    
+
     // Setup default mock behavior
     mockGenerateContent.mockResolvedValue({
       response: {
-        text: vi.fn().mockReturnValue("Mocked AI response for learning tips")
-      }
+        text: vi.fn().mockReturnValue("Mocked AI response for learning tips"),
+      },
     });
-    
+
     mockGetGenerativeModel.mockReturnValue({
-      generateContent: mockGenerateContent
+      generateContent: mockGenerateContent,
     });
-    
+
     mockGoogleGenerativeAI.mockImplementation(() => ({
-      getGenerativeModel: mockGetGenerativeModel
+      getGenerativeModel: mockGetGenerativeModel,
     }));
   });
 
@@ -80,7 +80,7 @@ describe("Tips API Route", async () => {
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "How to learn hiragana?" })
+        body: JSON.stringify({ userQuery: "How to learn hiragana?" }),
       });
 
       const response = await POST(request);
@@ -96,7 +96,7 @@ describe("Tips API Route", async () => {
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "How to learn hiragana?" })
+        body: JSON.stringify({ userQuery: "How to learn hiragana?" }),
       });
 
       const response = await POST(request);
@@ -112,14 +112,16 @@ describe("Tips API Route", async () => {
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({})
+        body: JSON.stringify({}),
       });
 
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe("Please provide a question about Japanese kana learning");
+      expect(data.error).toBe(
+        "Please provide a question about Japanese kana learning",
+      );
     });
 
     test("returns 400 when userQuery is empty string", async () => {
@@ -128,14 +130,16 @@ describe("Tips API Route", async () => {
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "" })
+        body: JSON.stringify({ userQuery: "" }),
       });
 
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe("Please provide a question about Japanese kana learning");
+      expect(data.error).toBe(
+        "Please provide a question about Japanese kana learning",
+      );
     });
 
     test("returns 400 when userQuery is only whitespace", async () => {
@@ -144,14 +148,16 @@ describe("Tips API Route", async () => {
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "   " })
+        body: JSON.stringify({ userQuery: "   " }),
       });
 
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe("Please provide a question about Japanese kana learning");
+      expect(data.error).toBe(
+        "Please provide a question about Japanese kana learning",
+      );
     });
 
     test("returns 400 when userQuery exceeds character limit", async () => {
@@ -162,14 +168,16 @@ describe("Tips API Route", async () => {
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: longQuery })
+        body: JSON.stringify({ userQuery: longQuery }),
       });
 
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe("Question too long. Please keep it under 500 characters.");
+      expect(data.error).toBe(
+        "Question too long. Please keep it under 500 characters.",
+      );
     });
 
     test("fetches user progress data successfully", async () => {
@@ -177,22 +185,24 @@ describe("Tips API Route", async () => {
         {
           kana: { character: "あ", romaji: "a" },
           attempts: 10,
-          accuracy: 0.5
+          accuracy: 0.5,
         },
         {
           kana: { character: "か", romaji: "ka" },
           attempts: 8,
-          accuracy: 0.9
-        }
+          accuracy: 0.9,
+        },
       ];
 
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
-      vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(mockUserProgress);
+      vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(
+        mockUserProgress,
+      );
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "How to improve my hiragana?" })
+        body: JSON.stringify({ userQuery: "How to improve my hiragana?" }),
       });
 
       const response = await POST(request);
@@ -211,7 +221,7 @@ describe("Tips API Route", async () => {
           kana: true,
         },
         orderBy: {
-          accuracy: 'asc',
+          accuracy: "asc",
         },
       });
     });
@@ -223,7 +233,7 @@ describe("Tips API Route", async () => {
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "How to start learning kana?" })
+        body: JSON.stringify({ userQuery: "How to start learning kana?" }),
       });
 
       const response = await POST(request);
@@ -235,21 +245,23 @@ describe("Tips API Route", async () => {
 
     test("returns 503 when GEMINI_API_KEY is missing", async () => {
       delete process.env.GEMINI_API_KEY;
-      
+
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "How to learn kana?" })
+        body: JSON.stringify({ userQuery: "How to learn kana?" }),
       });
 
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(503);
-      expect(data.error).toBe("AI service not configured. Please contact support.");
+      expect(data.error).toBe(
+        "AI service not configured. Please contact support.",
+      );
     });
 
     test("returns 500 when AI service fails", async () => {
@@ -262,22 +274,24 @@ describe("Tips API Route", async () => {
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "How to learn kana?" })
+        body: JSON.stringify({ userQuery: "How to learn kana?" }),
       });
 
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Unable to generate learning tips. Please try again later.");
+      expect(data.error).toBe(
+        "Unable to generate learning tips. Please try again later.",
+      );
     });
 
     test("returns 500 when AI returns empty response", async () => {
       // Override the mock to return empty response
       mockGenerateContent.mockResolvedValue({
         response: {
-          text: vi.fn().mockReturnValue("")
-        }
+          text: vi.fn().mockReturnValue(""),
+        },
       });
 
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
@@ -286,33 +300,37 @@ describe("Tips API Route", async () => {
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "How to learn kana?" })
+        body: JSON.stringify({ userQuery: "How to learn kana?" }),
       });
 
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Unable to generate learning tips at this time. Please try again.");
+      expect(data.error).toBe(
+        "Unable to generate learning tips at this time. Please try again.",
+      );
     });
 
     test("handles database errors gracefully", async () => {
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
       vi.mocked(prisma.kanaProgress.findMany).mockRejectedValue(
-        new Error("Database connection lost")
+        new Error("Database connection lost"),
       );
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "How to learn kana?" })
+        body: JSON.stringify({ userQuery: "How to learn kana?" }),
       });
 
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Unable to generate learning tips. Please try again later.");
+      expect(data.error).toBe(
+        "Unable to generate learning tips. Please try again later.",
+      );
     });
 
     test("accepts optional conversationHistory parameter", async () => {
@@ -321,16 +339,16 @@ describe("Tips API Route", async () => {
 
       const conversationHistory = [
         { role: "user", content: "Previous question" },
-        { role: "assistant", content: "Previous answer" }
+        { role: "assistant", content: "Previous answer" },
       ];
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           userQuery: "Follow-up question",
-          conversationHistory 
-        })
+          conversationHistory,
+        }),
       });
 
       const response = await POST(request);
@@ -345,39 +363,41 @@ describe("Tips API Route", async () => {
         {
           kana: { character: "あ", romaji: "a" },
           attempts: 10,
-          accuracy: 0.3 // Struggling
+          accuracy: 0.3, // Struggling
         },
         {
           kana: { character: "か", romaji: "ka" },
           attempts: 8,
-          accuracy: 0.95 // Mastered
-        }
+          accuracy: 0.95, // Mastered
+        },
       ];
 
       // Override the mock to return context-aware response
       mockGenerateContent.mockResolvedValue({
         response: {
-          text: vi.fn().mockReturnValue("Context-aware response")
-        }
+          text: vi.fn().mockReturnValue("Context-aware response"),
+        },
       });
 
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
-      vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(mockUserProgress);
+      vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(
+        mockUserProgress,
+      );
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "Help me improve" })
+        body: JSON.stringify({ userQuery: "Help me improve" }),
       });
 
       await POST(request);
 
       // Verify AI was called with context including user progress
       expect(mockGenerateContent).toHaveBeenCalledWith(
-        expect.stringContaining("あ (a): 30% accuracy")
+        expect.stringContaining("あ (a): 30% accuracy"),
       );
       expect(mockGenerateContent).toHaveBeenCalledWith(
-        expect.stringContaining("か (ka): 95% accuracy")
+        expect.stringContaining("か (ka): 95% accuracy"),
       );
     });
 
@@ -388,7 +408,7 @@ describe("Tips API Route", async () => {
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userQuery: "Test question" })
+        body: JSON.stringify({ userQuery: "Test question" }),
       });
 
       const response = await POST(request);
@@ -399,7 +419,7 @@ describe("Tips API Route", async () => {
       expect(data).toHaveProperty("timestamp");
       expect(typeof data.tip).toBe("string");
       expect(typeof data.timestamp).toBe("string");
-      
+
       // Verify timestamp is valid ISO string
       expect(new Date(data.timestamp).toISOString()).toBe(data.timestamp);
     });
