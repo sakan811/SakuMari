@@ -8,6 +8,12 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 🚀 **[Try it live](https://sakumari.fukudev.org/)** - No setup required!
 
+## Package Manager
+
+This project uses **pnpm** as its package manager. You'll need pnpm installed to run the development commands.
+
+Visit: https://pnpm.io/installation
+
 ## Google OAuth Setup
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
