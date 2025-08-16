@@ -38,8 +38,13 @@ echo "🌍 Environment: ${NODE_ENV:-development}"
 
 cd "$PROJECT_ROOT"
 
-echo "🔧 Generating Prisma client..."
-npx prisma generate
+# Check if Prisma client already exists (containerized environment)
+if [ -d "$PROJECT_ROOT/generated/prisma_client" ] && [ -f "$PROJECT_ROOT/generated/prisma_client/index.js" ]; then
+    echo "🔧 Prisma client already exists, skipping generation..."
+else
+    echo "🔧 Generating Prisma client..."
+    npx prisma generate
+fi
 
 echo "🗄️  Running database migrations..."
 npx prisma migrate deploy
