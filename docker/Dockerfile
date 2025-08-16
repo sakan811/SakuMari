@@ -4,12 +4,6 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-# Install system dependencies (Alpine packages)
-RUN apk add --no-cache \
-    libc6-compat \
-    openssl \
-    ca-certificates
-
 WORKDIR /usr/src/app
 
 # Copy package files
@@ -22,23 +16,13 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 # Copy source code
 COPY . .
 
-# Generate Prisma client with custom output path
-ENV PRISMA_ENGINES_MIRROR=https://registry.npmmirror.com/-/binary/prisma
-ENV PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
-RUN pnpm exec prisma generate
-
-# Build application
+# Generate Prisma client with custom output path, and build application
 RUN --mount=type=cache,id=nextjs,target=/.next/cache \
+    pnpm exec prisma generate && \
     pnpm build
 
 # Production stage
 FROM node:23-alpine AS runner
-
-# Install runtime dependencies (Alpine packages)
-RUN apk add --no-cache \
-    libc6-compat \
-    openssl \
-    ca-certificates
 
 # Create non-root user for security (Alpine syntax)
 RUN addgroup -g 1001 -S nodejs && \
@@ -63,9 +47,9 @@ USER nextjs
 EXPOSE 3000
 
 # Set environment variables
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3000 \
+    HOSTNAME=0.0.0.0
 
 # Start the application using the standalone server
 CMD ["node", "server.js"]
