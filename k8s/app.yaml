@@ -105,6 +105,16 @@ spec:
                 secretKeyRef:
                   name: sakumari-secrets
                   key: CREDS_TEST_PASSWORD
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sakumari-secrets
+                  key: GEMINI_API_KEY
+            - name: MODEL_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: sakumari-secrets
+                  key: MODEL_NAME
           readinessProbe:
             httpGet:
               path: /api/health
