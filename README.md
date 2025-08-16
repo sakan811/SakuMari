@@ -26,9 +26,9 @@ Copy `.env.example` to `.env` and configure:
 # Required - Generate at https://auth-secret-gen.vercel.app/
 AUTH_SECRET=your_generated_secret_here
 
-# Database (default values work for Docker setup)
+# Database (localhost is default for local dev and E2E tests)
 POSTGRES_DB=sakumari
-POSTGRES_HOST=localhost  # Use 'db' for Docker
+POSTGRES_HOST=localhost
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_PORT=5432
@@ -72,10 +72,7 @@ Visit http://localhost:3000
 For isolated testing environment:
 
 ```bash
-# Update .env for Docker
-POSTGRES_HOST=db
-
-# Start full stack
+# Start full stack (Docker automatically configures database host)
 pnpm run docker:dev-up
 
 # Setup database
@@ -88,6 +85,8 @@ pnpm run db:setup
 # Stop services
 pnpm run docker:down
 ```
+
+**Note**: Docker Compose automatically overrides `POSTGRES_HOST=db` for containerized services. No manual `.env` editing required.
 
 ## Kubernetes Deployment
 
@@ -147,16 +146,16 @@ pnpm run k8s:down
 
 **Production Environment**: Update `.env` with production values before copying to k8s/:
 
-- `POSTGRES_HOST=postgres-service`
+- `POSTGRES_HOST=postgres-service` (for Kubernetes service discovery)
 - `AUTH_URL=https://yourdomain.com`
 - `NODE_ENV=production`
 
 ## E2E Test Setup
 
-**Environment Configuration**: Ensure your `.env` file is configured for local testing:
+**Environment Configuration**: Default `.env` configuration works for E2E tests:
 
 ```bash
-# Database - Use localhost for E2E tests
+# Database (localhost is the default)
 POSTGRES_HOST=localhost
 POSTGRES_DB=sakumari
 POSTGRES_USER=postgres
@@ -171,6 +170,8 @@ CREDS_TEST_PASSWORD=TestPassword123!
 # Other required variables
 AUTH_SECRET=your_generated_secret_here
 ```
+
+**Note**: No special database configuration needed - the default localhost setting works for both local development and E2E testing.
 
 **Test Commands**:
 
