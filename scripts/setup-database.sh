@@ -20,12 +20,10 @@ if [ ! -f "$PROJECT_ROOT/.env" ]; then
 fi
 
 # Create temporary .env.local for database setup
-echo "📝 Creating temporary .env.local with localhost database configuration..."
+echo "📝 Creating temporary .env.local with test credentials..."
 cp "$PROJECT_ROOT/.env" "$PROJECT_ROOT/.env.local"
 
-# Replace POSTGRES_HOST with localhost in .env.local
-sed -i.bak 's/POSTGRES_HOST=.*/POSTGRES_HOST=localhost/' "$PROJECT_ROOT/.env.local"
-# Replace CREDS_PROVIDER with true
+# Replace CREDS_PROVIDER with true for testing
 sed -i.bak 's/CREDS_PROVIDER=.*/CREDS_PROVIDER=true/' "$PROJECT_ROOT/.env.local"
 rm -f "$PROJECT_ROOT/.env.local.bak"
 

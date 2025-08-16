@@ -46,6 +46,7 @@ services:
     env_file: ../.env
     environment:
       CREDS_PROVIDER: ${CREDS_PROVIDER:-false}
+      POSTGRES_HOST: db
     depends_on:
       db:
         condition: service_healthy
