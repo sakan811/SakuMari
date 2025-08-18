@@ -18,7 +18,6 @@ spec:
         app: cloudflare-tunnel
         environment: production
     spec:
-      # securityContext removed for compatibility
       containers:
         - name: cloudflared
           image: cloudflare/cloudflared:latest
@@ -39,8 +38,6 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "200m"
-          # securityContext removed for compatibility
-          # readinessProbe removed - cloudflared doesn't expose standard health endpoints
       volumes:
         - name: tunnel-token
           secret:
