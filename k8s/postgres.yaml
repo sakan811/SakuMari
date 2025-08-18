@@ -11,8 +11,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi # Right-sized for flashcard app
-  # storageClassName: fast-ssd  # Use default storage class for minikube
+      storage: 1Gi 
 ---
 apiVersion: apps/v1
 kind: Deployment
