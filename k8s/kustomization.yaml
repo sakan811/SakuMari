@@ -8,7 +8,7 @@ namespace: sakumari
 resources:
   - namespace.yaml
   - postgres.yaml
-  - dbgate.yaml
+  - pgadmin.yaml
   - app.yaml
   - cloudflare-tunnel.yaml
 

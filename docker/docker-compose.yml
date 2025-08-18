@@ -20,14 +20,20 @@ services:
     networks:
       - sakumari
 
-  # DBGate for database management
-  dbgate:
-    image: dbgate/dbgate:latest
-    container_name: ${CONTAINER_NAME_PREFIX:-sakumari}-dbgate
+  # pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ${CONTAINER_NAME_PREFIX:-sakumari}-pgadmin
     ports:
-      - "8080:3000"
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@sakumari.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
     volumes:
-      - dbgate_data:/root/.dbgate
+      - pgadmin_data:/var/lib/pgadmin
+      - ../data/pgadmin/servers.json:/pgadmin4/servers.json
     depends_on:
       db:
         condition: service_healthy
@@ -57,7 +63,7 @@ services:
 
 volumes:
   postgres_data:
-  dbgate_data:
+  pgadmin_data:
 
 networks:
   sakumari:
