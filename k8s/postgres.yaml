@@ -25,7 +25,7 @@ metadata:
 spec:
   replicas: 1
   strategy:
-    type: Recreate # Required for stateful services
+    type: Recreate 
   selector:
     matchLabels:
       app: postgres
@@ -35,7 +35,6 @@ spec:
         app: postgres
         environment: production
     spec:
-      # securityContext removed for compatibility - PostgreSQL runs as postgres user (UID 999)
       containers:
         - name: postgres
           image: postgres:17-alpine
