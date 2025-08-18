@@ -11,7 +11,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 500Mi # pgAdmin needs more storage
+      storage: 500Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -43,16 +43,15 @@ spec:
             - containerPort: 80
           env:
             - name: PGADMIN_DEFAULT_EMAIL
-              value: "admin@sakumari.local"
+              valueFrom:
+                secretKeyRef:
+                  name: sakumari-secrets
+                  key: PGADMIN_DEFAULT_EMAIL
             - name: PGADMIN_DEFAULT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: sakumari-secrets
-                  key: POSTGRES_PASSWORD
-            - name: PGADMIN_CONFIG_SERVER_MODE
-              value: "False"
-            - name: PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED
-              value: "False"
+                  key: PGADMIN_DEFAULT_PASSWORD
           volumeMounts:
             - name: pgadmin-storage
               mountPath: /var/lib/pgadmin
