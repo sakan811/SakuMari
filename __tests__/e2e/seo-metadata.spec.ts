@@ -44,6 +44,9 @@ test.describe("SEO and Metadata", () => {
   test("should have proper HTML structure", async ({ page }) => {
     await page.goto("/");
     
+    // Wait for page to be fully loaded
+    await expect(page.locator("h1")).toBeVisible();
+    
     // Language declaration
     const htmlLang = await page.getAttribute("html", "lang");
     expect(htmlLang).toBe("en");
