@@ -70,10 +70,10 @@ test.describe("Authentication Flow", () => {
 
     // Then logout
     await page.getByText("Sign Out").click();
-    await expect(page.getByText("Sign In")).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible();
 
     // Protected routes should redirect to home
     await page.goto("/hiragana");
-    await expect(page.getByText("Sign In")).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible();
   });
 });
