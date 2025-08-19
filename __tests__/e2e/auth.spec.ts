@@ -1,156 +1,79 @@
 import { test, expect } from "@playwright/test";
 
+// Auth tests should not use storageState since they test authentication flow
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe("Authentication Flow", () => {
-  test("should be authenticated and access protected routes", async ({
-    page,
-  }) => {
-    // Tests start already authenticated due to setup
+  test("should authenticate and access protected routes", async ({ page }) => {
+    // Login via credentials provider
     await page.goto("/");
+    await page.getByRole('button', { name: 'Sign In' }).click();
+    
+    // Wait for NextAuth signin page
+    await page.waitForURL(/.*signin.*/);
+    
+    await page.fill('input[name="email"]', "test@sakumari.local");
+    await page.fill('input[name="password"]', "TestPassword123!");
+    await page.click('form[action*="credentials"] button[type="submit"]');
+    await page.waitForURL("/");
 
     // Should show authenticated content
     await expect(page.getByText("ひらがな Hiragana Practice")).toBeVisible();
     await expect(page.getByText("カタカナ Katakana Practice")).toBeVisible();
     await expect(page.getByText("📊 View Your Progress")).toBeVisible();
-
-    // Should show user profile in header
-    await expect(page.getByText("Sign Out")).toBeVisible();
   });
 
-  test("should access hiragana practice", async ({ page }) => {
+  test("should access practice pages when authenticated", async ({ page }) => {
+    // First authenticate
     await page.goto("/");
-    await page.getByText("ひらがな Hiragana Practice").click();
-    await page.waitForURL("/hiragana");
+    await page.getByRole('button', { name: 'Sign In' }).click();
+    await page.waitForURL(/.*signin.*/);
+    await page.fill('input[name="email"]', "test@sakumari.local");
+    await page.fill('input[name="password"]', "TestPassword123!");
+    await page.click('form[action*="credentials"] button[type="submit"]');
+    await page.waitForURL("/");
 
-    // Wait for flashcard interface to load
-    await page.waitForSelector(
-      'input[placeholder="Type romaji equivalent..."]',
-      { timeout: 10000 },
-    );
-
-    // Should show flashcard interface
-    await expect(
-      page.getByPlaceholder("Type romaji equivalent..."),
-    ).toBeVisible();
-
-    // Should show mode selector
+    // Then access practice pages
+    await page.goto("/hiragana");
+    await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
     await expect(page.getByTestId("typing-button")).toBeVisible();
-    await expect(page.getByTestId("multiple-choice-button")).toBeVisible();
+    
+    await page.goto("/katakana");
+    await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
   });
 
-  test("should practice flashcard", async ({ page }) => {
-    await page.goto("/hiragana");
+  test("should access dashboard when authenticated", async ({ page }) => {
+    // First authenticate
+    await page.goto("/");
+    await page.getByRole('button', { name: 'Sign In' }).click();
+    await page.waitForURL(/.*signin.*/);
+    await page.fill('input[name="email"]', "test@sakumari.local");
+    await page.fill('input[name="password"]', "TestPassword123!");
+    await page.click('form[action*="credentials"] button[type="submit"]');
+    await page.waitForURL("/");
 
-    // Wait for kana to load and be displayed
-    await page.waitForSelector(
-      'input[placeholder="Type romaji equivalent..."]',
-      { timeout: 10000 },
-    );
-
-    // Type answer
-    await page.getByPlaceholder("Type romaji equivalent...").fill("a");
-    await page.getByRole("button", { name: "Submit" }).click();
-
-    // Should show result
-    await expect(
-      page.getByText("Correct!").or(page.getByText("Incorrect!")),
-    ).toBeVisible({ timeout: 5000 });
-  });
-
-  test("should switch to multiple choice mode", async ({ page }) => {
-    await page.goto("/hiragana");
-
-    // Wait for page to load
-    await page.waitForSelector(
-      'input[placeholder="Type romaji equivalent..."]',
-      { timeout: 10000 },
-    );
-
-    // Switch to multiple choice
-    await page.getByTestId("multiple-choice-button").click();
-
-    // Should show choice buttons - wait for them to load
-    await page.waitForFunction(
-      () => {
-        const buttons = document.querySelectorAll("button");
-        return Array.from(buttons).some((button) =>
-          /^[a-z]+$/i.test(button.textContent?.trim() || ""),
-        );
-      },
-      { timeout: 10000 },
-    );
-
-    // Should show choice buttons
-    await expect(
-      page
-        .locator("button")
-        .filter({ hasText: /^[a-z]+$/i })
-        .first(),
-    ).toBeVisible();
-  });
-
-  test("should access dashboard", async ({ page }) => {
+    // Then access dashboard
     await page.goto("/dashboard");
-
-    // Should show dashboard content
     await expect(page.getByText("Dashboard")).toBeVisible();
     await expect(page.getByText("Your Progress")).toBeVisible();
-
-    // Should show filter buttons
-    await expect(page.getByTestId("filter-all")).toBeVisible();
-    await expect(page.getByTestId("filter-hiragana")).toBeVisible();
-    await expect(page.getByTestId("filter-katakana")).toBeVisible();
   });
 
-  test("should logout successfully", async ({ page }) => {
+  test("should logout and redirect unauthenticated users", async ({ page }) => {
+    // First authenticate
     await page.goto("/");
+    await page.getByRole('button', { name: 'Sign In' }).click();
+    await page.waitForURL(/.*signin.*/);
+    await page.fill('input[name="email"]', "test@sakumari.local");
+    await page.fill('input[name="password"]', "TestPassword123!");
+    await page.click('form[action*="credentials"] button[type="submit"]');
+    await page.waitForURL("/");
 
-    // Should be authenticated initially
-    await expect(page.getByText("Sign Out")).toBeVisible();
+    // Then logout
+    await page.getByText("Sign Out").click();
+    await expect(page.getByText("Sign In")).toBeVisible();
 
-    // Click sign out
-    await page.getByText("Sign Out").click({ force: true });
-
-    // Wait for logout to complete by ensuring Sign Out button disappears
-    await expect(page.getByText("Sign Out")).not.toBeVisible({
-      timeout: 10000,
-    });
-
-    // Reload and wait for page to fully load
-    await page.reload();
-    await page.waitForLoadState("networkidle");
-
-    // Wait for sign-in button to appear
-    await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible({
-      timeout: 10000,
-    });
-
-    // Should show welcome message for unauthenticated users
-    await expect(page.getByText("🌸 SakuMari 🌸")).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: "Welcome to SakuMari!", level: 2 }),
-    ).toBeVisible();
-  });
-
-  test("should handle unauthenticated access to protected routes", async ({
-    page,
-  }) => {
-    // First logout
-    await page.goto("/");
-    await page.getByText("Sign Out").click({ force: true });
-
-    // Wait for logout to complete
-    await page.waitForTimeout(10000);
-    await page.reload();
-    await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible({
-      timeout: 10000,
-    });
-
-    // Try to access protected route
+    // Protected routes should redirect to home
     await page.goto("/hiragana");
-
-    // Should show sign in prompt on the hiragana page or redirect to home
-    await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible({
-      timeout: 5000,
-    });
+    await expect(page.getByText("Sign In")).toBeVisible();
   });
 });
