@@ -106,6 +106,10 @@ export default function HomePage() {
               >
                 📊 View Your Progress
               </Link>
+              <p className="text-xs sm:text-sm text-[#705a39] mt-3 sm:mt-4 font-medium">
+                ✨ Get AI-powered learning tips in your Dashboard to improve
+                faster
+              </p>
             </div>
           </>
         ) : (
@@ -117,7 +121,7 @@ export default function HomePage() {
               <p className="text-sm sm:text-base text-[#705a39] mb-4 sm:mb-6 leading-relaxed">
                 Sign in with your Google account to start practicing Japanese
                 Kana characters. Your progress will be saved and you can track
-                your improvement over time.
+                your improvement over time with AI-powered learning tips.
               </p>
               <div className="text-center">
                 <p className="text-xs sm:text-sm text-[#705a39] mb-3 sm:mb-4">
