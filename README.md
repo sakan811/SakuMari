@@ -117,20 +117,18 @@ pnpm run k8s:up
 pnpm run k8s:status
 ```
 
-3. **Database setup** (requires two terminals):
-
-**Terminal 1** - Port-forward database:
+3. **Database setup** (single terminal):
 
 ```bash
-# Port-forward database service (keep running)
-kubectl port-forward svc/postgres-service 5432:5432 -n sakumari
-```
+# Port-forward database service in background
+kubectl port-forward svc/postgres-service 5432:5432 -n sakumari &
 
-**Terminal 2** - Run database setup:
-
-```bash
-# Setup database (run in separate terminal)
+# Press Enter to get a clean prompt after port-forward messages appear
+# Setup database (same terminal)
 pnpm run db:setup
+
+# Kill the background port-forward process after setup
+kill %1
 ```
 
 4. **Access application**:
