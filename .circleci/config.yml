@@ -4,7 +4,7 @@ jobs:
   e2e-tests:
     parallelism: 4
     machine:
-      image: ubuntu-2204:2024.11.1
+      image: ubuntu-2204:current
     environment:
       NODE_ENV: test
       POSTGRES_HOST: localhost
