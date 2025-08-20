@@ -3,31 +3,34 @@ version: 2.1
 jobs:
   e2e-tests:
     parallelism: 4
-    docker:
-      - image: ubuntu-2204:2024.11.1
-        environment:
-          NODE_ENV: test
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          POSTGRES_DB: sakumari_test
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_PRISMA_URL: postgresql://postgres:postgres@localhost:5432/sakumari_test
-          POSTGRES_URL_NON_POOLING: postgresql://postgres:postgres@localhost:5432/sakumari_test
-          AUTH_URL: http://localhost:3000
-          CREDS_PROVIDER: true
-          CREDS_TEST_EMAIL: test@sakumari.local
-          CREDS_TEST_PASSWORD: TestPassword123!
-      - image: cimg/postgres:17.0
-        environment:
-          POSTGRES_DB: sakumari_test
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+    machine:
+      image: ubuntu-2204:2024.11.1
+    environment:
+      NODE_ENV: test
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: sakumari_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PRISMA_URL: postgresql://postgres:postgres@localhost:5432/sakumari_test
+      POSTGRES_URL_NON_POOLING: postgresql://postgres:postgres@localhost:5432/sakumari_test
+      AUTH_URL: http://localhost:3000
+      CREDS_PROVIDER: true
+      CREDS_TEST_EMAIL: test@sakumari.local
+      CREDS_TEST_PASSWORD: TestPassword123!
     
     resource_class: medium+
     
     steps:
       - checkout
+      
+      - run:
+          name: Install PostgreSQL
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y postgresql postgresql-contrib
+            sudo service postgresql start
+            sudo -u postgres createdb sakumari_test
       
       - run:
           name: Install pnpm
