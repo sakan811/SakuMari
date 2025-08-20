@@ -52,8 +52,12 @@ jobs:
       - run:
           name: Wait for PostgreSQL
           command: |
-            until nc -z localhost 5432; do
-              echo "Waiting for postgres..."
+            for i in {1..30}; do
+              if curl -f http://localhost:5432/ 2>/dev/null | grep -q '52'; then
+                echo "PostgreSQL is ready!"
+                break
+              fi
+              echo "Waiting for PostgreSQL... (attempt $i/30)"
               sleep 2
             done
       
