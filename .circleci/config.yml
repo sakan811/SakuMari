@@ -5,6 +5,7 @@ jobs:
     parallelism: 4
     machine:
       image: ubuntu-2204:current
+    resource_class: medium
     environment:
       NODE_ENV: test
       POSTGRES_HOST: localhost
@@ -18,9 +19,7 @@ jobs:
       CREDS_PROVIDER: true
       CREDS_TEST_EMAIL: test@sakumari.local
       CREDS_TEST_PASSWORD: TestPassword123!
-    
-    resource_class: medium+
-    
+        
     steps:
       - checkout
       
