@@ -10,6 +10,11 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
 
     services:
       postgres:
@@ -66,8 +71,14 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
 
+      - name: Run Auth Setup
+        env:
+          CREDS_PROVIDER: true
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sakumari
+        run: pnpm exec playwright test --project=setup
+
       - name: Run Playwright tests
         env:
           CREDS_PROVIDER: true
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sakumari
-        run: pnpm exec playwright test
+        run: pnpm exec playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --project=chromium --project=firefox --project=webkit --project=seo-chromium

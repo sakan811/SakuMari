@@ -70,10 +70,15 @@ jobs:
           command: pnpm run test:e2e:build
       
       - run:
+          name: Run Auth Setup
+          command: |
+            npx playwright test --project=setup
+      
+      - run:
           name: Run Playwright Tests
           command: |
             SHARD=$((CIRCLE_NODE_INDEX + 1))
-            npx playwright test --shard=${SHARD}/${CIRCLE_NODE_TOTAL}
+            npx playwright test --shard=${SHARD}/${CIRCLE_NODE_TOTAL} --project=chromium --project=firefox --project=webkit --project=seo-chromium
       
       - store_artifacts:
           path: test-results
