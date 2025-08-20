@@ -39,6 +39,7 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isMountedRef = useRef(true);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -53,6 +54,13 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
       inputRef.current.focus();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,13 +101,19 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
         timestamp: data.timestamp,
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      if (isMountedRef.current) {
+        setMessages((prev) => [...prev, assistantMessage]);
+      }
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Something went wrong";
-      setError(errorMessage);
+      if (isMountedRef.current) {
+        setError(errorMessage);
+      }
     } finally {
-      setIsLoading(false);
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
     }
   };
 
