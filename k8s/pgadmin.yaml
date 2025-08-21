@@ -32,10 +32,6 @@ spec:
         app: pgadmin
         environment: production
     spec:
-      securityContext:
-        runAsUser: 5050
-        runAsGroup: 5050
-        fsGroup: 5050
       containers:
         - name: pgadmin
           image: dpage/pgadmin4:latest
@@ -59,21 +55,21 @@ spec:
             httpGet:
               path: /login
               port: 80
-            initialDelaySeconds: 30
+            initialDelaySeconds: 90
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /login
               port: 80
-            initialDelaySeconds: 60
+            initialDelaySeconds: 120
             periodSeconds: 30
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "100m"
+              memory: "256Mi"
+              cpu: "250m"
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "2048Mi"
+              cpu: "1000m"
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
