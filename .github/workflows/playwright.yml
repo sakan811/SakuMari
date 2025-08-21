@@ -128,6 +128,9 @@ jobs:
           key: ${{ runner.os }}-deps-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
           fail-on-cache-miss: true
 
+      - name: Install Playwright system dependencies
+        run: pnpm exec playwright install --with-deps
+
       - name: Setup environment
         run: |
           cp .env.example .env
