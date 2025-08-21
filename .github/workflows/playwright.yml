@@ -7,8 +7,8 @@ on:
     branches: [master]
 
 jobs:
-  setup:
-    timeout-minutes: 30
+  test:
+    timeout-minutes: 60
     runs-on: ubuntu-latest
 
     services:
@@ -66,89 +66,8 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
 
-      - name: Run Auth Setup
-        env:
-          CREDS_PROVIDER: true
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sakumari
-        run: pnpm exec playwright test --project=setup
-
-      - name: Cache node_modules
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            node_modules
-            ~/.cache/ms-playwright
-            generated/prisma_client
-            .next
-          key: ${{ runner.os }}-deps-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
-
-  test:
-    needs: setup
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shardIndex: [1, 2, 3, 4]
-        shardTotal: [4]
-
-    services:
-      postgres:
-        image: postgres:17-alpine
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: sakumari
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Restore cached dependencies
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            node_modules
-            ~/.cache/ms-playwright
-            generated/prisma_client
-            .next
-          key: ${{ runner.os }}-deps-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
-          fail-on-cache-miss: true
-
-      - name: Install Playwright system dependencies
-        run: pnpm exec playwright install --with-deps
-
-      - name: Setup environment
-        run: |
-          cp .env.example .env
-          echo "CREDS_PROVIDER=true" >> .env
-          echo "POSTGRES_HOST=localhost" >> .env
-          echo "POSTGRES_DB=sakumari" >> .env
-
-      - name: Setup database for test shard
-        env:
-          PRISMA_ENGINES_MIRROR: https://registry.npmmirror.com/-/binary/prisma
-          PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sakumari
-        run: |
-          pnpm exec prisma migrate deploy
-          pnpm exec prisma db seed
-
       - name: Run Playwright tests
         env:
           CREDS_PROVIDER: true
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sakumari
-        run: pnpm exec playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --project=chromium --project=firefox --project=webkit --project=seo-chromium
+        run: pnpm exec playwright test
