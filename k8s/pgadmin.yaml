@@ -57,13 +57,13 @@ spec:
               mountPath: /var/lib/pgadmin
           readinessProbe:
             httpGet:
-              path: /misc/ping
+              path: /login
               port: 80
             initialDelaySeconds: 30
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /misc/ping
+              path: /login
               port: 80
             initialDelaySeconds: 60
             periodSeconds: 30
