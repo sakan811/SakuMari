@@ -38,18 +38,12 @@
     "docker:status": "docker compose -f docker/docker-compose.yml ps",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
     "docker:clean": "docker compose -f docker/docker-compose.yml down --volumes --rmi all --remove-orphans",
-    "k8s:up": "kubectl create namespace prod-monitor --dry-run=client -o yaml | kubectl apply -f - && kubectl apply -k k8s/ && kubectl apply -f k8s/monitoring-rbac.yaml && kubectl apply -f k8s/monitoring-secrets.yaml && kubectl apply -f k8s/prom.yaml && kubectl apply -f k8s/grafana.yaml",
+    "k8s:up": "kubectl apply -k k8s/",
     "k8s:logs": "kubectl logs -f deployment/sakumari-app -n sakumari",
     "k8s:logs-app": "kubectl logs -f deployment/sakumari-app -c app -n sakumari",
     "k8s:status": "kubectl get all -n sakumari",
-    "k8s:down": "kubectl delete -k k8s/ && kubectl delete -f k8s/prom.yaml && kubectl delete -f k8s/grafana.yaml && kubectl delete -f k8s/monitoring-rbac.yaml && kubectl delete -f k8s/monitoring-secrets.yaml",
-    "k8s:clean": "kubectl delete namespace sakumari --wait=false && kubectl delete namespace prod-monitor --wait=false && kubectl delete pvc -l app=sakumari --ignore-not-found=true && kubectl delete pvc -l component=monitor --ignore-not-found=true",
-    "k8s:monitor:setup": "kubectl create namespace prod-monitor --dry-run=client -o yaml | kubectl apply -f - && kubectl apply -f k8s/monitoring-rbac.yaml && kubectl apply -f k8s/monitoring-secrets.yaml",
-    "k8s:monitor:status": "kubectl get all -n prod-monitor",
-    "k8s:monitor:logs": "kubectl logs -f deployment/prometheus -n prod-monitor",
-    "k8s:monitor:logs-grafana": "kubectl logs -f deployment/grafana -n prod-monitor",
-    "k8s:monitor:port-forward": "kubectl port-forward svc/prometheus-service 9090:9090 -n prod-monitor & kubectl port-forward svc/grafana-service 3000:3000 -n prod-monitor",
-    "k8s:monitor:clean": "kubectl delete namespace prod-monitor --wait=false && kubectl delete pvc -l component=monitor --ignore-not-found=true"
+    "k8s:down": "kubectl delete -k k8s/",
+    "k8s:clean": "kubectl delete namespace sakumari --wait=false && kubectl delete pvc -l app=sakumari --ignore-not-found=true"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
