@@ -77,6 +77,17 @@ Visit http://localhost:3000
 
 For isolated testing environment:
 
+### Prerequisites
+
+```bash
+# Install dependencies first (required for Prisma commands)
+pnpm install
+```
+
+**Note**: Even though services run in containers, Prisma CLI commands execute on the host machine and require local dependencies.
+
+### Setup Steps
+
 ```bash
 # Start full stack (Docker automatically configures database host)
 pnpm run docker:dev-up
@@ -96,6 +107,15 @@ pnpm run docker:down
 ## Kubernetes Deployment
 
 Production deployment with persistent storage:
+
+### Prerequisites
+
+```bash
+# Install dependencies first (required for Prisma commands)
+pnpm install
+```
+
+**Note**: Even though services run in containers, Prisma CLI commands execute on the host machine and require local dependencies.
 
 ### Setup Steps
 
@@ -155,7 +175,18 @@ pnpm run k8s:down
 
 ## E2E Test Setup
 
-**Environment Configuration**: Default `.env` configuration works for E2E tests:
+### Prerequisites
+
+```bash
+# Install dependencies first (required for Prisma commands and test runners)
+pnpm install
+```
+
+**Note**: E2E tests use Prisma commands for database setup and Playwright for testing, both of which require local dependencies.
+
+### Environment Configuration
+
+Default `.env` configuration works for E2E tests:
 
 ```bash
 # Database (localhost is the default)
