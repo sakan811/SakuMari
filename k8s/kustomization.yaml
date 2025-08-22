@@ -11,6 +11,7 @@ resources:
   - pg-exporter.yaml
   - prom.yaml
   - grafana.yaml
+  - cloudbeaver.yaml
   - app.yaml
   - cloudflare-tunnel.yaml
 
