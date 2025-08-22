@@ -39,19 +39,6 @@ spec:
           image: dbeaver/cloudbeaver:latest
           ports:
             - containerPort: 8978
-          env:
-            - name: CB_SERVER_NAME
-              value: "SakuMari Database Admin"
-            - name: CB_ADMIN_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: sakumari-secrets
-                  key: CB_ADMIN_NAME
-            - name: CB_ADMIN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: sakumari-secrets
-                  key: CB_ADMIN_PASSWORD
           volumeMounts:
             - name: cloudbeaver-workspace
               mountPath: /opt/cloudbeaver/workspace
