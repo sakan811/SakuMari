@@ -10,6 +10,7 @@ resources:
   - postgres.yaml
   - pg-exporter.yaml
   - prom.yaml
+  - grafana.yaml
   - app.yaml
   - cloudflare-tunnel.yaml
 
