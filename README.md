@@ -86,7 +86,6 @@ pnpm run db:setup
 
 # Access services
 # App: http://localhost:3000
-# pgAdmin : http://localhost:8080
 
 # Stop services
 pnpm run docker:down
