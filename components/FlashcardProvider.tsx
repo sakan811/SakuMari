@@ -174,15 +174,16 @@ export function FlashcardProvider({
     const weights = data.map((kana) => {
       // New characters get high priority
       if (kana.attempts === 0) return 2.0;
-      
+
       // Base weight from accuracy (lower accuracy = higher weight)
       const accuracyWeight = Math.max(1 - kana.accuracy, 0.1);
-      
+
       // Confidence boost for high accuracy + few attempts (prevents first-success penalty)
-      const confidenceBoost = (kana.attempts < 3 && kana.accuracy > 0.8) 
-        ? 1 + (3 - kana.attempts) * 0.5 
-        : 1;
-      
+      const confidenceBoost =
+        kana.attempts < 3 && kana.accuracy > 0.8
+          ? 1 + (3 - kana.attempts) * 0.5
+          : 1;
+
       return accuracyWeight * confidenceBoost;
     });
 
