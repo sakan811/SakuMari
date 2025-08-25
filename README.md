@@ -39,6 +39,10 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_PORT=5432
 
+# Database URLs
+POSTGRES_PRISMA_URL=postgresql://postgres:postgres@localhost:5432/sakumari?pgbouncer=true&connection_limit=1
+POSTGRES_URL_NON_POOLING=postgresql://postgres:postgres@localhost:5432/sakumari
+
 # Google OAuth
 AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
