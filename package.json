@@ -37,13 +37,7 @@
     "docker:logs-app": "docker compose -f docker/docker-compose.yml logs -f app",
     "docker:status": "docker compose -f docker/docker-compose.yml ps",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
-    "docker:clean": "docker compose -f docker/docker-compose.yml down --volumes --rmi all --remove-orphans",
-    "k8s:up": "kubectl apply -k k8s/",
-    "k8s:logs": "kubectl logs -f deployment/sakumari-app -n sakumari",
-    "k8s:logs-app": "kubectl logs -f deployment/sakumari-app -c app -n sakumari",
-    "k8s:status": "kubectl get all -n sakumari",
-    "k8s:down": "kubectl delete -k k8s/",
-    "k8s:clean": "kubectl delete namespace sakumari --wait=false && kubectl delete pvc -l app=sakumari --ignore-not-found=true"
+    "docker:clean": "docker compose -f docker/docker-compose.yml down --volumes --rmi all --remove-orphans"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

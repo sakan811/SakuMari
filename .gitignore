@@ -48,6 +48,4 @@ node_modules/
 /git.md
 /CLAUDE.md
 
-# Docker Cloudflare secrets
-docker-compose.cloudflare.yml
 /data

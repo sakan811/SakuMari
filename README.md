@@ -12,7 +12,7 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 This project uses **pnpm** as its package manager. You'll need pnpm installed to run the development commands.
 
-Visit: https://pnpm.io/installation
+Visit: <https://pnpm.io/installation>
 
 ## Google OAuth Setup
 
@@ -71,7 +71,7 @@ pnpm run db:setup
 pnpm run dev
 ```
 
-Visit http://localhost:3000
+Visit <http://localhost:3000>
 
 ## Docker Compose Setup
 
@@ -103,75 +103,6 @@ pnpm run docker:down
 ```
 
 **Note**: Docker Compose automatically overrides `POSTGRES_HOST=db` for containerized services. No manual `.env` editing required.
-
-## Kubernetes Deployment
-
-Production deployment with persistent storage:
-
-### Prerequisites
-
-```bash
-# Install dependencies first (required for Prisma commands)
-pnpm install
-```
-
-**Note**: Even though services run in containers, Prisma CLI commands execute on the host machine and require local dependencies.
-
-### Setup Steps
-
-1. **Copy environment file to Kubernetes directory**:
-
-```bash
-# Copy .env file to k8s directory (required for deployment)
-cp .env k8s/.env
-```
-
-2. **Deploy all services**:
-
-```bash
-# Deploy all Kubernetes resources
-pnpm run k8s:up
-
-# Check deployment status
-pnpm run k8s:status
-```
-
-3. **Database setup** (single terminal):
-
-```bash
-# Port-forward database service in background
-kubectl port-forward svc/postgres-service 5432:5432 -n sakumari &
-
-# Press Enter to get a clean prompt after port-forward messages appear
-# Setup database (same terminal)
-pnpm run db:setup
-
-# Kill the background port-forward process after setup
-kill %1
-```
-
-4. **Access application**:
-
-```bash
-# Port-forward app service for local access
-kubectl port-forward svc/sakumari-app-service 3000:3000 -n sakumari
-```
-
-5. **Monitor deployment**:
-
-```bash
-# View application logs
-pnpm run k8s:logs
-
-# Stop deployment when done
-pnpm run k8s:down
-```
-
-**Production Environment**: Update `.env` with production values before copying to k8s/:
-
-- `POSTGRES_HOST=postgres-service` (for Kubernetes service discovery)
-- `AUTH_URL=https://yourdomain.com`
-- `NODE_ENV=production`
 
 ## E2E Test Setup
 
