@@ -30,6 +30,8 @@ type KanaWithAccuracy = {
   character: string;
   romaji: string;
   accuracy: number;
+  attempts: number;
+  correct_attempts: number;
 };
 
 type InteractionMode = "typing" | "multiple-choice";
@@ -164,18 +166,31 @@ export function FlashcardProvider({
     setChoices(allChoices);
   };
 
-  // Select a random kana based on weighted probability
+  // Select a kana using confidence-weighted selection (solves first-success penalty)
   const selectRandomKana = (data: KanaWithAccuracy[]) => {
     if (!data.length) return;
 
-    // Calculate weights (inverse of accuracy) with minimum weight to prevent zero weights
-    const weights = data.map((kana) => Math.max(1 - kana.accuracy, 0.01));
-    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+    // Calculate confidence-aware weights
+    const weights = data.map((kana) => {
+      // New characters get high priority
+      if (kana.attempts === 0) return 2.0;
+      
+      // Base weight from accuracy (lower accuracy = higher weight)
+      const accuracyWeight = Math.max(1 - kana.accuracy, 0.1);
+      
+      // Confidence boost for high accuracy + few attempts (prevents first-success penalty)
+      const confidenceBoost = (kana.attempts < 3 && kana.accuracy > 0.8) 
+        ? 1 + (3 - kana.attempts) * 0.5 
+        : 1;
+      
+      return accuracyWeight * confidenceBoost;
+    });
 
+    // Weighted random selection
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
     let randomVal = Math.random() * totalWeight;
     let selectedKana = null;
 
-    // Select kana based on weighted probability
     for (let i = 0; i < data.length; i++) {
       randomVal -= weights[i];
       if (randomVal <= 0) {
@@ -184,7 +199,7 @@ export function FlashcardProvider({
       }
     }
 
-    // Fallback: if no kana was selected (shouldn't happen), select the last one
+    // Fallback: if no kana was selected, select the last one
     if (!selectedKana) {
       selectedKana = data[data.length - 1];
     }

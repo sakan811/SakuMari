@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find or create KanaProgress record for this user
+    // Simple progress tracking - find or create KanaProgress record
     const kanaProgress = await prisma.kanaProgress.upsert({
       where: {
         kana_id_user_id: {
