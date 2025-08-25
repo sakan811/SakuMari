@@ -141,9 +141,9 @@ describe("TipsModal", () => {
 
   test("shows loading state during API call", async () => {
     // Mock response that resolves immediately
-    const mockResponse = mockApiResponse({ 
-      tip: "Test", 
-      timestamp: "2025-01-01T00:00:00Z" 
+    const mockResponse = mockApiResponse({
+      tip: "Test",
+      timestamp: "2025-01-01T00:00:00Z",
     });
     mockFetch.mockResolvedValue(mockResponse);
 
@@ -155,7 +155,7 @@ describe("TipsModal", () => {
     const submitButton = screen.getByRole("button", { name: "Ask" });
 
     fireEvent.change(input, { target: { value: "Test question" } });
-    
+
     await act(async () => {
       fireEvent.click(submitButton);
     });
@@ -282,10 +282,11 @@ describe("TipsModal", () => {
 
   test("submit button shows correct text based on loading state", async () => {
     // Use a delay to better test loading states
-    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-    const mockResponse = mockApiResponse({ 
-      tip: "Test", 
-      timestamp: "2025-01-01T00:00:00Z" 
+    const delay = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+    const mockResponse = mockApiResponse({
+      tip: "Test",
+      timestamp: "2025-01-01T00:00:00Z",
     });
     mockFetch.mockImplementation(() => delay(100).then(() => mockResponse));
 
