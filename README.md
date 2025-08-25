@@ -8,6 +8,55 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 🚀 **[Try it live](https://sakumari.fukudev.org/)** - No setup required!
 
+## Architecture
+
+SakuMari is built with a modern **Next.js 15 App Router** architecture featuring server-side rendering, API routes, and client-side state management. The application integrates **PostgreSQL** for data persistence, **NextAuth.js** for authentication, and **Google Gemini AI** for personalized learning recommendations.
+
+```mermaid
+graph TD
+    A[User] --> B[Next.js Frontend]
+    B --> C[FlashcardProvider Context]
+    B --> D[API Routes]
+    D --> E[PostgreSQL + Prisma]
+    D --> F[NextAuth.js]
+    D --> G[Google Gemini AI]
+    
+    subgraph Frontend
+        B
+        C
+        H[React Components]
+        I[Tailwind CSS]
+    end
+    
+    subgraph Backend
+        D
+        E
+        F
+        G
+    end
+    
+    C --> B
+    H --> B
+    E --> D
+    F --> D
+    G --> D
+```
+
+**Frontend Architecture:**
+- **App Router**: Server and client components with optimized rendering
+- **State Management**: React Context (FlashcardProvider) for practice sessions
+- **Components**: Modular UI with Flashcard, Dashboard, and authentication components
+- **Styling**: Tailwind CSS for responsive design
+
+**Backend Architecture:**
+- **API Routes**: RESTful endpoints for stats, flashcard submissions, and AI tips
+- **Database**: PostgreSQL 17 with Prisma ORM for type-safe queries
+- **Authentication**: NextAuth.js v5 with Google OAuth and session management
+- **AI Integration**: Google Gemini AI for personalized learning tips
+
+**Data Flow:**
+User practices flashcards → Progress tracked in database → Adaptive algorithm selects next cards → AI generates personalized tips based on performance patterns.
+
 ## Package Manager
 
 This project uses **pnpm** as its package manager. You'll need pnpm installed to run the development commands.
@@ -23,6 +72,8 @@ Visit: <https://pnpm.io/installation>
    - Development: `http://localhost:3000/api/auth/callback/google`
    - Production: `https://yourdomain.com/api/auth/callback/google`
 5. Copy Client ID and Secret to `.env` file
+
+More details: <https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid>
 
 ## Environment Setup
 
