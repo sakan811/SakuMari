@@ -10,7 +10,7 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 ## Architecture
 
-SakuMari is built with a modern **Next.js 15 App Router** architecture featuring server-side rendering, API routes, and client-side state management. The application integrates **PostgreSQL** for data persistence, **NextAuth.js** for authentication, and **Google Gemini AI** for personalized learning recommendations.
+The diagram below illustrates SakuMari's data flow: user interactions with the Next.js frontend trigger API routes that coordinate between PostgreSQL for progress tracking, NextAuth.js for authentication, and Google Gemini AI for personalized learning recommendations. The FlashcardProvider manages client-side practice session state while React components handle the UI layer.
 
 ```mermaid
 graph TD
@@ -41,21 +41,6 @@ graph TD
     F --> D
     G --> D
 ```
-
-**Frontend Architecture:**
-- **App Router**: Server and client components with optimized rendering
-- **State Management**: React Context (FlashcardProvider) for practice sessions
-- **Components**: Modular UI with Flashcard, Dashboard, and authentication components
-- **Styling**: Tailwind CSS for responsive design
-
-**Backend Architecture:**
-- **API Routes**: RESTful endpoints for stats, flashcard submissions, and AI tips
-- **Database**: PostgreSQL 17 with Prisma ORM for type-safe queries
-- **Authentication**: NextAuth.js v5 with Google OAuth and session management
-- **AI Integration**: Google Gemini AI for personalized learning tips
-
-**Data Flow:**
-User practices flashcards → Progress tracked in database → Adaptive algorithm selects next cards → AI generates personalized tips based on performance patterns.
 
 ## Package Manager
 
