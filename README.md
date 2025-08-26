@@ -10,36 +10,51 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 ## Architecture
 
-The diagram below illustrates SakuMari's data flow: user interactions with the Next.js frontend trigger API routes that coordinate between PostgreSQL for progress tracking, NextAuth.js for authentication, and Google Gemini AI for personalized learning recommendations. The FlashcardProvider manages client-side practice session state while React components handle the UI layer.
+SakuMari's architecture has three layers. The Frontend Layer handles user interactions through Next.js, React components, and FlashcardProvider context. The Security Layer manages authentication via NextAuth.js middleware. The Backend Layer processes data through API routes, Prisma ORM, PostgreSQL database, and Google Gemini AI for personalized learning tips.
 
 ```mermaid
-graph TD
-    A[User] --> B[Next.js Frontend]
-    B --> C[FlashcardProvider Context]
-    B --> D[API Routes]
-    D --> E[PostgreSQL + Prisma]
-    D --> F[NextAuth.js]
-    D --> G[Google Gemini AI]
+flowchart TD
+    User["🧑 User"]
     
-    subgraph Frontend
-        B
-        C
-        H[React Components]
-        I[Tailwind CSS]
+    subgraph Frontend["Frontend Layer"]
+        NextJS["Next.js<br/>App Router"]
+        SessionProvider["Session<br/>Provider"]
+        Pages["Pages<br/>(dashboard, hiragana, katakana)"]
+        FlashcardProvider["FlashcardProvider<br/>Context"]
+        Components["React<br/>Components"]
+        Tailwind["Tailwind<br/>CSS"]
     end
     
-    subgraph Backend
-        D
-        E
-        F
-        G
+    subgraph Security["Security Layer"]
+        Middleware["🔐 Middleware"]
+        NextAuth["NextAuth.js"]
     end
     
-    C --> B
-    H --> B
-    E --> D
-    F --> D
-    G --> D
+    subgraph Backend["Backend Layer"]
+        API["API Routes"]
+        Prisma["Prisma ORM"]
+        PostgreSQL["PostgreSQL 17"]
+        Gemini["Google<br/>Gemini AI"]
+    end
+    
+    User --> NextJS
+    NextJS -.-> Middleware
+    Middleware -.-> NextAuth
+    NextAuth -.-> Middleware
+    Middleware --> SessionProvider
+    SessionProvider -.-> NextAuth
+    NextAuth -.-> SessionProvider
+    SessionProvider --> Pages
+    Pages --> FlashcardProvider
+    FlashcardProvider -.-> API
+    API -.-> FlashcardProvider
+    FlashcardProvider --> Components
+    Components --> Tailwind
+    NextJS -.-> API
+    API -.-> Prisma
+    Prisma -.-> PostgreSQL
+    API -.-> NextAuth
+    API -.-> Gemini
 ```
 
 ## Package Manager
