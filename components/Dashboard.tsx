@@ -34,28 +34,15 @@ import {
   textStyles,
   utils,
 } from "../lib/design-system";
+import type { KanaData, SortColumn, KanaFilter } from "@/types/kana";
+import { isKanaType } from "@/lib/kana-utils";
 
-type KanaStats = {
-  id: string;
-  character: string;
-  romaji: string;
-  attempts: number;
-  correct_attempts: number;
-  accuracy: number;
-};
-
-type SortColumn =
-  | "character"
-  | "romaji"
-  | "attempts"
-  | "correct_attempts"
-  | "accuracy";
 
 export default function Dashboard() {
-  const [stats, setStats] = useState<KanaStats[]>([]);
+  const [stats, setStats] = useState<KanaData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "hiragana" | "katakana">("all");
+  const [filter, setFilter] = useState<KanaFilter>("all");
   const [sortColumn, setSortColumn] = useState<SortColumn>("accuracy");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
@@ -96,19 +83,12 @@ export default function Dashboard() {
     }
   };
 
-  const isKanaType = (char: string, type: string) => {
-    if (type === "all") return true;
-    const code = char.charCodeAt(0);
-    return type === "hiragana"
-      ? code >= 0x3040 && code <= 0x309f
-      : code >= 0x30a0 && code <= 0x30ff;
-  };
 
   const filteredStats = stats
     .filter((kana) => isKanaType(kana.character, filter))
     .sort((a, b) => {
-      const aValue = a[sortColumn as keyof KanaStats] as string | number;
-      const bValue = b[sortColumn as keyof KanaStats] as string | number;
+      const aValue = a[sortColumn as keyof KanaData] as string | number;
+      const bValue = b[sortColumn as keyof KanaData] as string | number;
 
       const comparison =
         typeof aValue === "string"
@@ -128,7 +108,7 @@ export default function Dashboard() {
     return (
       <div className={utils.cn(gradients.main, "min-h-screen")}>
         <div className="flex h-32 sm:h-64 items-center justify-center">
-          <div className={`h-8 w-8 sm:h-12 sm:w-12 animate-spin rounded-full border-2 sm:border-4 border-[${colors.primary}] border-t-transparent`}></div>
+          <div className={utils.createSpinnerClass()}></div>
         </div>
       </div>
     );

@@ -24,6 +24,7 @@ import React, {
   useEffect,
   useRef,
 } from "react";
+import { isKanaType } from "@/lib/kana-utils";
 
 type KanaWithAccuracy = {
   id: string;
@@ -102,10 +103,7 @@ export function FlashcardProvider({
       // Filter by kana type if specified
       if (kanaType) {
         data = data.filter((kana: KanaWithAccuracy) => {
-          const isHiragana =
-            kana.character.charCodeAt(0) >= 0x3040 &&
-            kana.character.charCodeAt(0) <= 0x309f;
-          return kanaType === "hiragana" ? isHiragana : !isHiragana;
+          return isKanaType(kana.character, kanaType);
         });
       }
 

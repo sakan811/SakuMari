@@ -21,13 +21,8 @@ import {
   createFilterButtonClass,
   utils,
 } from "../../lib/design-system";
+import type { SortColumn, KanaFilter } from "@/types/kana";
 
-type SortColumn =
-  | "character"
-  | "romaji"
-  | "attempts"
-  | "correct_attempts"
-  | "accuracy";
 
 interface SortableTableHeaderProps {
   column: SortColumn;
@@ -110,11 +105,11 @@ export const StatsCard = ({ title, value, colorScheme }: StatsCardProps) => {
 };
 
 interface FilterButtonProps {
-  filter: "all" | "hiragana" | "katakana";
-  currentFilter: "all" | "hiragana" | "katakana";
+  filter: KanaFilter;
+  currentFilter: KanaFilter;
   label: string;
   testId: string;
-  onClick: (filter: "all" | "hiragana" | "katakana") => void;
+  onClick: (filter: KanaFilter) => void;
 }
 
 export const FilterButton = ({

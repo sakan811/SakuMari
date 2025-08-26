@@ -135,6 +135,22 @@ export const utils = {
   cn: (...classes: (string | undefined | null | false)[]): string => {
     return classes.filter(Boolean).join(" ");
   },
+
+  /**
+   * Create loading spinner classes
+   */
+  createSpinnerClass: (size: "sm" | "md" | "lg" = "md"): string => {
+    const sizeClasses = {
+      sm: "h-4 w-4",
+      md: "h-8 w-8 sm:h-12 sm:w-12",
+      lg: "h-12 w-12 sm:h-16 sm:w-16",
+    };
+    return utils.cn(
+      sizeClasses[size],
+      "animate-spin rounded-full border-2 sm:border-4",
+      `border-[${colors.primary}] border-t-transparent`
+    );
+  },
 } as const;
 
 // Component helper functions
@@ -162,3 +178,4 @@ export const createFilterButtonClass = (
       : buttonStyles.variants.filter.inactive,
   );
 };
+

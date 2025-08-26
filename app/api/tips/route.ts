@@ -18,6 +18,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { utils } from "@/lib/design-system";
 
 interface ConversationMessage {
   role: string;
@@ -86,7 +87,7 @@ export async function POST(request: Request) {
       .filter((p) => p.attempts > 0 && p.accuracy < 0.7)
       .map(
         (p) =>
-          `${p.kana.character} (${p.kana.romaji}): ${Math.round(p.accuracy * 100)}% accuracy, ${p.attempts} attempts`,
+          `${p.kana.character} (${p.kana.romaji}): ${utils.formatAccuracySimple(p.accuracy)} accuracy, ${p.attempts} attempts`,
       )
       .slice(0, 10);
 
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
       .filter((p) => p.attempts > 5 && p.accuracy >= 0.9)
       .map(
         (p) =>
-          `${p.kana.character} (${p.kana.romaji}): ${Math.round(p.accuracy * 100)}% accuracy`,
+          `${p.kana.character} (${p.kana.romaji}): ${utils.formatAccuracySimple(p.accuracy)} accuracy`,
       )
       .slice(0, 5);
 
