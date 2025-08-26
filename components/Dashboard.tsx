@@ -19,7 +19,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import TipsButton from "./TipsButton";
 import TipsModal from "./TipsModal";
 
 type KanaStats = {
@@ -41,6 +40,15 @@ export default function Dashboard() {
   >("accuracy");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
+
+  // Reusable className strings
+  const buttonBase =
+    "rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border-2";
+  const filterActive = "bg-[#d1622b] text-white border-[#d1622b] shadow-lg";
+  const filterInactive =
+    "bg-white text-[#705a39] border-[#705a39] hover:bg-[#fad182] hover:border-[#d1622b]";
+  const headerCell =
+    "pb-2 sm:pb-3 pt-2 text-xs sm:text-sm font-semibold text-[#403933] cursor-pointer hover:text-[#d1622b] select-none transition-colors duration-200 px-1 sm:px-0";
 
   const fetchStats = async () => {
     try {
@@ -84,68 +92,33 @@ export default function Dashboard() {
     }
   };
 
-  const sortedStats = [
-    ...(filter === "all"
-      ? stats
-      : stats.filter((kana) => {
-          const charCode = kana.character.charCodeAt(0);
-          const isHiragana = charCode >= 0x3040 && charCode <= 0x309f;
-          const isKatakana = charCode >= 0x30a0 && charCode <= 0x30ff;
+  const isKanaType = (char: string, type: string) => {
+    if (type === "all") return true;
+    const code = char.charCodeAt(0);
+    return type === "hiragana"
+      ? code >= 0x3040 && code <= 0x309f
+      : code >= 0x30a0 && code <= 0x30ff;
+  };
 
-          if (filter === "hiragana") {
-            return isHiragana;
-          } else if (filter === "katakana") {
-            return isKatakana;
-          }
-          return false;
-        })),
-  ].sort((a, b) => {
-    let aValue: string | number;
-    let bValue: string | number;
+  const filteredStats = stats
+    .filter((kana) => isKanaType(kana.character, filter))
+    .sort((a, b) => {
+      const aValue = a[sortColumn as keyof KanaStats] as string | number;
+      const bValue = b[sortColumn as keyof KanaStats] as string | number;
 
-    switch (sortColumn) {
-      case "character":
-        aValue = a.character;
-        bValue = b.character;
-        break;
-      case "romaji":
-        aValue = a.romaji;
-        bValue = b.romaji;
-        break;
-      case "attempts":
-        aValue = a.attempts;
-        bValue = b.attempts;
-        break;
-      case "correct_attempts":
-        aValue = a.correct_attempts;
-        bValue = b.correct_attempts;
-        break;
-      case "accuracy":
-        aValue = a.accuracy;
-        bValue = b.accuracy;
-        break;
-      default:
-        return 0;
-    }
+      const comparison =
+        typeof aValue === "string"
+          ? aValue.localeCompare(bValue as string)
+          : (aValue as number) - (bValue as number);
 
-    if (typeof aValue === "string" && typeof bValue === "string") {
-      const comparison = aValue.localeCompare(bValue);
       return sortDirection === "asc" ? comparison : -comparison;
-    } else {
-      const comparison = (aValue as number) - (bValue as number);
-      return sortDirection === "asc" ? comparison : -comparison;
-    }
-  });
-
-  const filteredStats = sortedStats;
+    });
   const practicedStats = filteredStats.filter((kana) => kana.attempts > 0);
-
   const averageAccuracy =
     practicedStats.length > 0
       ? practicedStats.reduce((sum, kana) => sum + kana.accuracy, 0) /
         practicedStats.length
       : 0;
-
   const totalAttempts = filteredStats.reduce(
     (sum, kana) => sum + kana.attempts,
     0,
@@ -245,33 +218,21 @@ export default function Dashboard() {
                 <button
                   data-testid="filter-all"
                   onClick={() => setFilter("all")}
-                  className={`rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border-2 ${
-                    filter === "all"
-                      ? "bg-[#d1622b] text-white border-[#d1622b] shadow-lg"
-                      : "bg-white text-[#705a39] border-[#705a39] hover:bg-[#fad182] hover:border-[#d1622b]"
-                  }`}
+                  className={`${buttonBase} ${filter === "all" ? filterActive : filterInactive}`}
                 >
                   All
                 </button>
                 <button
                   data-testid="filter-hiragana"
                   onClick={() => setFilter("hiragana")}
-                  className={`rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border-2 ${
-                    filter === "hiragana"
-                      ? "bg-[#d1622b] text-white border-[#d1622b] shadow-lg"
-                      : "bg-white text-[#705a39] border-[#705a39] hover:bg-[#fad182] hover:border-[#d1622b]"
-                  }`}
+                  className={`${buttonBase} ${filter === "hiragana" ? filterActive : filterInactive}`}
                 >
                   Hiragana
                 </button>
                 <button
                   data-testid="filter-katakana"
                   onClick={() => setFilter("katakana")}
-                  className={`rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border-2 ${
-                    filter === "katakana"
-                      ? "bg-[#d1622b] text-white border-[#d1622b] shadow-lg"
-                      : "bg-white text-[#705a39] border-[#705a39] hover:bg-[#fad182] hover:border-[#d1622b]"
-                  }`}
+                  className={`${buttonBase} ${filter === "katakana" ? filterActive : filterInactive}`}
                 >
                   Katakana
                 </button>
@@ -309,7 +270,7 @@ export default function Dashboard() {
                       <tr className="border-b-2 border-[#705a39] text-left">
                         <th
                           data-testid="sort-character"
-                          className="pb-2 sm:pb-3 pt-2 text-xs sm:text-sm font-semibold text-[#403933] cursor-pointer hover:text-[#d1622b] select-none transition-colors duration-200 px-1 sm:px-0"
+                          className={headerCell}
                           onClick={() => handleSort("character")}
                         >
                           <div className="flex items-center gap-1">
@@ -323,7 +284,7 @@ export default function Dashboard() {
                         </th>
                         <th
                           data-testid="sort-romaji"
-                          className="pb-2 sm:pb-3 pt-2 text-xs sm:text-sm font-semibold text-[#403933] cursor-pointer hover:text-[#d1622b] select-none transition-colors duration-200 px-1 sm:px-0"
+                          className={headerCell}
                           onClick={() => handleSort("romaji")}
                         >
                           <div className="flex items-center gap-1">
@@ -337,7 +298,7 @@ export default function Dashboard() {
                         </th>
                         <th
                           data-testid="sort-attempts"
-                          className="pb-2 sm:pb-3 pt-2 text-xs sm:text-sm font-semibold text-[#403933] cursor-pointer hover:text-[#d1622b] select-none transition-colors duration-200 px-1 sm:px-0"
+                          className={headerCell}
                           onClick={() => handleSort("attempts")}
                         >
                           <div className="flex items-center gap-1">
@@ -351,7 +312,7 @@ export default function Dashboard() {
                         </th>
                         <th
                           data-testid="sort-correct-attempts"
-                          className="pb-2 sm:pb-3 pt-2 text-xs sm:text-sm font-semibold text-[#403933] cursor-pointer hover:text-[#d1622b] select-none transition-colors duration-200 px-1 sm:px-0"
+                          className={headerCell}
                           onClick={() => handleSort("correct_attempts")}
                         >
                           <div className="flex items-center gap-1">
@@ -365,7 +326,7 @@ export default function Dashboard() {
                         </th>
                         <th
                           data-testid="sort-accuracy"
-                          className="pb-2 sm:pb-3 pt-2 text-xs sm:text-sm font-semibold text-[#403933] cursor-pointer hover:text-[#d1622b] select-none transition-colors duration-200 px-1 sm:px-0"
+                          className={headerCell}
                           onClick={() => handleSort("accuracy")}
                         >
                           <div className="flex items-center gap-1">
