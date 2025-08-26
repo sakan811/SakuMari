@@ -20,6 +20,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import TipsModal from "./TipsModal";
+import { SortableTableHeader, StatsCard, FilterButton } from "./ui/DashboardComponents";
 
 type KanaStats = {
   id: string;
@@ -30,14 +31,14 @@ type KanaStats = {
   accuracy: number;
 };
 
+type SortColumn = "character" | "romaji" | "attempts" | "correct_attempts" | "accuracy";
+
 export default function Dashboard() {
   const [stats, setStats] = useState<KanaStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "hiragana" | "katakana">("all");
-  const [sortColumn, setSortColumn] = useState<
-    "character" | "romaji" | "attempts" | "correct_attempts" | "accuracy"
-  >("accuracy");
+  const [sortColumn, setSortColumn] = useState<SortColumn>("accuracy");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
 
@@ -76,14 +77,7 @@ export default function Dashboard() {
     fetchStats();
   }, []);
 
-  const handleSort = (
-    column:
-      | "character"
-      | "romaji"
-      | "attempts"
-      | "correct_attempts"
-      | "accuracy",
-  ) => {
+  const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -178,33 +172,21 @@ export default function Dashboard() {
               Your Progress
             </h2>
             <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-3">
-              <div className="rounded-md bg-gradient-to-br from-[#705a39] to-[#403933] p-3 sm:p-4 text-center shadow-lg border-2 border-[#403933]">
-                <p className="text-xs sm:text-sm text-[#fad182] font-medium">
-                  Total Characters Practiced
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-white">
-                  {practicedStats.length}
-                </p>
-              </div>
-              <div className="rounded-md bg-gradient-to-br from-green-600 to-green-700 p-3 sm:p-4 text-center shadow-lg border-2 border-green-700">
-                <p className="text-xs sm:text-sm text-green-100 font-medium">
-                  Average Accuracy
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-white">
-                  {practicedStats.length > 0
-                    ? (averageAccuracy * 100).toFixed(1)
-                    : 0}
-                  %
-                </p>
-              </div>
-              <div className="rounded-md bg-gradient-to-br from-[#d1622b] to-[#ae0d13] p-3 sm:p-4 text-center shadow-lg border-2 border-[#ae0d13]">
-                <p className="text-xs sm:text-sm text-orange-100 font-medium">
-                  Total Attempts
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-white">
-                  {totalAttempts}
-                </p>
-              </div>
+              <StatsCard 
+                title="Total Characters Practiced"
+                value={practicedStats.length}
+                colorScheme="primary"
+              />
+              <StatsCard 
+                title="Average Accuracy"
+                value={`${practicedStats.length > 0 ? (averageAccuracy * 100).toFixed(1) : 0}%`}
+                colorScheme="success"
+              />
+              <StatsCard 
+                title="Total Attempts"
+                value={totalAttempts}
+                colorScheme="accent"
+              />
             </div>
           </div>
 
@@ -215,27 +197,36 @@ export default function Dashboard() {
                 Character Progress
               </h2>
               <div className="flex flex-wrap gap-1 sm:gap-2">
-                <button
-                  data-testid="filter-all"
-                  onClick={() => setFilter("all")}
-                  className={`${buttonBase} ${filter === "all" ? filterActive : filterInactive}`}
-                >
-                  All
-                </button>
-                <button
-                  data-testid="filter-hiragana"
-                  onClick={() => setFilter("hiragana")}
-                  className={`${buttonBase} ${filter === "hiragana" ? filterActive : filterInactive}`}
-                >
-                  Hiragana
-                </button>
-                <button
-                  data-testid="filter-katakana"
-                  onClick={() => setFilter("katakana")}
-                  className={`${buttonBase} ${filter === "katakana" ? filterActive : filterInactive}`}
-                >
-                  Katakana
-                </button>
+                <FilterButton 
+                  filter="all"
+                  currentFilter={filter}
+                  label="All"
+                  testId="filter-all"
+                  onClick={setFilter}
+                  buttonBase={buttonBase}
+                  filterActive={filterActive}
+                  filterInactive={filterInactive}
+                />
+                <FilterButton 
+                  filter="hiragana"
+                  currentFilter={filter}
+                  label="Hiragana"
+                  testId="filter-hiragana"
+                  onClick={setFilter}
+                  buttonBase={buttonBase}
+                  filterActive={filterActive}
+                  filterInactive={filterInactive}
+                />
+                <FilterButton 
+                  filter="katakana"
+                  currentFilter={filter}
+                  label="Katakana"
+                  testId="filter-katakana"
+                  onClick={setFilter}
+                  buttonBase={buttonBase}
+                  filterActive={filterActive}
+                  filterInactive={filterInactive}
+                />
               </div>
             </div>
 
@@ -268,76 +259,51 @@ export default function Dashboard() {
                   <table className="w-full table-auto min-w-[400px]">
                     <thead>
                       <tr className="border-b-2 border-[#705a39] text-left">
-                        <th
-                          data-testid="sort-character"
-                          className={headerCell}
-                          onClick={() => handleSort("character")}
-                        >
-                          <div className="flex items-center gap-1">
-                            Character
-                            {sortColumn === "character" && (
-                              <span className="text-[#d1622b] text-sm sm:text-lg">
-                                {sortDirection === "asc" ? "↑" : "↓"}
-                              </span>
-                            )}
-                          </div>
-                        </th>
-                        <th
-                          data-testid="sort-romaji"
-                          className={headerCell}
-                          onClick={() => handleSort("romaji")}
-                        >
-                          <div className="flex items-center gap-1">
-                            Romaji
-                            {sortColumn === "romaji" && (
-                              <span className="text-[#d1622b] text-sm sm:text-lg">
-                                {sortDirection === "asc" ? "↑" : "↓"}
-                              </span>
-                            )}
-                          </div>
-                        </th>
-                        <th
-                          data-testid="sort-attempts"
-                          className={headerCell}
-                          onClick={() => handleSort("attempts")}
-                        >
-                          <div className="flex items-center gap-1">
-                            Attempts
-                            {sortColumn === "attempts" && (
-                              <span className="text-[#d1622b] text-sm sm:text-lg">
-                                {sortDirection === "asc" ? "↑" : "↓"}
-                              </span>
-                            )}
-                          </div>
-                        </th>
-                        <th
-                          data-testid="sort-correct-attempts"
-                          className={headerCell}
-                          onClick={() => handleSort("correct_attempts")}
-                        >
-                          <div className="flex items-center gap-1">
-                            Correct Attempts
-                            {sortColumn === "correct_attempts" && (
-                              <span className="text-[#d1622b] text-sm sm:text-lg">
-                                {sortDirection === "asc" ? "↑" : "↓"}
-                              </span>
-                            )}
-                          </div>
-                        </th>
-                        <th
-                          data-testid="sort-accuracy"
-                          className={headerCell}
-                          onClick={() => handleSort("accuracy")}
-                        >
-                          <div className="flex items-center gap-1">
-                            Accuracy
-                            {sortColumn === "accuracy" && (
-                              <span className="text-[#d1622b] text-sm sm:text-lg">
-                                {sortDirection === "asc" ? "↑" : "↓"}
-                              </span>
-                            )}
-                          </div>
-                        </th>
+                        <SortableTableHeader 
+                          column="character"
+                          label="Character"
+                          testId="sort-character"
+                          sortColumn={sortColumn}
+                          sortDirection={sortDirection}
+                          onSort={handleSort}
+                          headerCell={headerCell}
+                        />
+                        <SortableTableHeader 
+                          column="romaji"
+                          label="Romaji"
+                          testId="sort-romaji"
+                          sortColumn={sortColumn}
+                          sortDirection={sortDirection}
+                          onSort={handleSort}
+                          headerCell={headerCell}
+                        />
+                        <SortableTableHeader 
+                          column="attempts"
+                          label="Attempts"
+                          testId="sort-attempts"
+                          sortColumn={sortColumn}
+                          sortDirection={sortDirection}
+                          onSort={handleSort}
+                          headerCell={headerCell}
+                        />
+                        <SortableTableHeader 
+                          column="correct_attempts"
+                          label="Correct Attempts"
+                          testId="sort-correct-attempts"
+                          sortColumn={sortColumn}
+                          sortDirection={sortDirection}
+                          onSort={handleSort}
+                          headerCell={headerCell}
+                        />
+                        <SortableTableHeader 
+                          column="accuracy"
+                          label="Accuracy"
+                          testId="sort-accuracy"
+                          sortColumn={sortColumn}
+                          sortDirection={sortDirection}
+                          onSort={handleSort}
+                          headerCell={headerCell}
+                        />
                       </tr>
                     </thead>
                     <tbody>
