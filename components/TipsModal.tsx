@@ -19,6 +19,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
+import { colors } from "@/lib/design-system";
 
 interface TipsModalProps {
   isOpen: boolean;
@@ -128,9 +129,9 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="w-[85vw] sm:w-full sm:max-w-2xl h-[80vh] bg-white rounded-lg shadow-2xl border-2 border-[#705a39] flex flex-col">
+      <div className={`w-[85vw] sm:w-full sm:max-w-2xl h-[80vh] bg-white rounded-lg shadow-2xl border-2 border-[${colors.secondary}] flex flex-col`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#d1622b] to-[#ae0d13] text-white flex-shrink-0">
+        <div className={`flex items-center justify-between p-4 bg-gradient-to-r from-[${colors.primary}] to-[${colors.primaryDark}] text-white flex-shrink-0`}>
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="text-2xl flex-shrink-0">💡</div>
             <div className="min-w-0">
@@ -150,9 +151,9 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
         </div>
 
         {/* Messages Display Area */}
-        <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-br from-[#fad182]/10 to-[#f5c55a]/10 min-h-0">
+        <div className={`flex-1 overflow-y-auto p-4 bg-gradient-to-br from-[${colors.accent}]/10 to-[${colors.accentLight}]/10 min-h-0`}>
           {messages.length === 0 && (
-            <div className="text-center text-[#705a39] py-8">
+            <div className={`text-center text-[${colors.secondary}] py-8`}>
               <div className="text-4xl mb-4">🌸</div>
               <h3 className="text-lg font-semibold mb-2">
                 Welcome to Kana Learning Tips!
@@ -160,7 +161,7 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
               <p className="text-sm">
                 Ask me anything about learning Japanese hiragana and katakana.
               </p>
-              <div className="mt-4 text-xs text-[#705a39]/80">
+              <div className={`mt-4 text-xs text-[${colors.secondary}]/80`}>
                 Example: "How can I memorize hiragana faster?" or "Tips for
                 katakana practice?"
               </div>
@@ -172,7 +173,7 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
               {message.type === "user" ? (
                 <div className="flex justify-end gap-2 sm:gap-4">
                   <div className="min-w-[25%] max-w-[85%] sm:min-w-0 sm:max-w-[50%]">
-                    <div className="bg-[#d1622b] text-white rounded-lg rounded-br-none p-3 shadow-sm">
+                    <div className={`bg-[${colors.primary}] text-white rounded-lg rounded-br-none p-3 shadow-sm`}>
                       <div className="whitespace-pre-wrap text-sm leading-relaxed">
                         {message.content}
                       </div>
@@ -182,8 +183,8 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
               ) : (
                 <div className="flex justify-start gap-2 sm:gap-4">
                   <div className="min-w-[25%] max-w-[85%] sm:min-w-0 sm:max-w-[50%]">
-                    <div className="bg-white border-2 border-[#705a39]/20 text-[#403933] rounded-lg rounded-bl-none p-3 shadow-sm">
-                      <div className="text-sm leading-relaxed [&>h1]:text-lg [&>h1]:font-bold [&>h1]:mb-2 [&>h1]:text-[#403933] [&>h2]:text-base [&>h2]:font-bold [&>h2]:mb-2 [&>h2]:text-[#403933] [&>h3]:text-sm [&>h3]:font-bold [&>h3]:mb-1 [&>h3]:text-[#403933] [&>p]:mb-2 [&>p]:text-[#403933] [&>strong]:font-bold [&>strong]:text-[#403933] [&>em]:italic [&>em]:text-[#403933] [&>code]:text-[#d1622b] [&>code]:bg-[#fad182]/20 [&>code]:px-1 [&>code]:py-0.5 [&>code]:rounded [&>code]:font-mono [&>code]:text-xs [&>ul]:mb-2 [&>ul]:pl-4 [&>ol]:mb-2 [&>ol]:pl-4 [&>li]:mb-1 [&>li]:text-[#403933] [&>pre]:bg-[#fad182]/20 [&>pre]:p-2 [&>pre]:rounded [&>pre]:overflow-x-auto [&>pre]:mb-2 [&>blockquote]:border-l-4 [&>blockquote]:border-[#d1622b] [&>blockquote]:pl-3 [&>blockquote]:italic [&>blockquote]:text-[#403933]/80">
+                    <div className={`bg-white border-2 border-[${colors.secondary}]/20 text-[${colors.secondaryDark}] rounded-lg rounded-bl-none p-3 shadow-sm`}>
+                      <div className={`text-sm leading-relaxed [&>h1]:text-lg [&>h1]:font-bold [&>h1]:mb-2 [&>h1]:text-[${colors.secondaryDark}] [&>h2]:text-base [&>h2]:font-bold [&>h2]:mb-2 [&>h2]:text-[${colors.secondaryDark}] [&>h3]:text-sm [&>h3]:font-bold [&>h3]:mb-1 [&>h3]:text-[${colors.secondaryDark}] [&>p]:mb-2 [&>p]:text-[${colors.secondaryDark}] [&>strong]:font-bold [&>strong]:text-[${colors.secondaryDark}] [&>em]:italic [&>em]:text-[${colors.secondaryDark}] [&>code]:text-[${colors.primary}] [&>code]:bg-[${colors.accent}]/20 [&>code]:px-1 [&>code]:py-0.5 [&>code]:rounded [&>code]:font-mono [&>code]:text-xs [&>ul]:mb-2 [&>ul]:pl-4 [&>ol]:mb-2 [&>ol]:pl-4 [&>li]:mb-1 [&>li]:text-[${colors.secondaryDark}] [&>pre]:bg-[${colors.accent}]/20 [&>pre]:p-2 [&>pre]:rounded [&>pre]:overflow-x-auto [&>pre]:mb-2 [&>blockquote]:border-l-4 [&>blockquote]:border-[${colors.primary}] [&>blockquote]:pl-3 [&>blockquote]:italic [&>blockquote]:text-[${colors.secondaryDark}]/80`}>
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
                     </div>
@@ -197,20 +198,20 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
             <div className="mb-4">
               <div className="flex justify-start gap-2 sm:gap-4">
                 <div className="min-w-[25%] max-w-[85%] sm:min-w-0 sm:max-w-[50%]">
-                  <div className="bg-white border-2 border-[#705a39]/20 rounded-lg rounded-bl-none p-3 shadow-sm">
+                  <div className={`bg-white border-2 border-[${colors.secondary}]/20 rounded-lg rounded-bl-none p-3 shadow-sm`}>
                     <div className="flex items-center gap-2">
                       <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse"></div>
+                        <div className={`w-2 h-2 bg-[${colors.primary}] rounded-full animate-pulse`}></div>
                         <div
-                          className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse"
+                          className={`w-2 h-2 bg-[${colors.primary}] rounded-full animate-pulse`}
                           style={{ animationDelay: "0.2s" }}
                         ></div>
                         <div
-                          className="w-2 h-2 bg-[#d1622b] rounded-full animate-pulse"
+                          className={`w-2 h-2 bg-[${colors.primary}] rounded-full animate-pulse`}
                           style={{ animationDelay: "0.4s" }}
                         ></div>
                       </div>
-                      <span className="text-xs text-[#705a39]">
+                      <span className={`text-xs text-[${colors.secondary}]`}>
                         Thinking...
                       </span>
                     </div>
@@ -230,7 +231,7 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 border-t-2 border-[#705a39]/20 bg-white flex-shrink-0">
+        <div className={`p-4 border-t-2 border-[${colors.secondary}]/20 bg-white flex-shrink-0`}>
           <form onSubmit={handleSubmit}>
             <div className="flex gap-2">
               <div className="flex-1">
@@ -240,7 +241,7 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Ask about kana learning techniques..."
-                  className="w-full p-3 border-2 border-[#705a39]/30 rounded-lg focus:border-[#d1622b] focus:outline-none text-sm"
+                  className={`w-full p-3 border-2 border-[${colors.secondary}]/30 rounded-lg focus:border-[${colors.primary}] focus:outline-none text-sm`}
                   disabled={isLoading}
                   maxLength={500}
                 />
@@ -249,14 +250,14 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
                 <button
                   type="submit"
                   disabled={!inputValue.trim() || isLoading}
-                  className="px-6 py-3 bg-[#d1622b] text-white rounded-lg hover:bg-[#ae0d13] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                  className={`px-6 py-3 bg-[${colors.primary}] text-white rounded-lg hover:bg-[${colors.primaryDark}] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm font-medium`}
                 >
                   {isLoading ? "..." : "Ask"}
                 </button>
               </div>
             </div>
           </form>
-          <div className="text-xs text-[#705a39]/70 mt-2">
+          <div className={`text-xs text-[${colors.secondary}]/70 mt-2`}>
             Ask questions about Japanese kana learning techniques and
             strategies.
           </div>

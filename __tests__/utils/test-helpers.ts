@@ -35,3 +35,64 @@ export const mockSession = (authenticated = true) => ({
   data: authenticated ? { user: { id: "user123", name: "Test User" } } : null,
   status: authenticated ? "authenticated" : "unauthenticated",
 });
+
+// Standardized mock factories for API tests
+export const createMockFactories = () => {
+  return {
+    // Auth mock factory
+    createAuthMock: () => {
+      const authMock = vi.fn();
+      return {
+        mock: authMock,
+        mockAuthenticated: (userId = "user123") => authMock.mockResolvedValue({ user: { id: userId } }),
+        mockUnauthenticated: () => authMock.mockResolvedValue(null),
+        mockInvalidSession: () => authMock.mockResolvedValue({ user: {} }),
+      };
+    },
+
+    // Prisma mock factory
+    createPrismaMock: () => {
+      const prismaMock = {
+        kana: {
+          findMany: vi.fn(),
+          findUnique: vi.fn(),
+          create: vi.fn(),
+          update: vi.fn(),
+          delete: vi.fn(),
+        },
+        kanaProgress: {
+          findMany: vi.fn(),
+          findUnique: vi.fn(),
+          create: vi.fn(),
+          update: vi.fn(),
+          upsert: vi.fn(),
+        },
+        $queryRaw: vi.fn(),
+      };
+      
+      return {
+        mock: prismaMock,
+        mockDatabaseSuccess: () => prismaMock.$queryRaw.mockResolvedValue([1]),
+        mockDatabaseError: (error = new Error("Database connection failed")) => 
+          prismaMock.$queryRaw.mockRejectedValue(error),
+        mockKanaData: (data = [mockKana.withStats]) => prismaMock.kana.findMany.mockResolvedValue(data),
+      };
+    },
+  };
+};
+
+// Common test setup helper
+export const setupApiTest = () => {
+  const { createAuthMock, createPrismaMock } = createMockFactories();
+  
+  return {
+    auth: createAuthMock(),
+    prisma: createPrismaMock(),
+    cleanup: () => {
+      vi.clearAllMocks();
+    },
+    reset: () => {
+      vi.restoreAllMocks();
+    },
+  };
+};

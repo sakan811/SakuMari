@@ -21,6 +21,8 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
 import { useState } from "react";
+import { LoadingContainer } from "./ui/LoadingSpinner";
+import { gradients, colors } from "@/lib/design-system";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -30,24 +32,22 @@ export default function HomePage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#fad182] via-[#f5c55a] to-[#fad182]">
+      <div className={`min-h-screen ${gradients.main}`}>
         <Header activeTab={activeTab} setActiveTab={setActiveTab} />
-        <div className="flex h-32 sm:h-64 items-center justify-center">
-          <div className="h-8 w-8 sm:h-12 sm:w-12 animate-spin rounded-full border-2 sm:border-4 border-[#d1622b] border-t-transparent"></div>
-        </div>
+        <LoadingContainer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#fad182] via-[#f5c55a] to-[#fad182]">
+    <div className={`min-h-screen ${gradients.main}`}>
       <Header activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
         <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-3 sm:mb-4 text-[#403933] drop-shadow-lg leading-tight">
+          <h1 className={`text-2xl sm:text-3xl lg:text-5xl font-bold mb-3 sm:mb-4 text-[${colors.secondaryDark}] drop-shadow-lg leading-tight`}>
             🌸 SakuMari 🌸
           </h1>
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-2 sm:mb-3 text-[#403933]">
+          <h2 className={`text-lg sm:text-xl lg:text-2xl font-semibold mb-2 sm:mb-3 text-[${colors.secondaryDark}]`}>
             Japanese Kana Flashcard App
           </h2>
           <p className="text-sm sm:text-lg lg:text-xl text-[#705a39] font-medium">
