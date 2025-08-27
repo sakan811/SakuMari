@@ -24,7 +24,7 @@ export type KanaData = {
   accuracy: number;
 };
 
-export type SortColumn = 
+export type SortColumn =
   | "character"
   | "romaji"
   | "attempts"

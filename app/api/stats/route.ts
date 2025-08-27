@@ -17,51 +17,45 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { handleAuth, withErrorHandling } from "@/lib/api-helpers";
 
-export async function GET() {
-  try {
-    const session = await auth();
+async function handleGetStats() {
+  const authResult = await handleAuth();
+  if (!("userId" in authResult)) {
+    return authResult;
+  }
+  const { userId } = authResult;
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Single query with joins to get all data at once for the authenticated user
-    const kanaWithProgress = await prisma.kana.findMany({
-      include: {
-        progress: {
-          where: {
-            user_id: session.user.id,
-          },
-          select: {
-            attempts: true,
-            correct_attempts: true,
-            accuracy: true,
-          },
+  // Single query with joins to get all data at once for the authenticated user
+  const kanaWithProgress = await prisma.kana.findMany({
+    include: {
+      progress: {
+        where: {
+          user_id: userId,
+        },
+        select: {
+          attempts: true,
+          correct_attempts: true,
+          accuracy: true,
         },
       },
-    });
+    },
+  });
 
-    // Transform the data
-    const result = kanaWithProgress.map((kana) => {
-      const progress = kana.progress[0]; // Should be 0 or 1 record for this user
-      return {
-        id: kana.id,
-        character: kana.character,
-        romaji: kana.romaji,
-        attempts: progress?.attempts || 0,
-        correct_attempts: progress?.correct_attempts || 0,
-        accuracy: progress?.accuracy || 0,
-      };
-    });
+  // Transform the data
+  const result = kanaWithProgress.map((kana) => {
+    const progress = kana.progress[0]; // Should be 0 or 1 record for this user
+    return {
+      id: kana.id,
+      character: kana.character,
+      romaji: kana.romaji,
+      attempts: progress?.attempts || 0,
+      correct_attempts: progress?.correct_attempts || 0,
+      accuracy: progress?.accuracy || 0,
+    };
+  });
 
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error("Error fetching stats:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json(result);
 }
+
+export const GET = withErrorHandling(handleGetStats, "fetching stats");

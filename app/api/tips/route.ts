@@ -16,9 +16,13 @@
  */
 
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { utils } from "@/lib/design-system";
+import {
+  handleAuth,
+  createErrorResponse,
+  parseRequestBody,
+} from "@/lib/api-helpers";
 
 interface ConversationMessage {
   role: string;
@@ -37,85 +41,83 @@ async function createGeminiClient() {
   return new GoogleGenerativeAI(apiKey);
 }
 
-export async function POST(request: Request) {
-  try {
-    const session = await auth();
+async function handleGenerateTips(request: Request) {
+  const authResult = await handleAuth();
+  if (!("userId" in authResult)) {
+    return authResult;
+  }
+  const { userId } = authResult;
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const requestBody = await parseRequestBody(request);
+  const { userQuery, conversationHistory = [] } = requestBody;
 
-    const { userQuery, conversationHistory = [] } = await request.json();
+  if (
+    !userQuery ||
+    typeof userQuery !== "string" ||
+    userQuery.trim().length === 0
+  ) {
+    return createErrorResponse(
+      "Please provide a question about Japanese kana learning",
+      400,
+    );
+  }
 
-    if (
-      !userQuery ||
-      typeof userQuery !== "string" ||
-      userQuery.trim().length === 0
-    ) {
-      return NextResponse.json(
-        { error: "Please provide a question about Japanese kana learning" },
-        { status: 400 },
-      );
-    }
+  // Rate limiting check - simple in-memory approach
+  const maxLength = 500;
+  if (userQuery.length > maxLength) {
+    return createErrorResponse(
+      `Question too long. Please keep it under ${maxLength} characters.`,
+      400,
+    );
+  }
 
-    // Rate limiting check - simple in-memory approach
-    const maxLength = 500;
-    if (userQuery.length > maxLength) {
-      return NextResponse.json(
-        {
-          error: `Question too long. Please keep it under ${maxLength} characters.`,
-        },
-        { status: 400 },
-      );
-    }
+  // Fetch user's kana progress data
+  const userProgress = await prisma.kanaProgress.findMany({
+    where: {
+      user_id: userId,
+    },
+    include: {
+      kana: true,
+    },
+    orderBy: {
+      accuracy: "asc", // Show struggling characters first
+    },
+  });
 
-    // Fetch user's kana progress data
-    const userProgress = await prisma.kanaProgress.findMany({
-      where: {
-        user_id: session.user.id,
-      },
-      include: {
-        kana: true,
-      },
-      orderBy: {
-        accuracy: "asc", // Show struggling characters first
-      },
-    });
+  // Prepare user progress context
+  const strugglingKana = userProgress
+    .filter((p) => p.attempts > 0 && p.accuracy < 0.7)
+    .map(
+      (p) =>
+        `${p.kana.character} (${p.kana.romaji}): ${utils.formatAccuracySimple(p.accuracy)} accuracy, ${p.attempts} attempts`,
+    )
+    .slice(0, 10);
 
-    // Prepare user progress context
-    const strugglingKana = userProgress
-      .filter((p) => p.attempts > 0 && p.accuracy < 0.7)
-      .map(
-        (p) =>
-          `${p.kana.character} (${p.kana.romaji}): ${utils.formatAccuracySimple(p.accuracy)} accuracy, ${p.attempts} attempts`,
-      )
-      .slice(0, 10);
+  const masteredKana = userProgress
+    .filter((p) => p.attempts > 5 && p.accuracy >= 0.9)
+    .map(
+      (p) =>
+        `${p.kana.character} (${p.kana.romaji}): ${utils.formatAccuracySimple(p.accuracy)} accuracy`,
+    )
+    .slice(0, 5);
 
-    const masteredKana = userProgress
-      .filter((p) => p.attempts > 5 && p.accuracy >= 0.9)
-      .map(
-        (p) =>
-          `${p.kana.character} (${p.kana.romaji}): ${utils.formatAccuracySimple(p.accuracy)} accuracy`,
-      )
-      .slice(0, 5);
-
-    const progressContext = `
+  const progressContext = `
 User Progress Context:
 ${strugglingKana.length > 0 ? `Characters needing help: ${strugglingKana.join(", ")}` : "No struggling characters identified."}
 ${masteredKana.length > 0 ? `Well-mastered characters: ${masteredKana.join(", ")}` : "No mastered characters yet."}
 Total practice attempts: ${userProgress.reduce((sum, p) => sum + p.attempts, 0)}
 `;
 
-    // Format conversation history for context
-    const conversationContext =
-      conversationHistory.length > 0
-        ? `\n\nPrevious conversation:\n${conversationHistory.map((msg: ConversationMessage) => `${msg.role}: ${msg.content}`).join("\n")}`
-        : "";
+  // Format conversation history for context
+  const conversationContext =
+    conversationHistory.length > 0
+      ? `\n\nPrevious conversation:\n${conversationHistory.map((msg: ConversationMessage) => `${msg.role}: ${msg.content}`).join("\n")}`
+      : "";
 
-    const genAI = await createGeminiClient();
-    const model = genAI.getGenerativeModel({ model: process.env.MODEL_NAME });
+  const genAI = await createGeminiClient();
+  const model = genAI.getGenerativeModel({ model: process.env.MODEL_NAME });
 
-    const systemPrompt = `You are a helpful Japanese language learning assistant specializing in Hiragana and Katakana (kana). 
+  const systemPrompt = `You are a helpful Japanese language learning assistant specializing in Hiragana and Katakana (kana). 
 
 Your role is to provide personalized, practical learning tips and advice about Japanese kana based on the user's progress data. Keep your responses focused ONLY on:
 - Learning techniques for memorizing kana characters
@@ -133,37 +135,43 @@ Keep responses concise (under 300 words), friendly, and educational. Use the use
 
 User question: ${userQuery}`;
 
-    const result = await model.generateContent(systemPrompt);
-    const response = result.response;
-    const text = response.text();
+  const result = await model.generateContent(systemPrompt);
+  const response = result.response;
+  const text = response.text();
 
-    if (!text || text.trim().length === 0) {
-      return NextResponse.json(
-        {
-          error:
-            "Unable to generate learning tips at this time. Please try again.",
-        },
-        { status: 500 },
-      );
-    }
-
-    return NextResponse.json({
-      tip: text.trim(),
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error("Error generating kana learning tips:", error);
-
-    if (error instanceof Error && error.message.includes("GEMINI_API_KEY")) {
-      return NextResponse.json(
-        { error: "AI service not configured. Please contact support." },
-        { status: 503 },
-      );
-    }
-
-    return NextResponse.json(
-      { error: "Unable to generate learning tips. Please try again later." },
-      { status: 500 },
+  if (!text || text.trim().length === 0) {
+    return createErrorResponse(
+      "Unable to generate learning tips at this time. Please try again.",
+      500,
     );
+  }
+
+  return NextResponse.json({
+    tip: text.trim(),
+    timestamp: new Date().toISOString(),
+  });
+}
+
+function handleTipsError(error: unknown): NextResponse {
+  console.error("Error generating kana learning tips:", error);
+
+  if (error instanceof Error && error.message.includes("GEMINI_API_KEY")) {
+    return createErrorResponse(
+      "AI service not configured. Please contact support.",
+      503,
+    );
+  }
+
+  return createErrorResponse(
+    "Unable to generate learning tips. Please try again later.",
+    500,
+  );
+}
+
+export async function POST(request: Request): Promise<NextResponse> {
+  try {
+    return await handleGenerateTips(request);
+  } catch (error) {
+    return handleTipsError(error);
   }
 }

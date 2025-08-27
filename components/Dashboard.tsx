@@ -37,7 +37,6 @@ import {
 import type { KanaData, SortColumn, KanaFilter } from "@/types/kana";
 import { isKanaType } from "@/lib/kana-utils";
 
-
 export default function Dashboard() {
   const [stats, setStats] = useState<KanaData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +45,6 @@ export default function Dashboard() {
   const [sortColumn, setSortColumn] = useState<SortColumn>("accuracy");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
-
 
   const fetchStats = async () => {
     try {
@@ -83,7 +81,6 @@ export default function Dashboard() {
     }
   };
 
-
   const filteredStats = stats
     .filter((kana) => isKanaType(kana.character, filter))
     .sort((a, b) => {
@@ -117,7 +114,12 @@ export default function Dashboard() {
   return (
     <div className={utils.cn(gradients.main, "min-h-screen")}>
       <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 px-4 pt-4">
-        <h1 className={utils.cn("text-2xl sm:text-3xl font-bold drop-shadow-sm", textStyles.heading.primary)}>
+        <h1
+          className={utils.cn(
+            "text-2xl sm:text-3xl font-bold drop-shadow-sm",
+            textStyles.heading.primary,
+          )}
+        >
           Dashboard
         </h1>
         <div className="flex gap-2 sm:gap-3">
@@ -127,25 +129,31 @@ export default function Dashboard() {
           >
             💡 Tips
           </button>
-          <Link
-            href="/"
-            className={createButtonClass("primary")}
-          >
+          <Link href="/" className={createButtonClass("primary")}>
             Back to Home
           </Link>
         </div>
       </div>
 
       {error ? (
-        <div className={utils.cn(cardStyles.base, cardStyles.padding, "mb-4 sm:mb-6 mx-4", `bg-[${colors.error[100]}] border-2 border-[${colors.error[300]}]`)}>
-          <p className={utils.cn("text-center font-medium text-sm sm:text-base", `text-[${colors.error[800]}]`)}>
+        <div
+          className={utils.cn(
+            cardStyles.base,
+            cardStyles.padding,
+            "mb-4 sm:mb-6 mx-4",
+            `bg-[${colors.error[100]}] border-2 border-[${colors.error[300]}]`,
+          )}
+        >
+          <p
+            className={utils.cn(
+              "text-center font-medium text-sm sm:text-base",
+              `text-[${colors.error[800]}]`,
+            )}
+          >
             {error}
           </p>
           <div className="text-center mt-3 sm:mt-4">
-            <button
-              onClick={fetchStats}
-              className={createButtonClass("error")}
-            >
+            <button onClick={fetchStats} className={createButtonClass("error")}>
               Try Again
             </button>
           </div>
@@ -153,8 +161,20 @@ export default function Dashboard() {
       ) : (
         <>
           {/* Stats Cards */}
-          <div className={utils.cn(cardStyles.base, cardStyles.background, cardStyles.padding, "mb-4 sm:mb-6 mx-4")}>
-            <h2 className={utils.cn("mb-3 sm:mb-4 text-lg sm:text-xl font-semibold", textStyles.heading.primary)}>
+          <div
+            className={utils.cn(
+              cardStyles.base,
+              cardStyles.background,
+              cardStyles.padding,
+              "mb-4 sm:mb-6 mx-4",
+            )}
+          >
+            <h2
+              className={utils.cn(
+                "mb-3 sm:mb-4 text-lg sm:text-xl font-semibold",
+                textStyles.heading.primary,
+              )}
+            >
               Your Progress
             </h2>
             <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-3">
@@ -165,7 +185,11 @@ export default function Dashboard() {
               />
               <StatsCard
                 title="Average Accuracy"
-                value={practicedStats.length > 0 ? utils.formatAccuracy(averageAccuracy) : "0%"}
+                value={
+                  practicedStats.length > 0
+                    ? utils.formatAccuracy(averageAccuracy)
+                    : "0%"
+                }
                 colorScheme="success"
               />
               <StatsCard
@@ -177,9 +201,21 @@ export default function Dashboard() {
           </div>
 
           {/* Character Progress Table */}
-          <div className={utils.cn(cardStyles.base, cardStyles.background, cardStyles.padding, "mx-4")}>
+          <div
+            className={utils.cn(
+              cardStyles.base,
+              cardStyles.background,
+              cardStyles.padding,
+              "mx-4",
+            )}
+          >
             <div className="mb-3 sm:mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-              <h2 className={utils.cn("text-lg sm:text-xl font-semibold", textStyles.heading.primary)}>
+              <h2
+                className={utils.cn(
+                  "text-lg sm:text-xl font-semibold",
+                  textStyles.heading.primary,
+                )}
+              >
                 Character Progress
               </h2>
               <div className="flex flex-wrap gap-1 sm:gap-2">
@@ -209,10 +245,20 @@ export default function Dashboard() {
 
             {filteredStats.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
-                <p className={utils.cn("text-base sm:text-lg mb-3 sm:mb-4", textStyles.body)}>
+                <p
+                  className={utils.cn(
+                    "text-base sm:text-lg mb-3 sm:mb-4",
+                    textStyles.body,
+                  )}
+                >
                   No character data available yet.
                 </p>
-                <p className={utils.cn("mb-4 sm:mb-6 text-sm sm:text-base", textStyles.body)}>
+                <p
+                  className={utils.cn(
+                    "mb-4 sm:mb-6 text-sm sm:text-base",
+                    textStyles.body,
+                  )}
+                >
                   Start practicing to see your progress here!
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
@@ -235,7 +281,9 @@ export default function Dashboard() {
                 <div className="inline-block min-w-full align-middle">
                   <table className="w-full table-auto min-w-[400px]">
                     <thead>
-                      <tr className={`border-b-2 border-[${colors.secondary}] text-left`}>
+                      <tr
+                        className={`border-b-2 border-[${colors.secondary}] text-left`}
+                      >
                         <SortableTableHeader
                           column="character"
                           label="Character"

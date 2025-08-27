@@ -25,18 +25,26 @@ export const UNICODE_RANGES = {
 export const isKanaType = (char: string, type: KanaFilter): boolean => {
   if (type === "all") return true;
   const code = char.charCodeAt(0);
-  
+
   return type === "hiragana"
-    ? code >= UNICODE_RANGES.HIRAGANA.start && code <= UNICODE_RANGES.HIRAGANA.end
-    : code >= UNICODE_RANGES.KATAKANA.start && code <= UNICODE_RANGES.KATAKANA.end;
+    ? code >= UNICODE_RANGES.HIRAGANA.start &&
+        code <= UNICODE_RANGES.HIRAGANA.end
+    : code >= UNICODE_RANGES.KATAKANA.start &&
+        code <= UNICODE_RANGES.KATAKANA.end;
 };
 
 export const getKanaType = (char: string): KanaFilter => {
   const code = char.charCodeAt(0);
-  if (code >= UNICODE_RANGES.HIRAGANA.start && code <= UNICODE_RANGES.HIRAGANA.end) {
+  if (
+    code >= UNICODE_RANGES.HIRAGANA.start &&
+    code <= UNICODE_RANGES.HIRAGANA.end
+  ) {
     return "hiragana";
   }
-  if (code >= UNICODE_RANGES.KATAKANA.start && code <= UNICODE_RANGES.KATAKANA.end) {
+  if (
+    code >= UNICODE_RANGES.KATAKANA.start &&
+    code <= UNICODE_RANGES.KATAKANA.end
+  ) {
     return "katakana";
   }
   return "all";
@@ -48,7 +56,7 @@ export const kanaConstants = {
     hiragana: "hiragana" as const,
     katakana: "katakana" as const,
   },
-  
+
   sortColumns: {
     character: "character" as const,
     romaji: "romaji" as const,

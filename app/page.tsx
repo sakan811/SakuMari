@@ -15,41 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  description:
-    "Master Japanese Hiragana and Katakana with interactive flashcards. Free educational app to learn Japanese characters with progress tracking.",
-  keywords: [
-    "Japanese learning",
-    "Hiragana",
-    "Katakana",
-    "flashcards",
-    "Japanese alphabet",
-    "kana practice",
-    "learn Japanese free",
-  ],
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://sakumari.fukudev.org",
-    title: "SakuMari - Master Japanese Kana",
-    description:
-      "Master Japanese Hiragana and Katakana with interactive flashcards. Free educational app to learn Japanese characters.",
-    siteName: "SakuMari",
-  },
-  twitter: {
-    card: "summary_large_image",
-    description:
-      "Master Japanese Hiragana and Katakana with interactive flashcards. Free educational app to learn Japanese characters.",
-  },
-};
-
-// Move the HomePage component content directly here
 import HomePage from "@/components/HomePage";
+import { createPresetMetadata } from "@/lib/metadata";
+
+export const metadata = createPresetMetadata("home");
 
 export default function Home() {
   return <HomePage />;

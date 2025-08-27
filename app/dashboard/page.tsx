@@ -15,21 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Metadata } from "next";
 import Dashboard from "@/components/Dashboard";
+import { createPresetMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
-  title: "Dashboard - Your Progress",
-  description:
-    "Track your Japanese Kana learning progress. View your statistics, accuracy, and performance metrics.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-  alternates: {
-    canonical: "/dashboard",
-  },
-};
+export const metadata = createPresetMetadata("dashboard");
 
 export default function DashboardPage() {
   return <Dashboard />;

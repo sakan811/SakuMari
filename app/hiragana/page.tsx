@@ -15,37 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Metadata } from "next";
-import FlashcardApp from "@/components/FlashcardApp";
+import {
+  createPracticePage,
+  getPracticePageMetadata,
+} from "@/lib/page-templates";
 
-export const metadata: Metadata = {
-  title: "Hiragana Practice | SakuMari",
-  description:
-    "Practice Japanese Hiragana characters with interactive flashcards. Master all 46 basic Hiragana symbols and improve your reading skills.",
-  keywords: [
-    "Hiragana",
-    "Japanese characters",
-    "flashcards",
-    "practice",
-    "learning",
-    "あいうえお",
-  ],
-  alternates: {
-    canonical: "/hiragana",
-  },
-  openGraph: {
-    title: "Hiragana Practice | SakuMari",
-    description:
-      "Practice Japanese Hiragana characters with interactive flashcards. Master all 46 basic Hiragana symbols.",
-    url: "/hiragana",
-  },
-  twitter: {
-    title: "Hiragana Practice | SakuMari",
-    description:
-      "Practice Japanese Hiragana characters with interactive flashcards. Master all 46 basic Hiragana symbols.",
-  },
-};
-
-export default function HiraganaPage() {
-  return <FlashcardApp kanaType="hiragana" />;
-}
+export const metadata = getPracticePageMetadata("hiragana");
+export default createPracticePage("hiragana");

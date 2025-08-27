@@ -148,7 +148,7 @@ export const utils = {
     return utils.cn(
       sizeClasses[size],
       "animate-spin rounded-full border-2 sm:border-4",
-      `border-[${colors.primary}] border-t-transparent`
+      `border-[${colors.primary}] border-t-transparent`,
     );
   },
 } as const;
@@ -178,4 +178,3 @@ export const createFilterButtonClass = (
       : buttonStyles.variants.filter.inactive,
   );
 };
-

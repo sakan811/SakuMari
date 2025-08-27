@@ -23,7 +23,6 @@ import {
 } from "../../lib/design-system";
 import type { SortColumn, KanaFilter } from "@/types/kana";
 
-
 interface SortableTableHeaderProps {
   column: SortColumn;
   label: string;

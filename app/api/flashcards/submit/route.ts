@@ -17,70 +17,57 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import {
+  handleAuth,
+  withErrorHandling,
+  parseRequestBody,
+  validateRequiredFields,
+  validateFieldTypes,
+} from "@/lib/api-helpers";
 
-export async function POST(request: NextRequest) {
-  try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const requestBody = await request.json().catch(() => {
-      throw new Error("Invalid JSON");
-    });
-
-    const { kanaId, isCorrect } = requestBody;
-
-    // Validate required fields and types
-    if (!kanaId) {
-      return NextResponse.json(
-        { error: "kanaId is required" },
-        { status: 400 },
-      );
-    }
-    if (typeof isCorrect !== "boolean") {
-      return NextResponse.json(
-        { error: "isCorrect must be a boolean" },
-        { status: 400 },
-      );
-    }
-
-    // Simple progress tracking - find or create KanaProgress record
-    const kanaProgress = await prisma.kanaProgress.upsert({
-      where: {
-        kana_id_user_id: {
-          kana_id: kanaId,
-          user_id: session.user.id,
-        },
-      },
-      update: {
-        attempts: { increment: 1 },
-        correct_attempts: isCorrect ? { increment: 1 } : undefined,
-      },
-      create: {
-        kana_id: kanaId,
-        user_id: session.user.id,
-        attempts: 1,
-        correct_attempts: isCorrect ? 1 : 0,
-      },
-    });
-
-    // Calculate and update accuracy
-    const accuracy = kanaProgress.correct_attempts / kanaProgress.attempts;
-
-    await prisma.kanaProgress.update({
-      where: { id: kanaProgress.id },
-      data: { accuracy },
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Error submitting answer:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+async function handleSubmitAnswer(request: NextRequest) {
+  const authResult = await handleAuth();
+  if (!("userId" in authResult)) {
+    return authResult;
   }
+  const { userId } = authResult;
+
+  const requestBody = await parseRequestBody(request);
+  const { kanaId, isCorrect } = requestBody;
+
+  // Validate required fields and types
+  validateRequiredFields(requestBody, ["kanaId"]);
+  validateFieldTypes(requestBody, { isCorrect: "boolean" });
+
+  // Simple progress tracking - find or create KanaProgress record
+  const kanaProgress = await prisma.kanaProgress.upsert({
+    where: {
+      kana_id_user_id: {
+        kana_id: kanaId,
+        user_id: userId,
+      },
+    },
+    update: {
+      attempts: { increment: 1 },
+      correct_attempts: isCorrect ? { increment: 1 } : undefined,
+    },
+    create: {
+      kana_id: kanaId,
+      user_id: userId,
+      attempts: 1,
+      correct_attempts: isCorrect ? 1 : 0,
+    },
+  });
+
+  // Calculate and update accuracy
+  const accuracy = kanaProgress.correct_attempts / kanaProgress.attempts;
+
+  await prisma.kanaProgress.update({
+    where: { id: kanaProgress.id },
+    data: { accuracy },
+  });
+
+  return NextResponse.json({ success: true });
 }
+
+export const POST = withErrorHandling(handleSubmitAnswer, "submitting answer");
