@@ -17,7 +17,7 @@
 
 "use client";
 
-type InteractionMode = "typing" | "multiple-choice";
+import { InteractionMode } from "@/types/kana";
 
 interface ModeSelectorProps {
   currentMode: InteractionMode;

@@ -45,21 +45,3 @@ export function getPracticePageMetadata(kanaType: KanaType) {
   return createPresetMetadata(kanaType);
 }
 
-/**
- * Creates a simple wrapper page component
- * @param Component - The component to wrap
- * @param displayName - Display name for the wrapper component
- * @returns Wrapper component
- */
-export function createPageWrapper<T = {}>(
-  Component: React.ComponentType<T>,
-  displayName: string,
-) {
-  const WrapperComponent = function PageWrapper(props: T) {
-    return <Component {...props} />;
-  };
-
-  WrapperComponent.displayName = displayName;
-
-  return WrapperComponent;
-}
