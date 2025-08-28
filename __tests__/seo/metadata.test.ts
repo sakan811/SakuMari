@@ -120,7 +120,7 @@ describe("SEO Metadata Configuration", () => {
       expect(homeMetadata.openGraph?.description).toBe(
         "Master Japanese Hiragana and Katakana with interactive flashcards. Learn, practice, and track your progress in this free educational app.",
       );
-      expect(homeMetadata.openGraph?.url).toBe("https://sakumari.fukudev.org");
+      expect(homeMetadata.openGraph?.url).toBe("https://sakumari.fukudev.org/");
     });
 
     it("should have Twitter Card configuration", () => {

@@ -73,7 +73,7 @@ global.fetch = mockFetch;
 global.mockFetch = mockFetch;
 
 // Set global flag for React testing environment
-global.IS_REACT_ACT_ENVIRONMENT = true;
+
 
 // Global hooks
 beforeEach(() => {

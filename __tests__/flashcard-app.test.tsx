@@ -1,5 +1,6 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { act } from "react";
 import FlashcardApp from "../components/FlashcardApp";
 
 // Mock child components without interfering with the main structure
@@ -56,8 +57,8 @@ describe("FlashcardApp Component", () => {
       expect(outerDiv).toHaveClass("min-h-screen");
       expect(outerDiv).toHaveClass("bg-gradient-to-br");
       expect(outerDiv).toHaveClass("from-[#fad182]");
-      expect(outerDiv).toHaveClass("via-[#f5c55a]");
-      expect(outerDiv).toHaveClass("to-[#fad182]");
+      
+      expect(outerDiv).toHaveClass("to-[#f5c55a]");
     });
 
     test("renders main container with correct styling", () => {

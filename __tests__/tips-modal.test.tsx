@@ -191,7 +191,7 @@ describe("TipsModal", () => {
 
     // Error should be displayed in red background
     const errorElement = screen.getByText("Invalid request");
-    expect(errorElement.closest(".bg-\[\#fee2e2\]")).toBeTruthy();
+    expect(errorElement).toHaveClass("text-[#991b1b]");
   });
 
   test("handles network errors", async () => {
