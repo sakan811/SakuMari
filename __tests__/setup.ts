@@ -55,7 +55,17 @@ Object.defineProperty(window, "matchMedia", {
 Element.prototype.scrollIntoView = () => {};
 
 // Global fetch mock for all tests that need it
-const mockFetch = vi.fn();
+const mockFetch = vi.fn((url) => {
+  if (url === "/api/auth/providers") {
+    return Promise.resolve({
+      json: () => Promise.resolve({ credentialsEnabled: true }),
+    });
+  }
+  // Default for other fetches if any
+  return Promise.resolve({
+    json: () => Promise.resolve({}),
+  });
+});
 global.fetch = mockFetch;
 
 // Make mockFetch available globally for individual test files

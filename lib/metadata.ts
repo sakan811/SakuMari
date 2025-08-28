@@ -60,7 +60,8 @@ export function createMetadata({
   noIndex = false,
 }: MetadataConfig): Metadata {
   const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
-  const canonicalUrl = `${DEFAULT_CONFIG.baseUrl}${path}`;
+  const baseUrl = path === "/" ? DEFAULT_CONFIG.baseUrl.replace(/\/$/, "") : DEFAULT_CONFIG.baseUrl;
+  const canonicalUrl = `${baseUrl}${path}`;
   const combinedKeywords = [...DEFAULT_CONFIG.defaultKeywords, ...keywords];
 
   return {
