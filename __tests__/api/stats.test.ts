@@ -1,6 +1,5 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { GET } from "../../app/api/stats/route";
-import { setupApiTest } from "../utils/test-helpers";
 
 // Use direct function declaration pattern that works reliably with vitest
 vi.mock("@/lib/auth", () => ({
@@ -112,6 +111,19 @@ describe("Stats API Route", async () => {
       vi.mocked(prisma.kana.findMany).mockRejectedValue(
         new Error("Database connection lost"),
       );
+
+      const response = await GET();
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.error).toBe("Internal server error");
+    });
+
+    test("handles Prisma query timeout errors", async () => {
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      const timeoutError = new Error("Query timeout");
+      timeoutError.name = "PrismaClientKnownRequestError";
+      vi.mocked(prisma.kana.findMany).mockRejectedValue(timeoutError);
 
       const response = await GET();
       const data = await response.json();

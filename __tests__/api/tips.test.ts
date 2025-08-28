@@ -17,7 +17,6 @@
 
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { POST } from "../../app/api/tips/route";
-import { setupApiTest } from "../utils/test-helpers";
 
 // Use direct function declaration pattern that works reliably with vitest
 vi.mock("@/lib/auth", () => ({

@@ -1,30 +1,40 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { GET } from "@/app/api/stats/route";
 import { POST } from "@/app/api/flashcards/submit/route";
 import { NextRequest } from "next/server";
-import { setupApiTest } from "../utils/test-helpers";
 
-// Use vi.hoisted to declare mocks that can be used in vi.mock
-const { mockAuth, mockPrisma } = vi.hoisted(() => ({
-  mockAuth: vi.fn(),
-  mockPrisma: {
-    kana: { findMany: vi.fn() },
-    kanaProgress: { upsert: vi.fn(), update: vi.fn() },
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn(),
+}));
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    kana: {
+      findMany: vi.fn(),
+    },
+    kanaProgress: {
+      upsert: vi.fn(),
+      update: vi.fn(),
+    },
   },
 }));
 
-// Mock auth and prisma at top level
-vi.mock("@/lib/auth", () => ({ auth: mockAuth }));
-vi.mock("@/lib/prisma", () => ({ prisma: mockPrisma }));
+describe("API Authentication", async () => {
+  // Import the mocked functions after mocking
+  const { auth } = await import("@/lib/auth");
+  const { prisma } = await import("@/lib/prisma");
 
-describe("API Authentication", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   describe("GET /api/stats", () => {
     test("returns 401 for unauthenticated requests", async () => {
-      mockAuth.mockResolvedValue(null);
+      vi.mocked(auth).mockResolvedValue(null);
 
       const response = await GET();
       expect(response.status).toBe(401);
@@ -34,15 +44,15 @@ describe("API Authentication", () => {
     });
 
     test("returns 401 for session without user ID", async () => {
-      mockAuth.mockResolvedValue({ user: {} });
+      vi.mocked(auth).mockResolvedValue({ user: {} });
 
       const response = await GET();
       expect(response.status).toBe(401);
     });
 
     test("succeeds with valid session", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
-      mockPrisma.kana.findMany.mockResolvedValue([]);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(prisma.kana.findMany).mockResolvedValue([]);
 
       const response = await GET();
       expect(response.status).toBe(200);
@@ -51,7 +61,7 @@ describe("API Authentication", () => {
 
   describe("POST /api/flashcards/submit", () => {
     test("requires authentication for submissions", async () => {
-      mockAuth.mockResolvedValue(null);
+      vi.mocked(auth).mockResolvedValue(null);
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",
@@ -66,8 +76,8 @@ describe("API Authentication", () => {
     });
 
     test("processes submissions for authenticated users", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
-      mockPrisma.kanaProgress.upsert.mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(prisma.kanaProgress.upsert).mockResolvedValue({
         id: "1",
         attempts: 1,
         correct_attempts: 1,
