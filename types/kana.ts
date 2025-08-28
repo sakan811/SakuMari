@@ -32,3 +32,5 @@ export type SortColumn =
   | "accuracy";
 
 export type KanaFilter = "all" | "hiragana" | "katakana";
+
+export type InteractionMode = "typing" | "multiple-choice";

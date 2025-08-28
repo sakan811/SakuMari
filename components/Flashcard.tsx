@@ -22,8 +22,7 @@ import { useFlashcard } from "./FlashcardProvider";
 import ModeSelector from "./ModeSelector";
 import MultipleChoice from "./MultipleChoice";
 import { LoadingContainer } from "./ui/LoadingSpinner";
-
-type InteractionMode = "typing" | "multiple-choice";
+import { InteractionMode } from "@/types/kana";
 
 export default function Flashcard() {
   const {

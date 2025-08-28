@@ -25,6 +25,7 @@ import React, {
   useRef,
 } from "react";
 import { isKanaType } from "@/lib/kana-utils";
+import { InteractionMode } from "@/types/kana";
 
 type KanaWithAccuracy = {
   id: string;
@@ -34,8 +35,6 @@ type KanaWithAccuracy = {
   attempts: number;
   correct_attempts: number;
 };
-
-type InteractionMode = "typing" | "multiple-choice";
 
 type FlashcardContextType = {
   currentKana: KanaWithAccuracy | null;
