@@ -11,9 +11,6 @@ describe("ModeSelector Component", () => {
     disabled: false,
   };
 
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
 
   describe("Rendering", () => {
     test("renders both mode buttons", () => {

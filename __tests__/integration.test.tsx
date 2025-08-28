@@ -3,8 +3,8 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import FlashcardApp from "../components/FlashcardApp";
 import { mockKana, mockSession } from "./utils/test-helpers";
 
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+// Use the global mockFetch from setup
+const mockFetch = global.mockFetch;
 
 vi.mock("next-auth/react", () => ({
   useSession: () => mockSession(),
@@ -12,9 +12,6 @@ vi.mock("next-auth/react", () => ({
 }));
 
 describe("Integration Tests", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
 
   test("complete practice workflow", async () => {
     // Mock the initial flashcards fetch

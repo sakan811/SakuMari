@@ -1,33 +1,15 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import { POST } from "../../app/api/flashcards/submit/route";
 import { NextRequest } from "next/server";
 import { setupApiTest } from "../utils/test-helpers";
 
-vi.mock("@/lib/auth", () => ({
-  auth: vi.fn(),
-}));
-
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    kanaProgress: {
-      upsert: vi.fn(),
-      update: vi.fn(),
-    },
-  },
-}));
+// Set up API test mocks
+setupApiTest();
 
 describe("Flashcards API", async () => {
-  // Import the mocked functions after mocking
+  // Import the mocked functions after mocking  
   const { auth } = await import("@/lib/auth");
   const { prisma } = await import("@/lib/prisma");
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
 
   describe("POST /api/flashcards/submit", () => {
     test("creates progress record", async () => {

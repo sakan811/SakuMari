@@ -5,14 +5,11 @@ import {
   useFlashcard,
 } from "../components/FlashcardProvider";
 
-// Mock fetch for API calls
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+// Use global mock fetch
+const mockFetch = global.mockFetch;
 
 describe("FlashcardProvider", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-
     // Mock successful API response
     mockFetch.mockResolvedValue({
       ok: true,

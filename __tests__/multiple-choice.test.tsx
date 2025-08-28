@@ -14,9 +14,6 @@ describe("MultipleChoice Component", () => {
     error: undefined,
   };
 
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
 
   describe("Rendering", () => {
     test("renders all choices as buttons", () => {

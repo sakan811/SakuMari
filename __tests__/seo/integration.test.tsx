@@ -49,7 +49,6 @@ vi.mock("next/link", () => ({
 
 describe("SEO Integration Tests", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
     mockUseSession.mockReturnValue({
       data: {
         user: {

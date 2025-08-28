@@ -16,27 +16,13 @@ vi.mock("../components/Flashcard", () => ({
 }));
 
 vi.mock("../components/Header", () => ({
-  default: ({
-    activeTab,
-    setActiveTab,
-  }: {
-    activeTab: string;
-    setActiveTab: (tab: string) => void;
-  }) => (
+  default: () => (
     <div data-testid="header-component">
-      <span data-testid="active-tab">{activeTab}</span>
-      <button
-        data-testid="set-dashboard"
-        onClick={() => setActiveTab("dashboard")}
-      >
-        Dashboard
-      </button>
-      <button
-        data-testid="set-flashcards"
-        onClick={() => setActiveTab("flashcards")}
-      >
-        Flashcards
-      </button>
+      <nav>
+        <button data-testid="nav-hiragana">Hiragana</button>
+        <button data-testid="nav-katakana">Katakana</button>
+        <button data-testid="nav-dashboard">Dashboard</button>
+      </nav>
     </div>
   ),
 }));
@@ -48,9 +34,6 @@ vi.mock("../components/Dashboard", () => ({
 }));
 
 describe("FlashcardApp Component", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
 
   describe("Rendering", () => {
     test("renders with default tab (flashcards)", () => {
@@ -117,66 +100,10 @@ describe("FlashcardApp Component", () => {
     test("starts with flashcards tab active", () => {
       render(<FlashcardApp />);
 
-      expect(screen.getByTestId("active-tab")).toHaveTextContent("flashcards");
       expect(screen.getByTestId("flashcard-component")).toBeInTheDocument();
       expect(
         screen.queryByTestId("dashboard-component"),
       ).not.toBeInTheDocument();
-    });
-
-    test("switches to dashboard tab when clicked", () => {
-      render(<FlashcardApp />);
-
-      const dashboardButton = screen.getByTestId("set-dashboard");
-      fireEvent.click(dashboardButton);
-
-      expect(screen.getByTestId("active-tab")).toHaveTextContent("dashboard");
-      expect(screen.getByTestId("dashboard-component")).toBeInTheDocument();
-      expect(
-        screen.queryByTestId("flashcard-component"),
-      ).not.toBeInTheDocument();
-    });
-
-    test("switches back to flashcards tab", () => {
-      render(<FlashcardApp />);
-
-      // Switch to dashboard first
-      const dashboardButton = screen.getByTestId("set-dashboard");
-      fireEvent.click(dashboardButton);
-
-      expect(screen.getByTestId("dashboard-component")).toBeInTheDocument();
-
-      // Switch back to flashcards
-      const flashcardsButton = screen.getByTestId("set-flashcards");
-      fireEvent.click(flashcardsButton);
-
-      expect(screen.getByTestId("active-tab")).toHaveTextContent("flashcards");
-      expect(screen.getByTestId("flashcard-component")).toBeInTheDocument();
-      expect(
-        screen.queryByTestId("dashboard-component"),
-      ).not.toBeInTheDocument();
-    });
-
-    test("maintains tab state correctly during multiple switches", () => {
-      render(<FlashcardApp />);
-
-      const dashboardButton = screen.getByTestId("set-dashboard");
-      const flashcardsButton = screen.getByTestId("set-flashcards");
-
-      // Start with flashcards
-      expect(screen.getByTestId("active-tab")).toHaveTextContent("flashcards");
-
-      // Switch to dashboard
-      fireEvent.click(dashboardButton);
-      expect(screen.getByTestId("active-tab")).toHaveTextContent("dashboard");
-
-      // Switch back to flashcards
-      fireEvent.click(flashcardsButton);
-      expect(screen.getByTestId("active-tab")).toHaveTextContent("flashcards");
-
-      // Switch to dashboard again
-      fireEvent.click(dashboardButton);
-      expect(screen.getByTestId("active-tab")).toHaveTextContent("dashboard");
     });
   });
 
@@ -191,19 +118,6 @@ describe("FlashcardApp Component", () => {
       expect(provider).toBeInTheDocument();
       expect(header).toBeInTheDocument();
       expect(flashcard).toBeInTheDocument();
-    });
-
-    test("passes activeTab and setActiveTab to Header", () => {
-      render(<FlashcardApp />);
-
-      // Initially should be flashcards
-      expect(screen.getByTestId("active-tab")).toHaveTextContent("flashcards");
-
-      // Should be able to change via header buttons
-      const dashboardButton = screen.getByTestId("set-dashboard");
-      fireEvent.click(dashboardButton);
-
-      expect(screen.getByTestId("active-tab")).toHaveTextContent("dashboard");
     });
   });
 
@@ -224,40 +138,11 @@ describe("FlashcardApp Component", () => {
   });
 
   describe("Edge Cases", () => {
-    test("handles rapid tab switching", () => {
-      render(<FlashcardApp />);
-
-      const dashboardButton = screen.getByTestId("set-dashboard");
-      const flashcardsButton = screen.getByTestId("set-flashcards");
-
-      // Rapid clicks
-      fireEvent.click(dashboardButton);
-      fireEvent.click(flashcardsButton);
-      fireEvent.click(dashboardButton);
-      fireEvent.click(flashcardsButton);
-
-      expect(screen.getByTestId("active-tab")).toHaveTextContent("flashcards");
-      expect(screen.getByTestId("flashcard-component")).toBeInTheDocument();
-    });
-
     test("maintains provider context across tab switches", () => {
       render(<FlashcardApp kanaType="katakana" />);
 
       const provider = screen.getByTestId("flashcard-provider");
       expect(provider).toBeInTheDocument();
-
-      // Switch tabs
-      const dashboardButton = screen.getByTestId("set-dashboard");
-      fireEvent.click(dashboardButton);
-
-      // Provider should still be there
-      expect(screen.getByTestId("flashcard-provider")).toBeInTheDocument();
-
-      // Switch back
-      const flashcardsButton = screen.getByTestId("set-flashcards");
-      fireEvent.click(flashcardsButton);
-
-      expect(screen.getByTestId("flashcard-provider")).toBeInTheDocument();
     });
   });
 

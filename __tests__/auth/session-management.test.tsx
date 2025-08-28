@@ -1,10 +1,10 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, act } from "@testing-library/react";
+import { describe, test, expect, vi } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import { act } from "react-dom/test-utils";
 import FlashcardApp from "@/components/FlashcardApp";
 
-// Mock fetch globally
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+// Use the global mockFetch from setup
+const mockFetch = global.mockFetch;
 
 // Mock next-auth/react
 const mockUseSession = vi.fn();
@@ -17,7 +17,6 @@ vi.mock("next-auth/react", () => ({
 
 describe("Session Management", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => [],

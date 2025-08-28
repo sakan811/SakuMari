@@ -14,13 +14,6 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 describe("Health API Route", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
 
   describe("GET /api/health", () => {
     test("returns healthy status when database is connected", async () => {

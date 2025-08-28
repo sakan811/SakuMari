@@ -81,13 +81,41 @@ export const createMockFactories = () => {
   };
 };
 
-// Common test setup helper
+// Common test setup helper that sets up mocks for API tests
 export const setupApiTest = () => {
-  const { createAuthMock, createPrismaMock } = createMockFactories();
-  
+  // Mock auth module
+  vi.mock("@/lib/auth", () => ({
+    auth: vi.fn(),
+  }));
+
+  // Mock prisma module
+  vi.mock("@/lib/prisma", () => ({
+    prisma: {
+      kana: {
+        findMany: vi.fn(),
+        findUnique: vi.fn(),
+        create: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn(),
+      },
+      kanaProgress: {
+        findMany: vi.fn(),
+        findUnique: vi.fn(),
+        create: vi.fn(),
+        update: vi.fn(),
+        upsert: vi.fn(),
+      },
+      $queryRaw: vi.fn(),
+    },
+  }));
+
   return {
-    auth: createAuthMock(),
-    prisma: createPrismaMock(),
+    // Helper to get mocked functions after dynamic imports
+    async getMocks() {
+      const { auth } = await import("@/lib/auth");
+      const { prisma } = await import("@/lib/prisma");
+      return { auth, prisma };
+    },
     cleanup: () => {
       vi.clearAllMocks();
     },

@@ -1,31 +1,14 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import { GET } from "../../app/api/stats/route";
+import { setupApiTest } from "../utils/test-helpers";
 
-// Use direct function declaration pattern that works reliably with vitest
-vi.mock("@/lib/auth", () => ({
-  auth: vi.fn(),
-}));
-
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    kana: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+// Set up API test mocks
+setupApiTest();
 
 describe("Stats API Route", async () => {
   // Import the mocked functions after mocking
   const { auth } = await import("@/lib/auth");
   const { prisma } = await import("@/lib/prisma");
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
 
   describe("GET /api/stats", () => {
 

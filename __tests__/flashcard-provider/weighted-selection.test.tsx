@@ -1,14 +1,14 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { render, act, waitFor } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
+import { act } from "react-dom/test-utils";
 import {
   FlashcardProvider,
   useFlashcard,
 } from "@/components/FlashcardProvider";
 import React from "react";
 
-// Mock fetch for consistent test data
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+// Use global mock fetch
+const mockFetch = global.mockFetch;
 
 // Test component that tracks all kana selections including state changes
 function TestComponent({
@@ -51,7 +51,6 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
   ];
 
   beforeEach(() => {
-    vi.clearAllMocks();
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => mockKanaData,

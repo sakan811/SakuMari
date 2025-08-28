@@ -10,8 +10,8 @@ import {
 import Dashboard from "../components/Dashboard";
 import { mockApiResponse } from "./utils/test-helpers";
 
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+// Use the global mockFetch from setup
+const mockFetch = global.mockFetch;
 
 describe("Dashboard Component", () => {
   // Create distinct mock data with different characters
@@ -35,7 +35,6 @@ describe("Dashboard Component", () => {
   ];
 
   beforeEach(() => {
-    vi.clearAllMocks();
     mockFetch.mockResolvedValue(mockApiResponse(mockStats));
     cleanup();
   });

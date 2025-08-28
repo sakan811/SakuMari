@@ -27,15 +27,12 @@ import {
 import TipsModal from "../components/TipsModal";
 import { mockApiResponse } from "./utils/test-helpers";
 
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+// Use the global mockFetch from setup
+const mockFetch = global.mockFetch;
 
 describe("TipsModal", () => {
   const mockOnClose = vi.fn();
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
 
   afterEach(() => {
     cleanup();

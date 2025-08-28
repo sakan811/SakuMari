@@ -26,7 +26,6 @@ describe("Middleware", () => {
   let mockAuthMiddleware: any;
 
   beforeEach(() => {
-    vi.clearAllMocks();
     // Create a fresh mock for each test
     mockAuthMiddleware = vi.fn((req: any) => {
       // Simulate the actual middleware logic

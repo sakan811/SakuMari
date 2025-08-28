@@ -17,19 +17,10 @@
 
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { POST } from "../../app/api/tips/route";
+import { setupApiTest } from "../utils/test-helpers";
 
-// Use direct function declaration pattern that works reliably with vitest
-vi.mock("@/lib/auth", () => ({
-  auth: vi.fn(),
-}));
-
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    kanaProgress: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+// Set up API test mocks for auth and prisma
+setupApiTest();
 
 // Mock Google Generative AI
 const mockGenerateContent = vi.fn();
@@ -46,7 +37,6 @@ describe("Tips API Route", async () => {
   const { prisma } = await import("@/lib/prisma");
 
   beforeEach(() => {
-    vi.clearAllMocks();
     // Set default environment variables
     process.env.GEMINI_API_KEY = "test-api-key";
     process.env.MODEL_NAME = "gemini-2.5-flash-lite";
@@ -68,7 +58,6 @@ describe("Tips API Route", async () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
     delete process.env.GEMINI_API_KEY;
     delete process.env.MODEL_NAME;
   });

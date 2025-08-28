@@ -45,9 +45,6 @@ vi.mock("next/image", () => ({
 }));
 
 describe("Authentication Flow Tests", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
 
   describe("Unauthenticated State", () => {
     beforeEach(() => {

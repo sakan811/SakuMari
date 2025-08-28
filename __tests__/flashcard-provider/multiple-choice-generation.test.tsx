@@ -1,12 +1,12 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { render, act, waitFor } from "@testing-library/react";
+import { render, waitFor, screen } from "@testing-library/react";
+import { act } from "react-dom/test-utils";
 import {
   FlashcardProvider,
   useFlashcard,
 } from "@/components/FlashcardProvider";
 
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+const mockFetch = global.mockFetch;
 
 function ChoicesTestComponent() {
   const { currentKana, choices, setInteractionMode } = useFlashcard();
@@ -45,7 +45,6 @@ describe("FlashcardProvider - Multiple Choice Generation", () => {
   ];
 
   beforeEach(() => {
-    vi.clearAllMocks();
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => mockKanaData,
