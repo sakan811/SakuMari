@@ -50,18 +50,3 @@ export const getKanaType = (char: string): KanaFilter => {
   return "all";
 };
 
-export const kanaConstants = {
-  filters: {
-    all: "all" as const,
-    hiragana: "hiragana" as const,
-    katakana: "katakana" as const,
-  },
-
-  sortColumns: {
-    character: "character" as const,
-    romaji: "romaji" as const,
-    attempts: "attempts" as const,
-    correctAttempts: "correct_attempts" as const,
-    accuracy: "accuracy" as const,
-  },
-} as const;

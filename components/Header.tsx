@@ -19,15 +19,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
-
-interface HeaderProps {
-  activeTab: "flashcards" | "dashboard";
-  setActiveTab: Dispatch<SetStateAction<"flashcards" | "dashboard">>;
-}
-
-export default function Header({ activeTab, setActiveTab }: HeaderProps) {
+import { createButtonClass, colors, gradients, utils } from "@/lib/design-system";
+export default function Header() {
   const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [credentialsEnabled, setCredentialsEnabled] = useState(false);
@@ -41,13 +36,13 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
   }, []);
 
   return (
-    <header className="bg-gradient-to-r from-[#403933] via-[#705a39] to-[#403933] shadow-xl border-b-4 border-[#d1622b]">
+    <header className={utils.cn(gradients.secondary, "shadow-xl border-b-4", `border-[${colors.primary}]`)}>
       <div className="container mx-auto p-3 sm:p-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link
             href="/"
-            className="text-lg sm:text-2xl font-bold text-[#fad182] hover:text-white transition-colors duration-200 drop-shadow-sm min-h-[44px] relative z-10 inline-flex items-center"
+            className={utils.cn("text-lg sm:text-2xl font-bold hover:text-white transition-colors duration-200 drop-shadow-sm min-h-[44px] relative z-10 inline-flex items-center", `text-[${colors.accent}]`)}
           >
             🌸 SakuMari
           </Link>
@@ -58,19 +53,19 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
               <>
                 <Link
                   href="/hiragana"
-                  className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-white/10 border-2 border-transparent hover:border-[#fad182] text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center"
+                  className={utils.cn("hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
                 >
                   <span className="hidden xl:inline">ひらがな </span>Hiragana
                 </Link>
                 <Link
                   href="/katakana"
-                  className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-white/10 border-2 border-transparent hover:border-[#fad182] text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center"
+                  className={utils.cn("hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
                 >
                   <span className="hidden xl:inline">カタカナ </span>Katakana
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg bg-[#d1622b] hover:bg-[#ae0d13] border-2 border-[#d1622b] hover:border-[#ae0d13] shadow-lg hover:shadow-xl text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center"
+                  className={utils.cn(createButtonClass("primary", "md"), "text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center")}
                 >
                   📊 Dashboard
                 </Link>
@@ -94,7 +89,7 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
                   )}
                   <button
                     onClick={() => signOut()}
-                    className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg hover:bg-white/10 border-2 border-transparent hover:border-[#fad182] text-sm xl:text-base min-h-[44px] min-w-[80px] relative z-10 cursor-pointer"
+                    className={utils.cn("hover:bg-white/10 border-2 border-transparent transition-colors duration-200 font-medium px-4 py-3 rounded-lg text-sm xl:text-base min-h-[44px] min-w-[80px] relative z-10 cursor-pointer", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
                     type="button"
                   >
                     Sign Out
@@ -105,7 +100,7 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
               <button
                 onClick={() => signIn("credentials")}
                 disabled={status === "loading"}
-                className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg bg-[#d1622b] hover:bg-[#ae0d13] border-2 border-[#d1622b] hover:border-[#ae0d13] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm xl:text-base min-h-[44px] relative z-10 cursor-pointer"
+                className={utils.cn(createButtonClass("primary", "md"), "disabled:opacity-50 disabled:cursor-not-allowed text-sm xl:text-base min-h-[44px] relative z-10 cursor-pointer")}
                 type="button"
               >
                 {status === "loading" ? "Loading..." : "Sign In"}
@@ -114,7 +109,7 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
               <button
                 onClick={() => signIn("google")}
                 disabled={status === "loading"}
-                className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg bg-[#d1622b] hover:bg-[#ae0d13] border-2 border-[#d1622b] hover:border-[#ae0d13] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm xl:text-base min-h-[44px] relative z-10 cursor-pointer"
+                className={utils.cn(createButtonClass("primary", "md"), "disabled:opacity-50 disabled:cursor-not-allowed text-sm xl:text-base min-h-[44px] relative z-10 cursor-pointer")}
                 type="button"
               >
                 {status === "loading" ? "Loading..." : "Sign In"}
@@ -125,7 +120,7 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden text-[#fad182] hover:text-white transition-colors duration-200 p-3 min-h-[44px] min-w-[44px] relative z-10 cursor-pointer"
+            className={utils.cn("lg:hidden hover:text-white transition-colors duration-200 p-3 min-h-[44px] min-w-[44px] relative z-10 cursor-pointer", `text-[${colors.accent}]`)}
             aria-label="Toggle mobile menu"
             type="button"
           >
@@ -156,28 +151,28 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
 
         {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
-          <nav className="lg:hidden mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-[#fad182]/30">
+          <nav className={utils.cn("lg:hidden mt-3 sm:mt-4 pt-3 sm:pt-4 border-t", `border-[${colors.accent}]/30`)}>
             <div className="flex flex-col space-y-2 sm:space-y-3">
               {session ? (
                 <>
                   <Link
                     href="/hiragana"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg hover:bg-white/10 border-2 border-transparent hover:border-[#fad182] text-sm sm:text-base min-h-[44px] relative z-10 inline-flex items-center"
+                    className={utils.cn("hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm sm:text-base min-h-[44px] relative z-10 inline-flex items-center", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
                   >
                     ひらがな Hiragana
                   </Link>
                   <Link
                     href="/katakana"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg hover:bg-white/10 border-2 border-transparent hover:border-[#fad182] text-sm sm:text-base min-h-[44px] relative z-10 inline-flex items-center"
+                    className={utils.cn("hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm sm:text-base min-h-[44px] relative z-10 inline-flex items-center", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
                   >
                     カタカナ Katakana
                   </Link>
                   <Link
                     href="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg bg-[#d1622b] hover:bg-[#ae0d13] border-2 border-[#d1622b] hover:border-[#ae0d13] shadow-lg text-sm sm:text-base w-fit min-h-[44px] relative z-10 inline-flex items-center"
+                    className={utils.cn(createButtonClass("primary", "md"), "text-sm sm:text-base w-fit min-h-[44px] relative z-10 inline-flex items-center")}
                   >
                     📊 Dashboard
                   </Link>
@@ -188,18 +183,18 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
                         alt="Profile"
                         width={32}
                         height={32}
-                        className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-[#fad182]"
+                        className={utils.cn("w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2", `border-[${colors.accent}]`)}
                         unoptimized
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-[#fad182] bg-[#fad182] flex items-center justify-center">
-                        <span className="text-[#403933] text-xs sm:text-sm font-bold">
+                      <div className={utils.cn("w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center", `border-[${colors.accent}] bg-[${colors.accent}]`)}>
+                        <span className={utils.cn("text-xs sm:text-sm font-bold", `text-[${colors.secondaryDark}]`)}>
                           {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
                         </span>
                       </div>
                     )}
-                    <span className="text-[#fad182] text-sm sm:text-base font-medium">
+                    <span className={utils.cn("text-sm sm:text-base font-medium", `text-[${colors.accent}]`)}>
                       {session.user?.name}
                     </span>
                   </div>
@@ -208,7 +203,7 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
                       signOut();
                       setMobileMenuOpen(false);
                     }}
-                    className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg hover:bg-white/10 border-2 border-transparent hover:border-[#fad182] text-left text-sm sm:text-base w-fit min-h-[44px] min-w-[80px] relative z-10 cursor-pointer"
+                    className={utils.cn("hover:bg-white/10 border-2 border-transparent transition-colors duration-200 font-medium px-4 py-3 rounded-lg text-left text-sm sm:text-base w-fit min-h-[44px] min-w-[80px] relative z-10 cursor-pointer", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
                     type="button"
                   >
                     Sign Out
@@ -256,7 +251,7 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
                       setMobileMenuOpen(false);
                     }}
                     disabled={status === "loading"}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-[#403933] hover:bg-[#705a39] text-[#fad182] rounded-lg transition-colors duration-200 font-medium border-2 border-[#d1622b] disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px] cursor-pointer"
+                    className={utils.cn("w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 font-medium border-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px] cursor-pointer", `bg-[${colors.secondaryDark}] hover:bg-[${colors.secondary}] text-[${colors.accent}] border-[${colors.primary}]`)}
                     type="button"
                   >
                     <svg
@@ -282,7 +277,7 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
                     setMobileMenuOpen(false);
                   }}
                   disabled={status === "loading"}
-                  className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg bg-[#d1622b] hover:bg-[#ae0d13] border-2 border-[#d1622b] hover:border-[#ae0d13] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-fit min-h-[44px] relative z-10 cursor-pointer"
+                  className={utils.cn(createButtonClass("primary", "md"), "disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-fit min-h-[44px] relative z-10 cursor-pointer")}
                   type="button"
                 >
                   {status === "loading" ? "Loading..." : "Sign In"}

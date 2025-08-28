@@ -22,21 +22,20 @@ import { FlashcardProvider } from "./FlashcardProvider";
 import Flashcard from "./Flashcard";
 import Header from "./Header";
 import Dashboard from "./Dashboard";
-import { useState } from "react";
+import { gradients, utils } from "@/lib/design-system";
+import { useTabManagement } from "@/hooks/useTabManagement";
 
 interface FlashcardAppProps {
   kanaType?: "hiragana" | "katakana";
 }
 
 const FlashcardApp: FC<FlashcardAppProps> = ({ kanaType }) => {
-  const [activeTab, setActiveTab] = useState<"flashcards" | "dashboard">(
-    "flashcards",
-  );
+  const { activeTab } = useTabManagement("flashcards");
 
   return (
     <FlashcardProvider kanaType={kanaType}>
-      <div className="min-h-screen bg-gradient-to-br from-[#fad182] via-[#f5c55a] to-[#fad182]">
-        <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className={utils.cn("min-h-screen", gradients.main)}>
+        <Header />
         <main className="container mx-auto max-w-4xl px-4 py-4 sm:py-6 lg:py-8">
           {activeTab === "flashcards" ? <Flashcard /> : <Dashboard />}
         </main>

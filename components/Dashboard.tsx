@@ -34,6 +34,7 @@ import {
   textStyles,
   utils,
 } from "../lib/design-system";
+import { LoadingContainer } from "./ui/LoadingSpinner";
 import type { KanaData, SortColumn, KanaFilter } from "@/types/kana";
 import { isKanaType } from "@/lib/kana-utils";
 
@@ -104,9 +105,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className={utils.cn(gradients.main, "min-h-screen")}>
-        <div className="flex h-32 sm:h-64 items-center justify-center">
-          <div className={utils.createSpinnerClass()}></div>
-        </div>
+        <LoadingContainer />
       </div>
     );
   }
