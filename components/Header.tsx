@@ -76,13 +76,13 @@ export default function Header() {
                       alt="Profile"
                       width={32}
                       height={32}
-                      className="w-6 h-6 xl:w-8 xl:h-8 rounded-full border-2 border-[#fad182]"
+                      className={`w-6 h-6 xl:w-8 xl:h-8 rounded-full border-2 border-[${colors.accent}]`}
                       unoptimized
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="w-6 h-6 xl:w-8 xl:h-8 rounded-full border-2 border-[#fad182] bg-[#fad182] flex items-center justify-center">
-                      <span className="text-[#403933] text-xs xl:text-sm font-bold">
+                    <div className={`w-6 h-6 xl:w-8 xl:h-8 rounded-full border-2 border-[${colors.accent}] bg-[${colors.accent}] flex items-center justify-center`}>
+                      <span className={`text-[${colors.secondaryDark}] text-xs xl:text-sm font-bold`}>
                         {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
                       </span>
                     </div>
@@ -241,9 +241,9 @@ export default function Header() {
                     {status === "loading" ? "Loading..." : "Sign In"}
                   </button>
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 h-px bg-[#fad182]/30"></div>
-                    <span className="text-[#fad182] text-sm">or</span>
-                    <div className="flex-1 h-px bg-[#fad182]/30"></div>
+                    <div className={`flex-1 h-px bg-[${colors.accent}]/30`}></div>
+                    <span className={`text-[${colors.accent}] text-sm`}>or</span>
+                    <div className={`flex-1 h-px bg-[${colors.accent}]/30`}></div>
                   </div>
                   <button
                     onClick={() => {

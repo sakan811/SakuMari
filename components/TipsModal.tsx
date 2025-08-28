@@ -19,7 +19,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
-import { colors } from "@/lib/design-system";
+import { colors, createButtonClass, utils } from "@/lib/design-system";
 
 interface TipsModalProps {
   isOpen: boolean;
@@ -222,8 +222,8 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
           )}
 
           {error && (
-            <div className="mb-4 p-3 bg-red-100 border-2 border-red-300 rounded-lg">
-              <p className="text-red-800 text-sm">{error}</p>
+            <div className={`mb-4 p-3 bg-[${colors.error[100]}] border-2 border-[${colors.error[300]}] rounded-lg`}>
+              <p className={`text-[${colors.error[800]}] text-sm`}>{error}</p>
             </div>
           )}
 
@@ -250,7 +250,11 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
                 <button
                   type="submit"
                   disabled={!inputValue.trim() || isLoading}
-                  className={`px-6 py-3 bg-[${colors.primary}] text-white rounded-lg hover:bg-[${colors.primaryDark}] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm font-medium`}
+                  className={utils.cn(
+                    createButtonClass("primary", "md"),
+                    "px-6 py-3 text-sm",
+                    (!inputValue.trim() || isLoading) && "disabled:bg-gray-300 disabled:cursor-not-allowed hover:scale-100 hover:bg-gray-300"
+                  )}
                 >
                   {isLoading ? "..." : "Ask"}
                 </button>
