@@ -2,6 +2,7 @@ import { describe, test, expect, vi } from "vitest";
 import { GET } from "../../app/api/stats/route";
 import { POST } from "../../app/api/flashcards/submit/route";
 import { NextRequest } from "next/server";
+import { setupApiTest } from "../utils/test-helpers";
 
 // Use vi.hoisted to declare mocks that can be used in vi.mock
 const { mockAuth, mockPrisma } = vi.hoisted(() => ({
@@ -17,11 +18,6 @@ vi.mock("@/lib/prisma", () => ({ prisma: mockPrisma }));
 
 describe("Flashcards API", () => {
   describe("GET /api/stats", () => {
-    test("requires authentication", async () => {
-      mockAuth.mockResolvedValue(null);
-      const response = await GET();
-      expect(response.status).toBe(401);
-    });
 
     test("returns kana data for authenticated user", async () => {
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
@@ -130,21 +126,6 @@ describe("Flashcards API", () => {
       expect(response.status).toBe(500);
     });
 
-    test("requires authentication", async () => {
-      mockAuth.mockResolvedValue(null);
-
-      const request = new NextRequest(
-        "http://localhost/api/flashcards/submit",
-        {
-          method: "POST",
-          body: JSON.stringify({ kanaId: "1", isCorrect: true }),
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-
-      const response = await POST(request);
-      expect(response.status).toBe(401);
-    });
 
     test("handles missing kanaId in request body", async () => {
       mockAuth.mockResolvedValue({ user: { id: "user123" } });

@@ -1,5 +1,6 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { GET } from "../../app/api/stats/route";
+import { setupApiTest } from "../utils/test-helpers";
 
 // Use direct function declaration pattern that works reliably with vitest
 vi.mock("@/lib/auth", () => ({
@@ -28,25 +29,6 @@ describe("Stats API Route", async () => {
   });
 
   describe("GET /api/stats", () => {
-    test("returns 401 when user is not authenticated", async () => {
-      vi.mocked(auth).mockResolvedValue(null);
-
-      const response = await GET();
-      const data = await response.json();
-
-      expect(response.status).toBe(401);
-      expect(data.error).toBe("Unauthorized");
-    });
-
-    test("returns 401 when user session has no ID", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: {} });
-
-      const response = await GET();
-      const data = await response.json();
-
-      expect(response.status).toBe(401);
-      expect(data.error).toBe("Unauthorized");
-    });
 
     test("returns complete stats for authenticated user", async () => {
       const mockStatsData = [

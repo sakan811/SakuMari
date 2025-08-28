@@ -2,6 +2,7 @@ import { describe, test, expect, vi, beforeEach } from "vitest";
 import { GET } from "@/app/api/stats/route";
 import { POST } from "@/app/api/flashcards/submit/route";
 import { NextRequest } from "next/server";
+import { setupApiTest } from "../utils/test-helpers";
 
 // Use vi.hoisted to declare mocks that can be used in vi.mock
 const { mockAuth, mockPrisma } = vi.hoisted(() => ({
