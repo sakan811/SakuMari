@@ -3,20 +3,7 @@ import { cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { act } from "react";
 
-// Mock react-dom/test-utils to ensure React.act is used
-vi.mock('react-dom/test-utils', async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    act: act,
-  };
-});
 
-// Also make sure React.act is available
-global.React = {
-  ...global.React,
-  act: act,
-};
 
 // Mock next/server to resolve module import issues with next-auth
 vi.mock('next/server', async (importOriginal) => {

@@ -1,18 +1,59 @@
 import { describe, test, expect, vi } from "vitest";
-import { GET } from "../../app/api/stats/route";
 import { setupApiTest } from "../utils/test-helpers";
+import * as apiHelpers from "@/lib/api-helpers";
+
+vi.mock('@/lib/api-helpers', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    withErrorHandling: vi.fn((handler) => {
+      // Mock withErrorHandling to wrap the handler with proper error handling
+      return async (...args: any[]) => {
+        try {
+          return await handler(...args);
+        } catch (error) {
+          console.error("Mocked error:", error);
+          return new Response(
+            JSON.stringify({ error: "Internal server error" }),
+            { status: 500, headers: { "Content-Type": "application/json" } }
+          );
+        }
+      };
+    }),
+    createErrorResponse: vi.fn((message, status) => {
+      return new Response(
+        JSON.stringify({ error: message }),
+        { status, headers: { "Content-Type": "application/json" } }
+      );
+    }),
+  };
+});
 
 // Set up API test mocks
-setupApiTest();
+const { getMocks } = setupApiTest();
 
 describe("Stats API Route", async () => {
-  // Import the mocked functions after mocking
-  const { auth } = await import("@/lib/auth");
-  const { prisma } = await import("@/lib/prisma");
+  let auth: any;
+  let prisma: any;
+  let GET: any;
+
+  beforeAll(async () => {
+    ({ auth, prisma } = await getMocks());
+    // Dynamically import the route handler after mocks are set up
+    const routeModule = await import("../../app/api/stats/route");
+    GET = routeModule.GET;
+  });
+
+  beforeEach(() => {
+    // Reset mocks before each test
+    vi.clearAllMocks();
+  });
 
   describe("GET /api/stats", () => {
-
     test("returns complete stats for authenticated user", async () => {
+      // Mock authenticated user
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      
       const mockStatsData = [
         {
           id: "1",
@@ -34,7 +75,6 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
       const response = await GET();
@@ -61,7 +101,30 @@ describe("Stats API Route", async () => {
       ]);
     });
 
+    test("returns 401 for unauthenticated requests", async () => {
+      // Mock unauthenticated user
+      vi.mocked(auth).mockResolvedValue(null);
+
+      const response = await GET();
+      const data = await response.json();
+
+      expect(response.status).toBe(401);
+      expect(data.error).toBe("Unauthorized");
+    });
+
+    test("returns 401 for session without user ID", async () => {
+      // Mock session without user ID
+      vi.mocked(auth).mockResolvedValue({ user: {} });
+
+      const response = await GET();
+
+      expect(response.status).toBe(401);
+    });
+
     test("handles user with no practice data", async () => {
+      // Mock authenticated user
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      
       const mockStatsData = [
         {
           id: "1",
@@ -77,7 +140,6 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
       const response = await GET();
@@ -90,7 +152,9 @@ describe("Stats API Route", async () => {
     });
 
     test("handles database connection errors", async () => {
+      // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      
       vi.mocked(prisma.kana.findMany).mockRejectedValue(
         new Error("Database connection lost"),
       );
@@ -103,7 +167,9 @@ describe("Stats API Route", async () => {
     });
 
     test("handles Prisma query timeout errors", async () => {
+      // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      
       const timeoutError = new Error("Query timeout");
       timeoutError.name = "PrismaClientKnownRequestError";
       vi.mocked(prisma.kana.findMany).mockRejectedValue(timeoutError);
@@ -116,7 +182,9 @@ describe("Stats API Route", async () => {
     });
 
     test("correctly filters user-specific progress", async () => {
+      // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      
       vi.mocked(prisma.kana.findMany).mockResolvedValue([]);
 
       await GET();
@@ -138,6 +206,9 @@ describe("Stats API Route", async () => {
     });
 
     test("handles edge case with zero attempts but non-zero accuracy", async () => {
+      // Mock authenticated user
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      
       // This shouldn't happen in normal flow but tests data integrity
       const mockStatsData = [
         {
@@ -154,7 +225,6 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
       const response = await GET();

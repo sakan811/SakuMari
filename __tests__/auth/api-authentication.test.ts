@@ -1,16 +1,29 @@
 import { describe, test, expect, vi } from "vitest";
-import { GET } from "@/app/api/stats/route";
-import { POST } from "@/app/api/flashcards/submit/route";
 import { NextRequest } from "next/server";
 import { setupApiTest } from "../utils/test-helpers";
 
 // Set up API test mocks
-setupApiTest();
+const { getMocks } = setupApiTest();
 
 describe("API Authentication", async () => {
-  // Import the mocked functions after mocking
-  const { auth } = await import("@/lib/auth");
-  const { prisma } = await import("@/lib/prisma");
+  let auth: any;
+  let prisma: any;
+  let GET: any;
+  let POST: any;
+
+  beforeAll(async () => {
+    ({ auth, prisma } = await getMocks());
+    // Dynamically import the route handlers after mocks are set up
+    const statsRouteModule = await import("@/app/api/stats/route");
+    const flashcardsRouteModule = await import("@/app/api/flashcards/submit/route");
+    GET = statsRouteModule.GET;
+    POST = flashcardsRouteModule.POST;
+  });
+
+  beforeEach(() => {
+    // Reset mocks before each test
+    vi.clearAllMocks();
+  });
 
   describe("GET /api/stats", () => {
     test("returns 401 for unauthenticated requests", async () => {

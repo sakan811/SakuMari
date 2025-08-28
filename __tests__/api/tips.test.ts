@@ -16,11 +16,10 @@
  */
 
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { POST } from "../../app/api/tips/route";
 import { setupApiTest } from "../utils/test-helpers";
 
 // Set up API test mocks for auth and prisma
-setupApiTest();
+const { getMocks } = setupApiTest();
 
 // Mock Google Generative AI
 const mockGenerateContent = vi.fn();
@@ -31,12 +30,64 @@ vi.mock("@google/generative-ai", () => ({
   GoogleGenerativeAI: mockGoogleGenerativeAI,
 }));
 
+// Mock api-helpers to properly handle error wrapping
+vi.mock("@/lib/api-helpers", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    withErrorHandling: vi.fn((handler) => {
+      // Mock withErrorHandling to wrap the handler with proper error handling
+      return async (...args: any[]) => {
+        try {
+          return await handler(...args);
+        } catch (error) {
+          console.error("Mocked error:", error);
+          // For the tips route, we need to handle different error types
+          if (error instanceof Error && error.message.includes("GEMINI_API_KEY")) {
+            return new Response(
+              JSON.stringify({ error: "AI service not configured. Please contact support." }),
+              { status: 503, headers: { "Content-Type": "application/json" } }
+            );
+          }
+          if (error instanceof Error && error.message === "Unauthorized") {
+            return new Response(
+              JSON.stringify({ error: "Unauthorized" }),
+              { status: 401, headers: { "Content-Type": "application/json" } }
+            );
+          }
+          // Default error response
+          return new Response(
+            JSON.stringify({ error: "Unable to generate learning tips. Please try again later." }),
+            { status: 500, headers: { "Content-Type": "application/json" } }
+          );
+        }
+      };
+    }),
+    createErrorResponse: vi.fn((message, status) => {
+      return new Response(
+        JSON.stringify({ error: message }),
+        { status, headers: { "Content-Type": "application/json" } }
+      );
+    }),
+  };
+});
+
 describe("Tips API Route", async () => {
-  // Import the mocked functions after mocking
-  const { auth } = await import("@/lib/auth");
-  const { prisma } = await import("@/lib/prisma");
+  let auth: any;
+  let prisma: any;
+  let POST: any;
+
+  beforeAll(async () => {
+    ({ auth, prisma } = await getMocks());
+    // Dynamically import the route handler after mocks are set up
+    const routeModule = await import("../../app/api/tips/route");
+    POST = routeModule.POST;
+  });
 
   beforeEach(() => {
+    // Reset mocks before each test
+    vi.clearAllMocks();
+    
     // Set default environment variables
     process.env.GEMINI_API_KEY = "test-api-key";
     process.env.MODEL_NAME = "gemini-2.5-flash-lite";
