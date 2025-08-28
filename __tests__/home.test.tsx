@@ -33,26 +33,26 @@ describe("Home Page", () => {
     vi.resetAllMocks();
   });
 
-  test("renders all navigation cards", () => {
+  test("renders all navigation cards", async () => {
     render(<Home />);
 
-    expect(screen.getByText("🌸 SakuMari")).toBeDefined();
-    expect(screen.getByText("ひらがな Hiragana Practice")).toBeDefined();
-    expect(screen.getByText("カタカナ Katakana Practice")).toBeDefined();
-    expect(screen.getByText("📊 View Your Progress")).toBeDefined();
+    expect(await screen.findByText("🌸 SakuMari")).toBeDefined();
+    expect(await screen.findByText("ひらがな Hiragana Practice")).toBeDefined();
+    expect(await screen.findByText("カタカナ Katakana Practice")).toBeDefined();
+    expect(await screen.findByText("📊 View Your Progress")).toBeDefined();
   });
 
-  test("contains correct navigation links", () => {
+  test("contains correct navigation links", async () => {
     render(<Home />);
 
     // Fix: Use getByText instead of getAllByText with index
-    const hiraganaLink = screen
-      .getByText("ひらがな Hiragana Practice")
+    const hiraganaLink = (await screen
+      .findByText("ひらがな Hiragana Practice"))
       .closest("a");
-    const katakanaLink = screen
-      .getByText("カタカナ Katakana Practice")
+    const katakanaLink = (await screen
+      .findByText("カタカナ Katakana Practice"))
       .closest("a");
-    const progressLink = screen.getByText("📊 View Your Progress").closest("a");
+    const progressLink = (await screen.findByText("📊 View Your Progress")).closest("a");
 
     expect(hiraganaLink?.getAttribute("href")).toBe("/hiragana");
     expect(katakanaLink?.getAttribute("href")).toBe("/katakana");

@@ -61,6 +61,6 @@ describe("Integration Tests", () => {
     render(<FlashcardApp kanaType="hiragana" />);
 
     // Should handle gracefully without crashing
-    expect(screen.getByRole("status")).toBeDefined();
+    expect(await screen.findByRole("status")).toBeDefined();
   });
 });

@@ -115,9 +115,7 @@ describe("Dashboard Component", () => {
   test("handles API errors", async () => {
     mockFetch.mockRejectedValue(new Error("Network error"));
 
-    act(() => {
-      render(<Dashboard />);
-    });
+    render(<Dashboard />);
 
     await waitFor(() => {
       expect(screen.getByText("Failed to load progress data")).toBeTruthy();
@@ -284,14 +282,16 @@ describe("Dashboard Component", () => {
       expect(tipsButton.className).toContain("to-[#ae0d13]/80");
     });
 
-    test("tips modal is not rendered when closed", () => {
+    test("tips modal is not rendered when closed", async () => {
       render(<Dashboard />);
 
       // Tips modal content should not be present initially
-      expect(screen.queryByText("Kana Learning Tips")).toBeNull();
-      expect(
-        screen.queryByText("Ask questions about Japanese kana"),
-      ).toBeNull();
+      await waitFor(() => {
+        expect(screen.queryByText("Kana Learning Tips")).toBeNull();
+        expect(
+          screen.queryByText("Ask questions about Japanese kana"),
+        ).toBeNull();
+      });
     });
   });
 });

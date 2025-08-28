@@ -18,12 +18,12 @@ vi.mock("next-auth/react", () => ({
 }));
 
 describe("Header", () => {
-  it("renders navigation links", () => {
+  it("renders navigation links", async () => {
     render(<Header activeTab="flashcards" setActiveTab={() => {}} />);
-    expect(screen.getByText("Hiragana")).toBeDefined();
-    expect(screen.getByText("ひらがな")).toBeDefined();
-    expect(screen.getByText("Katakana")).toBeDefined();
-    expect(screen.getByText("カタカナ")).toBeDefined();
-    expect(screen.getByText("📊 Dashboard")).toBeDefined();
+    expect(await screen.findByText("Hiragana")).toBeDefined();
+    expect(await screen.findByText("ひらがな")).toBeDefined();
+    expect(await screen.findByText("Katakana")).toBeDefined();
+    expect(await screen.findByText("カタカナ")).toBeDefined();
+    expect(await screen.findByText("📊 Dashboard")).toBeDefined();
   });
 });

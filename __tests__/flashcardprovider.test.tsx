@@ -4,6 +4,7 @@ import {
   FlashcardProvider,
   useFlashcard,
 } from "../components/FlashcardProvider";
+import { waitFor } from "@testing-library/react";
 
 // Use global mock fetch
 const mockFetch = global.mockFetch;
@@ -41,6 +42,10 @@ describe("FlashcardProvider", () => {
     );
 
     const { result } = renderHook(() => useFlashcard(), { wrapper });
+
+    // Wait for the loading to complete and currentKana to be set
+    await waitFor(() => expect(result.current.loadingKana).toBe(false));
+    await waitFor(() => expect(result.current.currentKana).toBeDefined());
 
     expect(result.current).toHaveProperty("currentKana");
     expect(result.current).toHaveProperty("submitAnswer");

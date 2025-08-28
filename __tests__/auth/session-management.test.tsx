@@ -31,22 +31,20 @@ describe("Session Management", () => {
     });
 
     let rerender: any;
-    act(() => {
-      ({ rerender } = render(<FlashcardApp kanaType="hiragana" />));
-    });
+    ({ rerender } = render(<FlashcardApp kanaType="hiragana" />));
 
     // Simulate session expiration
-    act(() => {
-      mockUseSession.mockReturnValue({
-        data: null,
-        status: "unauthenticated",
-      });
-
-      rerender(<FlashcardApp kanaType="hiragana" />);
+    mockUseSession.mockReturnValue({
+      data: null,
+      status: "unauthenticated",
     });
 
+    rerender(<FlashcardApp kanaType="hiragana" />);
+
     // Should handle gracefully without errors
-    expect(screen.queryByRole("status")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole("status")).toBeInTheDocument();
+    });
   });
 
   test("maintains session state across component updates", () => {
@@ -61,14 +59,10 @@ describe("Session Management", () => {
     });
 
     let rerender: any;
-    act(() => {
-      ({ rerender } = render(<FlashcardApp kanaType="hiragana" />));
-    });
+    ({ rerender } = render(<FlashcardApp kanaType="hiragana" />));
 
     // Re-render with same session
-    act(() => {
-      rerender(<FlashcardApp kanaType="katakana" />);
-    });
+    rerender(<FlashcardApp kanaType="katakana" />);
 
     // Session should persist
     expect(mockUseSession).toHaveBeenCalled();
@@ -82,9 +76,7 @@ describe("Session Management", () => {
       status: "authenticated",
     });
 
-    act(() => {
-      render(<FlashcardApp kanaType="hiragana" />);
-    });
+    render(<FlashcardApp kanaType="hiragana" />);
 
     // Should handle network errors gracefully
     await waitFor(() => {

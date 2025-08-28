@@ -54,35 +54,35 @@ describe("Authentication Flow Tests", () => {
       });
     });
 
-    test("shows sign-in button when user is not authenticated", () => {
+    test("shows sign-in button when user is not authenticated", async () => {
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
-      expect(screen.getByText("Sign In")).toBeInTheDocument();
+      expect(await screen.findByText("Sign In")).toBeInTheDocument();
       expect(screen.queryByText("Sign Out")).not.toBeInTheDocument();
     });
 
-    test("calls signIn when sign-in button is clicked", () => {
+    test("calls signIn when sign-in button is clicked", async () => {
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
-      const signInButton = screen.getByText("Sign In");
+      const signInButton = await screen.findByText("Sign In");
       fireEvent.click(signInButton);
 
-      expect(mockSignIn).toHaveBeenCalledWith("google");
+      expect(mockSignIn).toHaveBeenCalledWith("credentials");
     });
 
-    test("shows welcome message instead of practice options", () => {
+    test("shows welcome message instead of practice options", async () => {
       render(<Home />);
 
-      expect(screen.getByText("Welcome to SakuMari!")).toBeInTheDocument();
+      expect(await screen.findByText("Welcome to SakuMari!")).toBeInTheDocument();
       expect(
-        screen.getByText(/Sign in with your Google account/),
+        await screen.findByText(/Sign in with your Google account/),
       ).toBeInTheDocument();
       expect(
         screen.queryByText("ひらがな Hiragana Practice"),
       ).not.toBeInTheDocument();
     });
 
-    test("disables sign-in button during loading state", () => {
+    test("disables sign-in button during loading state", async () => {
       mockUseSession.mockReturnValue({
         data: null,
         status: "loading",
@@ -90,7 +90,7 @@ describe("Authentication Flow Tests", () => {
 
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
-      const signInButton = screen.getByText("Loading...");
+      const signInButton = await screen.findByText("Loading...");
       expect(signInButton).toBeDisabled();
     });
   });
@@ -113,22 +113,22 @@ describe("Authentication Flow Tests", () => {
       });
     });
 
-    test("shows user profile and sign-out button when authenticated", () => {
+    test("shows user profile and sign-out button when authenticated", async () => {
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
-      expect(screen.getByText("Sign Out")).toBeInTheDocument();
+      expect(await screen.findByText("Sign Out")).toBeInTheDocument();
       expect(screen.queryByText("Sign In")).not.toBeInTheDocument();
     });
 
-    test("displays user avatar when image is available", () => {
+    test("displays user avatar when image is available", async () => {
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
-      const avatar = screen.getByAltText("Profile");
+      const avatar = await screen.findByAltText("Profile");
       expect(avatar).toBeInTheDocument();
       expect(avatar.getAttribute("src")).toContain("avatar.jpg");
     });
 
-    test("shows user initials when no image available", () => {
+    test("shows user initials when no image available", async () => {
       mockUseSession.mockReturnValue({
         data: { ...mockSession, user: { ...mockSession.user, image: null } },
         status: "authenticated",
@@ -136,36 +136,36 @@ describe("Authentication Flow Tests", () => {
 
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
-      expect(screen.getByText("J")).toBeInTheDocument(); // First letter of John
+      expect(await screen.findByText("J")).toBeInTheDocument(); // First letter of John
     });
 
-    test("calls signOut when sign-out button is clicked", () => {
+    test("calls signOut when sign-out button is clicked", async () => {
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
-      const signOutButton = screen.getByText("Sign Out");
+      const signOutButton = await screen.findByText("Sign Out");
       fireEvent.click(signOutButton);
 
       expect(mockSignOut).toHaveBeenCalled();
     });
 
-    test("shows practice options when authenticated", () => {
+    test("shows practice options when authenticated", async () => {
       render(<Home />);
 
       expect(
-        screen.getByText("ひらがな Hiragana Practice"),
+        await screen.findByText("ひらがな Hiragana Practice"),
       ).toBeInTheDocument();
       expect(
-        screen.getByText("カタカナ Katakana Practice"),
+        await screen.findByText("カタカナ Katakana Practice"),
       ).toBeInTheDocument();
-      expect(screen.getByText("📊 View Your Progress")).toBeInTheDocument();
+      expect(await screen.findByText("📊 View Your Progress")).toBeInTheDocument();
     });
 
-    test("shows navigation links in header when authenticated", () => {
+    test("shows navigation links in header when authenticated", async () => {
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
-      expect(screen.getByText(/Hiragana/)).toBeInTheDocument();
-      expect(screen.getByText(/Katakana/)).toBeInTheDocument();
-      expect(screen.getByText("📊 Dashboard")).toBeInTheDocument();
+      expect(await screen.findByText(/Hiragana/)).toBeInTheDocument();
+      expect(await screen.findByText(/Katakana/)).toBeInTheDocument();
+      expect(await screen.findByText("📊 Dashboard")).toBeInTheDocument();
     });
   });
 
@@ -177,29 +177,19 @@ describe("Authentication Flow Tests", () => {
       });
     });
 
-    test("shows loading spinner during authentication check", () => {
+    test("shows loading spinner during authentication check", async () => {
       render(<Home />);
 
-      // Try multiple approaches to find the loading spinner
-      // First try to find by class name (most common approach)
-      const spinner = screen.getByTestId
-        ? screen.queryByTestId("loading-spinner")
-        : screen.querySelector(".animate-spin");
-
-      if (spinner) {
-        expect(spinner).toBeInTheDocument();
-        expect(spinner).toHaveClass("animate-spin");
-      } else {
-        // Fallback: look for any element with animate-spin class
-        const spinnerByClass = document.querySelector(".animate-spin");
-        expect(spinnerByClass).toBeTruthy();
-      }
+      // Use findByTestId which waits for the element to appear
+      const spinner = await screen.findByTestId("loading-spinner");
+      expect(spinner).toBeInTheDocument();
+      expect(spinner).toHaveClass("animate-spin");
     });
 
-    test("disables sign-in button during loading", () => {
+    test("disables sign-in button during loading", async () => {
       render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
 
-      const button = screen.getByText("Loading...");
+      const button = await screen.findByText("Loading...");
       expect(button).toBeDisabled();
     });
   });
