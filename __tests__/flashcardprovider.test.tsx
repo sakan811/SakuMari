@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, cleanup } from "@testing-library/react";
+import React from "react";
 import {
   FlashcardProvider,
   useFlashcard,

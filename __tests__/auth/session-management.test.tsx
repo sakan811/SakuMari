@@ -1,5 +1,6 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, act, RenderResult } from "@testing-library/react";
+import React from "react";
 import FlashcardApp from "@/components/FlashcardApp";
 
 // Mock fetch globally
@@ -30,12 +31,12 @@ describe("Session Management", () => {
       data: { user: { id: "user123" } },
       status: "authenticated",
     });
+let rerender: (
+  _ui: React.ReactElement,
+) => void | RenderResult = () => {};
 
-    let rerender: (
-      ui: React.ReactElement,
-    ) => void | RenderResult = () => {};
-    act(() => {
-      ({ rerender } = render(<FlashcardApp kanaType="hiragana" />));
+act(() => {
+  ({ rerender } = render(<FlashcardApp kanaType="hiragana" />));
     });
 
     // Simulate session expiration
@@ -62,12 +63,12 @@ describe("Session Management", () => {
       data: sessionData,
       status: "authenticated",
     });
+let rerender: (
+  _ui: React.ReactElement,
+) => void | RenderResult = () => {};
 
-    let rerender: (
-      ui: React.ReactElement,
-    ) => void | RenderResult = () => {};
-    act(() => {
-      ({ rerender } = render(<FlashcardApp kanaType="hiragana" />));
+act(() => {
+  ({ rerender } = render(<FlashcardApp kanaType="hiragana" />));
     });
 
     // Re-render with same session

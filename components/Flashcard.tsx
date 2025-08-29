@@ -17,6 +17,7 @@
 
 "use client";
 
+import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { useFlashcard } from "./FlashcardProvider";
 import ModeSelector from "./ModeSelector";

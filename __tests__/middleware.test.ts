@@ -22,7 +22,7 @@ import { config } from "@/middleware";
 import { auth } from "@/lib/auth";
 
 describe("Middleware", () => {
-  let mockAuthMiddleware: (req: NextRequest & { auth?: any }) => NextResponse;
+  let mockAuthMiddleware: (_req: NextRequest & { auth?: any }) => NextResponse;
 
   beforeEach(() => {
     vi.clearAllMocks();
