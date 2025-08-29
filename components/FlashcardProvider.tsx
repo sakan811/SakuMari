@@ -23,6 +23,7 @@ import React, {
   useState,
   useEffect,
   useRef,
+  useCallback,
 } from "react";
 import { isKanaType } from "@/lib/kana-utils";
 import { InteractionMode } from "@/types/kana";
@@ -77,46 +78,8 @@ export function FlashcardProvider({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const hasFetched = useRef(false);
 
-  // Prevent double fetch in React strict mode
-  useEffect(() => {
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      fetchKanaData();
-    }
-  }, [kanaType]);
-
-  const fetchKanaData = async () => {
-    setLoadingKana(true);
-    try {
-      const response = await fetch("/api/stats");
-      if (!response.ok) {
-        throw new Error("Failed to fetch kana data");
-      }
-      let data = await response.json();
-
-      // Ensure data is an array before filtering
-      if (!Array.isArray(data)) {
-        throw new Error("Invalid data format received");
-      }
-
-      // Filter by kana type if specified
-      if (kanaType) {
-        data = data.filter((kana: KanaWithAccuracy) => {
-          return isKanaType(kana.character, kanaType);
-        });
-      }
-
-      setKanaList(data);
-      selectRandomKana(data);
-    } catch (error) {
-      console.error("Error fetching kana data:", error);
-    } finally {
-      setLoadingKana(false);
-    }
-  };
-
   // Generate choices for multiple choice mode
-  const generateChoices = (
+  const generateChoices = useCallback((
     correctKana: KanaWithAccuracy,
     kanaData: KanaWithAccuracy[],
   ) => {
@@ -161,10 +124,10 @@ export function FlashcardProvider({
     );
 
     setChoices(allChoices);
-  };
+  }, [setChoices]);
 
   // Select a kana using confidence-weighted selection (solves first-success penalty)
-  const selectRandomKana = (data: KanaWithAccuracy[]) => {
+  const selectRandomKana = useCallback((data: KanaWithAccuracy[]) => {
     if (!data.length) return;
 
     // Calculate confidence-aware weights
@@ -204,7 +167,45 @@ export function FlashcardProvider({
 
     setCurrentKana(selectedKana);
     generateChoices(selectedKana, data);
-  };
+  }, [setCurrentKana, generateChoices]);
+
+  const fetchKanaData = useCallback(async () => {
+    setLoadingKana(true);
+    try {
+      const response = await fetch("/api/stats");
+      if (!response.ok) {
+        throw new Error("Failed to fetch kana data");
+      }
+      let data = await response.json();
+
+      // Ensure data is an array before filtering
+      if (!Array.isArray(data)) {
+        throw new Error("Invalid data format received");
+      }
+
+      // Filter by kana type if specified
+      if (kanaType) {
+        data = data.filter((kana: KanaWithAccuracy) => {
+          return isKanaType(kana.character, kanaType);
+        });
+      }
+
+      setKanaList(data);
+      selectRandomKana(data);
+    } catch (error) {
+      console.error("Error fetching kana data:", error);
+    } finally {
+      setLoadingKana(false);
+    }
+  }, [kanaType, selectRandomKana, setKanaList, setLoadingKana]);
+
+  // Prevent double fetch in React strict mode
+  useEffect(() => {
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      fetchKanaData();
+    }
+  }, [kanaType, fetchKanaData]);
 
   // Submit answer and update accuracy
   const submitAnswer = async (answer: string) => {
