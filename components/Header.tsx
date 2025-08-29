@@ -19,7 +19,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 
 interface HeaderProps {}

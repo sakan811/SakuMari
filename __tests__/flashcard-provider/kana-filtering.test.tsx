@@ -301,7 +301,7 @@ describe("FlashcardProvider - Multiple Choice Generation", () => {
     });
 
     const firstKana = getByTestId("current-kana").textContent;
-    const firstChoices = Array.from(
+    const _firstChoices = Array.from(
       { length: 4 },
       (_, i) => getByTestId(`choice-${i}`).textContent,
     );

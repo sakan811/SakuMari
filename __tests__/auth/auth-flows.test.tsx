@@ -1,5 +1,6 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import React from "react";
 import Header from "@/components/Header";
 import Home from "@/app/page";
 

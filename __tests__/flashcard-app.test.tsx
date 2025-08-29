@@ -1,5 +1,6 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import React from "react";
 import FlashcardApp from "../components/FlashcardApp";
 
 // Mock child components without interfering with the main structure
@@ -21,7 +22,7 @@ vi.mock("../components/Header", () => ({
     setActiveTab,
   }: {
     activeTab: string;
-    setActiveTab: (tab: string) => void;
+    setActiveTab: (_tab: string) => void;
   }) => (
     <div data-testid="header-component">
       <span data-testid="active-tab">{activeTab}</span>

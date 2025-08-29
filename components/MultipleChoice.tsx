@@ -17,10 +17,12 @@
 
 "use client";
 
+import React from "react";
+
 interface MultipleChoiceProps {
   choices: string[];
   selectedChoice: number | null;
-  onChoiceSelect: (index: number) => void;
+  onChoiceSelect: (_index: number) => void;
   disabled?: boolean;
   error?: string;
 }

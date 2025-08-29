@@ -8,6 +8,7 @@ import { render, screen } from "@testing-library/react";
 import { useSession } from "next-auth/react";
 
 // Import actual components
+import React from "react";
 import HomePage from "../../components/HomePage";
 import FlashcardApp from "../../components/FlashcardApp";
 import Dashboard from "../../components/Dashboard";
