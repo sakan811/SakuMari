@@ -8,6 +8,7 @@
     "build": "pnpm exec prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
     "format": "pnpx prettier . --write",
@@ -30,14 +31,17 @@
     "test:e2e:build": "cross-env CREDS_PROVIDER=true pnpm build",
     "test:e2e:full": "pnpm test:e2e:setup && pnpm test:e2e:build && pnpm test:e2e",
     "test:e2e:clean": "docker compose -f docker/docker-compose.yml down --volumes",
-    "test:all": "pnpm lint && pnpm format && pnpm test:run && pnpm test:db:full && pnpm test:e2e:full",
+    "test:all": "pnpm lint && pnpm format && pnpm typecheck && pnpm test:run && pnpm test:db:full && pnpm test:e2e:full",
     "docker:db": "docker compose -f docker/docker-compose.yml up -d db",
     "docker:dev-up": "docker compose -f docker/docker-compose.yml up -d db app --build",
     "docker:logs": "docker compose -f docker/docker-compose.yml logs -f",
     "docker:logs-app": "docker compose -f docker/docker-compose.yml logs -f app",
     "docker:status": "docker compose -f docker/docker-compose.yml ps",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
-    "docker:clean": "docker compose -f docker/docker-compose.yml down --volumes --rmi all --remove-orphans"
+    "docker:clean": "docker compose -f docker/docker-compose.yml down --volumes --rmi all --remove-orphans",
+    "license:add": "node scripts/manage-license-headers.js add",
+    "license:remove": "node scripts/manage-license-headers.js remove",
+    "license:check": "node scripts/manage-license-headers.js check"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
