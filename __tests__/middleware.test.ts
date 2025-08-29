@@ -5,11 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 vi.mock("next/server", async () => {
   const actual = await vi.importActual("next/server");
   return {
-    ...actual,
     NextResponse: {
       ...actual.NextResponse,
-      redirect: vi.fn(),
-      next: vi.fn(),
+      redirect: vi.fn().mockImplementation((url: string) => actual.NextResponse.redirect(url)),
+      next: vi.fn().mockImplementation(() => actual.NextResponse.next()),
     },
   };
 });
@@ -23,12 +22,12 @@ import { config } from "@/middleware";
 import { auth } from "@/lib/auth";
 
 describe("Middleware", () => {
-  let mockAuthMiddleware: any;
+  let mockAuthMiddleware: (req: NextRequest & { auth?: any }) => NextResponse;
 
   beforeEach(() => {
     vi.clearAllMocks();
     // Create a fresh mock for each test
-    mockAuthMiddleware = vi.fn((req: any) => {
+    mockAuthMiddleware = vi.fn((req) => {
       // Simulate the actual middleware logic
       if (!req.auth && req.nextUrl.pathname !== "/") {
         return NextResponse.redirect(new URL("/", req.url));

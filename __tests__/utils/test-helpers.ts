@@ -25,7 +25,7 @@ export const mockFlashcardProvider = (overrides = {}) => ({
   ...overrides,
 });
 
-export const mockApiResponse = (data: any, ok = true) => ({
+export const mockApiResponse = (data: unknown, ok = true) => ({
   ok,
   status: ok ? 200 : 500,
   json: async () => data,

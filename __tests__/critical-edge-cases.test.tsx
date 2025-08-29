@@ -11,7 +11,7 @@ vi.mock("../components/FlashcardProvider", () => ({
 describe("Edge Cases", () => {
   test("handles whitespace-only input", () => {
     const submitAnswer = vi.fn();
-    (useFlashcard as any).mockReturnValue(
+    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
       mockFlashcardProvider({
         currentKana: mockKana.basic,
         submitAnswer,
@@ -32,7 +32,7 @@ describe("Edge Cases", () => {
   });
 
   test("handles corrupted data", () => {
-    (useFlashcard as any).mockReturnValue(
+    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
       mockFlashcardProvider({
         currentKana: { ...mockKana.basic, character: null },
         interactionMode: "typing",
@@ -46,7 +46,7 @@ describe("Edge Cases", () => {
   test("cleans up on unmount", () => {
     const removeListener = vi.spyOn(window, "removeEventListener");
 
-    (useFlashcard as any).mockReturnValue(
+    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
       mockFlashcardProvider({
         currentKana: mockKana.basic,
         result: "correct",

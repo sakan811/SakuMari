@@ -10,7 +10,7 @@ vi.mock("../components/FlashcardProvider", () => ({
 
 describe("Flashcard Component", () => {
   beforeEach(() => {
-    (useFlashcard as any).mockReturnValue(
+    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
       mockFlashcardProvider({
         interactionMode: "typing",
         choices: ["a", "ka", "sa", "ta"],
@@ -19,7 +19,7 @@ describe("Flashcard Component", () => {
   });
 
   test("shows loading state", () => {
-    (useFlashcard as any).mockReturnValue(
+    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
       mockFlashcardProvider({
         loadingKana: true,
         interactionMode: "typing",
@@ -31,7 +31,7 @@ describe("Flashcard Component", () => {
   });
 
   test("shows empty state when no cards", () => {
-    (useFlashcard as any).mockReturnValue(
+    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
       mockFlashcardProvider({
         interactionMode: "typing",
         choices: ["a", "ka", "sa", "ta"],
@@ -43,7 +43,7 @@ describe("Flashcard Component", () => {
 
   test("renders flashcard and handles submission", async () => {
     const submitAnswer = vi.fn();
-    (useFlashcard as any).mockReturnValue(
+    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
       mockFlashcardProvider({
         currentKana: mockKana.basic,
         submitAnswer,
@@ -67,7 +67,7 @@ describe("Flashcard Component", () => {
 
   test("shows results and handles next card", () => {
     const nextCard = vi.fn();
-    (useFlashcard as any).mockReturnValue(
+    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
       mockFlashcardProvider({
         currentKana: mockKana.basic,
         result: "correct",
@@ -86,7 +86,7 @@ describe("Flashcard Component", () => {
   });
 
   test("validates empty input", () => {
-    (useFlashcard as any).mockReturnValue(
+    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
       mockFlashcardProvider({
         currentKana: mockKana.basic,
         interactionMode: "typing",
@@ -103,7 +103,7 @@ describe("Flashcard Component", () => {
   describe("Keyboard Navigation", () => {
     test("submits answer when Enter is pressed in typing mode", () => {
       const submitAnswer = vi.fn();
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           submitAnswer,
@@ -123,7 +123,7 @@ describe("Flashcard Component", () => {
 
     test("advances to next card when Enter is pressed after result is shown", () => {
       const nextCard = vi.fn();
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           result: "correct",
@@ -141,7 +141,7 @@ describe("Flashcard Component", () => {
 
     test("does not advance to next card when Enter is pressed without result", () => {
       const nextCard = vi.fn();
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           nextCard,
@@ -157,7 +157,7 @@ describe("Flashcard Component", () => {
     });
 
     test("clears error when user starts typing", () => {
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           interactionMode: "typing",
@@ -181,7 +181,7 @@ describe("Flashcard Component", () => {
 
   describe("Disabled States", () => {
     test("disables input and submit button when processing", () => {
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           interactionMode: "typing",
@@ -204,7 +204,7 @@ describe("Flashcard Component", () => {
     });
 
     test("disables next card button when processing", () => {
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           result: "correct",
@@ -223,7 +223,7 @@ describe("Flashcard Component", () => {
 
     test("prevents multiple submissions when processing", () => {
       const submitAnswer = vi.fn();
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           submitAnswer,
@@ -251,7 +251,7 @@ describe("Flashcard Component", () => {
 
     test("prevents keyboard submission when processing", () => {
       const submitAnswer = vi.fn();
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           submitAnswer,
@@ -274,7 +274,7 @@ describe("Flashcard Component", () => {
 
     test("prevents next card action when processing", () => {
       const nextCard = vi.fn();
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           result: "correct",
@@ -296,7 +296,7 @@ describe("Flashcard Component", () => {
 
   describe("Multiple Choice Mode", () => {
     test("validates empty selection in multiple choice mode", () => {
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           interactionMode: "multiple-choice",
@@ -317,7 +317,7 @@ describe("Flashcard Component", () => {
         choices: ["a", "ka", "sa", "ta"],
       });
 
-      (useFlashcard as any).mockReturnValue(mockProvider);
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(mockProvider);
 
       render(<Flashcard />);
 
@@ -334,7 +334,7 @@ describe("Flashcard Component", () => {
   describe("Mode Switching", () => {
     test("clears state when switching between modes", () => {
       const setInteractionMode = vi.fn();
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           interactionMode: "typing",
@@ -354,7 +354,7 @@ describe("Flashcard Component", () => {
 
       // Unmount and switch modes
       unmount();
-      (useFlashcard as any).mockReturnValue(
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
         mockFlashcardProvider({
           currentKana: mockKana.basic,
           interactionMode: "multiple-choice",

@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, act } from "@testing-library/react";
+import { render, screen, waitFor, act, RenderResult } from "@testing-library/react";
 import FlashcardApp from "@/components/FlashcardApp";
 
 // Mock fetch globally
@@ -31,7 +31,9 @@ describe("Session Management", () => {
       status: "authenticated",
     });
 
-    let rerender: any;
+    let rerender: (
+      ui: React.ReactElement,
+    ) => void | RenderResult = () => {};
     act(() => {
       ({ rerender } = render(<FlashcardApp kanaType="hiragana" />));
     });
@@ -61,7 +63,9 @@ describe("Session Management", () => {
       status: "authenticated",
     });
 
-    let rerender: any;
+    let rerender: (
+      ui: React.ReactElement,
+    ) => void | RenderResult = () => {};
     act(() => {
       ({ rerender } = render(<FlashcardApp kanaType="hiragana" />));
     });

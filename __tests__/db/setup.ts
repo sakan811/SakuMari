@@ -2,10 +2,11 @@
 import { execSync } from "child_process";
 import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
-import { beforeAll, afterAll, beforeEach, afterEach } from "vitest";
+import { beforeAll, afterAll, beforeEach } from "vitest";
+import { PrismaClient } from "@prisma/client";
 
 // Single persistent client instance
-let testPrisma: any = null;
+let testPrisma: PrismaClient | null = null;
 let isSetupComplete = false;
 
 const TEST_DB_PATH = join(process.cwd(), "__tests__/db/test.db");

@@ -83,7 +83,7 @@ describe("TipsButton", () => {
 
   test("tooltip has correct styling and arrow", () => {
     const mockOnOpenTips = vi.fn();
-    const { container } = render(<TipsButton onOpenTips={mockOnOpenTips} />);
+    render(<TipsButton onOpenTips={mockOnOpenTips} />);
 
     const button = screen.getByRole("button");
     fireEvent.mouseEnter(button);

@@ -1,5 +1,4 @@
 import { describe, test, expect, vi } from "vitest";
-import { NextRequest, NextResponse } from "next/server";
 
 // Mock the auth function for middleware testing
 const mockAuth = vi.fn();

@@ -19,7 +19,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import TipsButton from "./TipsButton";
 import TipsModal from "./TipsModal";
 
 type KanaStats = {
