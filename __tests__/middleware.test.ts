@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Mock NextResponse static methods
 vi.mock("next/server", async () => {
-  const actual = await vi.importActual("next/server");
+  const actual = (await vi.importActual("next/server")) as any;
   return {
     ...actual,
     NextResponse: {

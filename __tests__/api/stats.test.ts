@@ -3,7 +3,7 @@ import { setupApiTest } from "../utils/test-helpers";
 import * as apiHelpers from "@/lib/api-helpers";
 
 vi.mock("@/lib/api-helpers", async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
     withErrorHandling: vi.fn((handler) => {

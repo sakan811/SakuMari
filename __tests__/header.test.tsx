@@ -19,7 +19,7 @@ vi.mock("next-auth/react", () => ({
 
 describe("Header", () => {
   it("renders navigation links", async () => {
-    render(<Header activeTab="flashcards" setActiveTab={() => {}} />);
+    render(<Header />);
     expect(await screen.findByText("Hiragana")).toBeDefined();
     expect(await screen.findByText("ひらがな")).toBeDefined();
     expect(await screen.findByText("Katakana")).toBeDefined();

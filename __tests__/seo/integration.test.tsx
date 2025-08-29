@@ -52,9 +52,11 @@ describe("SEO Integration Tests", () => {
     mockUseSession.mockReturnValue({
       data: {
         user: {
+          id: "test-user-123",
           name: "Test User",
           email: "test@example.com",
         },
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours from now
       },
       status: "authenticated",
       update: vi.fn(),

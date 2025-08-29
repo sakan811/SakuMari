@@ -54,14 +54,14 @@ describe("Authentication Flow Tests", () => {
     });
 
     test("shows sign-in button when user is not authenticated", async () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       expect(await screen.findByText("Sign In")).toBeInTheDocument();
       expect(screen.queryByText("Sign Out")).not.toBeInTheDocument();
     });
 
     test("calls signIn when sign-in button is clicked", async () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       const signInButton = await screen.findByText("Sign In");
       fireEvent.click(signInButton);
@@ -89,7 +89,7 @@ describe("Authentication Flow Tests", () => {
         status: "loading",
       });
 
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       const signInButton = await screen.findByText("Loading...");
       expect(signInButton).toBeDisabled();
@@ -115,14 +115,14 @@ describe("Authentication Flow Tests", () => {
     });
 
     test("shows user profile and sign-out button when authenticated", async () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       expect(await screen.findByText("Sign Out")).toBeInTheDocument();
       expect(screen.queryByText("Sign In")).not.toBeInTheDocument();
     });
 
     test("displays user avatar when image is available", async () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       const avatar = await screen.findByAltText("Profile");
       expect(avatar).toBeInTheDocument();
@@ -135,13 +135,13 @@ describe("Authentication Flow Tests", () => {
         status: "authenticated",
       });
 
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       expect(await screen.findByText("J")).toBeInTheDocument(); // First letter of John
     });
 
     test("calls signOut when sign-out button is clicked", async () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       const signOutButton = await screen.findByText("Sign Out");
       fireEvent.click(signOutButton);
@@ -164,7 +164,7 @@ describe("Authentication Flow Tests", () => {
     });
 
     test("shows navigation links in header when authenticated", async () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       expect(await screen.findByText(/Hiragana/)).toBeInTheDocument();
       expect(await screen.findByText(/Katakana/)).toBeInTheDocument();
@@ -190,7 +190,7 @@ describe("Authentication Flow Tests", () => {
     });
 
     test("disables sign-in button during loading", async () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       const button = await screen.findByText("Loading...");
       expect(button).toBeDisabled();
@@ -209,7 +209,7 @@ describe("Authentication Flow Tests", () => {
         status: "authenticated",
       });
 
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       // Click mobile menu button
       const menuButton = screen.getByLabelText("Toggle mobile menu");
@@ -228,7 +228,7 @@ describe("Authentication Flow Tests", () => {
         status: "authenticated",
       });
 
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       // Open mobile menu
       const menuButton = screen.getByLabelText("Toggle mobile menu");

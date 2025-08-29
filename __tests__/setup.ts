@@ -5,7 +5,7 @@ import { act } from "react";
 
 // Mock next/server to resolve module import issues with next-auth
 vi.mock("next/server", async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
     // Add any specific exports from next/server that next-auth might need
@@ -44,14 +44,42 @@ const mockFetch = vi.fn((url) => {
   if (url === "/api/auth/providers") {
     return Promise.resolve({
       json: () => Promise.resolve({ credentialsEnabled: true }),
-    });
+      ok: true,
+      status: 200,
+      headers: {} as any,
+      redirected: false,
+      statusText: "OK",
+      type: "default" as any,
+      url: url as string,
+      clone: () => ({}) as any,
+      body: null,
+      bodyUsed: false,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+      blob: () => Promise.resolve(new Blob()),
+      formData: () => Promise.resolve(new FormData()),
+      text: () => Promise.resolve(""),
+    } as Response);
   }
   // Default for other fetches if any
   return Promise.resolve({
     json: () => Promise.resolve({}),
-  });
+    ok: true,
+    status: 200,
+    headers: {} as any,
+    redirected: false,
+    statusText: "OK",
+    type: "default" as any,
+    url: url as string,
+    clone: () => ({}) as any,
+    body: null,
+    bodyUsed: false,
+    arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+    blob: () => Promise.resolve(new Blob()),
+    formData: () => Promise.resolve(new FormData()),
+    text: () => Promise.resolve(""),
+  } as Response);
 });
-global.fetch = mockFetch;
+global.fetch = mockFetch as any;
 
 // Make mockFetch available globally for individual test files
 // @ts-ignore

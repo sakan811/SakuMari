@@ -32,7 +32,7 @@ vi.mock("@google/generative-ai", () => ({
 
 // Mock api-helpers to properly handle error wrapping
 vi.mock("@/lib/api-helpers", async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
     withErrorHandling: vi.fn((handler) => {
