@@ -45,7 +45,6 @@ vi.mock("next/image", () => ({
 }));
 
 describe("Authentication Flow Tests", () => {
-
   describe("Unauthenticated State", () => {
     beforeEach(() => {
       mockUseSession.mockReturnValue({
@@ -73,7 +72,9 @@ describe("Authentication Flow Tests", () => {
     test("shows welcome message instead of practice options", async () => {
       render(<Home />);
 
-      expect(await screen.findByText("Welcome to SakuMari!")).toBeInTheDocument();
+      expect(
+        await screen.findByText("Welcome to SakuMari!"),
+      ).toBeInTheDocument();
       expect(
         await screen.findByText(/Sign in with your Google account/),
       ).toBeInTheDocument();
@@ -157,7 +158,9 @@ describe("Authentication Flow Tests", () => {
       expect(
         await screen.findByText("カタカナ Katakana Practice"),
       ).toBeInTheDocument();
-      expect(await screen.findByText("📊 View Your Progress")).toBeInTheDocument();
+      expect(
+        await screen.findByText("📊 View Your Progress"),
+      ).toBeInTheDocument();
     });
 
     test("shows navigation links in header when authenticated", async () => {

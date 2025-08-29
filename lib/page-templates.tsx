@@ -44,4 +44,3 @@ export function createPracticePage(kanaType: KanaType) {
 export function getPracticePageMetadata(kanaType: KanaType) {
   return createPresetMetadata(kanaType);
 }
-

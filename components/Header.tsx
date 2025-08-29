@@ -21,7 +21,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { createButtonClass, colors, gradients, utils } from "@/lib/design-system";
+import {
+  createButtonClass,
+  colors,
+  gradients,
+  utils,
+} from "@/lib/design-system";
 export default function Header() {
   const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,13 +41,22 @@ export default function Header() {
   }, []);
 
   return (
-    <header className={utils.cn(gradients.secondary, "shadow-xl border-b-4", `border-[${colors.primary}]`)}>
+    <header
+      className={utils.cn(
+        gradients.secondary,
+        "shadow-xl border-b-4",
+        `border-[${colors.primary}]`,
+      )}
+    >
       <div className="container mx-auto p-3 sm:p-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link
             href="/"
-            className={utils.cn("text-lg sm:text-2xl font-bold hover:text-white transition-colors duration-200 drop-shadow-sm min-h-[44px] relative z-10 inline-flex items-center", `text-[${colors.accent}]`)}
+            className={utils.cn(
+              "text-lg sm:text-2xl font-bold hover:text-white transition-colors duration-200 drop-shadow-sm min-h-[44px] relative z-10 inline-flex items-center",
+              `text-[${colors.accent}]`,
+            )}
           >
             🌸 SakuMari
           </Link>
@@ -53,19 +67,28 @@ export default function Header() {
               <>
                 <Link
                   href="/hiragana"
-                  className={utils.cn("hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
+                  className={utils.cn(
+                    "hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center",
+                    `text-[${colors.accent}] hover:border-[${colors.accent}]`,
+                  )}
                 >
                   <span className="hidden xl:inline">ひらがな </span>Hiragana
                 </Link>
                 <Link
                   href="/katakana"
-                  className={utils.cn("hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
+                  className={utils.cn(
+                    "hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center",
+                    `text-[${colors.accent}] hover:border-[${colors.accent}]`,
+                  )}
                 >
                   <span className="hidden xl:inline">カタカナ </span>Katakana
                 </Link>
                 <Link
                   href="/dashboard"
-                  className={utils.cn(createButtonClass("primary", "md"), "text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center")}
+                  className={utils.cn(
+                    createButtonClass("primary", "md"),
+                    "text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center",
+                  )}
                 >
                   📊 Dashboard
                 </Link>
@@ -81,15 +104,22 @@ export default function Header() {
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className={`w-6 h-6 xl:w-8 xl:h-8 rounded-full border-2 border-[${colors.accent}] bg-[${colors.accent}] flex items-center justify-center`}>
-                      <span className={`text-[${colors.secondaryDark}] text-xs xl:text-sm font-bold`}>
+                    <div
+                      className={`w-6 h-6 xl:w-8 xl:h-8 rounded-full border-2 border-[${colors.accent}] bg-[${colors.accent}] flex items-center justify-center`}
+                    >
+                      <span
+                        className={`text-[${colors.secondaryDark}] text-xs xl:text-sm font-bold`}
+                      >
                         {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
                       </span>
                     </div>
                   )}
                   <button
                     onClick={() => signOut()}
-                    className={utils.cn("hover:bg-white/10 border-2 border-transparent transition-colors duration-200 font-medium px-4 py-3 rounded-lg text-sm xl:text-base min-h-[44px] min-w-[80px] relative z-10 cursor-pointer", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
+                    className={utils.cn(
+                      "hover:bg-white/10 border-2 border-transparent transition-colors duration-200 font-medium px-4 py-3 rounded-lg text-sm xl:text-base min-h-[44px] min-w-[80px] relative z-10 cursor-pointer",
+                      `text-[${colors.accent}] hover:border-[${colors.accent}]`,
+                    )}
                     type="button"
                   >
                     Sign Out
@@ -100,7 +130,10 @@ export default function Header() {
               <button
                 onClick={() => signIn("credentials")}
                 disabled={status === "loading"}
-                className={utils.cn(createButtonClass("primary", "md"), "disabled:opacity-50 disabled:cursor-not-allowed text-sm xl:text-base min-h-[44px] relative z-10 cursor-pointer")}
+                className={utils.cn(
+                  createButtonClass("primary", "md"),
+                  "disabled:opacity-50 disabled:cursor-not-allowed text-sm xl:text-base min-h-[44px] relative z-10 cursor-pointer",
+                )}
                 type="button"
               >
                 {status === "loading" ? "Loading..." : "Sign In"}
@@ -109,7 +142,10 @@ export default function Header() {
               <button
                 onClick={() => signIn("google")}
                 disabled={status === "loading"}
-                className={utils.cn(createButtonClass("primary", "md"), "disabled:opacity-50 disabled:cursor-not-allowed text-sm xl:text-base min-h-[44px] relative z-10 cursor-pointer")}
+                className={utils.cn(
+                  createButtonClass("primary", "md"),
+                  "disabled:opacity-50 disabled:cursor-not-allowed text-sm xl:text-base min-h-[44px] relative z-10 cursor-pointer",
+                )}
                 type="button"
               >
                 {status === "loading" ? "Loading..." : "Sign In"}
@@ -120,7 +156,10 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={utils.cn("lg:hidden hover:text-white transition-colors duration-200 p-3 min-h-[44px] min-w-[44px] relative z-10 cursor-pointer", `text-[${colors.accent}]`)}
+            className={utils.cn(
+              "lg:hidden hover:text-white transition-colors duration-200 p-3 min-h-[44px] min-w-[44px] relative z-10 cursor-pointer",
+              `text-[${colors.accent}]`,
+            )}
             aria-label="Toggle mobile menu"
             type="button"
           >
@@ -151,28 +190,42 @@ export default function Header() {
 
         {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
-          <nav className={utils.cn("lg:hidden mt-3 sm:mt-4 pt-3 sm:pt-4 border-t", `border-[${colors.accent}]/30`)}>
+          <nav
+            className={utils.cn(
+              "lg:hidden mt-3 sm:mt-4 pt-3 sm:pt-4 border-t",
+              `border-[${colors.accent}]/30`,
+            )}
+          >
             <div className="flex flex-col space-y-2 sm:space-y-3">
               {session ? (
                 <>
                   <Link
                     href="/hiragana"
                     onClick={() => setMobileMenuOpen(false)}
-                    className={utils.cn("hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm sm:text-base min-h-[44px] relative z-10 inline-flex items-center", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
+                    className={utils.cn(
+                      "hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm sm:text-base min-h-[44px] relative z-10 inline-flex items-center",
+                      `text-[${colors.accent}] hover:border-[${colors.accent}]`,
+                    )}
                   >
                     ひらがな Hiragana
                   </Link>
                   <Link
                     href="/katakana"
                     onClick={() => setMobileMenuOpen(false)}
-                    className={utils.cn("hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm sm:text-base min-h-[44px] relative z-10 inline-flex items-center", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
+                    className={utils.cn(
+                      "hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg hover:bg-white/10 border-2 border-transparent text-sm sm:text-base min-h-[44px] relative z-10 inline-flex items-center",
+                      `text-[${colors.accent}] hover:border-[${colors.accent}]`,
+                    )}
                   >
                     カタカナ Katakana
                   </Link>
                   <Link
                     href="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
-                    className={utils.cn(createButtonClass("primary", "md"), "text-sm sm:text-base w-fit min-h-[44px] relative z-10 inline-flex items-center")}
+                    className={utils.cn(
+                      createButtonClass("primary", "md"),
+                      "text-sm sm:text-base w-fit min-h-[44px] relative z-10 inline-flex items-center",
+                    )}
                   >
                     📊 Dashboard
                   </Link>
@@ -183,18 +236,36 @@ export default function Header() {
                         alt="Profile"
                         width={32}
                         height={32}
-                        className={utils.cn("w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2", `border-[${colors.accent}]`)}
+                        className={utils.cn(
+                          "w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2",
+                          `border-[${colors.accent}]`,
+                        )}
                         unoptimized
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <div className={utils.cn("w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center", `border-[${colors.accent}] bg-[${colors.accent}]`)}>
-                        <span className={utils.cn("text-xs sm:text-sm font-bold", `text-[${colors.secondaryDark}]`)}>
+                      <div
+                        className={utils.cn(
+                          "w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center",
+                          `border-[${colors.accent}] bg-[${colors.accent}]`,
+                        )}
+                      >
+                        <span
+                          className={utils.cn(
+                            "text-xs sm:text-sm font-bold",
+                            `text-[${colors.secondaryDark}]`,
+                          )}
+                        >
                           {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
                         </span>
                       </div>
                     )}
-                    <span className={utils.cn("text-sm sm:text-base font-medium", `text-[${colors.accent}]`)}>
+                    <span
+                      className={utils.cn(
+                        "text-sm sm:text-base font-medium",
+                        `text-[${colors.accent}]`,
+                      )}
+                    >
                       {session.user?.name}
                     </span>
                   </div>
@@ -203,7 +274,10 @@ export default function Header() {
                       signOut();
                       setMobileMenuOpen(false);
                     }}
-                    className={utils.cn("hover:bg-white/10 border-2 border-transparent transition-colors duration-200 font-medium px-4 py-3 rounded-lg text-left text-sm sm:text-base w-fit min-h-[44px] min-w-[80px] relative z-10 cursor-pointer", `text-[${colors.accent}] hover:border-[${colors.accent}]`)}
+                    className={utils.cn(
+                      "hover:bg-white/10 border-2 border-transparent transition-colors duration-200 font-medium px-4 py-3 rounded-lg text-left text-sm sm:text-base w-fit min-h-[44px] min-w-[80px] relative z-10 cursor-pointer",
+                      `text-[${colors.accent}] hover:border-[${colors.accent}]`,
+                    )}
                     type="button"
                   >
                     Sign Out
@@ -241,9 +315,15 @@ export default function Header() {
                     {status === "loading" ? "Loading..." : "Sign In"}
                   </button>
                   <div className="flex items-center gap-2">
-                    <div className={`flex-1 h-px bg-[${colors.accent}]/30`}></div>
-                    <span className={`text-[${colors.accent}] text-sm`}>or</span>
-                    <div className={`flex-1 h-px bg-[${colors.accent}]/30`}></div>
+                    <div
+                      className={`flex-1 h-px bg-[${colors.accent}]/30`}
+                    ></div>
+                    <span className={`text-[${colors.accent}] text-sm`}>
+                      or
+                    </span>
+                    <div
+                      className={`flex-1 h-px bg-[${colors.accent}]/30`}
+                    ></div>
                   </div>
                   <button
                     onClick={() => {
@@ -251,7 +331,10 @@ export default function Header() {
                       setMobileMenuOpen(false);
                     }}
                     disabled={status === "loading"}
-                    className={utils.cn("w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 font-medium border-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px] cursor-pointer", `bg-[${colors.secondaryDark}] hover:bg-[${colors.secondary}] text-[${colors.accent}] border-[${colors.primary}]`)}
+                    className={utils.cn(
+                      "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 font-medium border-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px] cursor-pointer",
+                      `bg-[${colors.secondaryDark}] hover:bg-[${colors.secondary}] text-[${colors.accent}] border-[${colors.primary}]`,
+                    )}
                     type="button"
                   >
                     <svg
@@ -277,7 +360,10 @@ export default function Header() {
                     setMobileMenuOpen(false);
                   }}
                   disabled={status === "loading"}
-                  className={utils.cn(createButtonClass("primary", "md"), "disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-fit min-h-[44px] relative z-10 cursor-pointer")}
+                  className={utils.cn(
+                    createButtonClass("primary", "md"),
+                    "disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-fit min-h-[44px] relative z-10 cursor-pointer",
+                  )}
                   type="button"
                 >
                   {status === "loading" ? "Loading..." : "Sign In"}

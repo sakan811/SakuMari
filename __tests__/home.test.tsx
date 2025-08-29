@@ -46,13 +46,15 @@ describe("Home Page", () => {
     render(<Home />);
 
     // Fix: Use getByText instead of getAllByText with index
-    const hiraganaLink = (await screen
-      .findByText("ひらがな Hiragana Practice"))
-      .closest("a");
-    const katakanaLink = (await screen
-      .findByText("カタカナ Katakana Practice"))
-      .closest("a");
-    const progressLink = (await screen.findByText("📊 View Your Progress")).closest("a");
+    const hiraganaLink = (
+      await screen.findByText("ひらがな Hiragana Practice")
+    ).closest("a");
+    const katakanaLink = (
+      await screen.findByText("カタカナ Katakana Practice")
+    ).closest("a");
+    const progressLink = (
+      await screen.findByText("📊 View Your Progress")
+    ).closest("a");
 
     expect(hiraganaLink?.getAttribute("href")).toBe("/hiragana");
     expect(katakanaLink?.getAttribute("href")).toBe("/katakana");

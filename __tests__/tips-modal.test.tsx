@@ -33,7 +33,6 @@ const mockFetch = global.mockFetch;
 describe("TipsModal", () => {
   const mockOnClose = vi.fn();
 
-
   afterEach(() => {
     cleanup();
   });

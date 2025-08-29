@@ -21,12 +21,15 @@
  */
 
 import { NextResponse } from "next/server";
-import { performHealthCheck, checkDatabaseConnection } from "@/lib/health-check";
+import {
+  performHealthCheck,
+  checkDatabaseConnection,
+} from "@/lib/health-check";
 
 export async function GET() {
   const healthStatus = await performHealthCheck();
   const statusCode = healthStatus.status === "healthy" ? 200 : 503;
-  
+
   return NextResponse.json(healthStatus, { status: statusCode });
 }
 

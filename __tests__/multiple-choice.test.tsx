@@ -14,7 +14,6 @@ describe("MultipleChoice Component", () => {
     error: undefined,
   };
 
-
   describe("Rendering", () => {
     test("renders all choices as buttons", () => {
       render(<MultipleChoice {...defaultProps} />);

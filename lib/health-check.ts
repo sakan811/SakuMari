@@ -42,8 +42,8 @@ export async function checkDatabaseConnection(): Promise<void> {
  * @returns HealthStatus object
  */
 export function createHealthStatus(
-  isHealthy: boolean, 
-  error?: Error | string
+  isHealthy: boolean,
+  error?: Error | string,
 ): HealthStatus {
   const timestamp = new Date().toISOString();
   const uptime = process.uptime();
@@ -67,7 +67,8 @@ export function createHealthStatus(
     uptime,
     environment,
     database: "disconnected",
-    error: error instanceof Error ? error.message : String(error || "Unknown error"),
+    error:
+      error instanceof Error ? error.message : String(error || "Unknown error"),
   };
 }
 

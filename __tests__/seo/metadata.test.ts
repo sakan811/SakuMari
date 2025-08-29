@@ -156,7 +156,9 @@ describe("SEO Metadata Configuration", () => {
       expect(hiraganaMetadata.openGraph?.title).toBe(
         "Hiragana Practice | SakuMari",
       );
-      expect(hiraganaMetadata.openGraph?.url).toBe("https://sakumari.fukudev.org/hiragana");
+      expect(hiraganaMetadata.openGraph?.url).toBe(
+        "https://sakumari.fukudev.org/hiragana",
+      );
       expect(hiraganaMetadata.openGraph?.description).toBe(
         "Practice Japanese Hiragana characters with interactive flashcards. Master all 46 basic Hiragana symbols and improve your reading skills.",
       );
@@ -198,7 +200,9 @@ describe("SEO Metadata Configuration", () => {
       expect(katakanaMetadata.openGraph?.title).toBe(
         "Katakana Practice | SakuMari",
       );
-      expect(katakanaMetadata.openGraph?.url).toBe("https://sakumari.fukudev.org/katakana");
+      expect(katakanaMetadata.openGraph?.url).toBe(
+        "https://sakumari.fukudev.org/katakana",
+      );
       expect(katakanaMetadata.openGraph?.description).toBe(
         "Practice Japanese Katakana characters with interactive flashcards. Master all 46 basic Katakana symbols used for foreign words and names.",
       );
@@ -216,7 +220,9 @@ describe("SEO Metadata Configuration", () => {
 
   describe("Dashboard Page Metadata", () => {
     it("should have Dashboard-specific title", () => {
-      expect(dashboardMetadata.title).toBe("Dashboard - Your Progress | SakuMari");
+      expect(dashboardMetadata.title).toBe(
+        "Dashboard - Your Progress | SakuMari",
+      );
     });
 
     it("should have Dashboard-specific description", () => {

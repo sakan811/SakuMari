@@ -43,31 +43,39 @@ vi.mock("@/lib/api-helpers", async (importOriginal) => {
         } catch (error) {
           console.error("Mocked error:", error);
           // For the tips route, we need to handle different error types
-          if (error instanceof Error && error.message.includes("GEMINI_API_KEY")) {
+          if (
+            error instanceof Error &&
+            error.message.includes("GEMINI_API_KEY")
+          ) {
             return new Response(
-              JSON.stringify({ error: "AI service not configured. Please contact support." }),
-              { status: 503, headers: { "Content-Type": "application/json" } }
+              JSON.stringify({
+                error: "AI service not configured. Please contact support.",
+              }),
+              { status: 503, headers: { "Content-Type": "application/json" } },
             );
           }
           if (error instanceof Error && error.message === "Unauthorized") {
-            return new Response(
-              JSON.stringify({ error: "Unauthorized" }),
-              { status: 401, headers: { "Content-Type": "application/json" } }
-            );
+            return new Response(JSON.stringify({ error: "Unauthorized" }), {
+              status: 401,
+              headers: { "Content-Type": "application/json" },
+            });
           }
           // Default error response
           return new Response(
-            JSON.stringify({ error: "Unable to generate learning tips. Please try again later." }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            JSON.stringify({
+              error:
+                "Unable to generate learning tips. Please try again later.",
+            }),
+            { status: 500, headers: { "Content-Type": "application/json" } },
           );
         }
       };
     }),
     createErrorResponse: vi.fn((message, status) => {
-      return new Response(
-        JSON.stringify({ error: message }),
-        { status, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: message }), {
+        status,
+        headers: { "Content-Type": "application/json" },
+      });
     }),
   };
 });
@@ -87,7 +95,7 @@ describe("Tips API Route", async () => {
   beforeEach(() => {
     // Reset mocks before each test
     vi.clearAllMocks();
-    
+
     // Set default environment variables
     process.env.GEMINI_API_KEY = "test-api-key";
     process.env.MODEL_NAME = "gemini-2.5-flash-lite";

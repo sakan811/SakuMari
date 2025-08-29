@@ -32,5 +32,3 @@ export const isKanaType = (char: string, type: KanaFilter): boolean => {
     : code >= UNICODE_RANGES.KATAKANA.start &&
         code <= UNICODE_RANGES.KATAKANA.end;
 };
-
-

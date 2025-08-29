@@ -12,7 +12,6 @@ vi.mock("next-auth/react", () => ({
 }));
 
 describe("Integration Tests", () => {
-
   test("complete practice workflow", async () => {
     // Mock the initial flashcards fetch
     mockFetch.mockImplementation((url) => {

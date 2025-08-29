@@ -14,7 +14,6 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 describe("Health API Route", () => {
-
   describe("GET /api/health", () => {
     test("returns healthy status when database is connected", async () => {
       // Mock successful database query

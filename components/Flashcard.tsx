@@ -151,7 +151,9 @@ export default function Flashcard() {
         disabled={isSubmitting || !!result}
       />
 
-      <div className={`mb-6 sm:mb-8 rounded-lg bg-gradient-to-br from-[${colors.accent}] via-[${colors.accent}] to-[${colors.accentLight}] shadow-xl border-2 border-[${colors.secondary}] aspect-[5/3] sm:aspect-[2.5/3.5] flex flex-col justify-between p-4 sm:p-6`}>
+      <div
+        className={`mb-6 sm:mb-8 rounded-lg bg-gradient-to-br from-[${colors.accent}] via-[${colors.accent}] to-[${colors.accentLight}] shadow-xl border-2 border-[${colors.secondary}] aspect-[5/3] sm:aspect-[2.5/3.5] flex flex-col justify-between p-4 sm:p-6`}
+      >
         <div className="flex-grow flex items-center justify-center">
           <h2
             data-testid="current-kana"
@@ -200,13 +202,17 @@ export default function Flashcard() {
                   }}
                   placeholder="Type romaji equivalent..."
                   className={`mb-1 sm:mb-2 rounded-md border-2 ${
-                    error ? `border-[${colors.primaryDark}]` : `border-[${colors.secondary}]`
+                    error
+                      ? `border-[${colors.primaryDark}]`
+                      : `border-[${colors.secondary}]`
                   } px-3 sm:px-4 py-2 text-sm sm:text-base focus:border-[${colors.primary}] focus:outline-none bg-white text-[${colors.secondaryDark}] placeholder-[${colors.secondary}]`}
                   disabled={isSubmitting}
                   autoFocus
                 />
                 {error && (
-                  <div className={`mb-1 sm:mb-2 text-[${colors.primaryDark}] text-xs sm:text-sm font-medium`}>
+                  <div
+                    className={`mb-1 sm:mb-2 text-[${colors.primaryDark}] text-xs sm:text-sm font-medium`}
+                  >
                     {error}
                   </div>
                 )}
@@ -229,7 +235,8 @@ export default function Flashcard() {
               disabled={isSubmitting}
               className={utils.cn(
                 createButtonClass("primary", "md"),
-                isSubmitting && `bg-[${colors.secondary}] cursor-not-allowed border-[${colors.secondary}] hover:bg-[${colors.secondary}] hover:border-[${colors.secondary}] hover:scale-100 hover:shadow-lg`
+                isSubmitting &&
+                  `bg-[${colors.secondary}] cursor-not-allowed border-[${colors.secondary}] hover:bg-[${colors.secondary}] hover:border-[${colors.secondary}] hover:scale-100 hover:shadow-lg`,
               )}
             >
               {isSubmitting ? "Submitting..." : "Submit"}
@@ -241,7 +248,8 @@ export default function Flashcard() {
             disabled={isSubmitting}
             className={utils.cn(
               createButtonClass("primary", "md"),
-              isSubmitting && `bg-[${colors.secondary}] cursor-not-allowed border-[${colors.secondary}] hover:bg-[${colors.secondary}] hover:border-[${colors.secondary}] hover:scale-100 hover:shadow-lg`
+              isSubmitting &&
+                `bg-[${colors.secondary}] cursor-not-allowed border-[${colors.secondary}] hover:bg-[${colors.secondary}] hover:border-[${colors.secondary}] hover:scale-100 hover:shadow-lg`,
             )}
           >
             {isSubmitting ? "Loading..." : "Next Card"}

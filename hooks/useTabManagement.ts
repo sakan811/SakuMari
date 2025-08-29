@@ -28,7 +28,9 @@ export interface UseTabManagementReturn {
  * Custom hook for managing tab state across components
  * Centralizes the tab management logic used in FlashcardApp and HomePage
  */
-export function useTabManagement(initialTab: TabType = "flashcards"): UseTabManagementReturn {
+export function useTabManagement(
+  initialTab: TabType = "flashcards",
+): UseTabManagementReturn {
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
 
   return {

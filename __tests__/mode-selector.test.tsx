@@ -11,7 +11,6 @@ describe("ModeSelector Component", () => {
     disabled: false,
   };
 
-
   describe("Rendering", () => {
     test("renders both mode buttons", () => {
       render(<ModeSelector {...defaultProps} />);

@@ -15,7 +15,9 @@ describe("API Authentication", async () => {
     ({ auth, prisma } = await getMocks());
     // Dynamically import the route handlers after mocks are set up
     const statsRouteModule = await import("@/app/api/stats/route");
-    const flashcardsRouteModule = await import("@/app/api/flashcards/submit/route");
+    const flashcardsRouteModule = await import(
+      "@/app/api/flashcards/submit/route"
+    );
     GET = statsRouteModule.GET;
     POST = flashcardsRouteModule.POST;
   });

@@ -23,12 +23,16 @@ export const mockNextNavigation = () => {
 export const mockNextLink = () => {
   vi.mock("next/link", () => ({
     default: ({ children, href, ...props }: any) => {
-      return <a href={href} {...props}>{children}</a>;
+      return (
+        <a href={href} {...props}>
+          {children}
+        </a>
+      );
     },
   }));
 };
 
-// Mock next/image  
+// Mock next/image
 export const mockNextImage = () => {
   vi.mock("next/image", () => ({
     default: ({ src, alt, ...props }: any) => {
@@ -62,12 +66,12 @@ interface SetupUITestMocksOptions {
 }
 
 export const setupUITestMocks = (options: SetupUITestMocksOptions = {}) => {
-  const { 
-    includeNavigation = true, 
-    includeLink = true, 
-    includeImage = false, 
+  const {
+    includeNavigation = true,
+    includeLink = true,
+    includeImage = false,
     includeAuth = true,
-    sessionConfig = {}
+    sessionConfig = {},
   } = options;
 
   if (includeNavigation) mockNextNavigation();

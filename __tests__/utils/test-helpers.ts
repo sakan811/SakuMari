@@ -44,7 +44,8 @@ export const createMockFactories = () => {
       const authMock = vi.fn();
       return {
         mock: authMock,
-        mockAuthenticated: (userId = "user123") => authMock.mockResolvedValue({ user: { id: userId } }),
+        mockAuthenticated: (userId = "user123") =>
+          authMock.mockResolvedValue({ user: { id: userId } }),
         mockUnauthenticated: () => authMock.mockResolvedValue(null),
         mockInvalidSession: () => authMock.mockResolvedValue({ user: {} }),
       };
@@ -69,13 +70,14 @@ export const createMockFactories = () => {
         },
         $queryRaw: vi.fn(),
       };
-      
+
       return {
         mock: prismaMock,
         mockDatabaseSuccess: () => prismaMock.$queryRaw.mockResolvedValue([1]),
-        mockDatabaseError: (error = new Error("Database connection failed")) => 
+        mockDatabaseError: (error = new Error("Database connection failed")) =>
           prismaMock.$queryRaw.mockRejectedValue(error),
-        mockKanaData: (data = [mockKana.withStats]) => prismaMock.kana.findMany.mockResolvedValue(data),
+        mockKanaData: (data = [mockKana.withStats]) =>
+          prismaMock.kana.findMany.mockResolvedValue(data),
       };
     },
   };

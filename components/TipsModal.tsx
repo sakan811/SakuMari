@@ -129,9 +129,13 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className={`w-[85vw] sm:w-full sm:max-w-2xl h-[80vh] bg-white rounded-lg shadow-2xl border-2 border-[${colors.secondary}] flex flex-col`}>
+      <div
+        className={`w-[85vw] sm:w-full sm:max-w-2xl h-[80vh] bg-white rounded-lg shadow-2xl border-2 border-[${colors.secondary}] flex flex-col`}
+      >
         {/* Header */}
-        <div className={`flex items-center justify-between p-4 bg-gradient-to-r from-[${colors.primary}] to-[${colors.primaryDark}] text-white flex-shrink-0`}>
+        <div
+          className={`flex items-center justify-between p-4 bg-gradient-to-r from-[${colors.primary}] to-[${colors.primaryDark}] text-white flex-shrink-0`}
+        >
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="text-2xl flex-shrink-0">💡</div>
             <div className="min-w-0">
@@ -151,7 +155,9 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
         </div>
 
         {/* Messages Display Area */}
-        <div className={`flex-1 overflow-y-auto p-4 bg-gradient-to-br from-[${colors.accent}]/10 to-[${colors.accentLight}]/10 min-h-0`}>
+        <div
+          className={`flex-1 overflow-y-auto p-4 bg-gradient-to-br from-[${colors.accent}]/10 to-[${colors.accentLight}]/10 min-h-0`}
+        >
           {messages.length === 0 && (
             <div className={`text-center text-[${colors.secondary}] py-8`}>
               <div className="text-4xl mb-4">🌸</div>
@@ -162,8 +168,8 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
                 Ask me anything about learning Japanese hiragana and katakana.
               </p>
               <div className={`mt-4 text-xs text-[${colors.secondary}]/80`}>
-                Example: &ldquo;How can I memorize hiragana faster?&rdquo; or &ldquo;Tips for
-                katakana practice?&rdquo;
+                Example: &ldquo;How can I memorize hiragana faster?&rdquo; or
+                &ldquo;Tips for katakana practice?&rdquo;
               </div>
             </div>
           )}
@@ -173,7 +179,9 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
               {message.type === "user" ? (
                 <div className="flex justify-end gap-2 sm:gap-4">
                   <div className="min-w-[25%] max-w-[85%] sm:min-w-0 sm:max-w-[50%]">
-                    <div className={`bg-[${colors.primary}] text-white rounded-lg rounded-br-none p-3 shadow-sm`}>
+                    <div
+                      className={`bg-[${colors.primary}] text-white rounded-lg rounded-br-none p-3 shadow-sm`}
+                    >
                       <div className="whitespace-pre-wrap text-sm leading-relaxed">
                         {message.content}
                       </div>
@@ -183,8 +191,12 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
               ) : (
                 <div className="flex justify-start gap-2 sm:gap-4">
                   <div className="min-w-[25%] max-w-[85%] sm:min-w-0 sm:max-w-[50%]">
-                    <div className={`bg-white border-2 border-[${colors.secondary}]/20 text-[${colors.secondaryDark}] rounded-lg rounded-bl-none p-3 shadow-sm`}>
-                      <div className={`text-sm leading-relaxed [&>h1]:text-lg [&>h1]:font-bold [&>h1]:mb-2 [&>h1]:text-[${colors.secondaryDark}] [&>h2]:text-base [&>h2]:font-bold [&>h2]:mb-2 [&>h2]:text-[${colors.secondaryDark}] [&>h3]:text-sm [&>h3]:font-bold [&>h3]:mb-1 [&>h3]:text-[${colors.secondaryDark}] [&>p]:mb-2 [&>p]:text-[${colors.secondaryDark}] [&>strong]:font-bold [&>strong]:text-[${colors.secondaryDark}] [&>em]:italic [&>em]:text-[${colors.secondaryDark}] [&>code]:text-[${colors.primary}] [&>code]:bg-[${colors.accent}]/20 [&>code]:px-1 [&>code]:py-0.5 [&>code]:rounded [&>code]:font-mono [&>code]:text-xs [&>ul]:mb-2 [&>ul]:pl-4 [&>ol]:mb-2 [&>ol]:pl-4 [&>li]:mb-1 [&>li]:text-[${colors.secondaryDark}] [&>pre]:bg-[${colors.accent}]/20 [&>pre]:p-2 [&>pre]:rounded [&>pre]:overflow-x-auto [&>pre]:mb-2 [&>blockquote]:border-l-4 [&>blockquote]:border-[${colors.primary}] [&>blockquote]:pl-3 [&>blockquote]:italic [&>blockquote]:text-[${colors.secondaryDark}]/80`}>
+                    <div
+                      className={`bg-white border-2 border-[${colors.secondary}]/20 text-[${colors.secondaryDark}] rounded-lg rounded-bl-none p-3 shadow-sm`}
+                    >
+                      <div
+                        className={`text-sm leading-relaxed [&>h1]:text-lg [&>h1]:font-bold [&>h1]:mb-2 [&>h1]:text-[${colors.secondaryDark}] [&>h2]:text-base [&>h2]:font-bold [&>h2]:mb-2 [&>h2]:text-[${colors.secondaryDark}] [&>h3]:text-sm [&>h3]:font-bold [&>h3]:mb-1 [&>h3]:text-[${colors.secondaryDark}] [&>p]:mb-2 [&>p]:text-[${colors.secondaryDark}] [&>strong]:font-bold [&>strong]:text-[${colors.secondaryDark}] [&>em]:italic [&>em]:text-[${colors.secondaryDark}] [&>code]:text-[${colors.primary}] [&>code]:bg-[${colors.accent}]/20 [&>code]:px-1 [&>code]:py-0.5 [&>code]:rounded [&>code]:font-mono [&>code]:text-xs [&>ul]:mb-2 [&>ul]:pl-4 [&>ol]:mb-2 [&>ol]:pl-4 [&>li]:mb-1 [&>li]:text-[${colors.secondaryDark}] [&>pre]:bg-[${colors.accent}]/20 [&>pre]:p-2 [&>pre]:rounded [&>pre]:overflow-x-auto [&>pre]:mb-2 [&>blockquote]:border-l-4 [&>blockquote]:border-[${colors.primary}] [&>blockquote]:pl-3 [&>blockquote]:italic [&>blockquote]:text-[${colors.secondaryDark}]/80`}
+                      >
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
                     </div>
@@ -198,10 +210,14 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
             <div className="mb-4">
               <div className="flex justify-start gap-2 sm:gap-4">
                 <div className="min-w-[25%] max-w-[85%] sm:min-w-0 sm:max-w-[50%]">
-                  <div className={`bg-white border-2 border-[${colors.secondary}]/20 rounded-lg rounded-bl-none p-3 shadow-sm`}>
+                  <div
+                    className={`bg-white border-2 border-[${colors.secondary}]/20 rounded-lg rounded-bl-none p-3 shadow-sm`}
+                  >
                     <div className="flex items-center gap-2">
                       <div className="flex gap-1">
-                        <div className={`w-2 h-2 bg-[${colors.primary}] rounded-full animate-pulse`}></div>
+                        <div
+                          className={`w-2 h-2 bg-[${colors.primary}] rounded-full animate-pulse`}
+                        ></div>
                         <div
                           className={`w-2 h-2 bg-[${colors.primary}] rounded-full animate-pulse`}
                           style={{ animationDelay: "0.2s" }}
@@ -222,7 +238,9 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
           )}
 
           {error && (
-            <div className={`mb-4 p-3 bg-[${colors.error[100]}] border-2 border-[${colors.error[300]}] rounded-lg`}>
+            <div
+              className={`mb-4 p-3 bg-[${colors.error[100]}] border-2 border-[${colors.error[300]}] rounded-lg`}
+            >
               <p className={`text-[${colors.error[800]}] text-sm`}>{error}</p>
             </div>
           )}
@@ -231,7 +249,9 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
         </div>
 
         {/* Input Area */}
-        <div className={`p-4 border-t-2 border-[${colors.secondary}]/20 bg-white flex-shrink-0`}>
+        <div
+          className={`p-4 border-t-2 border-[${colors.secondary}]/20 bg-white flex-shrink-0`}
+        >
           <form onSubmit={handleSubmit}>
             <div className="flex gap-2">
               <div className="flex-1">
@@ -253,7 +273,8 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
                   className={utils.cn(
                     createButtonClass("primary", "md"),
                     "px-6 py-3 text-sm",
-                    (!inputValue.trim() || isLoading) && "disabled:bg-gray-300 disabled:cursor-not-allowed hover:scale-100 hover:bg-gray-300"
+                    (!inputValue.trim() || isLoading) &&
+                      "disabled:bg-gray-300 disabled:cursor-not-allowed hover:scale-100 hover:bg-gray-300",
                   )}
                 >
                   {isLoading ? "..." : "Ask"}

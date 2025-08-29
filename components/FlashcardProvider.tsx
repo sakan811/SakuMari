@@ -79,95 +79,98 @@ export function FlashcardProvider({
   const hasFetched = useRef(false);
 
   // Generate choices for multiple choice mode
-  const generateChoices = useCallback((
-    correctKana: KanaWithAccuracy,
-    kanaData: KanaWithAccuracy[],
-  ) => {
-    if (!kanaData.length) {
-      setChoices([]);
-      return;
-    }
-
-    const correctAnswer = correctKana.romaji;
-
-    // Get all possible wrong answers
-    const wrongAnswers = kanaData
-      .filter((kana) => kana.romaji !== correctAnswer)
-      .map((kana) => kana.romaji);
-
-    // Remove duplicates
-    const uniqueWrongAnswers = [...new Set(wrongAnswers)];
-
-    // Shuffle and take 3 wrong answers
-    const selectedWrongAnswers = uniqueWrongAnswers
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
-
-    // If we don't have enough wrong answers, fill with what we have
-    while (
-      selectedWrongAnswers.length < 3 &&
-      selectedWrongAnswers.length < uniqueWrongAnswers.length
-    ) {
-      const remaining = uniqueWrongAnswers.filter(
-        (answer) => !selectedWrongAnswers.includes(answer),
-      );
-      if (remaining.length > 0) {
-        selectedWrongAnswers.push(remaining[0]);
-      } else {
-        break;
+  const generateChoices = useCallback(
+    (correctKana: KanaWithAccuracy, kanaData: KanaWithAccuracy[]) => {
+      if (!kanaData.length) {
+        setChoices([]);
+        return;
       }
-    }
 
-    // Combine correct answer with wrong answers and shuffle
-    const allChoices = [correctAnswer, ...selectedWrongAnswers].sort(
-      () => Math.random() - 0.5,
-    );
+      const correctAnswer = correctKana.romaji;
 
-    setChoices(allChoices);
-  }, [setChoices]);
+      // Get all possible wrong answers
+      const wrongAnswers = kanaData
+        .filter((kana) => kana.romaji !== correctAnswer)
+        .map((kana) => kana.romaji);
+
+      // Remove duplicates
+      const uniqueWrongAnswers = [...new Set(wrongAnswers)];
+
+      // Shuffle and take 3 wrong answers
+      const selectedWrongAnswers = uniqueWrongAnswers
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
+
+      // If we don't have enough wrong answers, fill with what we have
+      while (
+        selectedWrongAnswers.length < 3 &&
+        selectedWrongAnswers.length < uniqueWrongAnswers.length
+      ) {
+        const remaining = uniqueWrongAnswers.filter(
+          (answer) => !selectedWrongAnswers.includes(answer),
+        );
+        if (remaining.length > 0) {
+          selectedWrongAnswers.push(remaining[0]);
+        } else {
+          break;
+        }
+      }
+
+      // Combine correct answer with wrong answers and shuffle
+      const allChoices = [correctAnswer, ...selectedWrongAnswers].sort(
+        () => Math.random() - 0.5,
+      );
+
+      setChoices(allChoices);
+    },
+    [setChoices],
+  );
 
   // Select a kana using confidence-weighted selection (solves first-success penalty)
-  const selectRandomKana = useCallback((data: KanaWithAccuracy[]) => {
-    if (!data.length) return;
+  const selectRandomKana = useCallback(
+    (data: KanaWithAccuracy[]) => {
+      if (!data.length) return;
 
-    // Calculate confidence-aware weights
-    const weights = data.map((kana) => {
-      // New characters get high priority
-      if (kana.attempts === 0) return 2.0;
+      // Calculate confidence-aware weights
+      const weights = data.map((kana) => {
+        // New characters get high priority
+        if (kana.attempts === 0) return 2.0;
 
-      // Base weight from accuracy (lower accuracy = higher weight)
-      const accuracyWeight = Math.max(1 - kana.accuracy, 0.1);
+        // Base weight from accuracy (lower accuracy = higher weight)
+        const accuracyWeight = Math.max(1 - kana.accuracy, 0.1);
 
-      // Confidence boost for high accuracy + few attempts (prevents first-success penalty)
-      const confidenceBoost =
-        kana.attempts < 3 && kana.accuracy > 0.8
-          ? 1 + (3 - kana.attempts) * 0.5
-          : 1;
+        // Confidence boost for high accuracy + few attempts (prevents first-success penalty)
+        const confidenceBoost =
+          kana.attempts < 3 && kana.accuracy > 0.8
+            ? 1 + (3 - kana.attempts) * 0.5
+            : 1;
 
-      return accuracyWeight * confidenceBoost;
-    });
+        return accuracyWeight * confidenceBoost;
+      });
 
-    // Weighted random selection
-    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-    let randomVal = Math.random() * totalWeight;
-    let selectedKana = null;
+      // Weighted random selection
+      const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+      let randomVal = Math.random() * totalWeight;
+      let selectedKana = null;
 
-    for (let i = 0; i < data.length; i++) {
-      randomVal -= weights[i];
-      if (randomVal <= 0) {
-        selectedKana = data[i];
-        break;
+      for (let i = 0; i < data.length; i++) {
+        randomVal -= weights[i];
+        if (randomVal <= 0) {
+          selectedKana = data[i];
+          break;
+        }
       }
-    }
 
-    // Fallback: if no kana was selected, select the last one
-    if (!selectedKana) {
-      selectedKana = data[data.length - 1];
-    }
+      // Fallback: if no kana was selected, select the last one
+      if (!selectedKana) {
+        selectedKana = data[data.length - 1];
+      }
 
-    setCurrentKana(selectedKana);
-    generateChoices(selectedKana, data);
-  }, [setCurrentKana, generateChoices]);
+      setCurrentKana(selectedKana);
+      generateChoices(selectedKana, data);
+    },
+    [setCurrentKana, generateChoices],
+  );
 
   const fetchKanaData = useCallback(async () => {
     setLoadingKana(true);

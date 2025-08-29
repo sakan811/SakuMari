@@ -2,7 +2,7 @@ import { describe, test, expect, vi } from "vitest";
 import { setupApiTest } from "../utils/test-helpers";
 import * as apiHelpers from "@/lib/api-helpers";
 
-vi.mock('@/lib/api-helpers', async (importOriginal) => {
+vi.mock("@/lib/api-helpers", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -15,16 +15,16 @@ vi.mock('@/lib/api-helpers', async (importOriginal) => {
           console.error("Mocked error:", error);
           return new Response(
             JSON.stringify({ error: "Internal server error" }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            { status: 500, headers: { "Content-Type": "application/json" } },
           );
         }
       };
     }),
     createErrorResponse: vi.fn((message, status) => {
-      return new Response(
-        JSON.stringify({ error: message }),
-        { status, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: message }), {
+        status,
+        headers: { "Content-Type": "application/json" },
+      });
     }),
   };
 });
@@ -53,7 +53,7 @@ describe("Stats API Route", async () => {
     test("returns complete stats for authenticated user", async () => {
       // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
-      
+
       const mockStatsData = [
         {
           id: "1",
@@ -124,7 +124,7 @@ describe("Stats API Route", async () => {
     test("handles user with no practice data", async () => {
       // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
-      
+
       const mockStatsData = [
         {
           id: "1",
@@ -154,7 +154,7 @@ describe("Stats API Route", async () => {
     test("handles database connection errors", async () => {
       // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
-      
+
       vi.mocked(prisma.kana.findMany).mockRejectedValue(
         new Error("Database connection lost"),
       );
@@ -169,7 +169,7 @@ describe("Stats API Route", async () => {
     test("handles Prisma query timeout errors", async () => {
       // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
-      
+
       const timeoutError = new Error("Query timeout");
       timeoutError.name = "PrismaClientKnownRequestError";
       vi.mocked(prisma.kana.findMany).mockRejectedValue(timeoutError);
@@ -184,7 +184,7 @@ describe("Stats API Route", async () => {
     test("correctly filters user-specific progress", async () => {
       // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
-      
+
       vi.mocked(prisma.kana.findMany).mockResolvedValue([]);
 
       await GET();
@@ -208,7 +208,7 @@ describe("Stats API Route", async () => {
     test("handles edge case with zero attempts but non-zero accuracy", async () => {
       // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
-      
+
       // This shouldn't happen in normal flow but tests data integrity
       const mockStatsData = [
         {

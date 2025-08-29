@@ -60,7 +60,7 @@ describe("Flashcards API", async () => {
     test("creates progress record", async () => {
       // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
-      
+
       vi.mocked(prisma.kanaProgress.upsert).mockResolvedValue({
         id: "1",
         attempts: 1,
@@ -84,7 +84,7 @@ describe("Flashcards API", async () => {
     test("handles database connection errors", async () => {
       // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
-      
+
       vi.mocked(prisma.kanaProgress.upsert).mockRejectedValue(
         new Error("Database connection failed"),
       );
@@ -105,7 +105,7 @@ describe("Flashcards API", async () => {
     test("handles Prisma constraint errors", async () => {
       // Mock authenticated user
       vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
-      
+
       const constraintError = new Error("Unique constraint failed");
       constraintError.name = "PrismaClientKnownRequestError";
       vi.mocked(prisma.kanaProgress.upsert).mockRejectedValue(constraintError);
@@ -122,7 +122,6 @@ describe("Flashcards API", async () => {
       const response = await POST(request);
       expect(response.status).toBe(500);
     });
-
 
     test("handles missing kanaId in request body", async () => {
       // Mock authenticated user

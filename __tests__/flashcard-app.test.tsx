@@ -35,7 +35,6 @@ vi.mock("../components/Dashboard", () => ({
 }));
 
 describe("FlashcardApp Component", () => {
-
   describe("Rendering", () => {
     test("renders with default tab (flashcards)", () => {
       render(<FlashcardApp />);
@@ -57,7 +56,7 @@ describe("FlashcardApp Component", () => {
       expect(outerDiv).toHaveClass("min-h-screen");
       expect(outerDiv).toHaveClass("bg-gradient-to-br");
       expect(outerDiv).toHaveClass("from-[#fad182]");
-      
+
       expect(outerDiv).toHaveClass("to-[#f5c55a]");
     });
 

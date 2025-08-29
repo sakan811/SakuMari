@@ -3,10 +3,8 @@ import { cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { act } from "react";
 
-
-
 // Mock next/server to resolve module import issues with next-auth
-vi.mock('next/server', async (importOriginal) => {
+vi.mock("next/server", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -61,7 +59,6 @@ global.mockFetch = mockFetch;
 
 // Set global flag for React testing environment
 
-
 // Global hooks
 beforeEach(() => {
   vi.clearAllMocks();
@@ -71,5 +68,3 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
 });
-
-

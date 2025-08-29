@@ -44,10 +44,38 @@ function TestComponent({
 
 describe("FlashcardProvider - Weighted Selection Algorithm", () => {
   const mockKanaData = [
-    { id: "1", character: "あ", romaji: "a", accuracy: 0.9, attempts: 10, correct_attempts: 9 }, // High accuracy - low weight
-    { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 10, correct_attempts: 3 }, // Low accuracy - high weight
-    { id: "3", character: "う", romaji: "u", accuracy: 0.1, attempts: 10, correct_attempts: 1 }, // Very low accuracy - very high weight
-    { id: "4", character: "え", romaji: "e", accuracy: 0.8, attempts: 10, correct_attempts: 8 }, // Good accuracy - low weight
+    {
+      id: "1",
+      character: "あ",
+      romaji: "a",
+      accuracy: 0.9,
+      attempts: 10,
+      correct_attempts: 9,
+    }, // High accuracy - low weight
+    {
+      id: "2",
+      character: "い",
+      romaji: "i",
+      accuracy: 0.3,
+      attempts: 10,
+      correct_attempts: 3,
+    }, // Low accuracy - high weight
+    {
+      id: "3",
+      character: "う",
+      romaji: "u",
+      accuracy: 0.1,
+      attempts: 10,
+      correct_attempts: 1,
+    }, // Very low accuracy - very high weight
+    {
+      id: "4",
+      character: "え",
+      romaji: "e",
+      accuracy: 0.8,
+      attempts: 10,
+      correct_attempts: 8,
+    }, // Good accuracy - low weight
   ];
 
   beforeEach(() => {
@@ -137,9 +165,30 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
 
   test("handles edge case with all perfect accuracy", async () => {
     const perfectKanaData = [
-      { id: "1", character: "あ", romaji: "a", accuracy: 1.0, attempts: 5, correct_attempts: 5 },
-      { id: "2", character: "い", romaji: "i", accuracy: 1.0, attempts: 5, correct_attempts: 5 },
-      { id: "3", character: "う", romaji: "u", accuracy: 1.0, attempts: 5, correct_attempts: 5 },
+      {
+        id: "1",
+        character: "あ",
+        romaji: "a",
+        accuracy: 1.0,
+        attempts: 5,
+        correct_attempts: 5,
+      },
+      {
+        id: "2",
+        character: "い",
+        romaji: "i",
+        accuracy: 1.0,
+        attempts: 5,
+        correct_attempts: 5,
+      },
+      {
+        id: "3",
+        character: "う",
+        romaji: "u",
+        accuracy: 1.0,
+        attempts: 5,
+        correct_attempts: 5,
+      },
     ];
 
     mockFetch.mockResolvedValue({
@@ -171,9 +220,30 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
 
   test("handles edge case with all zero accuracy", async () => {
     const zeroKanaData = [
-      { id: "1", character: "あ", romaji: "a", accuracy: 0.0, attempts: 5, correct_attempts: 0 },
-      { id: "2", character: "い", romaji: "i", accuracy: 0.0, attempts: 5, correct_attempts: 0 },
-      { id: "3", character: "う", romaji: "u", accuracy: 0.0, attempts: 5, correct_attempts: 0 },
+      {
+        id: "1",
+        character: "あ",
+        romaji: "a",
+        accuracy: 0.0,
+        attempts: 5,
+        correct_attempts: 0,
+      },
+      {
+        id: "2",
+        character: "い",
+        romaji: "i",
+        accuracy: 0.0,
+        attempts: 5,
+        correct_attempts: 0,
+      },
+      {
+        id: "3",
+        character: "う",
+        romaji: "u",
+        accuracy: 0.0,
+        attempts: 5,
+        correct_attempts: 0,
+      },
     ];
 
     mockFetch.mockResolvedValue({
@@ -206,8 +276,22 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
   test("weight calculation follows inverse accuracy formula", async () => {
     // Test with extreme difference in weights
     const testData = [
-      { id: "1", character: "low", romaji: "low", accuracy: 0.05, attempts: 10, correct_attempts: 1 }, // weight = 0.95
-      { id: "2", character: "high", romaji: "high", accuracy: 0.95, attempts: 10, correct_attempts: 9 }, // weight = 0.05
+      {
+        id: "1",
+        character: "low",
+        romaji: "low",
+        accuracy: 0.05,
+        attempts: 10,
+        correct_attempts: 1,
+      }, // weight = 0.95
+      {
+        id: "2",
+        character: "high",
+        romaji: "high",
+        accuracy: 0.95,
+        attempts: 10,
+        correct_attempts: 9,
+      }, // weight = 0.05
     ];
 
     mockFetch.mockResolvedValue({
@@ -220,16 +304,16 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
     // Values < 0.95 will select "low", values >= 0.95 will select "high"
     // Use mostly values that will select "low" to ensure it's selected more often
     const mockRandomValues = [
-      0.1,  // selects "low" 
-      0.2,  // selects "low"
-      0.3,  // selects "low"  
-      0.4,  // selects "low"
+      0.1, // selects "low"
+      0.2, // selects "low"
+      0.3, // selects "low"
+      0.4, // selects "low"
       0.97, // selects "high"
-      0.5,  // selects "low"
-      0.6,  // selects "low"
-      0.7,  // selects "low"
+      0.5, // selects "low"
+      0.6, // selects "low"
+      0.7, // selects "low"
       0.98, // selects "high"
-      0.8,  // selects "low"
+      0.8, // selects "low"
     ];
     let randomCallCount = 0;
     const originalRandom = Math.random;
