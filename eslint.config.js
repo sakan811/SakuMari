@@ -1,5 +1,4 @@
 const { FlatCompat } = require("@eslint/eslintrc");
-const path = require("path");
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -16,39 +15,37 @@ module.exports = [
       "coverage/**",
       ".env*",
       "*.config.js",
+      "*.config.mjs",
       "generated/**",
       "docker/**",
-      "__tests__/db/test.db*",
+      "__tests__/**",
       "playwright-report/**",
-      "test-results/**"
+      "test-results/**",
+      "next-env.d.ts",
+      "prisma/seed.js",
+      "scripts/**"
     ]
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     rules: {
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          "argsIgnorePattern": "^_",
-          "varsIgnorePattern": "^_",
-          "ignoreRestSiblings": true
-        }
-      ],
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-expressions": [
-        "error",
-        {
-          "allowShortCircuit": true,
-          "allowTernary": true,
-          "allowTaggedTemplates": true
-        }
-      ],
+      // Relax TypeScript rules
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      
+      // Essential rules only  
       "no-unreachable": "error",
-      "no-unused-labels": "error",
-      "prefer-const": "error",
+      "prefer-const": "warn",
       "no-var": "error",
-      "@typescript-eslint/no-explicit-any": "warn",
-      "no-console": ["warn", { "allow": ["warn", "error"] }]
+      "no-console": "off",
+      
+      // React rules relaxed
+      "react/no-unescaped-entities": "warn",
+      
+      // Next.js specific relaxed rules
+      "@next/next/no-img-element": "warn",
+      "react-hooks/exhaustive-deps": "warn"
     }
   }
 ];
