@@ -1,4 +1,5 @@
 import { vi } from "vitest";
+import React from "react";
 
 // Common Next.js component mocks
 
@@ -21,7 +22,7 @@ export const mockNextNavigation = () => {
 // Mock next/link
 export const mockNextLink = () => {
   vi.mock("next/link", () => ({
-    default: ({ children, href, ...props }) => {
+    default: ({ children, href, ...props }: any) => {
       return <a href={href} {...props}>{children}</a>;
     },
   }));
@@ -30,14 +31,14 @@ export const mockNextLink = () => {
 // Mock next/image  
 export const mockNextImage = () => {
   vi.mock("next/image", () => ({
-    default: ({ src, alt, ...props }) => {
+    default: ({ src, alt, ...props }: any) => {
       return <img src={src} alt={alt} {...props} />;
     },
   }));
 };
 
 // Mock next-auth/react with common session scenarios
-export const mockNextAuth = (sessionConfig = {}) => {
+export const mockNextAuth = (sessionConfig: any = {}) => {
   const defaultSession = {
     data: { user: { id: "user123", name: "Test User" } },
     status: "authenticated",
@@ -47,12 +48,20 @@ export const mockNextAuth = (sessionConfig = {}) => {
     useSession: vi.fn(() => ({ ...defaultSession, ...sessionConfig })),
     signIn: vi.fn(),
     signOut: vi.fn(),
-    SessionProvider: ({ children }) => children,
+    SessionProvider: ({ children }: any) => children,
   }));
 };
 
 // Convenience function to set up common UI test mocks
-export const setupUITestMocks = (options = {}) => {
+interface SetupUITestMocksOptions {
+  includeNavigation?: boolean;
+  includeLink?: boolean;
+  includeImage?: boolean;
+  includeAuth?: boolean;
+  sessionConfig?: any;
+}
+
+export const setupUITestMocks = (options: SetupUITestMocksOptions = {}) => {
   const { 
     includeNavigation = true, 
     includeLink = true, 
