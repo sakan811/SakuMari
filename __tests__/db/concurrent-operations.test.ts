@@ -1,5 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { getTestPrisma } from "./setup";
+import { Prisma } from "@prisma/client";
 
 describe("Database Operations Safety", () => {
   test("should handle sequential progress updates safely", async () => {
@@ -59,7 +60,7 @@ describe("Database Operations Safety", () => {
     const prisma = await getTestPrisma();
 
     await expect(async () => {
-      await prisma.$transaction(async (tx: any) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         // Create valid progress
         await tx.kanaProgress.create({
           data: {

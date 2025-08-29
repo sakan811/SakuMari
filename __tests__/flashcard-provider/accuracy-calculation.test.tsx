@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { render, act, waitFor, screen } from "@testing-library/react";
+import { render, act, waitFor } from "@testing-library/react";
 import {
   FlashcardProvider,
   useFlashcard,

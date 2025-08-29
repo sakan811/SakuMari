@@ -30,7 +30,14 @@ vi.mock("next/navigation", () => ({
 
 // Mock next/link
 vi.mock("next/link", () => ({
-  default: ({ children, href, ...props }: any) => (
+  default: ({
+    children,
+    href,
+    ...props
+  }: {
+    children: React.ReactNode;
+    href: string;
+  }) => (
     <a href={href} {...props}>
       {children}
     </a>
@@ -39,9 +46,14 @@ vi.mock("next/link", () => ({
 
 // Mock next/image
 vi.mock("next/image", () => ({
-  default: ({ src, alt, unoptimized, ...props }: any) => (
-    <img src={src} alt={alt} {...props} />
-  ),
+  default: ({
+    src,
+    alt,
+  }: {
+    src: string;
+    alt: string;
+    unoptimized?: boolean;
+  }) => <img src={src} alt={alt} />,
 }));
 
 describe("Authentication Flow Tests", () => {
@@ -58,14 +70,14 @@ describe("Authentication Flow Tests", () => {
     });
 
     test("shows sign-in button when user is not authenticated", () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       expect(screen.getByText("Sign In")).toBeInTheDocument();
       expect(screen.queryByText("Sign Out")).not.toBeInTheDocument();
     });
 
     test("calls signIn when sign-in button is clicked", () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       const signInButton = screen.getByText("Sign In");
       fireEvent.click(signInButton);
@@ -91,7 +103,7 @@ describe("Authentication Flow Tests", () => {
         status: "loading",
       });
 
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       const signInButton = screen.getByText("Loading...");
       expect(signInButton).toBeDisabled();
@@ -117,14 +129,14 @@ describe("Authentication Flow Tests", () => {
     });
 
     test("shows user profile and sign-out button when authenticated", () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       expect(screen.getByText("Sign Out")).toBeInTheDocument();
       expect(screen.queryByText("Sign In")).not.toBeInTheDocument();
     });
 
     test("displays user avatar when image is available", () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       const avatar = screen.getByAltText("Profile");
       expect(avatar).toBeInTheDocument();
@@ -137,13 +149,13 @@ describe("Authentication Flow Tests", () => {
         status: "authenticated",
       });
 
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       expect(screen.getByText("J")).toBeInTheDocument(); // First letter of John
     });
 
     test("calls signOut when sign-out button is clicked", () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       const signOutButton = screen.getByText("Sign Out");
       fireEvent.click(signOutButton);
@@ -164,7 +176,7 @@ describe("Authentication Flow Tests", () => {
     });
 
     test("shows navigation links in header when authenticated", () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       expect(screen.getByText(/Hiragana/)).toBeInTheDocument();
       expect(screen.getByText(/Katakana/)).toBeInTheDocument();
@@ -181,13 +193,13 @@ describe("Authentication Flow Tests", () => {
     });
 
     test("shows loading spinner during authentication check", () => {
-      render(<Home />);
+      const { container } = render(<Home />);
 
       // Try multiple approaches to find the loading spinner
       // First try to find by class name (most common approach)
       const spinner = screen.getByTestId
         ? screen.queryByTestId("loading-spinner")
-        : screen.querySelector(".animate-spin");
+        : container.querySelector(".animate-spin");
 
       if (spinner) {
         expect(spinner).toBeInTheDocument();
@@ -200,7 +212,7 @@ describe("Authentication Flow Tests", () => {
     });
 
     test("disables sign-in button during loading", () => {
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       const button = screen.getByText("Loading...");
       expect(button).toBeDisabled();
@@ -219,7 +231,7 @@ describe("Authentication Flow Tests", () => {
         status: "authenticated",
       });
 
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       // Click mobile menu button
       const menuButton = screen.getByLabelText("Toggle mobile menu");
@@ -238,7 +250,7 @@ describe("Authentication Flow Tests", () => {
         status: "authenticated",
       });
 
-      render(<Header activeTab="flashcards" setActiveTab={vi.fn()} />);
+      render(<Header />);
 
       // Open mobile menu
       const menuButton = screen.getByLabelText("Toggle mobile menu");

@@ -7,14 +7,14 @@ describe("Kana Filtering Database Operations", () => {
     const allKana = await prisma.kana.findMany();
 
     // Filter hiragana (Unicode range 0x3040-0x309F)
-    const hiragana = allKana.filter((kana: any) => {
+    const hiragana = allKana.filter((kana: { character: string }) => {
       const charCode = kana.character.charCodeAt(0);
       return charCode >= 0x3040 && charCode <= 0x309f;
     });
 
     expect(hiragana).toHaveLength(3); // あ, い, う
     expect(
-      hiragana.every((k: any) => ["あ", "い", "う"].includes(k.character)),
+      hiragana.every((k: { character: string }) => ["あ", "い", "う"].includes(k.character)),
     ).toBe(true);
   });
 
@@ -23,13 +23,13 @@ describe("Kana Filtering Database Operations", () => {
     const allKana = await prisma.kana.findMany();
 
     // Filter katakana (Unicode range 0x30A0-0x30FF)
-    const katakana = allKana.filter((kana: any) => {
+    const katakana = allKana.filter((kana: { character: string }) => {
       const charCode = kana.character.charCodeAt(0);
       return charCode >= 0x30a0 && charCode <= 0x30ff;
     });
 
     expect(katakana).toHaveLength(2); // ア, イ
-    expect(katakana.every((k: any) => ["ア", "イ"].includes(k.character))).toBe(
+    expect(katakana.every((k: { character: string }) => ["ア", "イ"].includes(k.character))).toBe(
       true,
     );
   });
@@ -76,7 +76,7 @@ describe("Kana Filtering Database Operations", () => {
       },
     });
 
-    const kanaWithProgress = user1Data.find((k: any) => k.id === "test-1");
+    const kanaWithProgress = user1Data.find((k: { id: string }) => k.id === "test-1");
     expect(kanaWithProgress?.progress).toHaveLength(1);
     expect(kanaWithProgress?.progress[0].accuracy).toBe(0.8);
   });

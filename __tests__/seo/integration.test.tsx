@@ -40,7 +40,7 @@ vi.mock("../../components/FlashcardProvider", () => ({
 }));
 
 vi.mock("next/link", () => ({
-  default: ({ href, children, ...props }: any) => (
+  default: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
     <a href={href} {...props}>
       {children}
     </a>
@@ -53,9 +53,11 @@ describe("SEO Integration Tests", () => {
     mockUseSession.mockReturnValue({
       data: {
         user: {
+          id: "test-user-1",
           name: "Test User",
           email: "test@example.com",
         },
+        expires: "2025-12-31T23:59:59.999Z",
       },
       status: "authenticated",
       update: vi.fn(),
