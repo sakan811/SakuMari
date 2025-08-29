@@ -15,7 +15,7 @@ SakuMari's architecture has three layers. The Frontend Layer handles user intera
 ```mermaid
 flowchart TD
     User["🧑 User"]
-    
+
     subgraph Frontend["Frontend Layer"]
         NextJS["Next.js<br/>App Router"]
         SessionProvider["Session<br/>Provider"]
@@ -24,19 +24,19 @@ flowchart TD
         Components["React<br/>Components"]
         Tailwind["Tailwind<br/>CSS"]
     end
-    
+
     subgraph Security["Security Layer"]
         Middleware["🔐 Middleware"]
         NextAuth["NextAuth.js"]
     end
-    
+
     subgraph Backend["Backend Layer"]
         API["API Routes"]
         Prisma["Prisma ORM"]
         PostgreSQL["PostgreSQL 17"]
         Gemini["Google<br/>Gemini AI"]
     end
-    
+
     User --> NextJS
     NextJS -.-> Middleware
     Middleware -.-> NextAuth
