@@ -174,15 +174,18 @@ export function FlashcardProvider({
 
     const correctAnswer = correctKana.romaji;
     
-    // Get 3 random wrong answers from other kana
-    const wrongAnswers = kanaData
-      .filter((kana) => kana.romaji !== correctAnswer)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3)
-      .map((kana) => kana.romaji);
+    // Get unique wrong answers from other kana (exclude duplicates)
+    const uniqueWrongAnswers = Array.from(
+      new Set(
+        kanaData
+          .filter((kana) => kana.romaji !== correctAnswer)
+          .map((kana) => kana.romaji)
+      )
+    ).sort(() => Math.random() - 0.5)
+      .slice(0, 3);
 
     // Combine correct answer with wrong answers and shuffle
-    const allChoices = [correctAnswer, ...wrongAnswers].sort(
+    const allChoices = [correctAnswer, ...uniqueWrongAnswers].sort(
       () => Math.random() - 0.5,
     );
 
