@@ -18,6 +18,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
+import { ApiErrors } from "@/lib/api-errors";
 
 async function getStats(_request: NextRequest, context: AuthenticatedContext) {
   try {
@@ -53,10 +54,7 @@ async function getStats(_request: NextRequest, context: AuthenticatedContext) {
     return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching stats:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return ApiErrors.internalError("Failed to fetch user statistics");
   }
 }
 
