@@ -18,29 +18,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
+import { ApiErrors, validateRequired, validateTypes } from "@/lib/api-errors";
 
 async function submitAnswer(request: NextRequest, context: AuthenticatedContext) {
   try {
-
     const requestBody = await request.json().catch(() => {
       throw new Error("Invalid JSON");
     });
 
     const { kanaId, isCorrect } = requestBody;
 
-    // Validate required fields and types
-    if (!kanaId) {
-      return NextResponse.json(
-        { error: "kanaId is required" },
-        { status: 400 },
-      );
-    }
-    if (typeof isCorrect !== "boolean") {
-      return NextResponse.json(
-        { error: "isCorrect must be a boolean" },
-        { status: 400 },
-      );
-    }
+    // Validate required fields
+    const requiredValidation = validateRequired(requestBody, ["kanaId", "isCorrect"]);
+    if (requiredValidation) return requiredValidation;
+
+    // Validate field types
+    const typeValidation = validateTypes(requestBody, {
+      isCorrect: (value) => typeof value === "boolean",
+    });
+    if (typeValidation) return typeValidation;
 
     // Simple progress tracking - find or create KanaProgress record
     const kanaProgress = await prisma.kanaProgress.upsert({
@@ -73,10 +69,14 @@ async function submitAnswer(request: NextRequest, context: AuthenticatedContext)
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error submitting answer:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    
+    if (error instanceof Error) {
+      if (error.message.includes("Invalid JSON")) {
+        return ApiErrors.badRequest("Invalid request format");
+      }
+    }
+    
+    return ApiErrors.internalError("Failed to submit flashcard answer");
   }
 }
 
