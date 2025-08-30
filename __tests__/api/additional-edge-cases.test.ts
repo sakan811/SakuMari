@@ -24,7 +24,10 @@ import { mockSession } from "../utils/mock-setup";
 const { mockAuth, mockPrisma } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
   mockPrisma: {
-    kanaProgress: { upsert: vi.fn() },
+    kanaProgress: { 
+      upsert: vi.fn(),
+      update: vi.fn(),
+    },
   },
 }));
 
@@ -47,6 +50,12 @@ describe("Additional API Edge Cases", () => {
         id: "1",
         attempts: 1,
         correct_attempts: 1,
+      });
+      mockPrisma.kanaProgress.update.mockResolvedValue({
+        id: "1",
+        attempts: 1,
+        correct_attempts: 1,
+        accuracy: 1.0,
       });
 
       const request = new NextRequest(
@@ -150,6 +159,12 @@ describe("Additional API Edge Cases", () => {
         attempts: 1,
         correct_attempts: 1,
       });
+      mockPrisma.kanaProgress.update.mockResolvedValue({
+        id: "1",
+        attempts: 1,
+        correct_attempts: 1,
+        accuracy: 1.0,
+      });
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",
@@ -176,6 +191,12 @@ describe("Additional API Edge Cases", () => {
         id: "1",
         attempts: 1,
         correct_attempts: 1,
+      });
+      mockPrisma.kanaProgress.update.mockResolvedValue({
+        id: "1",
+        attempts: 1,
+        correct_attempts: 1,
+        accuracy: 1.0,
       });
 
       const request = new NextRequest(

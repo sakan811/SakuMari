@@ -71,9 +71,10 @@ describe("MultipleChoice Component Tests", () => {
       />,
     );
 
-    const selectedButton = screen.getByText("u");
-    expect(selectedButton).toHaveClass("bg-[#d1622b]");
-    expect(selectedButton).toHaveClass("text-white");
+    const selectedButton = screen.getByTestId("choice-button-2");
+    expect(selectedButton).toHaveClass("border-[#d1622b]");
+    expect(selectedButton).toHaveClass("bg-[#fad182]/40");
+    expect(selectedButton).toHaveClass("text-[#403933]");
   });
 
   test("shows error message when provided", () => {
@@ -104,8 +105,8 @@ describe("MultipleChoice Component Tests", () => {
       />,
     );
 
-    mockChoices.forEach((choice) => {
-      const button = screen.getByText(choice);
+    mockChoices.forEach((choice, index) => {
+      const button = screen.getByTestId(`choice-button-${index}`);
       expect(button).toBeDisabled();
       expect(button).toHaveClass("cursor-not-allowed");
       expect(button).toHaveClass("opacity-50");
