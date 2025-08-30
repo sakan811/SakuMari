@@ -24,10 +24,10 @@ import { useSession, signIn, signOut } from "next-auth/react";
 
 interface HeaderProps {
   activeTab?: "flashcards" | "dashboard";
-  setActiveTab?: (_tab: "flashcards" | "dashboard") => void;
+  setActiveTab?: (_: "flashcards" | "dashboard") => void;
 }
 
-export default function Header({ activeTab: _activeTab, setActiveTab: _setActiveTab }: HeaderProps) {
+export default function Header(_: HeaderProps) {
   const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [credentialsEnabled, setCredentialsEnabled] = useState(false);

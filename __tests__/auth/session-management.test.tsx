@@ -32,7 +32,7 @@ describe("Session Management", () => {
       status: "authenticated",
     });
 let rerender: (
-  _ui: React.ReactElement,
+  _: React.ReactElement,
 ) => void | RenderResult = () => {};
 
 act(() => {
@@ -64,7 +64,7 @@ act(() => {
       status: "authenticated",
     });
 let rerender: (
-  _ui: React.ReactElement,
+  _: React.ReactElement,
 ) => void | RenderResult = () => {};
 
 act(() => {

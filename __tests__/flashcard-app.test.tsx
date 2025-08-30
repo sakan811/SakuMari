@@ -22,7 +22,7 @@ vi.mock("../components/Header", () => ({
     setActiveTab,
   }: {
     activeTab: string;
-    setActiveTab: (_tab: string) => void;
+    setActiveTab: (_: string) => void;
   }) => (
     <div data-testid="header-component">
       <span data-testid="active-tab">{activeTab}</span>

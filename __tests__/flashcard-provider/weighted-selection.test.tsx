@@ -14,7 +14,7 @@ global.fetch = mockFetch;
 function TestComponent({
   onKanaSelected,
 }: {
-  onKanaSelected: (_kana: { id: string; character: string; romaji: string; accuracy: number }) => void;
+  onKanaSelected: (_: { id: string; character: string; romaji: string; accuracy: number }) => void;
 }) {
   const { currentKana, nextCard, loadingKana } = useFlashcard();
   const [selectionCount, setSelectionCount] = React.useState(0);

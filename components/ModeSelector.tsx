@@ -21,7 +21,7 @@ type InteractionMode = "typing" | "multiple-choice";
 
 interface ModeSelectorProps {
   currentMode: InteractionMode;
-  onModeChange: (_mode: InteractionMode) => void;
+  onModeChange: (_: InteractionMode) => void;
   disabled?: boolean;
 }
 
