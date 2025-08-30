@@ -84,6 +84,30 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-gradient-to-br from-[#fad182] via-[#f5c55a] to-[#fad182] font-sans antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              name: "SakuMari",
+              url: "https://sakumari.fukudev.org/",
+              applicationCategory: "EducationalApplication",
+              operatingSystem: "All",
+              description:
+                "A web application for learning Japanese Hiragana and Katakana characters through interactive flashcards.",
+              inLanguage: "en-US",
+              author: {
+                "@type": "Person",
+                name: "Sakan Nirattisaykul",
+              },
+              publisher: {
+                "@type": "Organization",
+                name: "SakuMari",
+              },
+            }),
+          }}
+        />
         <Providers>{children}</Providers>
       </body>
     </html>
