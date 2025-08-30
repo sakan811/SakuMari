@@ -208,7 +208,7 @@ describe("Flashcards API", () => {
       );
 
       const response = await POST(request);
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400);
     });
 
     test("handles empty request body", async () => {
@@ -224,7 +224,7 @@ describe("Flashcards API", () => {
       );
 
       const response = await POST(request);
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400);
     });
   });
 });
