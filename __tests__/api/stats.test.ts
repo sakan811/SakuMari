@@ -73,7 +73,9 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue({
+        user: { id: "user123" },
+      } as MockAuthSession);
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
       const response = await GET();
@@ -116,7 +118,9 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue({
+        user: { id: "user123" },
+      } as MockAuthSession);
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
       const response = await GET();
@@ -129,7 +133,9 @@ describe("Stats API Route", async () => {
     });
 
     test("handles database connection errors", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue({
+        user: { id: "user123" },
+      } as MockAuthSession);
       vi.mocked(prisma.kana.findMany).mockRejectedValue(
         new Error("Database connection lost"),
       );
@@ -142,7 +148,9 @@ describe("Stats API Route", async () => {
     });
 
     test("correctly filters user-specific progress", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue({
+        user: { id: "user123" },
+      } as MockAuthSession);
       vi.mocked(prisma.kana.findMany).mockResolvedValue([]);
 
       await GET();
@@ -180,7 +188,9 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue({
+        user: { id: "user123" },
+      } as MockAuthSession);
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
       const response = await GET();

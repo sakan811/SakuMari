@@ -210,7 +210,6 @@ export function FlashcardProvider({
     setChoices(allChoices);
   };
 
-
   // Submit answer and update accuracy
   const submitAnswer = async (answer: string) => {
     if (!currentKana || isSubmitting) return;

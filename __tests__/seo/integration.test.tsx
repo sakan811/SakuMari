@@ -41,7 +41,14 @@ vi.mock("../../components/FlashcardProvider", () => ({
 }));
 
 vi.mock("next/link", () => ({
-  default: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
+  default: ({
+    href,
+    children,
+    ...props
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => (
     <a href={href} {...props}>
       {children}
     </a>

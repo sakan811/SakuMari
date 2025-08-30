@@ -14,7 +14,9 @@ describe("Kana Filtering Database Operations", () => {
 
     expect(hiragana).toHaveLength(3); // あ, い, う
     expect(
-      hiragana.every((k: { character: string }) => ["あ", "い", "う"].includes(k.character)),
+      hiragana.every((k: { character: string }) =>
+        ["あ", "い", "う"].includes(k.character),
+      ),
     ).toBe(true);
   });
 
@@ -29,9 +31,11 @@ describe("Kana Filtering Database Operations", () => {
     });
 
     expect(katakana).toHaveLength(2); // ア, イ
-    expect(katakana.every((k: { character: string }) => ["ア", "イ"].includes(k.character))).toBe(
-      true,
-    );
+    expect(
+      katakana.every((k: { character: string }) =>
+        ["ア", "イ"].includes(k.character),
+      ),
+    ).toBe(true);
   });
 
   test("should retrieve kana with user-specific progress only", async () => {
@@ -76,7 +80,9 @@ describe("Kana Filtering Database Operations", () => {
       },
     });
 
-    const kanaWithProgress = user1Data.find((k: { id: string }) => k.id === "test-1");
+    const kanaWithProgress = user1Data.find(
+      (k: { id: string }) => k.id === "test-1",
+    );
     expect(kanaWithProgress?.progress).toHaveLength(1);
     expect(kanaWithProgress?.progress[0].accuracy).toBe(0.8);
   });
