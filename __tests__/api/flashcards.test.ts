@@ -20,7 +20,8 @@ describe("Flashcards API", () => {
   describe("GET /api/stats", () => {
     test("requires authentication", async () => {
       mockAuth.mockResolvedValue(mockSession(false));
-      const response = await GET();
+      const request = new NextRequest("http://localhost/api/stats");
+      const response = await GET(request);
       expect(response.status).toBe(401);
     });
 
@@ -35,7 +36,8 @@ describe("Flashcards API", () => {
         },
       ]);
 
-      const response = await GET();
+      const request = new NextRequest("http://localhost/api/stats");
+      const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -55,7 +57,8 @@ describe("Flashcards API", () => {
         new Error("Database connection failed"),
       );
 
-      const response = await GET();
+      const request = new NextRequest("http://localhost/api/stats");
+      const response = await GET(request);
       expect(response.status).toBe(500);
     });
 
@@ -65,7 +68,8 @@ describe("Flashcards API", () => {
       timeoutError.name = "PrismaClientKnownRequestError";
       mockPrisma.kana.findMany.mockRejectedValue(timeoutError);
 
-      const response = await GET();
+      const request = new NextRequest("http://localhost/api/stats");
+      const response = await GET(request);
       expect(response.status).toBe(500);
     });
   });
