@@ -443,10 +443,10 @@ describe("Tips API Route", async () => {
 
       // Verify AI was called with context including user progress
       expect(mockGenerateContent).toHaveBeenCalledWith(
-        expect.stringContaining("あ (a): 30% accuracy"),
+        expect.stringContaining("Needs Practice: あ (30%)"),
       );
       expect(mockGenerateContent).toHaveBeenCalledWith(
-        expect.stringContaining("か (ka): 95% accuracy"),
+        expect.stringContaining("Mastering: か (95%)"),
       );
     });
 

@@ -19,15 +19,16 @@ import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Dashboard from "@/components/Dashboard";
 import React from "react";
+import { useDashboardData } from "@/hooks/useDashboardData";
 
 // Mock the hooks and components used by Dashboard
 vi.mock("@/hooks/useDashboardData", () => ({
-  useDashboardData: () => ({
+  useDashboardData: vi.fn(() => ({
     stats: [],
     loading: false,
     error: null,
     refetch: vi.fn(),
-  }),
+  })),
 }));
 
 type KanaStats = {
@@ -52,11 +53,7 @@ vi.mock("@/components/StatsSummary", () => ({
   StatsSummary: () => <div data-testid="stats-summary">Stats Summary</div>,
 }));
 
-vi.mock("@/components/CharacterProgressTable", () => ({
-  CharacterProgressTable: () => (
-    <div data-testid="character-progress-table">Character Progress Table</div>
-  ),
-}));
+// CharacterProgressTable not mocked - using real component for filter/sort testing
 
 vi.mock("@/components/TipsModal", () => ({
   default: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
@@ -88,9 +85,7 @@ describe("Dashboard Component Interaction Tests", () => {
 
   test("renders loading state", () => {
     // Mock loading state
-    vi.mocked(
-      require("@/hooks/useDashboardData"),
-    ).useDashboardData.mockReturnValue({
+    vi.mocked(useDashboardData).mockReturnValue({
       stats: [],
       loading: true,
       error: null,
@@ -106,9 +101,7 @@ describe("Dashboard Component Interaction Tests", () => {
     const mockRefetch = vi.fn();
 
     // Mock error state
-    vi.mocked(
-      require("@/hooks/useDashboardData"),
-    ).useDashboardData.mockReturnValue({
+    vi.mocked(useDashboardData).mockReturnValue({
       stats: [],
       loading: false,
       error: "Failed to load dashboard data",
@@ -130,9 +123,7 @@ describe("Dashboard Component Interaction Tests", () => {
 
   test("renders dashboard content when data is loaded", () => {
     // Mock successful data load
-    vi.mocked(
-      require("@/hooks/useDashboardData"),
-    ).useDashboardData.mockReturnValue({
+    vi.mocked(useDashboardData).mockReturnValue({
       stats: [
         {
           id: "1",
@@ -152,16 +143,14 @@ describe("Dashboard Component Interaction Tests", () => {
 
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
     expect(screen.getByTestId("stats-summary")).toBeInTheDocument();
-    expect(screen.getByTestId("character-progress-table")).toBeInTheDocument();
+    expect(screen.getByText("Character Progress")).toBeInTheDocument();
     expect(screen.getByText("💡 Tips")).toBeInTheDocument();
     expect(screen.getByTestId("button-link")).toBeInTheDocument();
   });
 
   test("opens and closes tips modal", async () => {
     // Mock successful data load
-    vi.mocked(
-      require("@/hooks/useDashboardData"),
-    ).useDashboardData.mockReturnValue({
+    vi.mocked(useDashboardData).mockReturnValue({
       stats: [],
       loading: false,
       error: null,
@@ -190,9 +179,7 @@ describe("Dashboard Component Interaction Tests", () => {
 
   test("filters stats correctly", () => {
     // Mock successful data load with mixed hiragana and katakana
-    vi.mocked(
-      require("@/hooks/useDashboardData"),
-    ).useDashboardData.mockReturnValue({
+    vi.mocked(useDashboardData).mockReturnValue({
       stats: [
         {
           id: "1",
@@ -226,9 +213,7 @@ describe("Dashboard Component Interaction Tests", () => {
 
   test("sorts stats correctly", () => {
     // Mock successful data load
-    vi.mocked(
-      require("@/hooks/useDashboardData"),
-    ).useDashboardData.mockReturnValue({
+    vi.mocked(useDashboardData).mockReturnValue({
       stats: [
         {
           id: "1",
