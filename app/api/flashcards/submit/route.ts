@@ -17,15 +17,10 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
 
-export async function POST(request: NextRequest) {
+async function submitAnswer(request: NextRequest, context: AuthenticatedContext) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     const requestBody = await request.json().catch(() => {
       throw new Error("Invalid JSON");
@@ -52,7 +47,7 @@ export async function POST(request: NextRequest) {
       where: {
         kana_id_user_id: {
           kana_id: kanaId,
-          user_id: session.user.id,
+          user_id: context.userId,
         },
       },
       update: {
@@ -61,7 +56,7 @@ export async function POST(request: NextRequest) {
       },
       create: {
         kana_id: kanaId,
-        user_id: session.user.id,
+        user_id: context.userId,
         attempts: 1,
         correct_attempts: isCorrect ? 1 : 0,
       },
@@ -84,3 +79,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withAuth(submitAnswer);

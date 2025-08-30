@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
 import { prisma } from "@/lib/prisma";
 
 interface ConversationMessage {
@@ -36,13 +36,8 @@ async function createGeminiClient() {
   return new GoogleGenerativeAI(apiKey);
 }
 
-export async function POST(request: Request) {
+async function generateTips(request: NextRequest, context: AuthenticatedContext) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     const { userQuery, conversationHistory = [] } = await request.json();
 
@@ -71,7 +66,7 @@ export async function POST(request: Request) {
     // Fetch user's kana progress data
     const userProgress = await prisma.kanaProgress.findMany({
       where: {
-        user_id: session.user.id,
+        user_id: context.userId,
       },
       include: {
         kana: true,
@@ -162,3 +157,5 @@ User question: ${userQuery}`;
     );
   }
 }
+
+export const POST = withAuth(generateTips);

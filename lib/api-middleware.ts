@@ -26,17 +26,17 @@ export interface AuthenticatedContext {
   userId: string;
 }
 
-type ApiHandler<T = unknown> = (
+type ApiHandler = (
   request: NextRequest,
   context: AuthenticatedContext,
-) => Promise<NextResponse<T>> | NextResponse<T>;
+) => Promise<NextResponse> | NextResponse;
 
 /**
  * Higher-order function that wraps API route handlers with authentication
  * Eliminates the need to duplicate auth checks across protected routes
  */
-export function withAuth<T = unknown>(handler: ApiHandler<T>) {
-  return async (request: NextRequest): Promise<NextResponse<T>> => {
+export function withAuth(handler: ApiHandler) {
+  return async (request: NextRequest): Promise<NextResponse> => {
     try {
       const session = await auth();
 
@@ -44,7 +44,7 @@ export function withAuth<T = unknown>(handler: ApiHandler<T>) {
         return NextResponse.json(
           { error: "Unauthorized" },
           { status: 401 },
-        ) as NextResponse<T>;
+        );
       }
 
       const context: AuthenticatedContext = {
@@ -57,7 +57,7 @@ export function withAuth<T = unknown>(handler: ApiHandler<T>) {
       return NextResponse.json(
         { error: "Authentication failed" },
         { status: 500 },
-      ) as NextResponse<T>;
+      );
     }
   };
 }
@@ -65,10 +65,10 @@ export function withAuth<T = unknown>(handler: ApiHandler<T>) {
 /**
  * Alternative withAuth for handlers that don't need the request object
  */
-export function withAuthSimple<T = unknown>(
+export function withAuthSimple(
   handler: (
     context: AuthenticatedContext,
-  ) => Promise<NextResponse<T>> | NextResponse<T>,
+  ) => Promise<NextResponse> | NextResponse,
 ) {
   return withAuth((_request: NextRequest, context: AuthenticatedContext) =>
     handler(context),
