@@ -173,15 +173,16 @@ export function FlashcardProvider({
     }
 
     const correctAnswer = correctKana.romaji;
-    
+
     // Get unique wrong answers from other kana (exclude duplicates)
     const uniqueWrongAnswers = Array.from(
       new Set(
         kanaData
           .filter((kana) => kana.romaji !== correctAnswer)
-          .map((kana) => kana.romaji)
-      )
-    ).sort(() => Math.random() - 0.5)
+          .map((kana) => kana.romaji),
+      ),
+    )
+      .sort(() => Math.random() - 0.5)
       .slice(0, 3);
 
     // Combine correct answer with wrong answers and shuffle

@@ -87,23 +87,24 @@ export function bg(
 }
 
 // Type-safe background class generator
-export function createBg<T extends keyof typeof backgrounds>(category: T): 
-  typeof backgrounds[T] extends string 
-    ? () => typeof backgrounds[T]
-    : (variant: keyof typeof backgrounds[T]) => string {
+export function createBg<T extends keyof typeof backgrounds>(
+  category: T,
+): (typeof backgrounds)[T] extends string
+  ? () => (typeof backgrounds)[T]
+  : (variant: keyof (typeof backgrounds)[T]) => string {
   const backgroundGroup = backgrounds[category];
 
   if (typeof backgroundGroup === "string") {
-    return (() => backgroundGroup) as typeof backgrounds[T] extends string 
-      ? () => typeof backgrounds[T]
-      : (variant: keyof typeof backgrounds[T]) => string;
+    return (() => backgroundGroup) as (typeof backgrounds)[T] extends string
+      ? () => (typeof backgrounds)[T]
+      : (variant: keyof (typeof backgrounds)[T]) => string;
   }
 
   return ((variant: keyof typeof backgroundGroup) => {
     return (backgroundGroup as Record<string, string>)[variant as string];
-  }) as typeof backgrounds[T] extends string 
-    ? () => typeof backgrounds[T]
-    : (variant: keyof typeof backgrounds[T]) => string;
+  }) as (typeof backgrounds)[T] extends string
+    ? () => (typeof backgrounds)[T]
+    : (variant: keyof (typeof backgrounds)[T]) => string;
 }
 
 // Commonly used combinations
