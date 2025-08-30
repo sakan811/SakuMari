@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 // Mock NextResponse static methods
 vi.mock("next/server", async () => {
   const actual = await vi.importActual("next/server");
-  const actualResponse = actual as { NextResponse: any };
+  const actualResponse = actual as { NextResponse: typeof NextResponse };
   return {
     NextResponse: {
       ...actualResponse.NextResponse,
@@ -23,7 +23,7 @@ import { config } from "@/middleware";
 import { auth } from "@/lib/auth";
 
 describe("Middleware", () => {
-  let mockAuthMiddleware: (_req: NextRequest & { auth?: object }) => NextResponse;
+  let mockAuthMiddleware: (_: NextRequest & { auth?: object }) => NextResponse;
 
   beforeEach(() => {
     vi.clearAllMocks();

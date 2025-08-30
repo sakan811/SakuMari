@@ -40,11 +40,11 @@ type InteractionMode = "typing" | "multiple-choice";
 type FlashcardContextType = {
   currentKana: KanaWithAccuracy | null;
   loadingKana: boolean;
-  submitAnswer: (_answer: string) => Promise<void>;
+  submitAnswer: (_: string) => Promise<void>;
   result: "correct" | "incorrect" | null;
   nextCard: () => void;
   interactionMode: InteractionMode;
-  setInteractionMode: (_mode: InteractionMode) => void;
+  setInteractionMode: (_: InteractionMode) => void;
   choices: string[];
   isSubmitting: boolean;
 };

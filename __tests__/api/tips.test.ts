@@ -18,6 +18,9 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { POST } from "../../app/api/tips/route";
 
+// Using any for test mocks to avoid complex NextAuth type conflicts  
+type MockAuthSession = any;
+
 // Use direct function declaration pattern that works reliably with vitest
 vi.mock("@/lib/auth", () => ({
   auth: vi.fn(),
@@ -91,7 +94,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 401 when user session has no ID", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: {} } as any);
+      vi.mocked(auth).mockResolvedValue({ user: {} } as MockAuthSession);
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
@@ -107,7 +110,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is missing", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
@@ -125,7 +128,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is empty string", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
@@ -143,7 +146,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is only whitespace", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
@@ -161,7 +164,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery exceeds character limit", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
 
       const longQuery = "a".repeat(501); // Over 500 character limit
 
@@ -202,7 +205,7 @@ describe("Tips API Route", async () => {
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(
         mockUserProgress,
       );
@@ -235,7 +238,7 @@ describe("Tips API Route", async () => {
     });
 
     test("handles users with no practice data", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const request = new Request("http://localhost/api/tips", {
@@ -254,7 +257,7 @@ describe("Tips API Route", async () => {
     test("returns 503 when GEMINI_API_KEY is missing", async () => {
       delete process.env.GEMINI_API_KEY;
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const request = new Request("http://localhost/api/tips", {
@@ -276,7 +279,7 @@ describe("Tips API Route", async () => {
       // Override the mock to throw an error
       mockGenerateContent.mockRejectedValue(new Error("AI service error"));
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const request = new Request("http://localhost/api/tips", {
@@ -302,7 +305,7 @@ describe("Tips API Route", async () => {
         },
       });
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const request = new Request("http://localhost/api/tips", {
@@ -321,7 +324,7 @@ describe("Tips API Route", async () => {
     });
 
     test("handles database errors gracefully", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockRejectedValue(
         new Error("Database connection lost"),
       );
@@ -342,7 +345,7 @@ describe("Tips API Route", async () => {
     });
 
     test("accepts optional conversationHistory parameter", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const conversationHistory = [
@@ -395,7 +398,7 @@ describe("Tips API Route", async () => {
         },
       });
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(
         mockUserProgress,
       );
@@ -418,7 +421,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns proper response format", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const request = new Request("http://localhost/api/tips", {

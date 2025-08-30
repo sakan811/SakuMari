@@ -50,8 +50,9 @@ export default defineConfig([
       ...eslintReact.configs.recommended.rules,
       ...eslintReactHooks.configs.recommended.rules,
       ...eslintNext.configs.recommended.rules,
+      "no-unused-vars": "off", // Disable base rule in favor of TypeScript rule
       "@typescript-eslint/no-unused-vars": [
-        "warn",
+        "warn", 
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
       "@typescript-eslint/no-explicit-any": "warn",

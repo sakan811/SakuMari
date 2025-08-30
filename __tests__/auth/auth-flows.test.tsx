@@ -54,7 +54,7 @@ vi.mock("next/image", () => ({
     src: string;
     alt: string;
     unoptimized?: boolean;
-  }) => <img src={src} alt={alt} />,
+  }) => <img src={src} alt={alt} />, // eslint-disable-line @next/next/no-img-element
 }));
 
 describe("Authentication Flow Tests", () => {

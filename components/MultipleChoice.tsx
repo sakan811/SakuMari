@@ -22,7 +22,7 @@ import React from "react";
 interface MultipleChoiceProps {
   choices: string[];
   selectedChoice: number | null;
-  onChoiceSelect: (_index: number) => void;
+  onChoiceSelect: (_: number) => void;
   disabled?: boolean;
   error?: string;
 }

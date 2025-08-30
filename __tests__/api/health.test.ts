@@ -1,6 +1,5 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { GET, HEAD } from "../../app/api/health/route";
-import { NextRequest } from "next/server";
 
 // Use vi.hoisted to declare mocks that can be used in vi.mock
 const { mockPrisma } = vi.hoisted(() => ({
