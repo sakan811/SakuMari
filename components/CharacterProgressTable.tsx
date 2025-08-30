@@ -34,6 +34,8 @@ interface CharacterProgressTableProps {
   sortColumn: string;
   sortDirection: "asc" | "desc";
   onSort: (column: string) => void;
+  filter: "all" | "hiragana" | "katakana";
+  setFilter: (filter: "all" | "hiragana" | "katakana") => void;
   onPracticeHiragana: () => void;
   onPracticeKatakana: () => void;
 }
@@ -43,6 +45,8 @@ export function CharacterProgressTable({
   sortColumn,
   sortDirection,
   onSort,
+  filter,
+  setFilter,
   onPracticeHiragana,
   onPracticeKatakana,
 }: CharacterProgressTableProps) {
@@ -55,9 +59,9 @@ export function CharacterProgressTable({
         <div className="flex flex-wrap gap-1 sm:gap-2">
           <button
             data-testid="filter-all"
-            onClick={() => onSort("character")}
+            onClick={() => setFilter("all")}
             className={`rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border-2 ${
-              sortColumn === "character" && sortDirection === "asc"
+              filter === "all"
                 ? "bg-[#d1622b] text-white border-[#d1622b] shadow-lg"
                 : "bg-white text-[#705a39] border-[#705a39] hover:bg-[#fad182] hover:border-[#d1622b]"
             }`}
@@ -66,9 +70,9 @@ export function CharacterProgressTable({
           </button>
           <button
             data-testid="filter-hiragana"
-            onClick={() => onSort("romaji")}
+            onClick={() => setFilter("hiragana")}
             className={`rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border-2 ${
-              sortColumn === "romaji" && sortDirection === "asc"
+              filter === "hiragana"
                 ? "bg-[#d1622b] text-white border-[#d1622b] shadow-lg"
                 : "bg-white text-[#705a39] border-[#705a39] hover:bg-[#fad182] hover:border-[#d1622b]"
             }`}
@@ -77,9 +81,9 @@ export function CharacterProgressTable({
           </button>
           <button
             data-testid="filter-katakana"
-            onClick={() => onSort("accuracy")}
+            onClick={() => setFilter("katakana")}
             className={`rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border-2 ${
-              sortColumn === "accuracy" && sortDirection === "desc"
+              filter === "katakana"
                 ? "bg-[#d1622b] text-white border-[#d1622b] shadow-lg"
                 : "bg-white text-[#705a39] border-[#705a39] hover:bg-[#fad182] hover:border-[#d1622b]"
             }`}
