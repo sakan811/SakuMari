@@ -10,18 +10,18 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 ## Features
 
-*   **Google Account Integration**: Securely log in and save your progress.
-*   **Dual Kana Support**: Practice both Hiragana and Katakana character sets.
-*   **Adaptive Flashcards**:
-    *   **Two Modes**: Choose between typing the answer (Input Mode) or selecting from options (Choice Mode).
-    *   **Smart Randomization**: The app prioritizes characters with lower accuracy to enhance learning efficiency.
-*   **Comprehensive Dashboard**:
-    *   **Detailed Stats**: Track your accuracy, attempts, and performance for each kana character.
-    *   **Dynamic Filtering**: Filter the statistics table by kana type (All, Hiragana, Katakana).
-    *   **Summary View**: An overview at the top of the table reflects the filtered data.
-    *   **Sortable Columns**: Easily sort the data by character, romaji, attempts, or accuracy.
-*   **AI-Powered Learning Tips**:
-    *   **Tips Button**: Access an AI-powered chat modal to ask for personalized learning advice.
+- **Google Account Integration**: Securely log in and save your progress.
+- **Dual Kana Support**: Practice both Hiragana and Katakana character sets.
+- **Adaptive Flashcards**:
+  - **Two Modes**: Choose between typing the answer (Input Mode) or selecting from options (Choice Mode).
+  - **Smart Randomization**: The app prioritizes characters with lower accuracy to enhance learning efficiency.
+- **Comprehensive Dashboard**:
+  - **Detailed Stats**: Track your accuracy, attempts, and performance for each kana character.
+  - **Dynamic Filtering**: Filter the statistics table by kana type (All, Hiragana, Katakana).
+  - **Summary View**: An overview at the top of the table reflects the filtered data.
+  - **Sortable Columns**: Easily sort the data by character, romaji, attempts, or accuracy.
+- **AI-Powered Learning Tips**:
+  - **Tips Button**: Access an AI-powered chat modal to ask for personalized learning advice.
 
 ## Architecture
 
