@@ -54,7 +54,7 @@ async function getStats(_request: NextRequest, context: AuthenticatedContext) {
     return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching stats:", error);
-    return ApiErrors.internalError("Failed to fetch user statistics");
+    return ApiErrors.internalError("Internal server error");
   }
 }
 
