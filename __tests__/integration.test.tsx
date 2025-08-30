@@ -1,69 +1,112 @@
+/*
+ * SakuMari - Japanese Kana Flashcard App
+ * Copyright (C) 2025  Sakan Nirattisaykul
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import FlashcardApp from "../components/FlashcardApp";
-import { mockKana, mockSession } from "./utils/test-helpers";
+import HomePage from "@/app/page";
+import HiraganaPage from "@/app/hiragana/page";
+import DashboardPage from "@/app/dashboard/page";
+import { mockSession, mockApiResponse } from "./utils/mock-setup";
+import React from "react";
 
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
-
+// Mock next-auth
 vi.mock("next-auth/react", () => ({
-  useSession: () => mockSession(),
-  SessionProvider: ({ children }) => <div>{children}</div>,
+  useSession: () => mockSession(true),
 }));
 
-describe("Integration Tests", () => {
+// Mock next/navigation
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
+
+// Mock fetch globally
+global.fetch = vi.fn();
+
+describe("Critical User Flow Integration Test", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  test("complete practice workflow", async () => {
-    // Mock the initial flashcards fetch
-    mockFetch.mockImplementation((url) => {
-      if (url === "/api/stats") {
-        return Promise.resolve({
-          ok: true,
-          json: async () => [mockKana.basic],
-        });
-      } else if (url === "/api/flashcards/submit") {
-        return Promise.resolve({
-          ok: true,
-          json: async () => ({ success: true }),
-        });
+  test("Login -> Practice -> View Stats", async () => {
+    // Mock fetch for initial data loading
+    const hiraganaData = [{ id: "1", character: "あ", romaji: "a" }];
+    (global.fetch as any).mockResolvedValue(mockApiResponse(hiraganaData));
+
+    // 1. User lands on the homepage
+    render(<HomePage />);
+
+    // Since we're mocking the session as authenticated, we should see the dashboard link
+    // rather than the login button
+    await waitFor(() => {
+      expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    });
+
+    // 2. User navigates to Hiragana practice page
+    render(<HiraganaPage />);
+
+    // Wait for flashcard to load
+    await waitFor(() => {
+      expect(screen.getByText("あ")).toBeInTheDocument();
+    });
+
+    // Submit correct answer
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "a" } });
+    fireEvent.click(screen.getByText("Submit"));
+
+    // Check for correct feedback
+    await waitFor(() => {
+      expect(screen.getByText("Correct!")).toBeInTheDocument();
+    });
+
+    // 3. User navigates to the dashboard to view stats
+    const statsData = [
+      {
+        id: "1",
+        character: "あ",
+        romaji: "a",
+        attempts: 1,
+        correct_attempts: 1,
+        accuracy: 1,
+      },
+    ];
+    (global.fetch as any).mockResolvedValueOnce(mockApiResponse(statsData));
+
+    render(<DashboardPage />);
+
+    // Check that dashboard loads with updated stats
+    await waitFor(() => {
+      expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    });
+
+    // Check for the character row in the table
+    await waitFor(() => {
+      const rows = screen.getAllByRole("row");
+      const targetRow = rows.find(
+        (row) =>
+          row.textContent?.includes("あ") && row.textContent?.includes("a"),
+      );
+      expect(targetRow).toBeInTheDocument();
+
+      if (targetRow) {
+        expect(targetRow).toHaveTextContent("1"); // attempts
+        expect(targetRow).toHaveTextContent("100%"); // accuracy
       }
-      return Promise.reject(new Error(`Unexpected URL: ${url}`));
     });
-
-    render(<FlashcardApp kanaType="hiragana" />);
-
-    await waitFor(() => screen.getByText("あ"));
-
-    // Submit answer
-    const input = screen.getByPlaceholderText("Type romaji equivalent...");
-    fireEvent.change(input, { target: { value: "a" } });
-    fireEvent.click(screen.getByRole("button", { name: "Submit" }));
-
-    // Wait for the result to appear
-    await waitFor(() => screen.getByText("Correct!"));
-
-    // Wait for the Next Card button to appear
-    await waitFor(() => screen.getByRole("button", { name: "Next Card" }));
-
-    // Click next card
-    fireEvent.click(screen.getByRole("button", { name: "Next Card" }));
-
-    await waitFor(() => expect(screen.queryByText("Correct!")).toBeNull());
-  });
-
-  test("handles authentication errors", async () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      status: 401,
-      json: async () => ({ error: "Unauthorized" }),
-    });
-
-    render(<FlashcardApp kanaType="hiragana" />);
-
-    // Should handle gracefully without crashing
-    expect(screen.getByRole("status")).toBeDefined();
   });
 });

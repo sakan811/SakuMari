@@ -3,6 +3,7 @@ import { GET } from "../../app/api/stats/route";
 import { POST } from "../../app/api/flashcards/submit/route";
 import { NextRequest } from "next/server";
 
+import { mockSession } from "../utils/mock-setup";
 // Use vi.hoisted to declare mocks that can be used in vi.mock
 const { mockAuth, mockPrisma } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
@@ -18,13 +19,13 @@ vi.mock("@/lib/prisma", () => ({ prisma: mockPrisma }));
 describe("Flashcards API", () => {
   describe("GET /api/stats", () => {
     test("requires authentication", async () => {
-      mockAuth.mockResolvedValue(null);
+      mockAuth.mockResolvedValue(mockSession(false));
       const response = await GET();
       expect(response.status).toBe(401);
     });
 
     test("returns kana data for authenticated user", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
       mockPrisma.kana.findMany.mockResolvedValue([
         {
           id: "1",
@@ -49,7 +50,7 @@ describe("Flashcards API", () => {
     });
 
     test("handles database connection errors", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
       mockPrisma.kana.findMany.mockRejectedValue(
         new Error("Database connection failed"),
       );
@@ -59,7 +60,7 @@ describe("Flashcards API", () => {
     });
 
     test("handles Prisma query timeout errors", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
       const timeoutError = new Error("Query timeout");
       timeoutError.name = "PrismaClientKnownRequestError";
       mockPrisma.kana.findMany.mockRejectedValue(timeoutError);
@@ -71,7 +72,7 @@ describe("Flashcards API", () => {
 
   describe("POST /api/flashcards/submit", () => {
     test("creates progress record", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
       mockPrisma.kanaProgress.upsert.mockResolvedValue({
         id: "1",
         attempts: 1,
@@ -93,7 +94,7 @@ describe("Flashcards API", () => {
     });
 
     test("handles database connection errors", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
       mockPrisma.kanaProgress.upsert.mockRejectedValue(
         new Error("Database connection failed"),
       );
@@ -112,7 +113,7 @@ describe("Flashcards API", () => {
     });
 
     test("handles Prisma constraint errors", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
       const constraintError = new Error("Unique constraint failed");
       constraintError.name = "PrismaClientKnownRequestError";
       mockPrisma.kanaProgress.upsert.mockRejectedValue(constraintError);
@@ -131,7 +132,7 @@ describe("Flashcards API", () => {
     });
 
     test("requires authentication", async () => {
-      mockAuth.mockResolvedValue(null);
+      mockAuth.mockResolvedValue(mockSession(false));
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",
@@ -147,7 +148,7 @@ describe("Flashcards API", () => {
     });
 
     test("handles missing kanaId in request body", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",
@@ -163,7 +164,7 @@ describe("Flashcards API", () => {
     });
 
     test("handles missing isCorrect in request body", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",
@@ -179,7 +180,7 @@ describe("Flashcards API", () => {
     });
 
     test("handles invalid data types in request body", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",
@@ -195,7 +196,7 @@ describe("Flashcards API", () => {
     });
 
     test("handles malformed JSON in request body", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",
@@ -211,7 +212,7 @@ describe("Flashcards API", () => {
     });
 
     test("handles empty request body", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",

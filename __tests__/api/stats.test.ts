@@ -21,7 +21,7 @@ describe("Stats API Route", async () => {
   // Import the mocked functions after mocking
   const { auth } = await import("@/lib/auth");
   const { prisma } = await import("@/lib/prisma");
-  
+
   // Import mock setup functions
   const { mockSession } = await import("../../utils/mock-setup");
 
@@ -35,7 +35,7 @@ describe("Stats API Route", async () => {
 
   describe("GET /api/stats", () => {
     test("returns 401 when user is not authenticated", async () => {
-      vi.mocked(auth).mockResolvedValue(null);
+      vi.mocked(auth).mockResolvedValue(mockSession(false));
 
       const response = await GET();
       const data = await response.json();
@@ -45,7 +45,7 @@ describe("Stats API Route", async () => {
     });
 
     test("returns 401 when user session has no ID", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: {} } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue(mockSession(true, { id: undefined }));
 
       const response = await GET();
       const data = await response.json();
@@ -76,9 +76,7 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({
-        user: { id: "user123" },
-      } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
       const response = await GET();
@@ -121,9 +119,7 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({
-        user: { id: "user123" },
-      } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
       const response = await GET();
@@ -136,9 +132,7 @@ describe("Stats API Route", async () => {
     });
 
     test("handles database connection errors", async () => {
-      vi.mocked(auth).mockResolvedValue({
-        user: { id: "user123" },
-      } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockRejectedValue(
         new Error("Database connection lost"),
       );
@@ -151,9 +145,7 @@ describe("Stats API Route", async () => {
     });
 
     test("correctly filters user-specific progress", async () => {
-      vi.mocked(auth).mockResolvedValue({
-        user: { id: "user123" },
-      } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockResolvedValue([]);
 
       await GET();
@@ -191,9 +183,7 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({
-        user: { id: "user123" },
-      } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
       const response = await GET();

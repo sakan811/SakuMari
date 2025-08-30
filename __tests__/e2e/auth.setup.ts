@@ -1,8 +1,12 @@
 import { test as setup, expect } from "@playwright/test";
+import resetDatabase from "./db-reset";
 
 const authFile = "playwright/.auth/user.json";
 
 setup("authenticate", async ({ page }) => {
+  // Reset database before each test run
+  await resetDatabase();
+
   // Perform authentication steps
   await page.goto("/");
 

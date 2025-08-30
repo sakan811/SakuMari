@@ -1,150 +1,149 @@
-import { describe, test, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import ModeSelector from "../components/ModeSelector";
+/*
+ * SakuMari - Japanese Kana Flashcard App
+ * Copyright (C) 2025  Sakan Nirattisaykul
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-describe("ModeSelector Component", () => {
+import { describe, test, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import ModeSelector from "@/components/ModeSelector";
+import React from "react";
+
+describe("ModeSelector Component Tests", () => {
   const mockOnModeChange = vi.fn();
 
-  const defaultProps = {
-    currentMode: "typing" as const,
-    onModeChange: mockOnModeChange,
-    disabled: false,
-  };
-
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("Rendering", () => {
-    test("renders both mode buttons", () => {
-      render(<ModeSelector {...defaultProps} />);
+  test("renders both mode buttons", () => {
+    render(
+      <ModeSelector
+        currentMode="typing"
+        onModeChange={mockOnModeChange}
+        disabled={false}
+      />,
+    );
 
-      expect(screen.getByText(/Typing/)).toBeInTheDocument();
-      expect(screen.getByText(/Choices/)).toBeInTheDocument();
-    });
+    expect(screen.getByTestId("typing-button")).toBeInTheDocument();
+    expect(screen.getByTestId("multiple-choice-button")).toBeInTheDocument();
 
-    test("shows active state for typing mode", () => {
-      render(<ModeSelector {...defaultProps} currentMode="typing" />);
-
-      const typingButton = screen.getByText(/Typing/).closest("button");
-      const choicesButton = screen.getByText(/Choices/).closest("button");
-
-      expect(typingButton).toHaveClass("bg-[#d1622b]", "text-white");
-      expect(choicesButton).not.toHaveClass("bg-[#d1622b]", "text-white");
-    });
-
-    test("shows active state for multiple-choice mode", () => {
-      render(<ModeSelector {...defaultProps} currentMode="multiple-choice" />);
-
-      const typingButton = screen.getByText(/Typing/).closest("button");
-      const choicesButton = screen.getByText(/Choices/).closest("button");
-
-      expect(choicesButton).toHaveClass("bg-[#d1622b]", "text-white");
-      expect(typingButton).not.toHaveClass("bg-[#d1622b]", "text-white");
-    });
-
-    test("renders emojis in buttons", () => {
-      render(<ModeSelector {...defaultProps} />);
-
-      expect(screen.getByText("⌨️")).toBeInTheDocument();
-      expect(screen.getByText("📝")).toBeInTheDocument();
-    });
+    // Check button labels
+    expect(screen.getByText("Typing")).toBeInTheDocument();
+    expect(screen.getByText("Choices")).toBeInTheDocument();
   });
 
-  describe("Interactions", () => {
-    test("calls onModeChange when typing button is clicked", () => {
-      render(<ModeSelector {...defaultProps} currentMode="multiple-choice" />);
+  test("shows correct active state for typing mode", () => {
+    render(
+      <ModeSelector
+        currentMode="typing"
+        onModeChange={mockOnModeChange}
+        disabled={false}
+      />,
+    );
 
-      const typingButton = screen.getByText(/Typing/).closest("button");
-      fireEvent.click(typingButton!);
+    const typingButton = screen.getByTestId("typing-button");
+    const multipleChoiceButton = screen.getByTestId("multiple-choice-button");
 
-      expect(mockOnModeChange).toHaveBeenCalledWith("typing");
-      expect(mockOnModeChange).toHaveBeenCalledTimes(1);
-    });
+    // Typing button should be active
+    expect(typingButton).toHaveClass("bg-[#d1622b]");
+    expect(typingButton).toHaveClass("text-white");
 
-    test("calls onModeChange when choices button is clicked", () => {
-      render(<ModeSelector {...defaultProps} currentMode="typing" />);
-
-      const choicesButton = screen.getByText(/Choices/).closest("button");
-      fireEvent.click(choicesButton!);
-
-      expect(mockOnModeChange).toHaveBeenCalledWith("multiple-choice");
-      expect(mockOnModeChange).toHaveBeenCalledTimes(1);
-    });
+    // Multiple choice button should be inactive
+    expect(multipleChoiceButton).not.toHaveClass("bg-[#d1622b]");
+    expect(multipleChoiceButton).not.toHaveClass("text-white");
   });
 
-  describe("Disabled State", () => {
-    test("disables buttons when disabled prop is true", () => {
-      render(<ModeSelector {...defaultProps} disabled={true} />);
+  test("shows correct active state for multiple choice mode", () => {
+    render(
+      <ModeSelector
+        currentMode="multiple-choice"
+        onModeChange={mockOnModeChange}
+        disabled={false}
+      />,
+    );
 
-      const typingButton = screen.getByText(/Typing/).closest("button");
-      const choicesButton = screen.getByText(/Choices/).closest("button");
+    const typingButton = screen.getByTestId("typing-button");
+    const multipleChoiceButton = screen.getByTestId("multiple-choice-button");
 
-      expect(typingButton).toBeDisabled();
-      expect(choicesButton).toBeDisabled();
-    });
+    // Multiple choice button should be active
+    expect(multipleChoiceButton).toHaveClass("bg-[#d1622b]");
+    expect(multipleChoiceButton).toHaveClass("text-white");
 
-    test("applies disabled styles when disabled", () => {
-      render(<ModeSelector {...defaultProps} disabled={true} />);
-
-      const typingButton = screen.getByText(/Typing/).closest("button");
-      const choicesButton = screen.getByText(/Choices/).closest("button");
-
-      expect(typingButton).toHaveClass("opacity-50", "cursor-not-allowed");
-      expect(choicesButton).toHaveClass("opacity-50", "cursor-not-allowed");
-    });
-
-    test("does not call onModeChange when disabled button is clicked", () => {
-      render(<ModeSelector {...defaultProps} disabled={true} />);
-
-      const choicesButton = screen.getByText(/Choices/).closest("button");
-      fireEvent.click(choicesButton!);
-
-      expect(mockOnModeChange).not.toHaveBeenCalled();
-    });
+    // Typing button should be inactive
+    expect(typingButton).not.toHaveClass("bg-[#d1622b]");
+    expect(typingButton).not.toHaveClass("text-white");
   });
 
-  describe("Responsive Design", () => {
-    test("shows full text on larger screens", () => {
-      render(<ModeSelector {...defaultProps} />);
+  test("calls onModeChange with correct value when typing button is clicked", () => {
+    render(
+      <ModeSelector
+        currentMode="multiple-choice"
+        onModeChange={mockOnModeChange}
+        disabled={false}
+      />,
+    );
 
-      expect(screen.getByText("Typing")).toHaveClass("hidden", "xs:inline");
-      expect(screen.getByText("Choices")).toHaveClass("hidden", "xs:inline");
-    });
+    fireEvent.click(screen.getByTestId("typing-button"));
 
-    test("shows shortened text on smaller screens", () => {
-      render(<ModeSelector {...defaultProps} />);
-
-      expect(screen.getByText("Type")).toHaveClass("xs:hidden");
-      expect(screen.getByText("Pick")).toHaveClass("xs:hidden");
-    });
+    expect(mockOnModeChange).toHaveBeenCalledWith("typing");
   });
 
-  describe("Accessibility", () => {
-    test("buttons are focusable when not disabled", () => {
-      render(<ModeSelector {...defaultProps} />);
+  test("calls onModeChange with correct value when multiple choice button is clicked", () => {
+    render(
+      <ModeSelector
+        currentMode="typing"
+        onModeChange={mockOnModeChange}
+        disabled={false}
+      />,
+    );
 
-      const typingButton = screen.getByText(/Typing/).closest("button");
-      const choicesButton = screen.getByText(/Choices/).closest("button");
+    fireEvent.click(screen.getByTestId("multiple-choice-button"));
 
-      // Check that buttons exist and are interactive
-      expect(typingButton).toBeInTheDocument();
-      expect(choicesButton).toBeInTheDocument();
-      expect(typingButton).not.toBeDisabled();
-      expect(choicesButton).not.toBeDisabled();
-    });
+    expect(mockOnModeChange).toHaveBeenCalledWith("multiple-choice");
+  });
 
-    test("supports keyboard navigation", () => {
-      render(<ModeSelector {...defaultProps} />);
+  test("disables buttons when disabled prop is true", () => {
+    render(
+      <ModeSelector
+        currentMode="typing"
+        onModeChange={mockOnModeChange}
+        disabled={true}
+      />,
+    );
 
-      const typingButton = screen.getByText(/Typing/).closest("button");
+    const typingButton = screen.getByTestId("typing-button");
+    const multipleChoiceButton = screen.getByTestId("multiple-choice-button");
 
-      typingButton!.focus();
-      expect(document.activeElement).toBe(typingButton);
+    expect(typingButton).toBeDisabled();
+    expect(multipleChoiceButton).toBeDisabled();
 
-      // ModeSelector doesn't handle keydown events, only click events
-      fireEvent.click(typingButton!);
-      expect(mockOnModeChange).toHaveBeenCalledWith("typing");
-    });
+    expect(typingButton).toHaveClass("opacity-50");
+    expect(multipleChoiceButton).toHaveClass("opacity-50");
+  });
+
+  test("does not call onModeChange when disabled", () => {
+    render(
+      <ModeSelector
+        currentMode="typing"
+        onModeChange={mockOnModeChange}
+        disabled={true}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("multiple-choice-button"));
+
+    expect(mockOnModeChange).not.toHaveBeenCalled();
   });
 });

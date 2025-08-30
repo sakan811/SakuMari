@@ -1,8 +1,8 @@
 // Re-export functions from mock-setup for backward compatibility
-export { 
+export {
   mockFlashcardProvider,
   mockApiResponse,
-  mockSession
+  mockSession,
 } from "./mock-setup";
 
 // For backward compatibility, maintain the old mockKana structure
