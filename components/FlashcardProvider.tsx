@@ -173,24 +173,16 @@ export function FlashcardProvider({
     }
 
     const correctAnswer = correctKana.romaji;
-
-    // Get all possible wrong answers
+    
+    // Get 3 random wrong answers from other kana
     const wrongAnswers = kanaData
       .filter((kana) => kana.romaji !== correctAnswer)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3)
       .map((kana) => kana.romaji);
 
-    // Remove duplicates and get 3 random unique wrong answers
-    const uniqueWrongAnswers = [...new Set(wrongAnswers)];
-    const selectedWrongAnswers = [];
-
-    // Shuffle and take up to 3 wrong answers
-    while (selectedWrongAnswers.length < 3 && uniqueWrongAnswers.length > 0) {
-      const randomIndex = Math.floor(Math.random() * uniqueWrongAnswers.length);
-      selectedWrongAnswers.push(uniqueWrongAnswers.splice(randomIndex, 1)[0]);
-    }
-
     // Combine correct answer with wrong answers and shuffle
-    const allChoices = [correctAnswer, ...selectedWrongAnswers].sort(
+    const allChoices = [correctAnswer, ...wrongAnswers].sort(
       () => Math.random() - 0.5,
     );
 
