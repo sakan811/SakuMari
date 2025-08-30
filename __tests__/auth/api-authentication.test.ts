@@ -3,6 +3,9 @@ import { GET } from "@/app/api/stats/route";
 import { POST } from "@/app/api/flashcards/submit/route";
 import { NextRequest } from "next/server";
 
+// Import mock setup functions
+import { mockSession } from "../utils/mock-setup";
+
 // Use vi.hoisted to declare mocks that can be used in vi.mock
 const { mockAuth, mockPrisma } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
@@ -34,7 +37,7 @@ describe("API Authentication", () => {
     });
 
     test("returns 401 for session without user ID", async () => {
-      mockAuth.mockResolvedValue({ user: {} });
+      mockAuth.mockResolvedValue(mockSession(true, { id: undefined }));
 
       const request = new NextRequest("http://localhost/api/stats");
       const response = await GET(request);
@@ -42,7 +45,7 @@ describe("API Authentication", () => {
     });
 
     test("succeeds with valid session", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
       mockPrisma.kana.findMany.mockResolvedValue([]);
 
       const request = new NextRequest("http://localhost/api/stats");
@@ -68,7 +71,7 @@ describe("API Authentication", () => {
     });
 
     test("processes submissions for authenticated users", async () => {
-      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
       mockPrisma.kanaProgress.upsert.mockResolvedValue({
         id: "1",
         attempts: 1,
