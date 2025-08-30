@@ -8,7 +8,7 @@ import {
   cleanup,
 } from "@testing-library/react";
 import Dashboard from "../components/Dashboard";
-import { mockApiResponse } from "./utils/test-helpers";
+import { mockApiResponse } from "./utils/mock-setup";
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;

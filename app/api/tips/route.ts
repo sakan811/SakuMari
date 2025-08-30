@@ -81,28 +81,24 @@ export async function POST(request: Request) {
       },
     });
 
-    // Prepare user progress context
+    // Prepare user progress context with simple accuracy categories
     const strugglingKana = userProgress
       .filter((p) => p.attempts > 0 && p.accuracy < 0.7)
-      .map(
-        (p) =>
-          `${p.kana.character} (${p.kana.romaji}): ${Math.round(p.accuracy * 100)}% accuracy, ${p.attempts} attempts`,
-      )
-      .slice(0, 10);
+      .slice(0, 5);
 
-    const masteredKana = userProgress
-      .filter((p) => p.attempts > 5 && p.accuracy >= 0.9)
-      .map(
-        (p) =>
-          `${p.kana.character} (${p.kana.romaji}): ${Math.round(p.accuracy * 100)}% accuracy`,
-      )
+    const progressingKana = userProgress
+      .filter((p) => p.attempts > 0 && p.accuracy >= 0.7 && p.accuracy < 0.9)
+      .slice(0, 5);
+
+    const masteringKana = userProgress
+      .filter((p) => p.attempts > 0 && p.accuracy >= 0.9)
       .slice(0, 5);
 
     const progressContext = `
-User Progress Context:
-${strugglingKana.length > 0 ? `Characters needing help: ${strugglingKana.join(", ")}` : "No struggling characters identified."}
-${masteredKana.length > 0 ? `Well-mastered characters: ${masteredKana.join(", ")}` : "No mastered characters yet."}
-Total practice attempts: ${userProgress.reduce((sum, p) => sum + p.attempts, 0)}
+User Progress:
+${strugglingKana.length > 0 ? `Needs Practice: ${strugglingKana.map(p => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
+${progressingKana.length > 0 ? `Making Progress: ${progressingKana.map(p => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
+${masteringKana.length > 0 ? `Mastering: ${masteringKana.map(p => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
 `;
 
     // Format conversation history for context

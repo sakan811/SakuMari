@@ -17,34 +17,9 @@
 
 import { Metadata } from "next";
 import FlashcardApp from "@/components/FlashcardApp";
+import { createKanaPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
-  title: "Katakana Practice",
-  description:
-    "Practice Japanese Katakana characters with interactive flashcards. Master all 46 basic Katakana symbols used for foreign words and names.",
-  keywords: [
-    "Katakana",
-    "Japanese characters",
-    "flashcards",
-    "practice",
-    "learning",
-    "アイウエオ",
-  ],
-  alternates: {
-    canonical: "/katakana",
-  },
-  openGraph: {
-    title: "Katakana Practice | SakuMari",
-    description:
-      "Practice Japanese Katakana characters with interactive flashcards. Master all 46 basic Katakana symbols.",
-    url: "/katakana",
-  },
-  twitter: {
-    title: "Katakana Practice | SakuMari",
-    description:
-      "Practice Japanese Katakana characters with interactive flashcards. Master all 46 basic Katakana symbols.",
-  },
-};
+export const metadata: Metadata = createKanaPageMetadata("katakana");
 
 export default function KatakanaPage() {
   return <FlashcardApp kanaType="katakana" />;

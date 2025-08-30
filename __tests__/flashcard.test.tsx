@@ -2,7 +2,8 @@ import { describe, test, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Flashcard from "../components/Flashcard";
 import { useFlashcard } from "../components/FlashcardProvider";
-import { mockFlashcardProvider, mockKana } from "./utils/test-helpers";
+import { mockFlashcardProvider } from "./utils/mock-setup";
+import { mockKana } from "./utils/test-helpers";
 
 vi.mock("../components/FlashcardProvider", () => ({
   useFlashcard: vi.fn(),

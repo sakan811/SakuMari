@@ -1,5 +1,11 @@
-import { vi } from "vitest";
+// Re-export functions from mock-setup for backward compatibility
+export { 
+  mockFlashcardProvider,
+  mockApiResponse,
+  mockSession
+} from "./mock-setup";
 
+// For backward compatibility, maintain the old mockKana structure
 export const mockKana = {
   basic: { id: "1", character: "あ", romaji: "a", accuracy: 0.7 },
   withStats: {
@@ -12,26 +18,5 @@ export const mockKana = {
   },
 };
 
-export const mockFlashcardProvider = (overrides = {}) => ({
-  currentKana: null,
-  loadingKana: false,
-  submitAnswer: vi.fn(),
-  result: null,
-  nextCard: vi.fn(),
-  interactionMode: "typing",
-  setInteractionMode: vi.fn(),
-  choices: [],
-  isSubmitting: false,
-  ...overrides,
-});
-
-export const mockApiResponse = (data: unknown, ok = true) => ({
-  ok,
-  status: ok ? 200 : 500,
-  json: async () => data,
-});
-
-export const mockSession = (authenticated = true) => ({
-  data: authenticated ? { user: { id: "user123", name: "Test User" } } : null,
-  status: authenticated ? "authenticated" : "unauthenticated",
-});
+// Export mockKanaData as a separate function for new usage
+export { mockKanaData } from "./mock-setup";
