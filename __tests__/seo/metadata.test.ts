@@ -173,7 +173,7 @@ describe("SEO Metadata Configuration", () => {
 
   describe("Katakana Page Metadata", () => {
     it("should have Katakana-specific title", () => {
-      expect(katakanaMetadata.title).toBe("Katakana Practice");
+      expect(katakanaMetadata.title).toBe("Katakana Practice | SakuMari");
     });
 
     it("should have Katakana-specific description", () => {
