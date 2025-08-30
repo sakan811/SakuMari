@@ -39,6 +39,6 @@ export function useAuthStatus() {
     status,
     credentialsEnabled,
     signIn,
-    signOut
+    signOut,
   };
 }
