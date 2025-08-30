@@ -25,7 +25,8 @@ describe("API Authentication", () => {
     test("returns 401 for unauthenticated requests", async () => {
       mockAuth.mockResolvedValue(null);
 
-      const response = await GET();
+      const request = new NextRequest("http://localhost/api/stats");
+      const response = await GET(request);
       expect(response.status).toBe(401);
 
       const data = await response.json();
@@ -35,7 +36,8 @@ describe("API Authentication", () => {
     test("returns 401 for session without user ID", async () => {
       mockAuth.mockResolvedValue({ user: {} });
 
-      const response = await GET();
+      const request = new NextRequest("http://localhost/api/stats");
+      const response = await GET(request);
       expect(response.status).toBe(401);
     });
 
@@ -43,7 +45,8 @@ describe("API Authentication", () => {
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
       mockPrisma.kana.findMany.mockResolvedValue([]);
 
-      const response = await GET();
+      const request = new NextRequest("http://localhost/api/stats");
+      const response = await GET(request);
       expect(response.status).toBe(200);
     });
   });
