@@ -24,7 +24,6 @@ import { commonBackgrounds } from "@/lib/backgrounds";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useSorting } from "@/hooks/useSorting";
 import { StatsSummary } from "./StatsSummary";
-import { FilterControls } from "./FilterControls";
 import { CharacterProgressTable } from "./CharacterProgressTable";
 
 type KanaStats = {
@@ -117,7 +116,7 @@ export default function Dashboard() {
       ) : (
         <>
           {/* Stats Cards */}
-          <StatsSummary stats={stats} />
+          <StatsSummary stats={filteredStats} />
 
           {/* Character Progress Table */}
           <CharacterProgressTable
@@ -125,6 +124,8 @@ export default function Dashboard() {
             sortColumn={sortColumn as string}
             sortDirection={sortDirection}
             onSort={handleSort}
+            filter={filter}
+            setFilter={setFilter}
             onPracticeHiragana={() => {}}
             onPracticeKatakana={() => {}}
           />
