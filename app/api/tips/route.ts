@@ -96,9 +96,9 @@ export async function POST(request: Request) {
 
     const progressContext = `
 User Progress:
-${strugglingKana.length > 0 ? `Needs Practice: ${strugglingKana.map(p => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
-${progressingKana.length > 0 ? `Making Progress: ${progressingKana.map(p => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
-${masteringKana.length > 0 ? `Mastering: ${masteringKana.map(p => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
+${strugglingKana.length > 0 ? `Needs Practice: ${strugglingKana.map((p) => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
+${progressingKana.length > 0 ? `Making Progress: ${progressingKana.map((p) => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
+${masteringKana.length > 0 ? `Mastering: ${masteringKana.map((p) => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
 `;
 
     // Format conversation history for context
