@@ -17,6 +17,7 @@
 
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { POST } from "../../app/api/tips/route";
+import { NextRequest } from "next/server";
 
 // Type for test mock sessions (matches NextAuth Session type)
 type MockAuthSession = {
@@ -84,9 +85,9 @@ describe("Tips API Route", async () => {
 
   describe("POST /api/tips", () => {
     test("returns 401 when user is not authenticated", async () => {
-      (auth as any).mockResolvedValue(null);
+      vi.mocked(auth).mockResolvedValue(null);
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "How to learn hiragana?" }),
@@ -100,9 +101,9 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 401 when user session has no ID", async () => {
-      (auth as any).mockResolvedValue({ user: {} } as MockAuthSession);
+      vi.mocked(auth).mockResolvedValue({ user: {} } as MockAuthSession);
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "How to learn hiragana?" }),
@@ -116,11 +117,11 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is missing", async () => {
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
@@ -136,11 +137,11 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is empty string", async () => {
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "" }),
@@ -156,11 +157,11 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is only whitespace", async () => {
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "   " }),
@@ -176,13 +177,13 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery exceeds character limit", async () => {
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
 
       const longQuery = "a".repeat(501); // Over 500 character limit
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: longQuery }),
@@ -219,14 +220,14 @@ describe("Tips API Route", async () => {
         },
       ];
 
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(
         mockUserProgress,
       );
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "How to improve my hiragana?" }),
@@ -254,12 +255,12 @@ describe("Tips API Route", async () => {
     });
 
     test("handles users with no practice data", async () => {
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "How to start learning kana?" }),
@@ -275,12 +276,12 @@ describe("Tips API Route", async () => {
     test("returns 503 when GEMINI_API_KEY is missing", async () => {
       delete process.env.GEMINI_API_KEY;
 
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "How to learn kana?" }),
@@ -299,12 +300,12 @@ describe("Tips API Route", async () => {
       // Override the mock to throw an error
       mockGenerateContent.mockRejectedValue(new Error("AI service error"));
 
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "How to learn kana?" }),
@@ -327,12 +328,12 @@ describe("Tips API Route", async () => {
         },
       });
 
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "How to learn kana?" }),
@@ -348,14 +349,14 @@ describe("Tips API Route", async () => {
     });
 
     test("handles database errors gracefully", async () => {
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockRejectedValue(
         new Error("Database connection lost"),
       );
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "How to learn kana?" }),
@@ -371,7 +372,7 @@ describe("Tips API Route", async () => {
     });
 
     test("accepts optional conversationHistory parameter", async () => {
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
@@ -381,7 +382,7 @@ describe("Tips API Route", async () => {
         { role: "assistant", content: "Previous answer" },
       ];
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -426,14 +427,14 @@ describe("Tips API Route", async () => {
         },
       });
 
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(
         mockUserProgress,
       );
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "Help me improve" }),
@@ -451,12 +452,12 @@ describe("Tips API Route", async () => {
     });
 
     test("returns proper response format", async () => {
-      (auth as any).mockResolvedValue({
+      vi.mocked(auth).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
-      const request = new Request("http://localhost/api/tips", {
+      const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuery: "Test question" }),
