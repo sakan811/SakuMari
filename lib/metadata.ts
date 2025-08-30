@@ -22,17 +22,21 @@ import { Metadata } from "next";
  * @param kanaType - The type of kana (hiragana or katakana)
  * @returns Metadata object for the kana practice page
  */
-export function createKanaPageMetadata(kanaType: "hiragana" | "katakana"): Metadata {
-  const title = kanaType === "hiragana" 
-    ? "Hiragana Practice | SakuMari" 
-    : "Katakana Practice | SakuMari";
-    
-  const description = kanaType === "hiragana"
-    ? "Practice Japanese Hiragana characters with interactive flashcards. Master all 46 basic Hiragana symbols and improve your reading skills."
-    : "Practice Japanese Katakana characters with interactive flashcards. Master all 46 basic Katakana symbols used for foreign words and names.";
-    
+export function createKanaPageMetadata(
+  kanaType: "hiragana" | "katakana",
+): Metadata {
+  const title =
+    kanaType === "hiragana"
+      ? "Hiragana Practice | SakuMari"
+      : "Katakana Practice | SakuMari";
+
+  const description =
+    kanaType === "hiragana"
+      ? "Practice Japanese Hiragana characters with interactive flashcards. Master all 46 basic Hiragana symbols and improve your reading skills."
+      : "Practice Japanese Katakana characters with interactive flashcards. Master all 46 basic Katakana symbols used for foreign words and names.";
+
   const kanaScript = kanaType === "hiragana" ? "あいうえお" : "アイウエオ";
-  
+
   return {
     title,
     description,

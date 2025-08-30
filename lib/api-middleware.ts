@@ -66,9 +66,11 @@ export function withAuth<T = unknown>(handler: ApiHandler<T>) {
  * Alternative withAuth for handlers that don't need the request object
  */
 export function withAuthSimple<T = unknown>(
-  handler: (context: AuthenticatedContext) => Promise<NextResponse<T>> | NextResponse<T>,
+  handler: (
+    context: AuthenticatedContext,
+  ) => Promise<NextResponse<T>> | NextResponse<T>,
 ) {
-  return withAuth((_request: NextRequest, context: AuthenticatedContext) => 
-    handler(context)
+  return withAuth((_request: NextRequest, context: AuthenticatedContext) =>
+    handler(context),
   );
 }
