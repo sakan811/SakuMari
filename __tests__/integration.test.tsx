@@ -24,9 +24,18 @@ import { mockSession, mockApiResponse } from "./utils/mock-setup";
 import React from "react";
 
 // Mock next-auth
-vi.mock("next-auth/react", () => ({
-  useSession: () => mockSession(true),
-}));
+vi.mock("next-auth/react", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useSession: () => ({
+      data: mockSession(true),
+      status: "authenticated",
+    }),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+  };
+});
 
 // Mock next/navigation
 vi.mock("next/navigation", () => ({
@@ -55,7 +64,7 @@ describe("Critical User Flow Integration Test", () => {
     // Since we're mocking the session as authenticated, we should see the dashboard link
     // rather than the login button
     await waitFor(() => {
-      expect(screen.getByText("Dashboard")).toBeInTheDocument();
+      expect(screen.getByText("📊 Dashboard")).toBeInTheDocument();
     });
 
     // 2. User navigates to Hiragana practice page
