@@ -25,7 +25,7 @@ export class ApiError extends Error {
     super(message);
     this.status = status;
     this.code = code;
-    this.name = 'ApiError';
+    this.name = "ApiError";
   }
 }
 
@@ -38,11 +38,11 @@ export function createErrorResponse(
   code?: string,
 ): NextResponse {
   return NextResponse.json(
-    { 
+    {
       error: message,
       ...(code && { code }),
     },
-    { status }
+    { status },
   );
 }
 
@@ -99,20 +99,21 @@ export function withErrorHandler<T = unknown>(
  */
 export const ApiErrors = {
   unauthorized: () => createErrorResponse("Unauthorized", 401, "UNAUTHORIZED"),
-  badRequest: (message: string) => createErrorResponse(message, 400, "BAD_REQUEST"),
-  notFound: (resource?: string) => 
+  badRequest: (message: string) =>
+    createErrorResponse(message, 400, "BAD_REQUEST"),
+  notFound: (resource?: string) =>
     createErrorResponse(
       resource ? `${resource} not found` : "Resource not found",
       404,
       "NOT_FOUND",
     ),
-  internalError: (message?: string) => 
+  internalError: (message?: string) =>
     createErrorResponse(
       message || "Internal server error",
       500,
       "INTERNAL_ERROR",
     ),
-  serviceUnavailable: (message?: string) => 
+  serviceUnavailable: (message?: string) =>
     createErrorResponse(
       message || "Service temporarily unavailable",
       503,
