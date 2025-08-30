@@ -19,12 +19,21 @@ import { useState, useEffect, useRef } from "react";
 
 type InteractionMode = "typing" | "multiple-choice";
 
+type KanaWithAccuracy = {
+  id: string;
+  character: string;
+  romaji: string;
+  accuracy: number;
+  attempts: number;
+  correct_attempts: number;
+};
+
 interface UseFlashcardInteractionProps {
   interactionMode: InteractionMode;
   result: "correct" | "incorrect" | null;
   isSubmitting: boolean;
   loadingKana: boolean;
-  currentKana: any;
+  currentKana: KanaWithAccuracy | null;
   nextCard: () => void;
 }
 
@@ -73,6 +82,16 @@ export function useFlashcardInteraction({
     }
   }, [currentKana, loadingKana, result, isSubmitting, interactionMode]);
 
+  // Handle next card action
+  const handleNextCard = () => {
+    nextCard();
+    setInteractionState({
+      answer: "",
+      selectedChoice: null,
+      error: "",
+    });
+  };
+
   // Handle Enter key when result is shown
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -83,7 +102,7 @@ export function useFlashcardInteraction({
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [result, isSubmitting]);
+  }, [result, isSubmitting, handleNextCard]);
 
   // Clear state when switching modes
   useEffect(() => {
@@ -93,15 +112,6 @@ export function useFlashcardInteraction({
       error: "",
     });
   }, [interactionMode]);
-
-  const handleNextCard = () => {
-    nextCard();
-    setInteractionState({
-      answer: "",
-      selectedChoice: null,
-      error: "",
-    });
-  };
 
   const handleSubmit = async (
     submitAnswer: (answer: string) => Promise<void>,

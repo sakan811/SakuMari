@@ -36,8 +36,8 @@ interface CharacterProgressTableProps {
   onSort: (column: string) => void;
   filter: "all" | "hiragana" | "katakana";
   setFilter: (filter: "all" | "hiragana" | "katakana") => void;
-  onPracticeHiragana: () => void;
-  onPracticeKatakana: () => void;
+  _onPracticeHiragana: () => void;
+  _onPracticeKatakana: () => void;
 }
 
 export function CharacterProgressTable({
@@ -47,8 +47,8 @@ export function CharacterProgressTable({
   onSort,
   filter,
   setFilter,
-  onPracticeHiragana,
-  onPracticeKatakana,
+  _onPracticeHiragana,
+  _onPracticeKatakana,
 }: CharacterProgressTableProps) {
   return (
     <div className="rounded-lg bg-white/90 backdrop-blur-sm p-4 sm:p-6 shadow-xl border-2 border-[#705a39] mx-4">

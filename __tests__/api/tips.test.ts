@@ -18,12 +18,18 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { POST } from "../../app/api/tips/route";
 
-// Using any for test mocks to avoid complex NextAuth type conflicts
-type MockAuthSession = any;
+// Type for test mock sessions (matches NextAuth Session type)
+type MockAuthSession = {
+  user: {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+  };
+} | null;
 
 // Use direct function declaration pattern that works reliably with vitest
 vi.mock("@/lib/auth", () => ({
-  auth: vi.fn(),
+  auth: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -78,7 +84,7 @@ describe("Tips API Route", async () => {
 
   describe("POST /api/tips", () => {
     test("returns 401 when user is not authenticated", async () => {
-      vi.mocked(auth).mockResolvedValue(null);
+      (auth as any).mockResolvedValue(null);
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
@@ -94,7 +100,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 401 when user session has no ID", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: {} } as MockAuthSession);
+      (auth as any).mockResolvedValue({ user: {} } as MockAuthSession);
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
@@ -110,7 +116,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is missing", async () => {
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
 
@@ -130,7 +136,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is empty string", async () => {
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
 
@@ -150,7 +156,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is only whitespace", async () => {
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
 
@@ -170,7 +176,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery exceeds character limit", async () => {
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
 
@@ -213,7 +219,7 @@ describe("Tips API Route", async () => {
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(
@@ -248,7 +254,7 @@ describe("Tips API Route", async () => {
     });
 
     test("handles users with no practice data", async () => {
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
@@ -269,7 +275,7 @@ describe("Tips API Route", async () => {
     test("returns 503 when GEMINI_API_KEY is missing", async () => {
       delete process.env.GEMINI_API_KEY;
 
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
@@ -293,7 +299,7 @@ describe("Tips API Route", async () => {
       // Override the mock to throw an error
       mockGenerateContent.mockRejectedValue(new Error("AI service error"));
 
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
@@ -321,7 +327,7 @@ describe("Tips API Route", async () => {
         },
       });
 
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
@@ -342,7 +348,7 @@ describe("Tips API Route", async () => {
     });
 
     test("handles database errors gracefully", async () => {
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockRejectedValue(
@@ -365,7 +371,7 @@ describe("Tips API Route", async () => {
     });
 
     test("accepts optional conversationHistory parameter", async () => {
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
@@ -420,7 +426,7 @@ describe("Tips API Route", async () => {
         },
       });
 
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(
@@ -445,7 +451,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns proper response format", async () => {
-      vi.mocked(auth).mockResolvedValue({
+      (auth as any).mockResolvedValue({
         user: { id: "user123" },
       } as MockAuthSession);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);

@@ -21,8 +21,14 @@ import Image from "next/image";
 import { signOut, signIn } from "next-auth/react";
 
 interface DesktopNavigationProps {
-  session: any;
-  status: any;
+  session: {
+    user?: {
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+    };
+  } | null;
+  status: "loading" | "authenticated" | "unauthenticated";
   credentialsEnabled: boolean;
 }
 

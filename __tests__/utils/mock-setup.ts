@@ -18,25 +18,22 @@
 import { vi } from "vitest";
 
 /**
- * Creates a mock session object for testing
+ * Creates a mock session object for testing NextAuth auth() function
  * @param authenticated - Whether the user is authenticated
  * @param userOverrides - Override properties for the user object
- * @returns Mock session object
+ * @returns Mock session object compatible with NextAuth auth()
  */
 export function mockSession(authenticated = true, userOverrides = {}) {
-  return {
-    data: authenticated
-      ? {
-          user: {
-            id: "user123",
-            name: "Test User",
-            email: "test@example.com",
-            ...userOverrides,
-          },
-        }
-      : null,
-    status: authenticated ? "authenticated" : "unauthenticated",
-  };
+  return authenticated
+    ? {
+        user: {
+          id: "user123",
+          name: "Test User",
+          email: "test@example.com",
+          ...userOverrides,
+        },
+      }
+    : null;
 }
 
 /**
