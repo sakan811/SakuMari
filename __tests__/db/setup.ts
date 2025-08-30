@@ -122,7 +122,7 @@ export async function cleanupTestDatabase() {
   if (testPrisma) {
     try {
       await testPrisma.$disconnect();
-    } catch (error) {
+    } catch {
       // Ignore disconnect errors
     }
     testPrisma = null;

@@ -91,7 +91,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 401 when user session has no ID", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: {} });
+      vi.mocked(auth).mockResolvedValue({ user: {} } as any);
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
@@ -107,7 +107,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is missing", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
@@ -125,7 +125,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is empty string", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
@@ -143,7 +143,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery is only whitespace", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
 
       const request = new Request("http://localhost/api/tips", {
         method: "POST",
@@ -161,7 +161,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns 400 when userQuery exceeds character limit", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
 
       const longQuery = "a".repeat(501); // Over 500 character limit
 
@@ -183,18 +183,26 @@ describe("Tips API Route", async () => {
     test("fetches user progress data successfully", async () => {
       const mockUserProgress = [
         {
-          kana: { character: "あ", romaji: "a" },
+          id: "progress-1",
+          kana_id: "kana-1",
+          user_id: "user123",
           attempts: 10,
+          correct_attempts: 5,
           accuracy: 0.5,
+          kana: { character: "あ", romaji: "a" },
         },
         {
-          kana: { character: "か", romaji: "ka" },
+          id: "progress-2",
+          kana_id: "kana-2",
+          user_id: "user123",
           attempts: 8,
+          correct_attempts: 7,
           accuracy: 0.9,
+          kana: { character: "か", romaji: "ka" },
         },
       ];
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(
         mockUserProgress,
       );
@@ -227,7 +235,7 @@ describe("Tips API Route", async () => {
     });
 
     test("handles users with no practice data", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const request = new Request("http://localhost/api/tips", {
@@ -246,7 +254,7 @@ describe("Tips API Route", async () => {
     test("returns 503 when GEMINI_API_KEY is missing", async () => {
       delete process.env.GEMINI_API_KEY;
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const request = new Request("http://localhost/api/tips", {
@@ -268,7 +276,7 @@ describe("Tips API Route", async () => {
       // Override the mock to throw an error
       mockGenerateContent.mockRejectedValue(new Error("AI service error"));
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const request = new Request("http://localhost/api/tips", {
@@ -294,7 +302,7 @@ describe("Tips API Route", async () => {
         },
       });
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const request = new Request("http://localhost/api/tips", {
@@ -313,7 +321,7 @@ describe("Tips API Route", async () => {
     });
 
     test("handles database errors gracefully", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
       vi.mocked(prisma.kanaProgress.findMany).mockRejectedValue(
         new Error("Database connection lost"),
       );
@@ -334,7 +342,7 @@ describe("Tips API Route", async () => {
     });
 
     test("accepts optional conversationHistory parameter", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const conversationHistory = [
@@ -361,14 +369,22 @@ describe("Tips API Route", async () => {
     test("includes user progress context in AI prompt", async () => {
       const mockUserProgress = [
         {
-          kana: { character: "あ", romaji: "a" },
+          id: "progress-3",
+          kana_id: "kana-3",
+          user_id: "user123",
           attempts: 10,
+          correct_attempts: 3,
           accuracy: 0.3, // Struggling
+          kana: { character: "あ", romaji: "a" },
         },
         {
-          kana: { character: "か", romaji: "ka" },
+          id: "progress-4",
+          kana_id: "kana-4",
+          user_id: "user123",
           attempts: 8,
+          correct_attempts: 8,
           accuracy: 0.95, // Mastered
+          kana: { character: "か", romaji: "ka" },
         },
       ];
 
@@ -379,7 +395,7 @@ describe("Tips API Route", async () => {
         },
       });
 
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(
         mockUserProgress,
       );
@@ -402,7 +418,7 @@ describe("Tips API Route", async () => {
     });
 
     test("returns proper response format", async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } });
+      vi.mocked(auth).mockResolvedValue({ user: { id: "user123" } } as any);
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
       const request = new Request("http://localhost/api/tips", {

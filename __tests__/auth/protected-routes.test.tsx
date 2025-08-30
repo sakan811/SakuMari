@@ -10,10 +10,10 @@ vi.mock("@/lib/auth", () => ({
 describe("Protected Routes Logic", () => {
   test("should redirect unauthenticated users from protected routes", () => {
     const protectedPaths = ["/hiragana", "/katakana", "/dashboard"];
-    const _isAuthenticated = false;
+    const isAuthenticated = false;
 
     protectedPaths.forEach((path) => {
-      if (!_isAuthenticated && path !== "/") {
+      if (!isAuthenticated && path !== "/") {
         // Should redirect to home
         expect(path).not.toBe("/");
       }
@@ -34,9 +34,10 @@ describe("Protected Routes Logic", () => {
 
   test("should allow unauthenticated access to home page", () => {
     const homePath = "/";
-    const _isAuthenticated = false;
+    const isAuthenticated = false;
 
     // Home should always be accessible
     expect(homePath).toBe("/");
+    expect(isAuthenticated).toBe(false);
   });
 });

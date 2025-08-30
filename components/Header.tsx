@@ -22,9 +22,12 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 
-interface HeaderProps {}
+interface HeaderProps {
+  activeTab?: "flashcards" | "dashboard";
+  setActiveTab?: (_tab: "flashcards" | "dashboard") => void;
+}
 
-export default function Header({}: HeaderProps) {
+export default function Header({ activeTab: _activeTab, setActiveTab: _setActiveTab }: HeaderProps) {
   const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [credentialsEnabled, setCredentialsEnabled] = useState(false);

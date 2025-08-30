@@ -4,11 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 // Mock NextResponse static methods
 vi.mock("next/server", async () => {
   const actual = await vi.importActual("next/server");
+  const actualResponse = actual as { NextResponse: any };
   return {
     NextResponse: {
-      ...actual.NextResponse,
-      redirect: vi.fn().mockImplementation((url: string) => actual.NextResponse.redirect(url)),
-      next: vi.fn().mockImplementation(() => actual.NextResponse.next()),
+      ...actualResponse.NextResponse,
+      redirect: vi.fn().mockImplementation((url: string) => actualResponse.NextResponse.redirect(url)),
+      next: vi.fn().mockImplementation(() => actualResponse.NextResponse.next()),
     },
   };
 });
@@ -22,7 +23,7 @@ import { config } from "@/middleware";
 import { auth } from "@/lib/auth";
 
 describe("Middleware", () => {
-  let mockAuthMiddleware: (_req: NextRequest & { auth?: any }) => NextResponse;
+  let mockAuthMiddleware: (_req: NextRequest & { auth?: object }) => NextResponse;
 
   beforeEach(() => {
     vi.clearAllMocks();

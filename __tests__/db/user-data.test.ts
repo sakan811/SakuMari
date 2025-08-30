@@ -44,7 +44,7 @@ describe("User Data Integration", () => {
     expect(kanaWithProgress).toHaveLength(5); // All kana
 
     const progressKana = kanaWithProgress.filter(
-      (k: { progress: any[] }) => k.progress.length > 0,
+      (k: { progress: unknown[] }) => k.progress.length > 0,
     );
     expect(progressKana).toHaveLength(2); // Only 2 have progress
 

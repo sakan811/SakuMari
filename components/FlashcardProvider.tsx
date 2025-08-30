@@ -23,6 +23,7 @@ import React, {
   useState,
   useEffect,
   useRef,
+  useCallback,
 } from "react";
 
 type KanaWithAccuracy = {
@@ -77,15 +78,50 @@ export function FlashcardProvider({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const hasFetched = useRef(false);
 
-  // Prevent double fetch in React strict mode
-  useEffect(() => {
-    if (!hasFetched.current) {
-      hasFetched.current = true;
-      fetchKanaData();
-    }
-  }, [kanaType]);
+  // Select a kana using confidence-weighted selection (solves first-success penalty)
+  const selectRandomKana = useCallback((data: KanaWithAccuracy[]) => {
+    if (!data.length) return;
 
-  const fetchKanaData = async () => {
+    // Calculate confidence-aware weights
+    const weights = data.map((kana) => {
+      // New characters get high priority
+      if (kana.attempts === 0) return 2.0;
+
+      // Base weight from accuracy (lower accuracy = higher weight)
+      const accuracyWeight = Math.max(1 - kana.accuracy, 0.1);
+
+      // Confidence boost for high accuracy + few attempts (prevents first-success penalty)
+      const confidenceBoost =
+        kana.attempts < 3 && kana.accuracy > 0.8
+          ? 1 + (3 - kana.attempts) * 0.5
+          : 1;
+
+      return accuracyWeight * confidenceBoost;
+    });
+
+    // Weighted random selection
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+    let randomVal = Math.random() * totalWeight;
+    let selectedKana = null;
+
+    for (let i = 0; i < data.length; i++) {
+      randomVal -= weights[i];
+      if (randomVal <= 0) {
+        selectedKana = data[i];
+        break;
+      }
+    }
+
+    // Fallback: if no kana was selected, select the last one
+    if (!selectedKana) {
+      selectedKana = data[data.length - 1];
+    }
+
+    setCurrentKana(selectedKana);
+    generateChoices(selectedKana, data);
+  }, []);
+
+  const fetchKanaData = useCallback(async () => {
     setLoadingKana(true);
     try {
       const response = await fetch("/api/stats");
@@ -116,7 +152,15 @@ export function FlashcardProvider({
     } finally {
       setLoadingKana(false);
     }
-  };
+  }, [kanaType, selectRandomKana]);
+
+  // Prevent double fetch in React strict mode
+  useEffect(() => {
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      fetchKanaData();
+    }
+  }, [kanaType, fetchKanaData]);
 
   // Generate choices for multiple choice mode
   const generateChoices = (
@@ -166,48 +210,6 @@ export function FlashcardProvider({
     setChoices(allChoices);
   };
 
-  // Select a kana using confidence-weighted selection (solves first-success penalty)
-  const selectRandomKana = (data: KanaWithAccuracy[]) => {
-    if (!data.length) return;
-
-    // Calculate confidence-aware weights
-    const weights = data.map((kana) => {
-      // New characters get high priority
-      if (kana.attempts === 0) return 2.0;
-
-      // Base weight from accuracy (lower accuracy = higher weight)
-      const accuracyWeight = Math.max(1 - kana.accuracy, 0.1);
-
-      // Confidence boost for high accuracy + few attempts (prevents first-success penalty)
-      const confidenceBoost =
-        kana.attempts < 3 && kana.accuracy > 0.8
-          ? 1 + (3 - kana.attempts) * 0.5
-          : 1;
-
-      return accuracyWeight * confidenceBoost;
-    });
-
-    // Weighted random selection
-    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-    let randomVal = Math.random() * totalWeight;
-    let selectedKana = null;
-
-    for (let i = 0; i < data.length; i++) {
-      randomVal -= weights[i];
-      if (randomVal <= 0) {
-        selectedKana = data[i];
-        break;
-      }
-    }
-
-    // Fallback: if no kana was selected, select the last one
-    if (!selectedKana) {
-      selectedKana = data[data.length - 1];
-    }
-
-    setCurrentKana(selectedKana);
-    generateChoices(selectedKana, data);
-  };
 
   // Submit answer and update accuracy
   const submitAnswer = async (answer: string) => {

@@ -28,11 +28,7 @@ describe("Health API Route", () => {
       mockPrisma.$queryRaw.mockResolvedValue([1]);
 
       // Mock environment variables through vitest config
-      const request = new NextRequest("http://localhost/api/health", {
-        method: "GET",
-      });
-
-      const response = await GET(request);
+      const response = await GET();
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -59,11 +55,7 @@ describe("Health API Route", () => {
       );
 
       // Mock environment variables through vitest config
-      const request = new NextRequest("http://localhost/api/health", {
-        method: "GET",
-      });
-
-      const response = await GET(request);
+      const response = await GET();
       const data = await response.json();
 
       expect(response.status).toBe(503);
@@ -87,11 +79,7 @@ describe("Health API Route", () => {
       // Mock successful database query
       mockPrisma.$queryRaw.mockResolvedValue([1]);
 
-      const request = new NextRequest("http://localhost/api/health", {
-        method: "GET",
-      });
-
-      const response = await GET(request);
+      const response = await GET();
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -102,11 +90,7 @@ describe("Health API Route", () => {
       // Mock successful database query
       mockPrisma.$queryRaw.mockResolvedValue([1]);
 
-      const request = new NextRequest("http://localhost/api/health", {
-        method: "GET",
-      });
-
-      const response = await GET(request);
+      const response = await GET();
       const data = await response.json();
 
       // Check all required fields are present
@@ -130,11 +114,7 @@ describe("Health API Route", () => {
       // Mock failed database query
       mockPrisma.$queryRaw.mockRejectedValue(new Error("Connection timeout"));
 
-      const request = new NextRequest("http://localhost/api/health", {
-        method: "GET",
-      });
-
-      const response = await GET(request);
+      const response = await GET();
       const data = await response.json();
 
       // Check all required fields are present
@@ -160,11 +140,7 @@ describe("Health API Route", () => {
       // Mock successful database query
       mockPrisma.$queryRaw.mockResolvedValue([1]);
 
-      const request = new NextRequest("http://localhost/api/health", {
-        method: "HEAD",
-      });
-
-      const response = await HEAD(request);
+      const response = await HEAD();
 
       expect(response.status).toBe(200);
       // HEAD requests should have no body
@@ -177,11 +153,7 @@ describe("Health API Route", () => {
         new Error("Database connection failed"),
       );
 
-      const request = new NextRequest("http://localhost/api/health", {
-        method: "HEAD",
-      });
-
-      const response = await HEAD(request);
+      const response = await HEAD();
 
       expect(response.status).toBe(503);
       // HEAD requests should have no body
@@ -193,11 +165,7 @@ describe("Health API Route", () => {
     // Mock successful database query
     mockPrisma.$queryRaw.mockResolvedValue([1]);
 
-    const request = new NextRequest("http://localhost/api/health", {
-      method: "GET",
-    });
-
-    await GET(request);
+    await GET();
 
     // Verify that the database query was called
     expect(mockPrisma.$queryRaw).toHaveBeenCalledWith(["SELECT 1"]);
