@@ -20,10 +20,11 @@ import Link from "next/link";
 
 // Utility function for className merging
 function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
-export interface ButtonLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+export interface ButtonLinkProps
+  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
   children: ReactNode;
   href: string;
   variant?: "primary" | "secondary" | "brown" | "outline" | "ghost";
@@ -65,19 +66,22 @@ const buttonAnimations = {
 };
 
 export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
-  ({
-    children,
-    href,
-    className,
-    variant = "primary",
-    size = "md",
-    fullWidth = false,
-    animation = "shadow",
-    external = false,
-    ...props
-  }, ref) => {
+  (
+    {
+      children,
+      href,
+      className,
+      variant = "primary",
+      size = "md",
+      fullWidth = false,
+      animation = "shadow",
+      external = false,
+      ...props
+    },
+    ref,
+  ) => {
     const variantStyles = buttonVariants[variant];
-    
+
     const linkClasses = cn(
       // Base button styles
       "inline-flex items-center justify-center rounded-lg transition-all duration-200 font-medium relative z-10",
@@ -91,7 +95,7 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
       fullWidth && "w-full",
       // Text alignment for full width
       fullWidth && "text-center",
-      className
+      className,
     );
 
     if (external) {
@@ -110,16 +114,11 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
     }
 
     return (
-      <Link
-        href={href}
-        ref={ref}
-        className={linkClasses}
-        {...props}
-      >
+      <Link href={href} ref={ref} className={linkClasses} {...props}>
         {children}
       </Link>
     );
-  }
+  },
 );
 
 ButtonLink.displayName = "ButtonLink";

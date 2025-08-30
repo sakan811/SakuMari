@@ -39,18 +39,14 @@ export default function Dashboard() {
   const { stats, loading, error, refetch } = useDashboardData();
   const [filter, setFilter] = useState<"all" | "hiragana" | "katakana">("all");
   const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
-  
-  const {
-    sortColumn,
-    sortDirection,
-    handleSort,
-    sortedData
-  } = useSorting<KanaStats>("accuracy", "asc");
+
+  const { sortColumn, sortDirection, handleSort, sortedData } =
+    useSorting<KanaStats>("accuracy", "asc");
 
   // Filter stats based on selected filter
   const filteredStats = stats.filter((kana) => {
     if (filter === "all") return true;
-    
+
     const charCode = kana.character.charCodeAt(0);
     const isHiragana = charCode >= 0x3040 && charCode <= 0x309f;
     const isKatakana = charCode >= 0x30a0 && charCode <= 0x30ff;
@@ -89,11 +85,7 @@ export default function Dashboard() {
           >
             💡 Tips
           </button>
-          <ButtonLink
-            href="/"
-            size="responsive"
-            animation="scale"
-          >
+          <ButtonLink href="/" size="responsive" animation="scale">
             Back to Home
           </ButtonLink>
         </div>

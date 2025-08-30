@@ -19,7 +19,7 @@ import { ButtonHTMLAttributes, forwardRef, ReactNode } from "react";
 
 // Utility function for className merging
 function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -36,23 +36,28 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const buttonVariants = {
   primary: {
     base: "bg-[#d1622b] text-[#fad182] hover:text-white hover:bg-[#ae0d13] border-2 border-[#d1622b] hover:border-[#ae0d13]",
-    disabled: "disabled:bg-[#705a39] disabled:border-[#705a39] disabled:cursor-not-allowed disabled:opacity-50",
+    disabled:
+      "disabled:bg-[#705a39] disabled:border-[#705a39] disabled:cursor-not-allowed disabled:opacity-50",
   },
   secondary: {
     base: "bg-gray-100 text-gray-900 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300",
-    disabled: "disabled:bg-gray-50 disabled:border-gray-100 disabled:cursor-not-allowed disabled:opacity-50",
+    disabled:
+      "disabled:bg-gray-50 disabled:border-gray-100 disabled:cursor-not-allowed disabled:opacity-50",
   },
   brown: {
     base: "bg-[#705a39] text-white hover:bg-[#403933] border-2 border-[#705a39] hover:border-[#403933]",
-    disabled: "disabled:bg-[#403933] disabled:border-[#403933] disabled:cursor-not-allowed disabled:opacity-50",
+    disabled:
+      "disabled:bg-[#403933] disabled:border-[#403933] disabled:cursor-not-allowed disabled:opacity-50",
   },
   outline: {
     base: "bg-transparent text-[#d1622b] border-2 border-[#d1622b] hover:bg-[#d1622b] hover:text-[#fad182]",
-    disabled: "disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed disabled:opacity-50",
+    disabled:
+      "disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed disabled:opacity-50",
   },
   ghost: {
     base: "bg-transparent text-[#d1622b] hover:bg-[#d1622b]/10 border-2 border-transparent",
-    disabled: "disabled:text-gray-300 disabled:cursor-not-allowed disabled:opacity-50",
+    disabled:
+      "disabled:text-gray-300 disabled:cursor-not-allowed disabled:opacity-50",
   },
 };
 
@@ -70,22 +75,25 @@ const buttonAnimations = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({
-    children,
-    className,
-    variant = "primary",
-    size = "md",
-    loading = false,
-    fullWidth = false,
-    animation = "shadow",
-    disabled,
-    href,
-    asChild,
-    ...props
-  }, ref) => {
+  (
+    {
+      children,
+      className,
+      variant = "primary",
+      size = "md",
+      loading = false,
+      fullWidth = false,
+      animation = "shadow",
+      disabled,
+      href,
+      asChild,
+      ...props
+    },
+    ref,
+  ) => {
     const isDisabled = disabled || loading;
     const variantStyles = buttonVariants[variant];
-    
+
     const buttonClasses = cn(
       // Base button styles
       "inline-flex items-center justify-center rounded-lg transition-all duration-200 font-medium relative z-10",
@@ -100,7 +108,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       fullWidth && "w-full",
       // Loading cursor
       loading && "cursor-not-allowed",
-      className
+      className,
     );
 
     // If href is provided, render as link (would need Link component)
@@ -115,13 +123,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         {...props}
       >
-        {loading && (
-          <span className="mr-2 animate-spin">⌛</span>
-        )}
+        {loading && <span className="mr-2 animate-spin">⌛</span>}
         {children}
       </button>
     );
-  }
+  },
 );
 
 Button.displayName = "Button";
