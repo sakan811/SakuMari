@@ -30,12 +30,21 @@ vi.mock("@/hooks/useDashboardData", () => ({
   }),
 }));
 
+type KanaStats = {
+  id: string;
+  character: string;
+  romaji: string;
+  attempts: number;
+  correct_attempts: number;
+  accuracy: number;
+};
+
 vi.mock("@/hooks/useSorting", () => ({
   useSorting: () => ({
     sortColumn: "accuracy",
     sortDirection: "asc",
     handleSort: vi.fn(),
-    sortedData: (data: any[]) => data,
+    sortedData: (data: KanaStats[]) => data,
   }),
 }));
 

@@ -36,7 +36,8 @@ vi.mock("next/navigation", () => ({
 }));
 
 // Mock fetch globally
-global.fetch = vi.fn();
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
 
 describe("Critical User Flow Integration Test", () => {
   beforeEach(() => {
@@ -46,7 +47,7 @@ describe("Critical User Flow Integration Test", () => {
   test("Login -> Practice -> View Stats", async () => {
     // Mock fetch for initial data loading
     const hiraganaData = [{ id: "1", character: "あ", romaji: "a" }];
-    (global.fetch as any).mockResolvedValue(mockApiResponse(hiraganaData));
+    mockFetch.mockResolvedValue(mockApiResponse(hiraganaData));
 
     // 1. User lands on the homepage
     render(<HomePage />);
@@ -85,7 +86,7 @@ describe("Critical User Flow Integration Test", () => {
         accuracy: 1,
       },
     ];
-    (global.fetch as any).mockResolvedValueOnce(mockApiResponse(statsData));
+    mockFetch.mockResolvedValueOnce(mockApiResponse(statsData));
 
     render(<DashboardPage />);
 

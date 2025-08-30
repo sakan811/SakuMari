@@ -118,8 +118,8 @@ export default function Dashboard() {
             onSort={handleSort}
             filter={filter}
             setFilter={setFilter}
-            onPracticeHiragana={() => {}}
-            onPracticeKatakana={() => {}}
+            _onPracticeHiragana={() => {}}
+            _onPracticeKatakana={() => {}}
           />
         </>
       )}

@@ -19,6 +19,7 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
+import type { Provider } from "next-auth/providers";
 import { prisma } from "@/lib/prisma";
 
 // Google OAuth provider
@@ -62,7 +63,7 @@ const credentialsProvider = Credentials({
 
 // Configure authentication providers
 const getProviders = () => {
-  const providers: any[] = [googleProvider];
+  const providers: Provider[] = [googleProvider];
 
   // Add credentials provider only when explicitly enabled for E2E testing
   if (process.env.CREDS_PROVIDER === "true") {

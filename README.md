@@ -31,20 +31,20 @@ SakuMari uses a modern Next.js 15 App Router architecture that seamlessly integr
 flowchart TD
     %% User Interface Layer
     User([👤 User]) --> Browser{{"🌐 Next.js App Router"}}
-    
+
     %% Authentication Flow
     Browser --> Auth["🔐 NextAuth.js v5<br/>Google OAuth + Test Creds"]
     Auth --> Session["📝 Session Management<br/>30-day JWT + Cookies"]
-    
+
     %% Page Routes
     Browser --> Home["🏠 HomePage<br/>Landing & Navigation"]
     Browser --> Practice["⚡ Practice Pages<br/>Hiragana/Katakana"]
     Browser --> Dashboard["📊 Dashboard<br/>Progress Tracking"]
-    
+
     %% React Context & State
     Practice --> Provider["🎯 FlashcardProvider<br/>Adaptive Algorithm"]
     Provider --> Components["🃏 UI Components<br/>Flashcard, ModeSelector"]
-    
+
     %% API Layer
     Components --> API["🔌 API Routes"]
     Dashboard --> API
@@ -52,19 +52,19 @@ flowchart TD
     API --> Submit["/api/flashcards/submit<br/>Answer Processing"]
     API --> Tips["/api/tips<br/>AI Recommendations"]
     API --> Health["/api/health<br/>System Status"]
-    
+
     %% Data Layer
     Stats --> Prisma["🗄️ Prisma ORM<br/>Type-safe Queries"]
     Submit --> Prisma
     Tips --> Prisma
     Prisma --> DB[(🐘 PostgreSQL 17<br/>Kana + Progress + Auth)]
-    
+
     %% AI Integration
     Tips --> Gemini["🤖 Google Gemini AI<br/>Personalized Learning"]
-    
+
     %% Progressive Web App
     Browser --> PWA["📱 PWA Features<br/>Manifest + Offline"]
-    
+
     %% Custom Hooks
     Components --> Hooks["⚡ React Hooks<br/>Auth, Data, Interaction"]
     Dashboard --> Hooks
@@ -74,7 +74,7 @@ flowchart TD
     classDef appLayer fill:#fef3c7,stroke:#d97706,stroke-width:2px
     classDef dataLayer fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
     classDef aiLayer fill:#fdf4ff,stroke:#a855f7,stroke-width:2px
-    
+
     class User,Browser userLayer
     class Home,Practice,Dashboard,Provider,Components,API,Hooks,PWA appLayer
     class Prisma,DB dataLayer
