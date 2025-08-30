@@ -1,5 +1,16 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, test, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
 import { GET } from "../../app/api/stats/route";
+import { NextRequest } from "next/server";
+
+// Define type for stats response
+interface StatResponse {
+  id: string;
+  character: string;
+  romaji: string;
+  attempts: number;
+  correct_attempts: number;
+  accuracy: number;
+}
 
 // Use direct function declaration pattern that works reliably with vitest
 vi.mock("@/lib/auth", () => ({
@@ -32,22 +43,22 @@ describe("Stats API Route", async () => {
 
   describe("GET /api/stats", () => {
     test("returns 401 when user is not authenticated", async () => {
-      (auth as any).mockResolvedValue(mockSession(false));
+      (auth as Mock).mockResolvedValue(mockSession(false));
+      const response1 = await GET(new NextRequest("http://localhost/api/stats"));
 
-      const response = await GET();
-      const data = await response.json();
+      const data = await response1.json();
 
-      expect(response.status).toBe(401);
+      expect(response1.status).toBe(401);
       expect(data.error).toBe("Unauthorized");
     });
 
     test("returns 401 when user session has no ID", async () => {
-      (auth as any).mockResolvedValue(mockSession(true, { id: undefined }));
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: undefined }));
 
-      const response = await GET();
-      const data = await response.json();
+      const response2 = await GET(new NextRequest("http://localhost/api/stats"));
+      const data = await response2.json();
 
-      expect(response.status).toBe(401);
+      expect(response2.status).toBe(401);
       expect(data.error).toBe("Unauthorized");
     });
 
@@ -73,13 +84,13 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      (auth as any).mockResolvedValue(mockSession(true, { id: "user123" }));
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
-      const response = await GET();
-      const data = await response.json();
+      const response3 = await GET(new NextRequest("http://localhost/api/stats"));
+      const data = await response3.json();
 
-      expect(response.status).toBe(200);
+      expect(response3.status).toBe(200);
       expect(data).toEqual([
         {
           id: "1",
@@ -116,36 +127,36 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      (auth as any).mockResolvedValue(mockSession(true, { id: "user123" }));
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
-      const response = await GET();
-      const data = await response.json();
+      const response4 = await GET(new NextRequest("http://localhost/api/stats"));
+      const data = await response4.json();
 
-      expect(response.status).toBe(200);
+      expect(response4.status).toBe(200);
       expect(data).toHaveLength(2);
-      expect(data.every((stat: any) => stat.attempts === 0)).toBe(true);
-      expect(data.every((stat: any) => stat.accuracy === 0)).toBe(true);
+      expect(data.every((stat: StatResponse) => stat.attempts === 0)).toBe(true);
+      expect(data.every((stat: StatResponse) => stat.accuracy === 0)).toBe(true);
     });
 
     test("handles database connection errors", async () => {
-      (auth as any).mockResolvedValue(mockSession(true, { id: "user123" }));
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockRejectedValue(
         new Error("Database connection lost"),
       );
 
-      const response = await GET();
-      const data = await response.json();
+      const response5 = await GET(new NextRequest("http://localhost/api/stats"));
+      const data = await response5.json();
 
-      expect(response.status).toBe(500);
+      expect(response5.status).toBe(500);
       expect(data.error).toBe("Internal server error");
     });
 
     test("correctly filters user-specific progress", async () => {
-      (auth as any).mockResolvedValue(mockSession(true, { id: "user123" }));
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockResolvedValue([]);
 
-      await GET();
+      await GET(new NextRequest("http://localhost/api/stats"));
 
       expect(prisma.kana.findMany).toHaveBeenCalledWith({
         include: {
@@ -180,13 +191,13 @@ describe("Stats API Route", async () => {
         },
       ];
 
-      (auth as any).mockResolvedValue(mockSession(true, { id: "user123" }));
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
-      const response = await GET();
-      const data = await response.json();
+      const response6 = await GET(new NextRequest("http://localhost/api/stats"));
+      const data = await response6.json();
 
-      expect(response.status).toBe(200);
+      expect(response6.status).toBe(200);
       expect(data[0]).toEqual({
         id: "1",
         character: "あ",
