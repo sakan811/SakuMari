@@ -162,8 +162,8 @@ export default function TipsModal({ isOpen, onClose }: TipsModalProps) {
                 Ask me anything about learning Japanese hiragana and katakana.
               </p>
               <div className="mt-4 text-xs text-[#705a39]/80">
-                Example: "How can I memorize hiragana faster?" or "Tips for
-                katakana practice?"
+                Example: &ldquo;How can I memorize hiragana faster?&rdquo; or &ldquo;Tips for
+                katakana practice?&rdquo;
               </div>
             </div>
           )}
