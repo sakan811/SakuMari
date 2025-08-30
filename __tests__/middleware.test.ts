@@ -8,8 +8,14 @@ vi.mock("next/server", async () => {
   return {
     NextResponse: {
       ...actualResponse.NextResponse,
-      redirect: vi.fn().mockImplementation((url: string) => actualResponse.NextResponse.redirect(url)),
-      next: vi.fn().mockImplementation(() => actualResponse.NextResponse.next()),
+      redirect: vi
+        .fn()
+        .mockImplementation((url: string) =>
+          actualResponse.NextResponse.redirect(url),
+        ),
+      next: vi
+        .fn()
+        .mockImplementation(() => actualResponse.NextResponse.next()),
     },
   };
 });

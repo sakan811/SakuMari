@@ -14,7 +14,12 @@ global.fetch = mockFetch;
 function TestComponent({
   onKanaSelected,
 }: {
-  onKanaSelected: (_: { id: string; character: string; romaji: string; accuracy: number }) => void;
+  onKanaSelected: (_: {
+    id: string;
+    character: string;
+    romaji: string;
+    accuracy: number;
+  }) => void;
 }) {
   const { currentKana, nextCard, loadingKana } = useFlashcard();
   const [selectionCount, setSelectionCount] = React.useState(0);
@@ -61,7 +66,12 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
   test("selects kana with lower accuracy more frequently", async () => {
     const selectedKana: string[] = [];
 
-    const onKanaSelected = (kana: { id: string; character: string; romaji: string; accuracy: number }) => {
+    const onKanaSelected = (kana: {
+      id: string;
+      character: string;
+      romaji: string;
+      accuracy: number;
+    }) => {
       if (kana) {
         selectedKana.push(kana.character);
       }
@@ -149,7 +159,12 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
     });
 
     const selectedKana: string[] = [];
-    const onKanaSelected = (kana: { id: string; character: string; romaji: string; accuracy: number }) => {
+    const onKanaSelected = (kana: {
+      id: string;
+      character: string;
+      romaji: string;
+      accuracy: number;
+    }) => {
       if (kana) selectedKana.push(kana.character);
     };
 
@@ -183,7 +198,12 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
     });
 
     const selectedKana: string[] = [];
-    const onKanaSelected = (kana: { id: string; character: string; romaji: string; accuracy: number }) => {
+    const onKanaSelected = (kana: {
+      id: string;
+      character: string;
+      romaji: string;
+      accuracy: number;
+    }) => {
       if (kana) selectedKana.push(kana.character);
     };
 
@@ -217,7 +237,12 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
     });
 
     const selectedKana: string[] = [];
-    const onKanaSelected = (kana: { id: string; character: string; romaji: string; accuracy: number }) => {
+    const onKanaSelected = (kana: {
+      id: string;
+      character: string;
+      romaji: string;
+      accuracy: number;
+    }) => {
       if (kana) selectedKana.push(kana.character);
     };
 
@@ -266,9 +291,19 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
   });
 
   test("maintains selection consistency within single session", async () => {
-    const selectedKana: { id: string; character: string; romaji: string; accuracy: number }[] = [];
+    const selectedKana: {
+      id: string;
+      character: string;
+      romaji: string;
+      accuracy: number;
+    }[] = [];
 
-    const onKanaSelected = (kana: { id: string; character: string; romaji: string; accuracy: number }) => {
+    const onKanaSelected = (kana: {
+      id: string;
+      character: string;
+      romaji: string;
+      accuracy: number;
+    }) => {
       if (kana) {
         selectedKana.push(kana);
       }
@@ -314,7 +349,12 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
 
   test("weighted selection produces variety over time", async () => {
     const selectedKana: string[] = [];
-    const onKanaSelected = (kana: { id: string; character: string; romaji: string; accuracy: number }) => {
+    const onKanaSelected = (kana: {
+      id: string;
+      character: string;
+      romaji: string;
+      accuracy: number;
+    }) => {
       if (kana) selectedKana.push(kana.character);
     };
 
@@ -359,7 +399,12 @@ describe("FlashcardProvider - Weighted Selection Algorithm", () => {
 
   test("verifies basic selection mechanism", async () => {
     const selectedKana: string[] = [];
-    const onKanaSelected = (kana: { id: string; character: string; romaji: string; accuracy: number }) => {
+    const onKanaSelected = (kana: {
+      id: string;
+      character: string;
+      romaji: string;
+      accuracy: number;
+    }) => {
       if (kana) selectedKana.push(kana.character);
     };
 
