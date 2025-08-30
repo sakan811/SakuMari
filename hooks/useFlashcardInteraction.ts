@@ -39,20 +39,23 @@ export function useFlashcardInteraction({
   isSubmitting,
   loadingKana,
   currentKana,
-  nextCard
+  nextCard,
 }: UseFlashcardInteractionProps) {
   // Interaction state
   const [interactionState, setInteractionState] = useState({
     answer: "",
     selectedChoice: null as number | null,
-    error: ""
+    error: "",
   });
-  
+
   const { answer, selectedChoice, error } = interactionState;
-  const setAnswer = (value: string) => setInteractionState(prev => ({ ...prev, answer: value }));
-  const setSelectedChoice = (value: number | null) => setInteractionState(prev => ({ ...prev, selectedChoice: value }));
-  const setError = (value: string) => setInteractionState(prev => ({ ...prev, error: value }));
-  
+  const setAnswer = (value: string) =>
+    setInteractionState((prev) => ({ ...prev, answer: value }));
+  const setSelectedChoice = (value: number | null) =>
+    setInteractionState((prev) => ({ ...prev, selectedChoice: value }));
+  const setError = (value: string) =>
+    setInteractionState((prev) => ({ ...prev, error: value }));
+
   // Input ref for focus management
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -87,7 +90,7 @@ export function useFlashcardInteraction({
     setInteractionState({
       answer: "",
       selectedChoice: null,
-      error: ""
+      error: "",
     });
   }, [interactionMode]);
 
@@ -96,13 +99,13 @@ export function useFlashcardInteraction({
     setInteractionState({
       answer: "",
       selectedChoice: null,
-      error: ""
+      error: "",
     });
   };
 
   const handleSubmit = async (
     submitAnswer: (answer: string) => Promise<void>,
-    choices: string[]
+    choices: string[],
   ) => {
     if (isSubmitting) return;
 
@@ -144,13 +147,13 @@ export function useFlashcardInteraction({
     setError,
     interactionState,
     setInteractionState,
-    
+
     // Refs
     inputRef,
-    
+
     // Handlers
     handleNextCard,
     handleSubmit,
-    handleChoiceSelect
+    handleChoiceSelect,
   };
 }

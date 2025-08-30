@@ -27,10 +27,11 @@ type SortDirection = "asc" | "desc";
  */
 export function useSorting<T>(
   initialColumn: keyof T,
-  initialDirection: SortDirection = "asc"
+  initialDirection: SortDirection = "asc",
 ) {
   const [sortColumn, setSortColumn] = useState<keyof T>(initialColumn);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(initialDirection);
+  const [sortDirection, setSortDirection] =
+    useState<SortDirection>(initialDirection);
 
   const handleSort = (column: keyof T) => {
     if (sortColumn === column) {
@@ -60,6 +61,6 @@ export function useSorting<T>(
     sortColumn,
     sortDirection,
     handleSort,
-    sortedData
+    sortedData,
   };
 }
