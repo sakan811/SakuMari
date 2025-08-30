@@ -182,7 +182,7 @@ export function FlashcardProvider({
     // Remove duplicates and get 3 random unique wrong answers
     const uniqueWrongAnswers = [...new Set(wrongAnswers)];
     const selectedWrongAnswers = [];
-    
+
     // Shuffle and take up to 3 wrong answers
     while (selectedWrongAnswers.length < 3 && uniqueWrongAnswers.length > 0) {
       const randomIndex = Math.floor(Math.random() * uniqueWrongAnswers.length);
@@ -190,8 +190,9 @@ export function FlashcardProvider({
     }
 
     // Combine correct answer with wrong answers and shuffle
-    const allChoices = [correctAnswer, ...selectedWrongAnswers]
-      .sort(() => Math.random() - 0.5);
+    const allChoices = [correctAnswer, ...selectedWrongAnswers].sort(
+      () => Math.random() - 0.5,
+    );
 
     setChoices(allChoices);
   };

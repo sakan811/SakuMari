@@ -64,9 +64,7 @@ export function StatsSummary({ stats }: StatsSummaryProps) {
             Average Accuracy
           </p>
           <p className="text-xl sm:text-2xl font-bold text-white">
-            {practicedStats.length > 0
-              ? (averageAccuracy * 100).toFixed(1)
-              : 0}
+            {practicedStats.length > 0 ? (averageAccuracy * 100).toFixed(1) : 0}
             %
           </p>
         </div>

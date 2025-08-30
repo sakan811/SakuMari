@@ -26,7 +26,11 @@ interface DesktopNavigationProps {
   credentialsEnabled: boolean;
 }
 
-export function DesktopNavigation({ session, status, credentialsEnabled }: DesktopNavigationProps) {
+export function DesktopNavigation({
+  session,
+  status,
+  credentialsEnabled,
+}: DesktopNavigationProps) {
   if (session) {
     return (
       <nav className="hidden lg:flex items-center space-x-4 xl:space-x-6">

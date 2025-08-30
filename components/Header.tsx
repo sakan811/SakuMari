@@ -29,7 +29,8 @@ interface HeaderProps {
 }
 
 export default function Header(_: HeaderProps) {
-  const { session, status, credentialsEnabled, signIn, signOut } = useAuthStatus();
+  const { session, status, credentialsEnabled, signIn, signOut } =
+    useAuthStatus();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (

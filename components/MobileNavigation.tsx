@@ -28,12 +28,12 @@ interface MobileNavigationProps {
   setMobileMenuOpen: (open: boolean) => void;
 }
 
-export function MobileNavigation({ 
-  session, 
-  status, 
-  credentialsEnabled, 
-  mobileMenuOpen, 
-  setMobileMenuOpen 
+export function MobileNavigation({
+  session,
+  status,
+  credentialsEnabled,
+  mobileMenuOpen,
+  setMobileMenuOpen,
 }: MobileNavigationProps) {
   if (!mobileMenuOpen) return null;
 
