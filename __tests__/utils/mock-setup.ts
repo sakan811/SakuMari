@@ -46,13 +46,28 @@ export function mockSession(authenticated = true, userOverrides = {}) {
  * @param status - HTTP status code
  * @returns Mock response object
  */
-export function mockApiResponse(data: unknown, ok = true, status = 200) {
+export function mockApiResponse(
+  data: unknown,
+  ok = true,
+  status = 200,
+): Response {
   return {
     ok,
     status: ok ? status : 500,
+    statusText: ok ? "OK" : "Internal Server Error",
+    headers: new Headers(),
+    url: "",
+    redirected: false,
+    type: "basic",
+    body: null,
+    bodyUsed: false,
     json: async () => data,
     text: async () => JSON.stringify(data),
-  };
+    clone: () => mockApiResponse(data, ok, status),
+    blob: async () => new Blob(),
+    formData: async () => new FormData(),
+    arrayBuffer: async () => new ArrayBuffer(0),
+  } as Response;
 }
 
 /**
