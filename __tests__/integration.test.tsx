@@ -27,7 +27,7 @@ import React from "react";
 vi.mock("next-auth/react", async (importOriginal) => {
   const actual = await importOriginal();
   return {
-    ...actual,
+    ...(typeof actual === "object" && actual !== null ? actual : {}),
     useSession: () => ({
       data: mockSession(true),
       status: "authenticated",
