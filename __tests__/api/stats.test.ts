@@ -21,6 +21,9 @@ describe("Stats API Route", async () => {
   // Import the mocked functions after mocking
   const { auth } = await import("@/lib/auth");
   const { prisma } = await import("@/lib/prisma");
+  
+  // Import mock setup functions
+  const { mockSession } = await import("../../utils/mock-setup");
 
   beforeEach(() => {
     vi.clearAllMocks();

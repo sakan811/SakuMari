@@ -17,34 +17,9 @@
 
 import { Metadata } from "next";
 import FlashcardApp from "@/components/FlashcardApp";
+import { createKanaPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
-  title: "Hiragana Practice | SakuMari",
-  description:
-    "Practice Japanese Hiragana characters with interactive flashcards. Master all 46 basic Hiragana symbols and improve your reading skills.",
-  keywords: [
-    "Hiragana",
-    "Japanese characters",
-    "flashcards",
-    "practice",
-    "learning",
-    "あいうえお",
-  ],
-  alternates: {
-    canonical: "/hiragana",
-  },
-  openGraph: {
-    title: "Hiragana Practice | SakuMari",
-    description:
-      "Practice Japanese Hiragana characters with interactive flashcards. Master all 46 basic Hiragana symbols.",
-    url: "/hiragana",
-  },
-  twitter: {
-    title: "Hiragana Practice | SakuMari",
-    description:
-      "Practice Japanese Hiragana characters with interactive flashcards. Master all 46 basic Hiragana symbols.",
-  },
-};
+export const metadata: Metadata = createKanaPageMetadata("hiragana");
 
 export default function HiraganaPage() {
   return <FlashcardApp kanaType="hiragana" />;
