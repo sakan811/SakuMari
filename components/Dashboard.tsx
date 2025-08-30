@@ -18,8 +18,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import TipsModal from "./TipsModal";
+import { ButtonLink } from "./ui/ButtonLink";
+import { commonBackgrounds } from "@/lib/backgrounds";
 
 type KanaStats = {
   id: string;
@@ -152,7 +153,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-[#fad182] to-[#f5c55a] min-h-screen">
+      <div className={commonBackgrounds.dashboard}>
         <div className="flex h-32 sm:h-64 items-center justify-center">
           <div className="h-8 w-8 sm:h-12 sm:w-12 animate-spin rounded-full border-2 sm:border-4 border-[#d1622b] border-t-transparent"></div>
         </div>
@@ -161,7 +162,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-[#fad182] to-[#f5c55a] min-h-screen">
+    <div className={commonBackgrounds.dashboard}>
       <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 px-4 pt-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-[#403933] drop-shadow-sm">
           Dashboard
@@ -173,12 +174,13 @@ export default function Dashboard() {
           >
             💡 Tips
           </button>
-          <Link
+          <ButtonLink
             href="/"
-            className="rounded-lg bg-[#d1622b] px-4 sm:px-6 py-2 sm:py-3 text-white hover:bg-[#ae0d13] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-[#d1622b] hover:border-[#ae0d13] font-medium text-center text-sm sm:text-base"
+            size="responsive"
+            animation="scale"
           >
             Back to Home
-          </Link>
+          </ButtonLink>
         </div>
       </div>
 
@@ -286,18 +288,22 @@ export default function Dashboard() {
                   Start practicing to see your progress here!
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                  <Link
+                  <ButtonLink
                     href="/hiragana"
-                    className="bg-[#d1622b] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-[#ae0d13] transition-colors font-medium text-sm sm:text-base"
+                    size="responsive"
+                    variant="primary"
+                    animation="shadow"
                   >
                     Practice Hiragana
-                  </Link>
-                  <Link
+                  </ButtonLink>
+                  <ButtonLink
                     href="/katakana"
-                    className="bg-[#705a39] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-[#403933] transition-colors font-medium text-sm sm:text-base"
+                    size="responsive"
+                    variant="brown"
+                    animation="shadow"
                   >
                     Practice Katakana
-                  </Link>
+                  </ButtonLink>
                 </div>
               </div>
             ) : (
