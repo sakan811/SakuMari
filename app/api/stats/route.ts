@@ -15,24 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
 
-export async function GET() {
+async function getStats(_request: NextRequest, context: AuthenticatedContext) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     // Single query with joins to get all data at once for the authenticated user
     const kanaWithProgress = await prisma.kana.findMany({
       include: {
         progress: {
           where: {
-            user_id: session.user.id,
+            user_id: context.userId,
           },
           select: {
             attempts: true,
@@ -65,3 +59,5 @@ export async function GET() {
     );
   }
 }
+
+export const GET = withAuth(getStats);
