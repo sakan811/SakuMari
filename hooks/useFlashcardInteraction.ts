@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 type InteractionMode = "typing" | "multiple-choice";
 
@@ -83,14 +83,14 @@ export function useFlashcardInteraction({
   }, [currentKana, loadingKana, result, isSubmitting, interactionMode]);
 
   // Handle next card action
-  const handleNextCard = () => {
+  const handleNextCard = useCallback(() => {
     nextCard();
     setInteractionState({
       answer: "",
       selectedChoice: null,
       error: "",
     });
-  };
+  }, [nextCard]);
 
   // Handle Enter key when result is shown
   useEffect(() => {

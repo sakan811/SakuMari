@@ -263,7 +263,7 @@ describe("Flashcard Component Interaction Tests", () => {
       character: "あ",
       romaji: "a",
     });
-    
+
     const { rerender } = render(
       <FlashcardProvider>
         <Flashcard />

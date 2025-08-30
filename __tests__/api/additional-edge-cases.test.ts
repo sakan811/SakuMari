@@ -24,7 +24,7 @@ import { mockSession } from "../utils/mock-setup";
 const { mockAuth, mockPrisma } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
   mockPrisma: {
-    kanaProgress: { 
+    kanaProgress: {
       upsert: vi.fn(),
       update: vi.fn(),
     },

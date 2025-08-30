@@ -36,9 +36,11 @@ async function createGeminiClient() {
   return new GoogleGenerativeAI(apiKey);
 }
 
-async function generateTips(request: NextRequest, context: AuthenticatedContext) {
+async function generateTips(
+  request: NextRequest,
+  context: AuthenticatedContext,
+) {
   try {
-
     const { userQuery, conversationHistory = [] } = await request.json();
 
     if (

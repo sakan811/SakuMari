@@ -1,4 +1,12 @@
-import { describe, test, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
+import {
+  describe,
+  test,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+  type Mock,
+} from "vitest";
 import { GET } from "../../app/api/stats/route";
 import { NextRequest } from "next/server";
 
@@ -44,7 +52,9 @@ describe("Stats API Route", async () => {
   describe("GET /api/stats", () => {
     test("returns 401 when user is not authenticated", async () => {
       (auth as Mock).mockResolvedValue(mockSession(false));
-      const response1 = await GET(new NextRequest("http://localhost/api/stats"));
+      const response1 = await GET(
+        new NextRequest("http://localhost/api/stats"),
+      );
 
       const data = await response1.json();
 
@@ -55,7 +65,9 @@ describe("Stats API Route", async () => {
     test("returns 401 when user session has no ID", async () => {
       (auth as Mock).mockResolvedValue(mockSession(true, { id: undefined }));
 
-      const response2 = await GET(new NextRequest("http://localhost/api/stats"));
+      const response2 = await GET(
+        new NextRequest("http://localhost/api/stats"),
+      );
       const data = await response2.json();
 
       expect(response2.status).toBe(401);
@@ -87,7 +99,9 @@ describe("Stats API Route", async () => {
       (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
-      const response3 = await GET(new NextRequest("http://localhost/api/stats"));
+      const response3 = await GET(
+        new NextRequest("http://localhost/api/stats"),
+      );
       const data = await response3.json();
 
       expect(response3.status).toBe(200);
@@ -130,13 +144,19 @@ describe("Stats API Route", async () => {
       (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
-      const response4 = await GET(new NextRequest("http://localhost/api/stats"));
+      const response4 = await GET(
+        new NextRequest("http://localhost/api/stats"),
+      );
       const data = await response4.json();
 
       expect(response4.status).toBe(200);
       expect(data).toHaveLength(2);
-      expect(data.every((stat: StatResponse) => stat.attempts === 0)).toBe(true);
-      expect(data.every((stat: StatResponse) => stat.accuracy === 0)).toBe(true);
+      expect(data.every((stat: StatResponse) => stat.attempts === 0)).toBe(
+        true,
+      );
+      expect(data.every((stat: StatResponse) => stat.accuracy === 0)).toBe(
+        true,
+      );
     });
 
     test("handles database connection errors", async () => {
@@ -145,7 +165,9 @@ describe("Stats API Route", async () => {
         new Error("Database connection lost"),
       );
 
-      const response5 = await GET(new NextRequest("http://localhost/api/stats"));
+      const response5 = await GET(
+        new NextRequest("http://localhost/api/stats"),
+      );
       const data = await response5.json();
 
       expect(response5.status).toBe(500);
@@ -194,7 +216,9 @@ describe("Stats API Route", async () => {
       (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
 
-      const response6 = await GET(new NextRequest("http://localhost/api/stats"));
+      const response6 = await GET(
+        new NextRequest("http://localhost/api/stats"),
+      );
       const data = await response6.json();
 
       expect(response6.status).toBe(200);
