@@ -24,11 +24,14 @@ import { DesktopNavigation } from "./DesktopNavigation";
 import { MobileNavigation } from "./MobileNavigation";
 
 interface HeaderProps {
-  activeTab?: string;
-  setActiveTab?: (tab: string) => void;
+  activeTab?: "flashcards" | "dashboard";
+  setActiveTab?: (tab: "flashcards" | "dashboard") => void;
 }
 
-export default function Header({ activeTab: _activeTab, setActiveTab: _setActiveTab }: HeaderProps) {
+export default function Header({
+  activeTab: _activeTab,
+  setActiveTab: _setActiveTab,
+}: HeaderProps) {
   const { session, status, credentialsEnabled } = useAuthStatus();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
