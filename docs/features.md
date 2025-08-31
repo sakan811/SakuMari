@@ -10,8 +10,7 @@ Comprehensive technical documentation covering all features of the SakuMari Japa
 4. [Character Set Support](#character-set-support)
 5. [Progress Analytics Dashboard](#progress-analytics-dashboard)
 6. [AI-Powered Learning Assistant](#ai-powered-learning-assistant)
-7. [Progressive Web App Features](#progressive-web-app-features)
-8. [Technical Architecture](#technical-architecture)
+7. [Technical Architecture](#technical-architecture)
 
 ---
 
@@ -313,46 +312,6 @@ const masteringKana = userProgress
 
 ---
 
-## Progressive Web App Features
-
-### Installation Support
-
-**Manifest Configuration** (`app/manifest.ts`):
-```typescript
-export default function manifest(): MetadataRoute.Manifest {
-  return {
-    name: "SakuMari - Japanese Kana Flashcards",
-    short_name: "SakuMari",
-    description: "Learn Japanese Hiragana and Katakana with adaptive flashcards",
-    start_url: "/",
-    display: "standalone",
-    background_color: "#fad182",
-    theme_color: "#d1622b",
-    icons: [
-      { src: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
-      { src: "/icon-512x512.png", sizes: "512x512", type: "image/png" }
-    ]
-  }
-}
-```
-
-### Offline Capabilities
-
-**Service Worker**: Automatic Next.js service worker for static asset caching.
-
-**Cached Resources**:
-- Application shell (HTML, CSS, JavaScript)
-- Static assets (icons, images)
-- Font files for consistent typography
-- API responses cached with background refresh
-
-**User Benefits**:
-- **Installable**: Add to home screen on mobile devices
-- **Offline Access**: Practice characters without internet connection
-- **Fast Loading**: Cached assets provide instant app startup
-- **Native Feel**: Full-screen experience similar to native apps
-
----
 
 ## Technical Architecture
 

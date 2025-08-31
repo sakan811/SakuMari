@@ -18,7 +18,6 @@ For comprehensive technical documentation of all features, see [docs/features.md
 - **Dual Practice Modes**: Typing input and multiple-choice with seamless mode switching
 - **Complete Analytics**: Real-time progress tracking with sortable, filterable dashboard
 - **AI Learning Assistant**: Personalized tips powered by Google Gemini AI
-- **Progressive Web App**: Installable with offline support and native app experience
 
 ## Architecture
 

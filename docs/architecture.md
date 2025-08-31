@@ -41,8 +41,6 @@ flowchart TD
     %% AI Integration
     Tips --> Gemini["🤖 Google Gemini AI<br/>Personalized Learning"]
 
-    %% Progressive Web App
-    Browser --> PWA["📱 PWA Features<br/>Manifest + Offline"]
 
     %% Custom Hooks
     Components --> Hooks["⚡ React Hooks<br/>Auth, Data, Interaction"]
@@ -55,7 +53,7 @@ flowchart TD
     classDef aiLayer fill:#fdf4ff,stroke:#a855f7,stroke-width:2px
 
     class User,Browser userLayer
-    class Home,Practice,Dashboard,Provider,Components,API,Hooks,PWA appLayer
+    class Home,Practice,Dashboard,Provider,Components,API,Hooks appLayer
     class Prisma,DB dataLayer
     class Auth,Session,Gemini aiLayer
 ```
