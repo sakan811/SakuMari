@@ -19,6 +19,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { signOut, signIn } from "next-auth/react";
+import { Button } from "@/components/ui/Button";
 
 interface DesktopNavigationProps {
   session: {
@@ -40,24 +41,35 @@ export function DesktopNavigation({
   if (session) {
     return (
       <nav className="hidden lg:flex items-center space-x-4 xl:space-x-6">
-        <Link
-          href="/hiragana"
-          className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-white/10 border-2 border-transparent hover:border-[#fad182] text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center"
+        <Button
+          variant="ghost"
+          size="responsive"
+          className="hover:bg-white/10 hover:border-[#fad182] text-[#fad182]"
+          asChild
         >
-          <span className="hidden xl:inline">ひらがな </span>Hiragana
-        </Link>
-        <Link
-          href="/katakana"
-          className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-white/10 border-2 border-transparent hover:border-[#fad182] text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center"
+          <Link href="/hiragana">
+            <span className="hidden xl:inline">ひらがな </span>Hiragana
+          </Link>
+        </Button>
+        <Button
+          variant="ghost"
+          size="responsive"
+          className="hover:bg-white/10 hover:border-[#fad182] text-[#fad182]"
+          asChild
         >
-          <span className="hidden xl:inline">カタカナ </span>Katakana
-        </Link>
-        <Link
-          href="/dashboard"
-          className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg bg-[#d1622b] hover:bg-[#ae0d13] border-2 border-[#d1622b] hover:border-[#ae0d13] shadow-lg hover:shadow-xl text-sm xl:text-base min-h-[44px] relative z-10 inline-flex items-center"
+          <Link href="/katakana">
+            <span className="hidden xl:inline">カタカナ </span>Katakana
+          </Link>
+        </Button>
+        <Button
+          variant="primary"
+          size="md"
+          asChild
         >
-          📊 Dashboard
-        </Link>
+          <Link href="/dashboard">
+            📊 Dashboard
+          </Link>
+        </Button>
         <div className="flex items-center space-x-2 xl:space-x-3">
           {session.user?.image ? (
             <Image
@@ -76,13 +88,14 @@ export function DesktopNavigation({
               </span>
             </div>
           )}
-          <button
+          <Button
             onClick={() => signOut()}
-            className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg hover:bg-white/10 border-2 border-transparent hover:border-[#fad182] text-sm xl:text-base min-h-[44px] min-w-[80px] relative z-10 cursor-pointer"
-            type="button"
+            variant="ghost"
+            size="md"
+            className="hover:bg-white/10 hover:border-[#fad182] text-[#fad182] min-w-[80px]"
           >
             Sign Out
-          </button>
+          </Button>
         </div>
       </nav>
     );
@@ -91,28 +104,30 @@ export function DesktopNavigation({
   if (credentialsEnabled) {
     return (
       <nav className="hidden lg:flex items-center">
-        <button
+        <Button
           onClick={() => signIn("credentials")}
           disabled={status === "loading"}
-          className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg bg-[#d1622b] hover:bg-[#ae0d13] border-2 border-[#d1622b] hover:border-[#ae0d13] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm xl:text-base min-h-[44px] relative z-10 cursor-pointer"
-          type="button"
+          variant="primary"
+          size="md"
+          loading={status === "loading"}
         >
-          {status === "loading" ? "Loading..." : "Sign In"}
-        </button>
+          Sign In
+        </Button>
       </nav>
     );
   }
 
   return (
     <nav className="hidden lg:flex items-center">
-      <button
+      <Button
         onClick={() => signIn("google")}
         disabled={status === "loading"}
-        className="text-[#fad182] hover:text-white transition-colors duration-200 font-medium px-4 py-3 rounded-lg bg-[#d1622b] hover:bg-[#ae0d13] border-2 border-[#d1622b] hover:border-[#ae0d13] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm xl:text-base min-h-[44px] relative z-10 cursor-pointer"
-        type="button"
+        variant="primary"
+        size="md"
+        loading={status === "loading"}
       >
-        {status === "loading" ? "Loading..." : "Sign In"}
-      </button>
+        Sign In
+      </Button>
     </nav>
   );
 }

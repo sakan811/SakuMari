@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ButtonHTMLAttributes, forwardRef, ReactNode } from "react";
+import { ButtonHTMLAttributes, forwardRef, ReactNode, cloneElement, isValidElement } from "react";
 
 // Utility function for className merging
 function cn(...classes: (string | undefined | null | false)[]): string {
@@ -114,6 +114,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // If href is provided, render as link (would need Link component)
     if (href && !asChild) {
       throw new Error("Link functionality requires Link component import");
+    }
+
+    // Handle asChild pattern - render the child element with button styling
+    if (asChild && isValidElement(children)) {
+      return cloneElement(children, {
+        ...(children.props as any),
+        className: cn(buttonClasses, (children.props as any)?.className),
+        ref,
+        ...props
+      });
     }
 
     return (

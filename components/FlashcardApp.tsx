@@ -22,6 +22,7 @@ import { FlashcardProvider } from "./FlashcardProvider";
 import Flashcard from "./Flashcard";
 import Header from "./Header";
 import Dashboard from "./Dashboard";
+import { commonBackgrounds } from "@/lib/backgrounds";
 import { useState } from "react";
 
 interface FlashcardAppProps {
@@ -35,7 +36,7 @@ const FlashcardApp: FC<FlashcardAppProps> = ({ kanaType }) => {
 
   return (
     <FlashcardProvider kanaType={kanaType}>
-      <div className="min-h-screen bg-gradient-to-br from-[#fad182] via-[#f5c55a] to-[#fad182]">
+      <div className={commonBackgrounds.page}>
         <Header />
         <main className="container mx-auto max-w-4xl px-4 py-4 sm:py-6 lg:py-8">
           {activeTab === "flashcards" ? <Flashcard /> : <Dashboard />}
