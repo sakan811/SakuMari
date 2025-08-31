@@ -25,61 +25,12 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 ## Architecture
 
-SakuMari uses a modern Next.js 15 App Router architecture that seamlessly integrates client-side interactivity with server-side efficiency. The system centers around authenticated user sessions managed by NextAuth.js v5, flowing through three main page routes (HomePage, Practice Pages, Dashboard) that connect to a unified API layer. The FlashcardProvider manages adaptive learning state using React Context, while custom hooks handle data fetching and user interactions. All user progress flows through Prisma ORM to PostgreSQL 17, with Google Gemini AI providing personalized learning recommendations.
+For detailed system and component architecture documentation, see [docs/architecture.md](docs/architecture.md).
 
-```mermaid
-flowchart TD
-    %% User Interface Layer
-    User([👤 User]) --> Browser{{"🌐 Next.js App Router"}}
-
-    %% Authentication Flow
-    Browser --> Auth["🔐 NextAuth.js v5<br/>Google OAuth + Test Creds"]
-    Auth --> Session["📝 Session Management<br/>30-day JWT + Cookies"]
-
-    %% Page Routes
-    Browser --> Home["🏠 HomePage<br/>Landing & Navigation"]
-    Browser --> Practice["⚡ Practice Pages<br/>Hiragana/Katakana"]
-    Browser --> Dashboard["📊 Dashboard<br/>Progress Tracking"]
-
-    %% React Context & State
-    Practice --> Provider["🎯 FlashcardProvider<br/>Adaptive Algorithm"]
-    Provider --> Components["🃏 UI Components<br/>Flashcard, ModeSelector"]
-
-    %% API Layer
-    Components --> API["🔌 API Routes"]
-    Dashboard --> API
-    API --> Stats["/api/stats<br/>Progress Data"]
-    API --> Submit["/api/flashcards/submit<br/>Answer Processing"]
-    API --> Tips["/api/tips<br/>AI Recommendations"]
-    API --> Health["/api/health<br/>System Status"]
-
-    %% Data Layer
-    Stats --> Prisma["🗄️ Prisma ORM<br/>Type-safe Queries"]
-    Submit --> Prisma
-    Tips --> Prisma
-    Prisma --> DB[(🐘 PostgreSQL 17<br/>Kana + Progress + Auth)]
-
-    %% AI Integration
-    Tips --> Gemini["🤖 Google Gemini AI<br/>Personalized Learning"]
-
-    %% Progressive Web App
-    Browser --> PWA["📱 PWA Features<br/>Manifest + Offline"]
-
-    %% Custom Hooks
-    Components --> Hooks["⚡ React Hooks<br/>Auth, Data, Interaction"]
-    Dashboard --> Hooks
-
-    %% Styling
-    classDef userLayer fill:#e8f4fd,stroke:#1e40af,stroke-width:2px
-    classDef appLayer fill:#fef3c7,stroke:#d97706,stroke-width:2px
-    classDef dataLayer fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
-    classDef aiLayer fill:#fdf4ff,stroke:#a855f7,stroke-width:2px
-
-    class User,Browser userLayer
-    class Home,Practice,Dashboard,Provider,Components,API,Hooks,PWA appLayer
-    class Prisma,DB dataLayer
-    class Auth,Session,Gemini aiLayer
-```
+The architecture includes:
+- **System Overview**: Next.js 15 App Router with NextAuth.js v5, PostgreSQL 17, and Google Gemini AI integration
+- **Component Relationships**: Detailed component hierarchy and data flow patterns
+- **Design Patterns**: Context-based state management, responsive design, and adaptive learning algorithms
 
 ## Package Manager
 
