@@ -10,18 +10,15 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 ## Features
 
-- **Google Account Integration**: Securely log in and save your progress.
-- **Dual Kana Support**: Practice both Hiragana and Katakana character sets.
-- **Adaptive Flashcards**:
-  - **Two Modes**: Choose between typing the answer (Input Mode) or selecting from options (Choice Mode).
-  - **Smart Randomization**: The app prioritizes characters with lower accuracy to enhance learning efficiency.
-- **Comprehensive Dashboard**:
-  - **Detailed Stats**: Track your accuracy, attempts, and performance for each kana character.
-  - **Dynamic Filtering**: Filter the statistics table by kana type (All, Hiragana, Katakana).
-  - **Summary View**: An overview at the top of the table reflects the filtered data.
-  - **Sortable Columns**: Easily sort the data by character, romaji, attempts, or accuracy.
-- **AI-Powered Learning Tips**:
-  - **Tips Button**: Access an AI-powered chat modal to ask for personalized learning advice.
+For comprehensive technical documentation of all features, see [docs/features.md](docs/features.md).
+
+**Core Features**:
+- **Secure Authentication**: Google OAuth integration with session management
+- **Adaptive Learning**: Confidence-weighted character selection that prioritizes struggling kana
+- **Dual Practice Modes**: Typing input and multiple-choice with seamless mode switching
+- **Complete Analytics**: Real-time progress tracking with sortable, filterable dashboard
+- **AI Learning Assistant**: Personalized tips powered by Google Gemini AI
+- **Progressive Web App**: Installable with offline support and native app experience
 
 ## Architecture
 
