@@ -30,14 +30,14 @@ interface FlashcardAppProps {
 }
 
 const FlashcardApp: FC<FlashcardAppProps> = ({ kanaType }) => {
-  const [activeTab, _setActiveTab] = useState<"flashcards" | "dashboard">(
+  const [activeTab, setActiveTab] = useState<"flashcards" | "dashboard">(
     "flashcards",
   );
 
   return (
     <FlashcardProvider kanaType={kanaType}>
       <div className={commonBackgrounds.page}>
-        <Header />
+        <Header activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="container mx-auto max-w-4xl px-4 py-4 sm:py-6 lg:py-8">
           {activeTab === "flashcards" ? <Flashcard /> : <Dashboard />}
         </main>
