@@ -50,6 +50,20 @@ test.describe("Dashboard Features", () => {
   });
 
   test("should sort character data", async ({ page }) => {
+    // Generate some practice data first
+    await page.goto("/hiragana");
+    await page.waitForSelector('[data-testid="current-kana"]');
+
+    for (let i = 0; i < 3; i++) {
+      await page.getByPlaceholder("Type romaji equivalent...").fill("a");
+      await page.getByRole("button", { name: "Submit" }).click();
+      await expect(
+        page.getByText("Correct!").or(page.getByText("Incorrect!")),
+      ).toBeVisible();
+      await page.getByRole("button", { name: "Next Card" }).click();
+    }
+
+    // Now check dashboard
     await page.goto("/dashboard");
 
     // Should show sortable headers
