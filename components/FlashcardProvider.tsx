@@ -26,16 +26,7 @@ import React, {
   useCallback,
 } from "react";
 
-type KanaWithAccuracy = {
-  id: string;
-  character: string;
-  romaji: string;
-  accuracy: number;
-  attempts: number;
-  correct_attempts: number;
-};
-
-type InteractionMode = "typing" | "multiple-choice";
+import type { KanaWithAccuracy, InteractionMode } from "@/types/common";
 
 type FlashcardContextType = {
   currentKana: KanaWithAccuracy | null;

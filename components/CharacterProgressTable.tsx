@@ -20,24 +20,15 @@ import { SortableTableHeader } from "./SortableTableHeader";
 import { CharacterTableRow } from "./CharacterTableRow";
 import { ButtonLink } from "./ui/ButtonLink";
 
-type KanaStats = {
-  id: string;
-  character: string;
-  romaji: string;
-  attempts: number;
-  correct_attempts: number;
-  accuracy: number;
-};
+import type { KanaWithAccuracy, SortDirection } from "@/types/common";
 
 interface CharacterProgressTableProps {
-  filteredStats: KanaStats[];
+  filteredStats: KanaWithAccuracy[];
   sortColumn: string;
-  sortDirection: "asc" | "desc";
+  sortDirection: SortDirection;
   onSort: (column: string) => void;
   filter: "all" | "hiragana" | "katakana";
   setFilter: (filter: "all" | "hiragana" | "katakana") => void;
-  _onPracticeHiragana: () => void;
-  _onPracticeKatakana: () => void;
 }
 
 export function CharacterProgressTable({
@@ -47,8 +38,6 @@ export function CharacterProgressTable({
   onSort,
   filter,
   setFilter,
-  _onPracticeHiragana,
-  _onPracticeKatakana,
 }: CharacterProgressTableProps) {
   return (
     <div className="rounded-lg bg-white/90 backdrop-blur-sm p-4 sm:p-6 shadow-xl border-2 border-[#705a39] mx-4">
