@@ -23,7 +23,12 @@ import { useAuthStatus } from "@/hooks/useAuthStatus";
 import { DesktopNavigation } from "./DesktopNavigation";
 import { MobileNavigation } from "./MobileNavigation";
 
-export default function Header() {
+interface HeaderProps {
+  activeTab?: string;
+  setActiveTab?: (tab: string) => void;
+}
+
+export default function Header({ activeTab: _activeTab, setActiveTab: _setActiveTab }: HeaderProps) {
   const { session, status, credentialsEnabled } = useAuthStatus();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
