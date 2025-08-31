@@ -18,6 +18,7 @@
 "use client";
 
 import { useState } from "react";
+import { commonBackgrounds } from "@/lib/backgrounds";
 
 interface TipsButtonProps {
   onOpenTips: () => void;
@@ -41,10 +42,9 @@ export default function TipsButton({ onOpenTips }: TipsButtonProps) {
         onClick={onOpenTips}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="
+        className={`
           w-14 h-14 sm:w-16 sm:h-16
-          bg-gradient-to-br from-[#d1622b]/80 to-[#ae0d13]/80 
-          hover:from-[#d1622b] hover:to-[#ae0d13]
+          ${commonBackgrounds.primaryButton}
           backdrop-blur-sm
           text-white 
           rounded-full 
@@ -57,7 +57,7 @@ export default function TipsButton({ onOpenTips }: TipsButtonProps) {
           font-bold
           hover:rotate-12
           active:scale-95
-        "
+        `}
         aria-label="Get Japanese kana learning tips"
       >
         💡
