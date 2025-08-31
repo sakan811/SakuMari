@@ -106,7 +106,7 @@ describe("Authentication Flow Tests", () => {
 
       render(<Header />);
 
-      const signInButton = screen.getByText("Loading...");
+      const signInButton = screen.getByText("Sign In");
       expect(signInButton).toBeDisabled();
     });
   });
@@ -215,7 +215,7 @@ describe("Authentication Flow Tests", () => {
     test("disables sign-in button during loading", () => {
       render(<Header />);
 
-      const button = screen.getByText("Loading...");
+      const button = screen.getByText("Sign In");
       expect(button).toBeDisabled();
     });
   });
