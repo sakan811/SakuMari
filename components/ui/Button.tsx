@@ -15,7 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ButtonHTMLAttributes, forwardRef, ReactNode, cloneElement, isValidElement } from "react";
+import {
+  ButtonHTMLAttributes,
+  forwardRef,
+  ReactNode,
+  cloneElement,
+  isValidElement,
+} from "react";
 
 // Utility function for className merging
 function cn(...classes: (string | undefined | null | false)[]): string {
@@ -120,10 +126,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     if (asChild && isValidElement(children)) {
       return cloneElement(children, {
         ...(children.props as any),
-        className: cn(buttonClasses, (children.props as any)?.className),
+        className: cn(
+          buttonClasses,
+          (children.props as { className?: string }).className,
+        ),
         ref,
-        ...props
-      });
+        ...props,
+      } as any);
     }
 
     return (

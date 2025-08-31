@@ -52,7 +52,9 @@ export function StatsSummary({ stats }: StatsSummaryProps) {
         Your Progress
       </h2>
       <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-3">
-        <div className={`rounded-md ${backgrounds.progress.struggling} p-3 sm:p-4 text-center shadow-lg border-2 border-[#403933]`}>
+        <div
+          className={`rounded-md ${backgrounds.progress.struggling} p-3 sm:p-4 text-center shadow-lg border-2 border-[#403933]`}
+        >
           <p className="text-xs sm:text-sm text-[#fad182] font-medium">
             Total Characters Practiced
           </p>
@@ -60,7 +62,9 @@ export function StatsSummary({ stats }: StatsSummaryProps) {
             {practicedStats.length}
           </p>
         </div>
-        <div className={`rounded-md ${backgrounds.progress.good} p-3 sm:p-4 text-center shadow-lg border-2 border-green-700`}>
+        <div
+          className={`rounded-md ${backgrounds.progress.good} p-3 sm:p-4 text-center shadow-lg border-2 border-green-700`}
+        >
           <p className="text-xs sm:text-sm text-green-100 font-medium">
             Average Accuracy
           </p>
@@ -69,7 +73,9 @@ export function StatsSummary({ stats }: StatsSummaryProps) {
             %
           </p>
         </div>
-        <div className={`rounded-md ${backgrounds.progress.excellent} p-3 sm:p-4 text-center shadow-lg border-2 border-[#ae0d13]`}>
+        <div
+          className={`rounded-md ${backgrounds.progress.excellent} p-3 sm:p-4 text-center shadow-lg border-2 border-[#ae0d13]`}
+        >
           <p className="text-xs sm:text-sm text-orange-100 font-medium">
             Total Attempts
           </p>

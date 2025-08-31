@@ -61,14 +61,8 @@ export function DesktopNavigation({
             <span className="hidden xl:inline">カタカナ </span>Katakana
           </Link>
         </Button>
-        <Button
-          variant="primary"
-          size="md"
-          asChild
-        >
-          <Link href="/dashboard">
-            📊 Dashboard
-          </Link>
+        <Button variant="primary" size="md" asChild>
+          <Link href="/dashboard">📊 Dashboard</Link>
         </Button>
         <div className="flex items-center space-x-2 xl:space-x-3">
           {session.user?.image ? (

@@ -160,7 +160,9 @@ export default function Flashcard() {
         disabled={isSubmitting || !!result}
       />
 
-      <div className={`mb-6 sm:mb-8 rounded-lg ${commonBackgrounds.flashcard} aspect-[5/3] sm:aspect-[2.5/3.5] flex flex-col justify-between p-4 sm:p-6`}>
+      <div
+        className={`mb-6 sm:mb-8 rounded-lg ${commonBackgrounds.flashcard} aspect-[5/3] sm:aspect-[2.5/3.5] flex flex-col justify-between p-4 sm:p-6`}
+      >
         <div className="flex-grow flex items-center justify-center">
           <h2
             data-testid="current-kana"
