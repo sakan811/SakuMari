@@ -20,19 +20,15 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
-import { useState } from "react";
 import { commonBackgrounds } from "@/lib/backgrounds";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
-  const [activeTab, setActiveTab] = useState<"flashcards" | "dashboard">(
-    "flashcards",
-  );
 
   if (status === "loading") {
     return (
       <div className={commonBackgrounds.page}>
-        <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+        <Header />
         <div className="flex h-32 sm:h-64 items-center justify-center">
           <div className="h-8 w-8 sm:h-12 sm:w-12 animate-spin rounded-full border-2 sm:border-4 border-[#d1622b] border-t-transparent"></div>
         </div>
@@ -42,7 +38,7 @@ export default function HomePage() {
 
   return (
     <div className={commonBackgrounds.page}>
-      <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Header />
       <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-3 sm:mb-4 text-[#403933] drop-shadow-lg leading-tight">

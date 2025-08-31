@@ -17,21 +17,14 @@
 
 import { useState, useEffect } from "react";
 
-type KanaStats = {
-  id: string;
-  character: string;
-  romaji: string;
-  attempts: number;
-  correct_attempts: number;
-  accuracy: number;
-};
+import type { KanaWithAccuracy } from "@/types/common";
 
 /**
  * Custom hook for fetching and managing dashboard data
  * @returns Object containing dashboard data, loading state, error state, and refetch function
  */
 export function useDashboardData() {
-  const [stats, setStats] = useState<KanaStats[]>([]);
+  const [stats, setStats] = useState<KanaWithAccuracy[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

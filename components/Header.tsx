@@ -23,12 +23,7 @@ import { useAuthStatus } from "@/hooks/useAuthStatus";
 import { DesktopNavigation } from "./DesktopNavigation";
 import { MobileNavigation } from "./MobileNavigation";
 
-interface HeaderProps {
-  activeTab?: "flashcards" | "dashboard";
-  setActiveTab?: (_: "flashcards" | "dashboard") => void;
-}
-
-export default function Header(_: HeaderProps) {
+export default function Header() {
   const { session, status, credentialsEnabled } = useAuthStatus();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

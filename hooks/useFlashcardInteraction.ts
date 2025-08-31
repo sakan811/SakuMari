@@ -17,16 +17,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
-type InteractionMode = "typing" | "multiple-choice";
-
-type KanaWithAccuracy = {
-  id: string;
-  character: string;
-  romaji: string;
-  accuracy: number;
-  attempts: number;
-  correct_attempts: number;
-};
+import type { KanaWithAccuracy, InteractionMode } from "@/types/common";
 
 interface UseFlashcardInteractionProps {
   interactionMode: InteractionMode;

@@ -17,7 +17,7 @@
 
 import { useState } from "react";
 
-type SortDirection = "asc" | "desc";
+import type { SortDirection } from "@/types/common";
 
 /**
  * Custom hook for managing sorting state and functionality
