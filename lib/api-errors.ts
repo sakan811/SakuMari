@@ -129,7 +129,7 @@ export function validateRequired(
   fields: string[],
 ): NextResponse | null {
   for (const field of fields) {
-    if (!data[field]) {
+    if (data[field] === undefined || data[field] === null) {
       return ApiErrors.badRequest(`${field} is required`);
     }
   }
