@@ -20,21 +20,33 @@ import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
 import { prisma } from "@/lib/prisma";
 import { TipsApiErrors } from "@/lib/api-errors";
 
+// Note: @google/generative-ai is dynamically imported for optimal code splitting
+// as it's a large dependency only needed when this endpoint is called
+
 interface ConversationMessage {
   role: string;
   content: string;
 }
 
-// Initialize Gemini AI client
+// Initialize Gemini AI client with dynamic import for optimal code splitting
 async function createGeminiClient() {
-  const { GoogleGenerativeAI } = await import("@google/generative-ai");
-  const apiKey = process.env.GEMINI_API_KEY;
+  try {
+    // Dynamic import for code splitting - only load when needed
+    const { GoogleGenerativeAI } = await import("@google/generative-ai");
+    const apiKey = process.env.GEMINI_API_KEY;
 
-  if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable not configured");
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY environment variable not configured");
+    }
+
+    return new GoogleGenerativeAI(apiKey);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("GEMINI_API_KEY")) {
+      throw error; // Re-throw configuration errors
+    }
+    // Handle import errors
+    throw new Error("Failed to initialize AI service");
   }
-
-  return new GoogleGenerativeAI(apiKey);
 }
 
 async function generateTips(

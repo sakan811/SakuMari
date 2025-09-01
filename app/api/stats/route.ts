@@ -16,8 +16,8 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
+import { prisma } from "@/lib/prisma";
 import { ApiErrors } from "@/lib/api-errors";
 
 async function getStats(_request: NextRequest, context: AuthenticatedContext) {
