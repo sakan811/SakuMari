@@ -19,7 +19,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   description:
-    "Master Japanese Hiragana and Katakana with interactive flashcards. Learn, practice, and track your progress in this free educational app.",
+    "Master Japanese Hiragana and Katakana with interactive flashcards. Free educational app to learn Japanese characters with progress tracking.",
   keywords: [
     "Japanese",
     "Hiragana",
@@ -28,6 +28,8 @@ export const metadata: Metadata = {
     "learn Japanese",
     "kana practice",
     "Japanese alphabet",
+    "Japanese learning",
+    "learn Japanese free",
   ],
   alternates: {
     canonical: "/",
@@ -38,14 +40,14 @@ export const metadata: Metadata = {
     url: "https://sakumari.fukudev.org",
     title: "SakuMari - Master Japanese Kana",
     description:
-      "Master Japanese Hiragana and Katakana with interactive flashcards. Learn, practice, and track your progress.",
+      "Master Japanese Hiragana and Katakana with interactive flashcards. Free educational app to learn Japanese characters.",
     siteName: "SakuMari",
   },
   twitter: {
     card: "summary_large_image",
     title: "SakuMari - Master Japanese Kana",
     description:
-      "Master Japanese Hiragana and Katakana with interactive flashcards. Learn, practice, and track your progress.",
+      "Master Japanese Hiragana and Katakana with interactive flashcards. Free educational app to learn Japanese characters.",
   },
 };
 
