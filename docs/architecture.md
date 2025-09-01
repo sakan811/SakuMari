@@ -90,7 +90,6 @@ flowchart TD
     
     Dashboard --> StatsSummary["📈 StatsSummary<br/>Progress Overview Cards<br/>Key Metrics Display"]
     Dashboard --> CharacterProgressTable["📋 CharacterProgressTable<br/>Detailed Progress Table<br/>Character-level Statistics"]
-    Dashboard --> TipsButton["💡 TipsButton<br/>AI Learning Tips Trigger<br/>Chat Interface Access"]
     Dashboard --> TipsModal["🤖 TipsModal<br/>AI Chat Interface<br/>Personalized Learning Tips"]
     
     %% Table Sub-Components
@@ -111,7 +110,6 @@ flowchart TD
     HomePage -.-> ButtonLink
     Dashboard -.-> Button
     Dashboard -.-> ButtonLink
-    TipsButton -.-> Button
     ModeSelector -.-> Button
     MultipleChoice -.-> Button
     Flashcard -.-> Button
@@ -132,7 +130,7 @@ flowchart TD
     
     class SessionProviders,HomePage,FlashcardApp,Header,DesktopNavigation,MobileNavigation coreComponent
     class Flashcard,ModeSelector,MultipleChoice,FlashcardProvider practiceComponent
-    class Dashboard,StatsSummary,CharacterProgressTable,SortableTableHeader,CharacterTableRow,TipsButton,TipsModal dashboardComponent
+    class Dashboard,StatsSummary,CharacterProgressTable,SortableTableHeader,CharacterTableRow,TipsModal dashboardComponent
     class Button,ButtonLink uiComponent
     class FlashcardProvider,SessionProviders contextProvider
     class useDashboardData,useSorting,useAuthStatus customHook
@@ -177,7 +175,6 @@ flowchart TD
 - **Dashboard**: Progress tracking main view
 - **StatsSummary**: Overview statistics cards
 - **CharacterProgressTable**: Detailed progress table with filtering and sorting
-- **TipsButton**: Trigger for AI-powered learning tips
 - **TipsModal**: Modal interface for AI chat functionality
 
 #### Supporting Components
