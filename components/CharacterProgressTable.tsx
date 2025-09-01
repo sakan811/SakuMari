@@ -19,6 +19,7 @@ import React from "react";
 import { SortableTableHeader } from "./SortableTableHeader";
 import { CharacterTableRow } from "./CharacterTableRow";
 import { ButtonLink } from "./ui/ButtonLink";
+import { FilterButtonGroup } from "./ui/FilterButton";
 
 import type { KanaWithAccuracy, SortDirection } from "@/types/common";
 
@@ -45,41 +46,7 @@ export function CharacterProgressTable({
         <h2 className="text-lg sm:text-xl font-semibold text-[#403933]">
           Character Progress
         </h2>
-        <div className="flex flex-wrap gap-1 sm:gap-2">
-          <button
-            data-testid="filter-all"
-            onClick={() => setFilter("all")}
-            className={`rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border-2 ${
-              filter === "all"
-                ? "bg-[#d1622b] text-white border-[#d1622b] shadow-lg"
-                : "bg-white text-[#705a39] border-[#705a39] hover:bg-[#fad182] hover:border-[#d1622b]"
-            }`}
-          >
-            All
-          </button>
-          <button
-            data-testid="filter-hiragana"
-            onClick={() => setFilter("hiragana")}
-            className={`rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border-2 ${
-              filter === "hiragana"
-                ? "bg-[#d1622b] text-white border-[#d1622b] shadow-lg"
-                : "bg-white text-[#705a39] border-[#705a39] hover:bg-[#fad182] hover:border-[#d1622b]"
-            }`}
-          >
-            Hiragana
-          </button>
-          <button
-            data-testid="filter-katakana"
-            onClick={() => setFilter("katakana")}
-            className={`rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border-2 ${
-              filter === "katakana"
-                ? "bg-[#d1622b] text-white border-[#d1622b] shadow-lg"
-                : "bg-white text-[#705a39] border-[#705a39] hover:bg-[#fad182] hover:border-[#d1622b]"
-            }`}
-          >
-            Katakana
-          </button>
-        </div>
+        <FilterButtonGroup filter={filter} setFilter={setFilter} />
       </div>
 
       {filteredStats.length === 0 ? (
