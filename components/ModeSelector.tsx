@@ -17,7 +17,7 @@
 
 "use client";
 
-type InteractionMode = "typing" | "multiple-choice";
+import type { InteractionMode } from "@/types/common";
 
 interface ModeSelectorProps {
   currentMode: InteractionMode;
