@@ -94,7 +94,6 @@ flowchart TD
     Dashboard --> TipsModal["🤖 TipsModal<br/>AI Chat Interface<br/>Personalized Learning Tips"]
     
     %% Table Sub-Components
-    CharacterProgressTable --> FilterControls["🔍 FilterControls<br/>Kana Type Filter<br/>Hiragana/Katakana Toggle"]
     CharacterProgressTable --> SortableTableHeader["🔄 SortableTableHeader<br/>Column Sorting Controls<br/>Dynamic Table Ordering"]
     CharacterProgressTable --> CharacterTableRow["📝 CharacterTableRow<br/>Individual Character Stats<br/>Progress Data Display"]
     
@@ -113,7 +112,6 @@ flowchart TD
     Dashboard -.-> Button
     Dashboard -.-> ButtonLink
     TipsButton -.-> Button
-    FilterControls -.-> Button
     ModeSelector -.-> Button
     MultipleChoice -.-> Button
     Flashcard -.-> Button
@@ -134,7 +132,7 @@ flowchart TD
     
     class SessionProviders,HomePage,FlashcardApp,Header,DesktopNavigation,MobileNavigation coreComponent
     class Flashcard,ModeSelector,MultipleChoice,FlashcardProvider practiceComponent
-    class Dashboard,StatsSummary,CharacterProgressTable,FilterControls,SortableTableHeader,CharacterTableRow,TipsButton,TipsModal dashboardComponent
+    class Dashboard,StatsSummary,CharacterProgressTable,SortableTableHeader,CharacterTableRow,TipsButton,TipsModal dashboardComponent
     class Button,ButtonLink uiComponent
     class FlashcardProvider,SessionProviders contextProvider
     class useDashboardData,useSorting,useAuthStatus customHook
@@ -184,7 +182,7 @@ flowchart TD
 
 #### Supporting Components
 - **Navigation Components**: DesktopNavigation, MobileNavigation for responsive menus
-- **Table Components**: FilterControls, SortableTableHeader, CharacterTableRow for data presentation
+- **Table Components**: SortableTableHeader, CharacterTableRow for data presentation
 - **UI Components**: Button, ButtonLink for consistent interface elements
 
 This architecture ensures maintainable code through clear component boundaries, predictable data flow, and separation of concerns between presentation and business logic.
