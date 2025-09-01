@@ -27,7 +27,6 @@ import { StatsSummary } from "./StatsSummary";
 import { CharacterProgressTable } from "./CharacterProgressTable";
 import type { KanaWithAccuracy } from "@/types/common";
 
-
 export default function Dashboard() {
   const { stats, loading, error, refetch } = useDashboardData();
   const [filter, setFilter] = useState<"all" | "hiragana" | "katakana">("all");

@@ -19,7 +19,6 @@ import React from "react";
 import { backgrounds } from "@/lib/backgrounds";
 import type { KanaWithAccuracy } from "@/types/common";
 
-
 interface StatsSummaryProps {
   stats: KanaWithAccuracy[];
 }

@@ -26,11 +26,11 @@ interface FilterButtonProps {
   children: React.ReactNode;
 }
 
-export function FilterButton({ 
-  value, 
-  currentFilter, 
-  onClick, 
-  children 
+export function FilterButton({
+  value,
+  currentFilter,
+  onClick,
+  children,
 }: FilterButtonProps) {
   const isActive = currentFilter === value;
 
@@ -55,32 +55,20 @@ interface FilterButtonGroupProps {
   className?: string;
 }
 
-export function FilterButtonGroup({ 
-  filter, 
-  setFilter, 
-  className = "flex flex-wrap gap-1 sm:gap-2" 
+export function FilterButtonGroup({
+  filter,
+  setFilter,
+  className = "flex flex-wrap gap-1 sm:gap-2",
 }: FilterButtonGroupProps) {
   return (
     <div className={className}>
-      <FilterButton
-        value="all"
-        currentFilter={filter}
-        onClick={setFilter}
-      >
+      <FilterButton value="all" currentFilter={filter} onClick={setFilter}>
         All
       </FilterButton>
-      <FilterButton
-        value="hiragana"
-        currentFilter={filter}
-        onClick={setFilter}
-      >
+      <FilterButton value="hiragana" currentFilter={filter} onClick={setFilter}>
         Hiragana
       </FilterButton>
-      <FilterButton
-        value="katakana"
-        currentFilter={filter}
-        onClick={setFilter}
-      >
+      <FilterButton value="katakana" currentFilter={filter} onClick={setFilter}>
         Katakana
       </FilterButton>
     </div>

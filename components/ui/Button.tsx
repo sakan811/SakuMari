@@ -95,7 +95,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       .filter(Boolean)
       .join(" ");
 
-
     // Handle asChild pattern - render the child element with button styling
     if (asChild && isValidElement(children)) {
       return cloneElement(children, {

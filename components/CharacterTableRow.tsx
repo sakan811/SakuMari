@@ -18,7 +18,6 @@
 import React from "react";
 import type { KanaWithAccuracy } from "@/types/common";
 
-
 interface CharacterTableRowProps {
   kana: KanaWithAccuracy;
   index: number;
