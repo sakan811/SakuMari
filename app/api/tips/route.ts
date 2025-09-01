@@ -18,6 +18,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
 import { prisma } from "@/lib/prisma";
+import { TipsApiErrors } from "@/lib/api-errors";
 
 interface ConversationMessage {
   role: string;
@@ -48,21 +49,13 @@ async function generateTips(
       typeof userQuery !== "string" ||
       userQuery.trim().length === 0
     ) {
-      return NextResponse.json(
-        { error: "Please provide a question about Japanese kana learning" },
-        { status: 400 },
-      );
+      return TipsApiErrors.missingUserQuery();
     }
 
     // Rate limiting check - simple in-memory approach
     const maxLength = 500;
     if (userQuery.length > maxLength) {
-      return NextResponse.json(
-        {
-          error: `Question too long. Please keep it under ${maxLength} characters.`,
-        },
-        { status: 400 },
-      );
+      return TipsApiErrors.queryTooLong(maxLength);
     }
 
     // Fetch user's kana progress data
@@ -130,13 +123,7 @@ User question: ${userQuery}`;
     const text = response.text();
 
     if (!text || text.trim().length === 0) {
-      return NextResponse.json(
-        {
-          error:
-            "Unable to generate learning tips at this time. Please try again.",
-        },
-        { status: 500 },
-      );
+      return TipsApiErrors.generationFailed();
     }
 
     return NextResponse.json({
@@ -147,16 +134,10 @@ User question: ${userQuery}`;
     console.error("Error generating kana learning tips:", error);
 
     if (error instanceof Error && error.message.includes("GEMINI_API_KEY")) {
-      return NextResponse.json(
-        { error: "AI service not configured. Please contact support." },
-        { status: 503 },
-      );
+      return TipsApiErrors.aiServiceNotConfigured();
     }
 
-    return NextResponse.json(
-      { error: "Unable to generate learning tips. Please try again later." },
-      { status: 500 },
-    );
+    return TipsApiErrors.generationError();
   }
 }
 
