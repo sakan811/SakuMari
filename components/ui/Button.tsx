@@ -23,10 +23,9 @@ import {
   isValidElement,
 } from "react";
 
-// Utility function for className merging
-function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(" ");
-}
+// Base button styles constant
+const BASE_BUTTON_CLASSES =
+  "inline-flex items-center justify-center rounded-lg transition-all duration-200 font-medium relative z-10";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -100,22 +99,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const isDisabled = disabled || loading;
     const variantStyles = buttonVariants[variant];
 
-    const buttonClasses = cn(
-      // Base button styles
-      "inline-flex items-center justify-center rounded-lg transition-all duration-200 font-medium relative z-10",
-      // Variant styles
+    // Build button classes with constants and conditionals
+    const buttonClasses = [
+      BASE_BUTTON_CLASSES,
       variantStyles.base,
       variantStyles.disabled,
-      // Size styles
       buttonSizes[size],
-      // Animation styles
       buttonAnimations[animation],
-      // Width
       fullWidth && "w-full",
-      // Loading cursor
       loading && "cursor-not-allowed",
       className,
-    );
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     // If href is provided, render as link (would need Link component)
     if (href && !asChild) {
@@ -126,10 +122,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     if (asChild && isValidElement(children)) {
       return cloneElement(children, {
         ...(children.props as any),
-        className: cn(
+        className: [
           buttonClasses,
           (children.props as { className?: string }).className,
-        ),
+        ]
+          .filter(Boolean)
+          .join(" "),
         ref,
         ...props,
       } as any);
