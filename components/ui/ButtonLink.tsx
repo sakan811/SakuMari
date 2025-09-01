@@ -18,10 +18,9 @@
 import { forwardRef, ReactNode, AnchorHTMLAttributes } from "react";
 import Link from "next/link";
 
-// Utility function for className merging
-function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(" ");
-}
+// Base button styles constant
+const BASE_BUTTON_CLASSES =
+  "inline-flex items-center justify-center rounded-lg transition-all duration-200 font-medium relative z-10";
 
 export interface ButtonLinkProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
@@ -82,21 +81,18 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
   ) => {
     const variantStyles = buttonVariants[variant];
 
-    const linkClasses = cn(
-      // Base button styles
-      "inline-flex items-center justify-center rounded-lg transition-all duration-200 font-medium relative z-10",
-      // Variant styles
+    // Build link classes with constants and conditionals
+    const linkClasses = [
+      BASE_BUTTON_CLASSES,
       variantStyles.base,
-      // Size styles
       buttonSizes[size],
-      // Animation styles
       buttonAnimations[animation],
-      // Width
       fullWidth && "w-full",
-      // Text alignment for full width
       fullWidth && "text-center",
       className,
-    );
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     if (external) {
       return (
