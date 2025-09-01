@@ -16,18 +16,11 @@
  */
 
 import React from "react";
+import type { KanaWithAccuracy } from "@/types/common";
 
-type KanaStats = {
-  id: string;
-  character: string;
-  romaji: string;
-  attempts: number;
-  correct_attempts: number;
-  accuracy: number;
-};
 
 interface CharacterTableRowProps {
-  kana: KanaStats;
+  kana: KanaWithAccuracy;
   index: number;
 }
 

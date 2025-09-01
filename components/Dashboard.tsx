@@ -25,15 +25,8 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useSorting } from "@/hooks/useSorting";
 import { StatsSummary } from "./StatsSummary";
 import { CharacterProgressTable } from "./CharacterProgressTable";
+import type { KanaWithAccuracy } from "@/types/common";
 
-type KanaStats = {
-  id: string;
-  character: string;
-  romaji: string;
-  attempts: number;
-  correct_attempts: number;
-  accuracy: number;
-};
 
 export default function Dashboard() {
   const { stats, loading, error, refetch } = useDashboardData();
@@ -41,7 +34,7 @@ export default function Dashboard() {
   const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
 
   const { sortColumn, sortDirection, handleSort, sortedData } =
-    useSorting<KanaStats>("accuracy", "asc");
+    useSorting<KanaWithAccuracy>("accuracy", "asc");
 
   // Filter stats based on selected filter
   const filteredStats = stats.filter((kana) => {
