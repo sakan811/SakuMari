@@ -122,6 +122,42 @@ export const ApiErrors = {
 } as const;
 
 /**
+ * Tips API specific errors
+ */
+export const TipsApiErrors = {
+  missingUserQuery: () =>
+    createErrorResponse(
+      "Please provide a question about Japanese kana learning",
+      400,
+      "MISSING_USER_QUERY",
+    ),
+  queryTooLong: (maxLength: number) =>
+    createErrorResponse(
+      `Question too long. Please keep it under ${maxLength} characters.`,
+      400,
+      "QUERY_TOO_LONG",
+    ),
+  generationFailed: () =>
+    createErrorResponse(
+      "Unable to generate learning tips at this time. Please try again.",
+      500,
+      "GENERATION_FAILED",
+    ),
+  aiServiceNotConfigured: () =>
+    createErrorResponse(
+      "AI service not configured. Please contact support.",
+      503,
+      "AI_SERVICE_NOT_CONFIGURED",
+    ),
+  generationError: () =>
+    createErrorResponse(
+      "Unable to generate learning tips. Please try again later.",
+      500,
+      "GENERATION_ERROR",
+    ),
+} as const;
+
+/**
  * Validation helper for request bodies
  */
 export function validateRequired(
