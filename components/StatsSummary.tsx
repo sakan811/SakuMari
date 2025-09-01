@@ -17,18 +17,11 @@
 
 import React from "react";
 import { backgrounds } from "@/lib/backgrounds";
+import type { KanaWithAccuracy } from "@/types/common";
 
-type KanaStats = {
-  id: string;
-  character: string;
-  romaji: string;
-  attempts: number;
-  correct_attempts: number;
-  accuracy: number;
-};
 
 interface StatsSummaryProps {
-  stats: KanaStats[];
+  stats: KanaWithAccuracy[];
 }
 
 export function StatsSummary({ stats }: StatsSummaryProps) {
