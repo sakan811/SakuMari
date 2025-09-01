@@ -23,8 +23,8 @@ import { useFlashcard } from "./FlashcardProvider";
 import ModeSelector from "./ModeSelector";
 import MultipleChoice from "./MultipleChoice";
 import { commonBackgrounds } from "@/lib/backgrounds";
+import type { InteractionMode } from "@/types/common";
 
-type InteractionMode = "typing" | "multiple-choice";
 
 export default function Flashcard() {
   const {
