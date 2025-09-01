@@ -10,6 +10,7 @@ const { mockAuth, mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     kana: { findMany: vi.fn() },
     kanaProgress: { upsert: vi.fn(), update: vi.fn() },
+    $executeRaw: vi.fn(),
   },
 }));
 
@@ -77,11 +78,7 @@ describe("Flashcards API", () => {
   describe("POST /api/flashcards/submit", () => {
     test("creates progress record", async () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
-      mockPrisma.kanaProgress.upsert.mockResolvedValue({
-        id: "1",
-        attempts: 1,
-        correct_attempts: 1,
-      });
+      mockPrisma.$executeRaw.mockResolvedValue(undefined);
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",
@@ -94,12 +91,12 @@ describe("Flashcards API", () => {
 
       const response = await POST(request);
       expect(response.status).toBe(200);
-      expect(mockPrisma.kanaProgress.upsert).toHaveBeenCalled();
+      expect(mockPrisma.$executeRaw).toHaveBeenCalled();
     });
 
     test("handles database connection errors", async () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
-      mockPrisma.kanaProgress.upsert.mockRejectedValue(
+      mockPrisma.$executeRaw.mockRejectedValue(
         new Error("Database connection failed"),
       );
 
@@ -120,7 +117,7 @@ describe("Flashcards API", () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
       const constraintError = new Error("Unique constraint failed");
       constraintError.name = "PrismaClientKnownRequestError";
-      mockPrisma.kanaProgress.upsert.mockRejectedValue(constraintError);
+      mockPrisma.$executeRaw.mockRejectedValue(constraintError);
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",
