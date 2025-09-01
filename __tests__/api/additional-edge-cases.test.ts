@@ -28,6 +28,7 @@ const { mockAuth, mockPrisma } = vi.hoisted(() => ({
       upsert: vi.fn(),
       update: vi.fn(),
     },
+    $executeRaw: vi.fn(),
   },
 }));
 
@@ -46,17 +47,7 @@ describe("Additional API Edge Cases", () => {
   describe("POST /api/flashcards/submit - Additional Edge Cases", () => {
     test("handles extremely large kanaId", async () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
-      mockPrisma.kanaProgress.upsert.mockResolvedValue({
-        id: "1",
-        attempts: 1,
-        correct_attempts: 1,
-      });
-      mockPrisma.kanaProgress.update.mockResolvedValue({
-        id: "1",
-        attempts: 1,
-        correct_attempts: 1,
-        accuracy: 1.0,
-      });
+      mockPrisma.$executeRaw.mockResolvedValue(undefined);
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",
@@ -154,17 +145,7 @@ describe("Additional API Edge Cases", () => {
 
     test("handles extra fields in request body", async () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
-      mockPrisma.kanaProgress.upsert.mockResolvedValue({
-        id: "1",
-        attempts: 1,
-        correct_attempts: 1,
-      });
-      mockPrisma.kanaProgress.update.mockResolvedValue({
-        id: "1",
-        attempts: 1,
-        correct_attempts: 1,
-        accuracy: 1.0,
-      });
+      mockPrisma.$executeRaw.mockResolvedValue(undefined);
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",
@@ -187,17 +168,7 @@ describe("Additional API Edge Cases", () => {
 
     test("handles special characters in kanaId", async () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
-      mockPrisma.kanaProgress.upsert.mockResolvedValue({
-        id: "1",
-        attempts: 1,
-        correct_attempts: 1,
-      });
-      mockPrisma.kanaProgress.update.mockResolvedValue({
-        id: "1",
-        attempts: 1,
-        correct_attempts: 1,
-        accuracy: 1.0,
-      });
+      mockPrisma.$executeRaw.mockResolvedValue(undefined);
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",

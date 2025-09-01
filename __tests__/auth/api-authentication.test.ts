@@ -12,6 +12,7 @@ const { mockAuth, mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     kana: { findMany: vi.fn() },
     kanaProgress: { upsert: vi.fn(), update: vi.fn() },
+    $executeRaw: vi.fn(),
   },
 }));
 
@@ -72,11 +73,7 @@ describe("API Authentication", () => {
 
     test("processes submissions for authenticated users", async () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
-      mockPrisma.kanaProgress.upsert.mockResolvedValue({
-        id: "1",
-        attempts: 1,
-        correct_attempts: 1,
-      });
+      mockPrisma.$executeRaw.mockResolvedValue(undefined);
 
       const request = new NextRequest(
         "http://localhost/api/flashcards/submit",

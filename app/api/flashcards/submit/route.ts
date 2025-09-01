@@ -44,33 +44,28 @@ async function submitAnswer(
     });
     if (typeValidation) return typeValidation;
 
-    // Simple progress tracking - find or create KanaProgress record
-    const kanaProgress = await prisma.kanaProgress.upsert({
-      where: {
-        kana_id_user_id: {
-          kana_id: kanaId,
-          user_id: context.userId,
-        },
-      },
-      update: {
-        attempts: { increment: 1 },
-        correct_attempts: isCorrect ? { increment: 1 } : undefined,
-      },
-      create: {
-        kana_id: kanaId,
-        user_id: context.userId,
-        attempts: 1,
-        correct_attempts: isCorrect ? 1 : 0,
-      },
-    });
-
-    // Calculate and update accuracy
-    const accuracy = kanaProgress.correct_attempts / kanaProgress.attempts;
-
-    await prisma.kanaProgress.update({
-      where: { id: kanaProgress.id },
-      data: { accuracy },
-    });
+    // Optimized progress tracking using raw SQL to calculate accuracy in single operation
+    await prisma.$executeRaw`
+      INSERT INTO "KanaProgress" (
+        id, kana_id, user_id, attempts, correct_attempts, accuracy
+      ) VALUES (
+        gen_random_uuid(),
+        ${kanaId}::text,
+        ${context.userId}::text,
+        1,
+        ${isCorrect ? 1 : 0},
+        ${isCorrect ? 1.0 : 0.0}
+      )
+      ON CONFLICT (kana_id, user_id) 
+      DO UPDATE SET 
+        attempts = "KanaProgress".attempts + 1,
+        correct_attempts = "KanaProgress".correct_attempts + ${isCorrect ? 1 : 0},
+        accuracy = (
+          "KanaProgress".correct_attempts + ${isCorrect ? 1 : 0}
+        )::float / (
+          "KanaProgress".attempts + 1
+        )::float
+    `;
 
     return NextResponse.json({ success: true });
   } catch (error) {
