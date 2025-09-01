@@ -25,7 +25,6 @@ import MultipleChoice from "./MultipleChoice";
 import { commonBackgrounds } from "@/lib/backgrounds";
 import type { InteractionMode } from "@/types/common";
 
-
 export default function Flashcard() {
   const {
     currentKana,
