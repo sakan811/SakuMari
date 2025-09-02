@@ -191,3 +191,130 @@ flowchart TD
 - **UI Components**: Button, ButtonLink for consistent interface elements
 
 This architecture ensures maintainable code through clear component boundaries, predictable data flow, and separation of concerns between presentation and business logic.
+
+## App Architecture
+
+The SakuMari app follows the Next.js 15 App Router paradigm, which provides a file-system based routing structure with enhanced capabilities for layouts, middleware, and API routes. The app directory serves as the foundation for all pages, API endpoints, and shared resources, creating a cohesive and scalable application structure.
+
+The App Router architecture enables server-side rendering, static site generation, and client-side routing seamlessly. Each page.tsx file becomes a route, while layout.tsx files provide shared UI components across route segments. API routes are co-located with pages, making the codebase more organized and maintainable.
+
+```mermaid
+flowchart TD
+    %% Root App Structure
+    AppRoot["📁 app/<br/>Next.js 15 App Router Root<br/>File-based Routing System"]
+    
+    %% Root Layout and Global Files
+    AppRoot --> RootLayout["📄 layout.tsx<br/>Root Layout Component<br/>Global HTML Structure + Metadata"]
+    AppRoot --> GlobalCSS["🎨 globals.css<br/>Global Styles<br/>Tailwind CSS Imports"]
+    AppRoot --> Favicon["🖼️ favicon.ico<br/>App Icon<br/>Browser Tab Icon"]
+    
+    %% SEO and Meta Files
+    AppRoot --> SitemapTS["🗺️ sitemap.ts<br/>Dynamic Sitemap<br/>SEO Route Discovery"]
+    AppRoot --> RobotsTS["🤖 robots.ts<br/>Robots.txt Config<br/>Search Engine Rules"]
+    
+    %% Page Routes (Direct Children)
+    AppRoot --> HomePage["🏠 page.tsx<br/>Root Page (Home)<br/>Landing Page Route"]
+    AppRoot --> DashboardDir["📁 dashboard/<br/>Dashboard Route Segment<br/>Protected User Statistics"]
+    AppRoot --> HiraganaDir["📁 hiragana/<br/>Hiragana Practice Route<br/>Character Learning Mode"]
+    AppRoot --> KatakanaDir["📁 katakana/<br/>Katakana Practice Route<br/>Character Learning Mode"]
+    
+    %% Page Route Files
+    DashboardDir --> DashboardPage["📄 page.tsx<br/>Dashboard Page<br/>Progress Tracking UI"]
+    HiraganaDir --> HiraganaPage["📄 page.tsx<br/>Hiragana Practice<br/>Interactive Flashcard Session"]
+    KatakanaDir --> KatakanaPage["📄 page.tsx<br/>Katakana Practice<br/>Interactive Flashcard Session"]
+    
+    %% API Routes Structure
+    AppRoot --> APIRoot["📁 api/<br/>API Routes Directory<br/>Server-side Endpoints"]
+    
+    %% Authentication API Routes
+    APIRoot --> AuthDir["📁 auth/<br/>Authentication Routes<br/>NextAuth.js Integration"]
+    AuthDir --> NextAuthRoute["📁 [...nextauth]/<br/>Dynamic Auth Route<br/>OAuth + Session Management"]
+    NextAuthRoute --> NextAuthFile["📄 route.ts<br/>NextAuth Handler<br/>Login/Logout/Session"]
+    AuthDir --> ProvidersRoute["📁 providers/<br/>Auth Providers Route<br/>Available Login Methods"]
+    ProvidersRoute --> ProvidersFile["📄 route.ts<br/>Providers API<br/>OAuth Configuration"]
+    
+    %% Application API Routes
+    APIRoot --> FlashcardsDir["📁 flashcards/<br/>Flashcard API Routes<br/>Practice Session Data"]
+    FlashcardsDir --> SubmitDir["📁 submit/<br/>Answer Submission<br/>Progress Tracking"]
+    SubmitDir --> SubmitFile["📄 route.ts<br/>Submit API<br/>Answer Processing + Statistics"]
+    
+    APIRoot --> StatsDir["📁 stats/<br/>Statistics Route<br/>User Progress Data"]
+    StatsDir --> StatsFile["📄 route.ts<br/>Stats API<br/>Dashboard Data Aggregation"]
+    
+    APIRoot --> TipsDir["📁 tips/<br/>AI Tips Route<br/>Personalized Learning"]
+    TipsDir --> TipsFile["📄 route.ts<br/>Tips API<br/>Gemini AI Integration"]
+    
+    APIRoot --> HealthDir["📁 health/<br/>Health Check Route<br/>System Monitoring"]
+    HealthDir --> HealthFile["📄 route.ts<br/>Health API<br/>Database Connectivity"]
+    
+    %% Layout Inheritance Flow
+    RootLayout -.-> HomePage
+    RootLayout -.-> DashboardPage
+    RootLayout -.-> HiraganaPage
+    RootLayout -.-> KatakanaPage
+    
+    %% API Route Usage by Pages
+    HomePage -.-> NextAuthFile
+    HomePage -.-> ProvidersFile
+    DashboardPage -.-> StatsFile
+    DashboardPage -.-> TipsFile
+    HiraganaPage -.-> SubmitFile
+    KatakanaPage -.-> SubmitFile
+    
+    %% Metadata and SEO Integration
+    SitemapTS -.-> HomePage
+    SitemapTS -.-> DashboardPage
+    SitemapTS -.-> HiraganaPage
+    SitemapTS -.-> KatakanaPage
+    RobotsTS -.-> SitemapTS
+    
+    %% Component Integration
+    HomePage --> HomePageComponent["🧩 HomePage Component<br/>Landing Interface<br/>Authentication State"]
+    DashboardPage --> DashboardComponent["🧩 Dashboard Component<br/>Statistics Interface<br/>Progress Visualization"]
+    HiraganaPage --> FlashcardAppComponent["🧩 FlashcardApp Component<br/>Practice Interface<br/>Adaptive Learning"]
+    KatakanaPage --> FlashcardAppComponent
+    
+    %% Styling
+    classDef rootStructure fill:#e8f4fd,stroke:#1e40af,stroke-width:3px
+    classDef pageRoute fill:#fef3c7,stroke:#d97706,stroke-width:2px
+    classDef apiRoute fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
+    classDef authRoute fill:#fdf4ff,stroke:#a855f7,stroke-width:2px
+    classDef globalFile fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    classDef component fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,stroke-dasharray: 5 5
+    
+    class AppRoot,RootLayout rootStructure
+    class HomePage,DashboardDir,DashboardPage,HiraganaDir,HiraganaPage,KatakanaDir,KatakanaPage pageRoute
+    class APIRoot,FlashcardsDir,SubmitDir,SubmitFile,StatsDir,StatsFile,TipsDir,TipsFile,HealthDir,HealthFile apiRoute
+    class AuthDir,NextAuthRoute,NextAuthFile,ProvidersRoute,ProvidersFile authRoute
+    class GlobalCSS,Favicon,SitemapTS,RobotsTS globalFile
+    class HomePageComponent,DashboardComponent,FlashcardAppComponent component
+```
+
+### App Router Key Features
+
+#### File-based Routing
+- **Automatic Route Creation**: Each `page.tsx` file automatically becomes a route
+- **Nested Routes**: Folder structure maps directly to URL structure
+- **Layout Inheritance**: `layout.tsx` files provide shared UI across route segments
+
+#### Server and Client Components
+- **Server Components**: Default rendering on the server for better performance
+- **Client Components**: Interactive components with `"use client"` directive
+- **Hybrid Rendering**: Seamless integration of server and client components
+
+#### API Route Integration
+- **Co-located APIs**: API routes live alongside pages for better organization
+- **Route Handlers**: Modern `route.ts` files replace legacy API pages
+- **Dynamic Routes**: `[...nextauth]` enables catch-all authentication routes
+
+#### Metadata and SEO
+- **Page-level Metadata**: Each page can export metadata for SEO optimization
+- **Dynamic Generation**: `sitemap.ts` and `robots.ts` generate SEO files automatically
+- **Structured Data**: JSON-LD schema markup for search engines
+
+#### Performance Optimizations
+- **Automatic Code Splitting**: Routes are automatically split for optimal loading
+- **Server-side Rendering**: Enhanced SSR capabilities with React Server Components
+- **Static Generation**: Build-time optimization for non-dynamic content
+
+This App Router architecture provides a scalable foundation that separates concerns while maintaining close relationships between related functionality, enabling efficient development and optimal user experience.
