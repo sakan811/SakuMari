@@ -1,536 +1,368 @@
-# SakuMari Features Documentation
+# SakuMari Features Overview
 
-Comprehensive technical documentation covering all features of the SakuMari Japanese Kana Flashcard App.
+Learn Japanese Hiragana and Katakana with SakuMari's comprehensive feature set designed to make your learning journey effective and enjoyable.
 
-**Current Version**: v9.7.0 | **Tech Stack**: Next.js 15.5.2 + React 19.1.1 + TypeScript 5.9.2 + PostgreSQL 17
-
-**Last Updated**: September 2025 | [View CLAUDE.md for development setup](../CLAUDE.md)
+**Last Updated**: September 2025
 
 ## Table of Contents
 
-1. [Authentication System](#authentication-system)
-2. [Adaptive Learning Engine](#adaptive-learning-engine)
-3. [Dual Practice Modes](#dual-practice-modes)
-4. [Character Set Support](#character-set-support)
-5. [Progress Analytics Dashboard](#progress-analytics-dashboard)
-6. [AI-Powered Learning Assistant](#ai-powered-learning-assistant)
-7. [Technical Architecture](#technical-architecture)
-8. [Navigation System](#navigation-system)
+1. [Google Account Integration](#google-account-integration)
+2. [Smart Learning System](#smart-learning-system)
+3. [Flexible Practice Modes](#flexible-practice-modes)
+4. [Character Set Practice](#character-set-practice)
+5. [Progress Dashboard](#progress-dashboard)
+6. [AI Learning Assistant](#ai-learning-assistant)
+7. [Responsive Navigation](#responsive-navigation)
 
 ---
 
-## Authentication System
+## Google Account Integration
 
-### Google Account Integration
+### Secure and Simple Sign-In
 
-**Implementation**: NextAuth.js v5 with Prisma adapter for secure session management.
+Start learning immediately with your Google account - no complicated registration forms or new passwords to remember.
 
-**Technical Details**:
+**What You Get**:
 
-- **OAuth Provider**: Google OAuth 2.0 integration via `GoogleProvider`
-- **Session Strategy**: JWT-based sessions with 30-day expiration
-- **Database Storage**: User profiles and sessions stored in PostgreSQL via Prisma
-- **Security**: PKCE flow with secure cookie configuration for production
-- **Session Management**: Automatic token refresh and secure cookie handling
+- **Quick Access**: Sign in with one click using your existing Google account
+- **Automatic Progress Saving**: Your learning progress is automatically saved and synchronized across all your devices
+- **Personalized Experience**: Your profile information creates a personalized learning environment
+- **Long-Term Sessions**: Stay signed in for up to 30 days without interruption
+- **Privacy Protection**: Only your basic profile information (name, email) is used - no access to your other Google data
 
-**User Flow**:
+**How It Works**:
 
-1. User clicks "Sign in with Google" on homepage
-2. Redirected to Google OAuth consent screen
-3. Upon consent, Google returns to `/api/auth/callback/google`
-4. NextAuth.js creates user record in database if first login
-5. JWT token issued with user ID for subsequent API authentication
-6. Session persists across browser sessions for 30 days
+1. Click "Sign In with Google" on the homepage
+2. Authorize SakuMari to access your basic profile information
+3. Start practicing immediately with your progress automatically tracked
+4. Access your learning data from any device by signing in
 
-**Code Implementation**:
+**Benefits for Learners**:
 
-```typescript
-// lib/auth.ts - NextAuth configuration
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  providers: [googleProvider],
-  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
-  callbacks: {
-    jwt: ({ token, user }) => {
-      if (user) token.id = user.id;
-      return token;
-    },
-    session: ({ session, token }) => ({
-      ...session,
-      user: { ...session.user, id: token.id },
-    }),
-  },
-});
-```
-
-**Database Schema**:
-
-- `User`: Core user profile (id, name, email, emailVerified, image)
-- `Account`: OAuth provider connections
-- `Session`: Active user sessions for session-based auth
-- `VerificationToken`: Email verification tokens
+- **No Data Loss**: Your progress is safely stored and never lost
+- **Multi-Device Learning**: Continue your studies on phone, tablet, or computer
+- **Secure Access**: Industry-standard security protects your account
+- **Hassle-Free**: No passwords to remember or accounts to manage
 
 ---
 
-## Adaptive Learning Engine
+## Smart Learning System
 
-### Confidence-Weighted Character Selection
+### Personalized Character Selection
 
-**Algorithm**: Advanced weighted randomization that prevents "first-success penalty" and optimizes learning efficiency.
+SakuMari learns from your performance and automatically adjusts which characters you practice, ensuring you spend time on what you need most.
 
-**Technical Implementation**:
+**How Your Learning Adapts**:
 
-**Core Algorithm** (`components/FlashcardProvider.tsx`):
+- **New Character Priority**: Characters you haven't seen yet appear more frequently to introduce you to all kana
+- **Struggle Support**: Characters you find difficult get extra practice time until you improve
+- **Confidence Building**: Even characters you've answered correctly once get reinforcement to build lasting memory
+- **Mastery Maintenance**: Well-learned characters still appear occasionally to prevent forgetting
 
-```typescript
-const selectRandomKana = useCallback((data: KanaWithAccuracy[]) => {
-  const weights = data.map((kana) => {
-    // New characters get high priority (2.0x weight)
-    if (kana.attempts === 0) return 2.0;
+**Smart Selection Benefits**:
 
-    // Base weight from accuracy (lower accuracy = higher weight)
-    const accuracyWeight = Math.max(1 - kana.accuracy, 0.1);
+- **Efficient Learning**: No time wasted on characters you've already mastered
+- **Confidence Building**: Prevents the frustration of "getting it right once but never seeing it again"
+- **Balanced Practice**: Ensures you don't neglect any characters in your learning journey
+- **Natural Progression**: Characters appear at the right frequency for your current skill level
 
-    // Confidence boost for high accuracy + few attempts
-    const confidenceBoost =
-      kana.attempts < 3 && kana.accuracy > 0.8
-        ? 1 + (3 - kana.attempts) * 0.5
-        : 1;
+**What You Experience**:
 
-    return accuracyWeight * confidenceBoost;
-  });
+- **Seamless Flow**: The app automatically selects your next character without any input needed
+- **Visible Improvement**: You'll notice difficult characters becoming easier over time
+- **Complete Coverage**: Every kana character gets appropriate practice time
+- **Personal Learning Curve**: The system adapts to your unique learning pace and strengths
 
-  // Weighted random selection implementation
-  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-  let randomVal = Math.random() * totalWeight;
+**Real-Time Progress**:
 
-  for (let i = 0; i < data.length; i++) {
-    randomVal -= weights[i];
-    if (randomVal <= 0) return data[i];
-  }
-}, []);
-```
-
-**Smart Prioritization Logic**:
-
-- **New Characters**: 2.0x priority for unlearned kana
-- **Struggling Characters**: Higher weight for accuracy < 70%
-- **Confidence Boost**: Prevents first-success penalty by giving extra weight to high-accuracy characters with few attempts
-- **Minimum Weight**: 0.1 minimum ensures mastered characters still appear occasionally
-
-**Progress Tracking**:
-
-- **Database**: PostgreSQL with `KanaProgress` table tracking per-user, per-character statistics
-- **Real-time Updates**: Immediate accuracy recalculation after each answer
-- **Atomic Operations**: Database upsert operations ensure data consistency
+- **Instant Feedback**: Your accuracy is calculated immediately after each answer
+- **Live Updates**: Your progress statistics update in real-time as you practice
+- **Consistent Tracking**: All your attempts and successes are recorded for future learning sessions
 
 ---
 
-## Dual Practice Modes
+## Flexible Practice Modes
 
-### Input Mode (Typing)
+### Typing Mode - Traditional Flashcard Learning
 
-**User Experience**: Traditional flashcard experience where users type the romanized pronunciation.
+Perfect for building muscle memory and reinforcing the connection between visual kana and their pronunciation.
 
-**Technical Implementation**:
+**What You Experience**:
 
-- **Component**: `components/Flashcard.tsx` with controlled input handling
-- **Validation**: Case-insensitive comparison with `.toLowerCase()` normalization
-- **Real-time Feedback**: Instant result display with visual feedback animations
-- **Keyboard Support**: Enter key submission, focus management
+- **Classic Flashcard Feel**: See a kana character and type its romanized pronunciation
+- **Instant Feedback**: Know immediately whether your answer is correct
+- **Smooth Flow**: The input field automatically focuses so you can type right away
+- **Forgiving Input**: Case doesn't matter - "ka" and "KA" are both accepted
+- **Keyboard Friendly**: Press Enter to submit your answer quickly
 
-**Features**:
+**Best For**:
 
-- Auto-focus on input field for seamless typing flow
-- Real-time character validation with immediate feedback
-- Support for both correct answer confirmation and error handling
+- **Building Recall Speed**: Trains you to quickly remember character pronunciations
+- **Muscle Memory**: Develops the ability to type kana pronunciations automatically
+- **Active Learning**: Requires you to actively recall rather than just recognize
+- **Desktop Practice**: Ideal when you have a keyboard available
 
-### Multiple Choice Mode
+### Multiple Choice Mode - Recognition Practice
 
-**User Experience**: Four-option selection interface optimized for mobile and accessibility.
+Great for beginners and mobile users, offering a gentler introduction to kana recognition.
 
-**Technical Implementation**:
+**What You Experience**:
 
-- **Component**: `components/MultipleChoice.tsx` with keyboard navigation
-- **Choice Generation**: Intelligent wrong answer selection from other kana characters
-- **Accessibility**: ARIA labels, keyboard navigation (Enter/Space), focus management
-- **Visual Feedback**: Selected state indication with checkmarks
+- **Four Clear Options**: Choose the correct pronunciation from four possibilities
+- **Smart Distractors**: Wrong answers are real kana pronunciations, not random text
+- **Touch Friendly**: Large buttons perfect for phone and tablet use
+- **Visual Feedback**: Selected answers are clearly highlighted
+- **Accessible Navigation**: Works with keyboard, mouse, or touch input
 
-**Algorithm for Choice Generation**:
+**Best For**:
 
-```typescript
-const generateChoices = (
-  correctKana: KanaWithAccuracy,
-  kanaData: KanaWithAccuracy[],
-) => {
-  const correctAnswer = correctKana.romaji;
+- **Getting Started**: Less intimidating for complete beginners
+- **Mobile Learning**: Perfect for studying on your phone during commutes
+- **Recognition Building**: Helps you distinguish between similar-looking characters
+- **Quick Practice**: Faster than typing, ideal for short study sessions
 
-  // Get unique wrong answers (no duplicates)
-  const uniqueWrongAnswers = Array.from(
-    new Set(
-      kanaData
-        .filter((kana) => kana.romaji !== correctAnswer)
-        .map((kana) => kana.romaji),
-    ),
-  )
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 3);
+### Easy Mode Switching
 
-  // Combine and shuffle
-  return [correctAnswer, ...uniqueWrongAnswers].sort(() => Math.random() - 0.5);
-};
-```
+Switch between practice modes anytime to match your learning needs and device.
 
-### Mode Switching
+**Seamless Experience**:
 
-**Component**: `components/ModeSelector.tsx` with persistent mode selection.
-
-**Features**:
-
-- **Seamless Switching**: Change modes without losing current character
-- **Visual Indicators**: Clear mode identification with icons and labels
-- **State Persistence**: Mode preference maintained throughout session
-- **Responsive Design**: Adaptive labels for mobile devices
+- **Instant Switching**: Change modes without losing your current character
+- **Mode Memory**: Your preference is remembered throughout your session
+- **Visual Clarity**: Always know which mode you're in with clear indicators
+- **No Interruption**: Switch modes without affecting your learning streak
 
 ---
 
-## Character Set Support
+## Character Set Practice
 
-### Hiragana and Katakana Separation
+### Separate Hiragana and Katakana Learning
 
-**Technical Implementation**: Unicode-based character detection and filtering.
+Master both Japanese writing systems with dedicated practice sessions designed for each character set's unique characteristics.
 
-**Character Detection Logic**:
+### Hiragana Practice
 
-```typescript
-// Filter by kana type based on Unicode ranges
-const filteredData = data.filter((kana: KanaWithAccuracy) => {
-  const isHiragana =
-    kana.character.charCodeAt(0) >= 0x3040 &&
-    kana.character.charCodeAt(0) <= 0x309f;
-  return kanaType === "hiragana" ? isHiragana : !isHiragana;
-});
-```
+Learn the fundamental Japanese phonetic script used in everyday writing.
 
-**Unicode Ranges**:
+**What You'll Practice**:
 
-- **Hiragana**: U+3040 to U+309F (あ-ゟ)
-- **Katakana**: U+30A0 to U+30FF (ア-ヿ)
+- **Complete Hiragana Set**: All basic hiragana characters (あ, か, さ, た, な, は, ま, や, ら, わ, ん)
+- **Curved Characters**: Master the flowing, cursive-style hiragana forms
+- **Common Usage**: Focus on the script you'll see most in Japanese text
+- **Foundation Building**: Essential for reading Japanese words and particles
 
-**Route Organization**:
+**Perfect For**:
 
-- `/hiragana` - Dedicated hiragana practice page
-- `/katakana` - Dedicated katakana practice page
-- Each route filters the same base kana dataset by character type
+- **Beginners**: Start here if you're new to Japanese
+- **Reading Practice**: Most common script in native Japanese words
+- **Grammar Foundation**: Essential for particles and verb endings
 
-**Database Design**:
+### Katakana Practice
 
-- Single `Kana` table contains both character sets
-- Runtime filtering eliminates need for separate tables
-- Progress tracking works identically for both sets
+Master the angular script used for foreign words and emphasis.
 
----
+**What You'll Practice**:
 
-## Progress Analytics Dashboard
+- **Complete Katakana Set**: All basic katakana characters (ア, カ, サ, タ, ナ, ハ, マ, ヤ, ラ, ワ, ン)
+- **Angular Forms**: Learn the sharp, geometric katakana shapes
+- **Foreign Words**: Practice the script used for borrowed words from other languages
+- **Modern Usage**: Essential for reading contemporary Japanese text
 
-### Real-Time Statistics
+**Perfect For**:
 
-**Data Source**: Live queries to PostgreSQL via `/api/stats` endpoint.
+- **Foreign Word Recognition**: Read English loanwords written in Japanese
+- **Complete Literacy**: Complement your hiragana knowledge
+- **Modern Japanese**: Navigate contemporary media and technology terms
 
-**API Implementation** (`app/api/stats/route.ts`):
+### Smart Progress Tracking
 
-```typescript
-const kanaWithProgress = await prisma.kana.findMany({
-  include: {
-    progress: {
-      where: { user_id: context.userId },
-      select: { attempts: true, correct_attempts: true, accuracy: true },
-    },
-  },
-});
-```
+Your progress in each character set is tracked separately, allowing you to:
 
-**Metrics Calculated**:
-
-- **Per-Character Stats**: Individual accuracy, attempt count, correct attempts
-- **Overall Progress**: Total characters learned, average accuracy
-- **Learning Trends**: Characters needing practice vs. mastered characters
-
-### Interactive Data Table
-
-**Component**: `components/CharacterProgressTable.tsx` with advanced sorting and filtering.
-
-**Supporting Components**:
-- `components/SortableTableHeader.tsx` - Column header with sorting controls
-- `components/CharacterTableRow.tsx` - Individual row display with progress indicators
-- `components/ui/FilterButton.tsx` - Character set filtering controls
-
-**Sorting Features**:
-
-- **Multi-Column Support**: Sort by character, romaji, attempts, or accuracy
-- **Direction Toggle**: Ascending/descending with visual indicators
-- **State Management**: Custom `useSorting` hook maintains sort preferences
-
-**Filtering System**:
-
-```typescript
-const filteredStats = stats.filter((kana) => {
-  if (filter === "all") return true;
-
-  const charCode = kana.character.charCodeAt(0);
-  const isHiragana = charCode >= 0x3040 && charCode <= 0x309f;
-  const isKatakana = charCode >= 0x30a0 && charCode <= 0x30ff;
-
-  return filter === "hiragana" ? isHiragana : isKatakana;
-});
-```
-
-**Visual Design**:
-
-- **Responsive Layout**: Mobile-optimized table with horizontal scrolling
-- **Color-Coded Accuracy**: Visual accuracy indicators with gradient backgrounds
-- **Loading States**: Skeleton loading with smooth transitions
-
-### Statistics Summary Cards
-
-**Component**: `components/StatsSummary.tsx` with key performance indicators.
-
-**Metrics Displayed**:
-
-- **Total Characters**: Count of characters with practice attempts
-- **Average Accuracy**: Weighted average across all practiced characters
-- **Characters Mastered**: Count of characters with >90% accuracy
-- **Active Learning**: Count of characters currently being practiced
+- **Focus Your Study**: See which character set needs more attention
+- **Track Improvement**: Monitor your progress in hiragana and katakana independently
+- **Balanced Learning**: Ensure you're developing both skills evenly
+- **Personalized Practice**: Get recommendations based on your performance in each set
 
 ---
 
-## AI-Powered Learning Assistant
+## Progress Dashboard
 
-### Google Gemini Integration
+### Visual Learning Analytics
 
-**Model**: Gemini 2.5 Flash Lite for fast, cost-effective responses.
+Track your Japanese learning journey with comprehensive statistics and insights that help you understand your progress and identify areas for improvement.
 
-**Version**: Google Gemini AI v0.24.1 with React Markdown v10.1.0 for rich text rendering.
+### Quick Stats Overview
 
-**Technical Architecture**:
+Get an instant snapshot of your learning achievements with key metrics displayed prominently.
 
-- **API Endpoint**: `/api/tips` with authenticated access
-- **Context Awareness**: User progress data integrated into AI prompts
-- **Conversation Memory**: Maintains conversation history for context
-- **Rate Limiting**: Input validation and length restrictions for API efficiency
+**At-a-Glance Information**:
 
-### Personalized Learning Context
+- **Total Characters Practiced**: See how many kana you've encountered in your learning journey
+- **Overall Accuracy**: Your average success rate across all characters you've practiced
+- **Characters Mastered**: Count of kana you've achieved high proficiency with (over 90% accuracy)
+- **Active Learning Characters**: How many characters are in your current learning rotation
 
-**Progress Analysis** (`app/api/tips/route.ts`):
+**Benefits for Your Learning**:
 
-```typescript
-const strugglingKana = userProgress
-  .filter((p) => p.attempts > 0 && p.accuracy < 0.7)
-  .slice(0, 5);
+- **Progress Motivation**: See concrete evidence of your improvement over time
+- **Goal Setting**: Understand how close you are to mastering all kana
+- **Learning Efficiency**: Track whether your accuracy is improving with practice
 
-const progressingKana = userProgress
-  .filter((p) => p.attempts > 0 && p.accuracy >= 0.7 && p.accuracy < 0.9)
-  .slice(0, 5);
+### Detailed Character Progress Table
 
-const masteringKana = userProgress
-  .filter((p) => p.attempts > 0 && p.accuracy >= 0.9)
-  .slice(0, 5);
-```
+Dive deep into your performance with individual character statistics that show exactly where you stand with each kana.
 
-**AI Prompt Engineering**:
+**What You Can See**:
 
-- **Role Definition**: Japanese kana learning specialist
-- **Scope Limitation**: Focused only on hiragana/katakana learning
-- **Progress Integration**: User's struggling/progressing/mastered characters included
-- **Response Guidelines**: Concise, practical, educational responses under 300 words
+- **Individual Character Performance**: Each kana's accuracy rate and practice count
+- **Visual Progress Indicators**: Color-coded accuracy levels for quick identification
+- **Attempt Tracking**: How many times you've encountered each character
+- **Success Patterns**: Your correct answer count for every kana
 
-### Interactive Chat Interface
+**Interactive Features**:
 
-**Component**: `components/TipsModal.tsx` with full-featured chat experience.
+- **Smart Sorting**: Click column headers to sort by character, pronunciation, accuracy, or attempt count
+- **Character Set Filtering**: Focus on just hiragana, just katakana, or view both together
+- **Mobile Responsive**: Full functionality on phones and tablets with touch-friendly controls
+- **Real-Time Updates**: Statistics refresh automatically as you practice
 
-**Features**:
+**Learning Insights**:
 
-- **Conversation History**: Message persistence during session
-- **Markdown Support**: Rich text formatting with ReactMarkdown
-- **Loading States**: Animated typing indicators during AI processing
-- **Error Handling**: Graceful failure handling with retry options
-- **Responsive Design**: Mobile-optimized modal with proper keyboard handling
+- **Identify Weak Spots**: Quickly spot characters that need more practice
+- **Celebrate Progress**: See characters where you've achieved high accuracy
+- **Plan Your Study**: Focus your next practice session on specific characters
+- **Track Improvement**: Monitor how individual characters improve over time
 
-**User Experience**:
+### Personal Learning Analytics
 
-- **Quick Access**: Tips button on dashboard for immediate help
-- **Context Awareness**: AI knows user's specific learning challenges
-- **Educational Focus**: Responses tailored to learning techniques and strategies
-- **Example Questions**: Suggested prompts for new users
+Transform your practice data into actionable insights for more effective learning.
 
----
+**Performance Patterns**:
 
-## Technical Architecture
-
-### Frontend Architecture
-
-**Framework**: Next.js 15.5.2 with App Router and React 19.1.1
-
-**State Management**:
-
-- **React Context**: `FlashcardProvider` for practice session state
-- **Custom Hooks**: `useDashboardData`, `useSorting` for data management
-- **Local State**: Component-level state with React hooks
-
-**Component Hierarchy**:
-
-```
-App Router (app/)
-├── layout.tsx (Root layout with metadata)
-├── page.tsx (Home page)
-├── dashboard/page.tsx (Progress dashboard)
-├── hiragana/page.tsx (Hiragana practice)
-├── katakana/page.tsx (Katakana practice)
-├── robots.ts (SEO robots configuration)
-└── sitemap.ts (Dynamic sitemap generation)
-
-Components (components/)
-├── Core Components
-│   ├── FlashcardProvider.tsx (Context provider)
-│   ├── FlashcardApp.tsx (Practice session container)
-│   ├── Header.tsx (Application header)
-│   └── HomePage.tsx (Landing page)
-├── Practice Components
-│   ├── Flashcard.tsx (Individual flashcard display)
-│   ├── ModeSelector.tsx (Input mode switching)
-│   └── MultipleChoice.tsx (Multiple choice interface)
-├── Dashboard Components
-│   ├── Dashboard.tsx (Analytics dashboard)
-│   ├── CharacterProgressTable.tsx (Progress data table)
-│   ├── StatsSummary.tsx (Summary metrics)
-│   ├── TipsModal.tsx (AI chat interface)
-│   ├── SortableTableHeader.tsx (Table sorting)
-│   └── CharacterTableRow.tsx (Table row display)
-├── Navigation Components
-│   ├── DesktopNavigation.tsx (Desktop menu)
-│   └── MobileNavigation.tsx (Mobile menu)
-├── UI Components
-│   └── ui/FilterButton.tsx (Filter controls)
-└── Auth Components
-    └── SessionProviders.tsx (Authentication wrapper)
-```
-
-### Backend Architecture
-
-**API Design**: RESTful endpoints with TypeScript and middleware authentication.
-
-**Key Endpoints**:
-
-- `GET /api/stats` - User progress data for dashboard and practice
-- `POST /api/flashcards/submit` - Answer submission with accuracy tracking
-- `POST /api/tips` - AI-powered learning recommendations
-- `GET /api/health` - Database connectivity monitoring
-
-**Database Layer**:
-
-- **ORM**: Prisma 6.15.0 with PostgreSQL 17
-- **Schema**: Normalized design with user progress tracking
-- **Queries**: Optimized joins and indexing for performance
-- **Migrations**: Version-controlled schema evolution
-- **Client Generation**: Custom output to `generated/prisma_client/`
-- **Health Monitoring**: Database connectivity checks via `/api/health`
-
-**Authentication Middleware**:
-
-```typescript
-// lib/api-middleware.ts
-export function withAuth<T extends (...args: any[]) => any>(handler: T) {
-  return async (request: NextRequest, ...args: any[]) => {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    return handler(request, { userId: session.user.id }, ...args);
-  };
-}
-```
-
-### Data Flow Architecture
-
-**Practice Session Flow**:
-
-1. User navigates to practice page (`/hiragana` or `/katakana`)
-2. `FlashcardProvider` fetches user progress via `/api/stats`
-3. Adaptive algorithm selects character based on confidence weights
-4. User submits answer through typing or multiple choice
-5. Answer processed via `/api/flashcards/submit` with database update
-6. New character selected and cycle repeats
-
-**Dashboard Flow**:
-
-1. User visits `/dashboard`
-2. `Dashboard` component fetches stats via `/api/stats`
-3. Real-time filtering and sorting applied to progress data
-4. Summary cards and detailed table updated reactively
-5. AI tips accessible through modal interface
-
-**Authentication Flow**:
-
-1. Unauthenticated users see homepage with login option
-2. Google OAuth flow handled by NextAuth.js
-3. Successful login creates/updates user record
-4. JWT token issued for subsequent API authentication
-5. Middleware protects all practice and API routes
+- **Struggling Characters**: Easily identify which kana need more attention
+- **Strong Performance**: Recognize characters you've mastered to build confidence
+- **Learning Velocity**: Understand how quickly you're progressing through the character sets
+- **Practice Balance**: See if you're practicing hiragana and katakana evenly
 
 ---
 
-## Navigation System
+## AI Learning Assistant
 
-### Responsive Navigation Architecture
+### Your Personal Japanese Learning Coach
 
-**Implementation**: Adaptive navigation system with dedicated desktop and mobile components.
+Get customized learning advice and strategies from an AI assistant that understands your specific progress and challenges with kana characters.
 
-**Components**:
+### Smart Progress Analysis
 
-- **Desktop Navigation** (`components/DesktopNavigation.tsx`): Full-featured navigation bar with user profile integration
-- **Mobile Navigation** (`components/MobileNavigation.tsx`): Hamburger menu with touch-optimized interface
-- **Header Component** (`components/Header.tsx`): Main navigation wrapper with responsive behavior
+The AI assistant analyzes your learning data to provide personalized guidance that adapts to your unique situation.
 
-**Features**:
+**What the AI Knows About Your Learning**:
 
-- **Responsive Breakpoints**: Automatic switching between desktop/mobile layouts
-- **User Authentication State**: Dynamic menu items based on login status
-- **Active Route Highlighting**: Visual indication of current page
-- **Accessibility**: ARIA labels and keyboard navigation support
-- **Session Integration**: User profile display with sign-out functionality
+- **Your Challenging Characters**: Which kana you're struggling with and need more practice on
+- **Your Improving Characters**: Kana that you're making progress with but haven't mastered yet
+- **Your Mastered Characters**: Characters you've achieved high accuracy with
+- **Your Learning Patterns**: How you're progressing through different character sets
 
-**Technical Implementation**:
+**Personalized Assistance**:
 
-```typescript
-// Responsive navigation switching
-const Header = () => {
-  return (
-    <header className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Desktop Navigation - hidden on mobile */}
-          <div className="hidden md:block">
-            <DesktopNavigation />
-          </div>
-          
-          {/* Mobile Navigation - hidden on desktop */}
-          <div className="md:hidden">
-            <MobileNavigation />
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-};
-```
+- **Targeted Advice**: Get specific tips for the characters you find most difficult
+- **Learning Strategies**: Discover new memorization techniques tailored to your progress level
+- **Study Planning**: Receive suggestions for structuring your practice sessions
+- **Motivation Support**: Get encouragement and perspective on your learning journey
 
-**User Experience**:
+### Interactive Chat Experience
 
-- **Seamless Transitions**: Smooth switching between navigation modes
-- **Touch-Friendly**: Mobile interface optimized for finger navigation
-- **Visual Consistency**: Consistent branding and styling across devices
-- **Performance**: Minimal layout shifts during responsive transitions
+Have natural conversations with your AI learning coach through an easy-to-use chat interface.
+
+**Chat Features**:
+
+- **Context Awareness**: The AI remembers your conversation and learning situation
+- **Rich Responses**: Get detailed explanations with formatted text and examples
+- **Quick Access**: Open the chat anytime from your dashboard with one click
+- **Conversation History**: Previous messages are saved during your session
+
+**What You Can Ask About**:
+
+- **Study Techniques**: "How can I remember similar-looking characters better?"
+- **Practice Strategies**: "Should I focus on hiragana or katakana first?"
+- **Character Help**: "I keep confusing は and ほ, what can I do?"
+- **Learning Progress**: "How am I doing compared to other learners?"
+- **Motivation**: "I'm feeling stuck, what should I focus on next?"
+
+### Educational Focus
+
+The AI assistant is specifically designed for Japanese kana learning and provides educational, supportive guidance.
+
+**Learning-Centered Responses**:
+
+- **Practical Tips**: Actionable advice you can apply immediately
+- **Educational Content**: Explanations that deepen your understanding
+- **Positive Reinforcement**: Recognition of your progress and achievements
+- **Realistic Expectations**: Honest guidance about learning timelines and goals
+
+**Safe and Focused**:
+
+- **Learning Specialist**: Trained specifically for Japanese kana education
+- **Appropriate Content**: Responses are always educational and supportive
+- **Privacy Respectful**: Only uses your practice statistics, not personal information
 
 ---
 
-This comprehensive documentation covers all technical aspects of SakuMari's feature set, from user-facing functionality to underlying implementation details. Each feature is designed with modern web standards, accessibility, and optimal user experience in mind.
+## Responsive Navigation
+
+### Seamless Experience Across All Devices
+
+Navigate through SakuMari effortlessly whether you're on a desktop computer, tablet, or mobile phone.
+
+### Desktop Experience
+
+Enjoy full-featured navigation when using a computer or laptop.
+
+**What You Get**:
+
+- **Full Menu Bar**: Complete navigation options always visible at the top of your screen
+- **Quick Access**: Direct links to Hiragana practice, Katakana practice, and your Dashboard
+- **User Profile Integration**: See your profile information and easily sign out when needed
+- **Current Page Highlighting**: Always know which section of the app you're currently using
+
+**Designed For**:
+
+- **Keyboard Users**: Full keyboard navigation support for accessibility
+- **Efficiency**: Quick navigation between different practice modes and features
+- **Multitasking**: Easy to navigate while managing other applications
+
+### Mobile Experience
+
+Practice on the go with touch-optimized navigation designed for smartphones and tablets.
+
+**Mobile-First Design**:
+
+- **Hamburger Menu**: Clean, minimal interface that doesn't crowd your practice space
+- **Touch-Friendly**: Large, easy-to-tap navigation elements
+- **Gesture Support**: Swipe and tap interactions optimized for mobile use
+- **Portrait and Landscape**: Works perfectly in any phone orientation
+
+**Perfect For**:
+
+- **Commute Learning**: Quick practice sessions during travel
+- **Casual Study**: Learn while relaxing anywhere
+- **Compact Screens**: All features accessible without excessive scrolling
+
+### Smart Adaptation
+
+The navigation automatically adjusts to provide the best experience for your device.
+
+**Intelligent Features**:
+
+- **Automatic Detection**: The interface instantly adapts to your screen size
+- **Consistent Experience**: All features work the same way across devices
+- **Visual Clarity**: Current page always clearly indicated regardless of device
+- **Smooth Transitions**: No jarring changes when switching between landscape and portrait
+
+**Authentication Integration**:
+
+- **Dynamic Menus**: Navigation options change based on whether you're signed in
+- **Profile Management**: Easy access to sign out from any device
+- **Session Continuity**: Your navigation preferences carry across devices
+
+---
