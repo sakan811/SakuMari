@@ -2,6 +2,10 @@
 
 Comprehensive technical documentation covering all features of the SakuMari Japanese Kana Flashcard App.
 
+**Current Version**: v9.7.0 | **Tech Stack**: Next.js 15.5.2 + React 19.1.1 + TypeScript 5.9.2 + PostgreSQL 17
+
+**Last Updated**: September 2025 | [View CLAUDE.md for development setup](../CLAUDE.md)
+
 ## Table of Contents
 
 1. [Authentication System](#authentication-system)
@@ -11,6 +15,7 @@ Comprehensive technical documentation covering all features of the SakuMari Japa
 5. [Progress Analytics Dashboard](#progress-analytics-dashboard)
 6. [AI-Powered Learning Assistant](#ai-powered-learning-assistant)
 7. [Technical Architecture](#technical-architecture)
+8. [Navigation System](#navigation-system)
 
 ---
 
@@ -255,6 +260,11 @@ const kanaWithProgress = await prisma.kana.findMany({
 
 **Component**: `components/CharacterProgressTable.tsx` with advanced sorting and filtering.
 
+**Supporting Components**:
+- `components/SortableTableHeader.tsx` - Column header with sorting controls
+- `components/CharacterTableRow.tsx` - Individual row display with progress indicators
+- `components/ui/FilterButton.tsx` - Character set filtering controls
+
 **Sorting Features**:
 
 - **Multi-Column Support**: Sort by character, romaji, attempts, or accuracy
@@ -299,6 +309,8 @@ const filteredStats = stats.filter((kana) => {
 ### Google Gemini Integration
 
 **Model**: Gemini 2.5 Flash Lite for fast, cost-effective responses.
+
+**Version**: Google Gemini AI v0.24.1 with React Markdown v10.1.0 for rich text rendering.
 
 **Technical Architecture**:
 
@@ -357,7 +369,7 @@ const masteringKana = userProgress
 
 ### Frontend Architecture
 
-**Framework**: Next.js 15 with App Router and React 19
+**Framework**: Next.js 15.5.2 with App Router and React 19.1.1
 
 **State Management**:
 
@@ -373,15 +385,34 @@ App Router (app/)
 ├── page.tsx (Home page)
 ├── dashboard/page.tsx (Progress dashboard)
 ├── hiragana/page.tsx (Hiragana practice)
-└── katakana/page.tsx (Katakana practice)
+├── katakana/page.tsx (Katakana practice)
+├── robots.ts (SEO robots configuration)
+└── sitemap.ts (Dynamic sitemap generation)
 
 Components (components/)
-├── FlashcardProvider.tsx (Context provider)
-├── FlashcardApp.tsx (Practice session container)
-├── Flashcard.tsx (Individual flashcard display)
-├── Dashboard.tsx (Analytics dashboard)
-├── TipsModal.tsx (AI chat interface)
-└── [Various UI components]
+├── Core Components
+│   ├── FlashcardProvider.tsx (Context provider)
+│   ├── FlashcardApp.tsx (Practice session container)
+│   ├── Header.tsx (Application header)
+│   └── HomePage.tsx (Landing page)
+├── Practice Components
+│   ├── Flashcard.tsx (Individual flashcard display)
+│   ├── ModeSelector.tsx (Input mode switching)
+│   └── MultipleChoice.tsx (Multiple choice interface)
+├── Dashboard Components
+│   ├── Dashboard.tsx (Analytics dashboard)
+│   ├── CharacterProgressTable.tsx (Progress data table)
+│   ├── StatsSummary.tsx (Summary metrics)
+│   ├── TipsModal.tsx (AI chat interface)
+│   ├── SortableTableHeader.tsx (Table sorting)
+│   └── CharacterTableRow.tsx (Table row display)
+├── Navigation Components
+│   ├── DesktopNavigation.tsx (Desktop menu)
+│   └── MobileNavigation.tsx (Mobile menu)
+├── UI Components
+│   └── ui/FilterButton.tsx (Filter controls)
+└── Auth Components
+    └── SessionProviders.tsx (Authentication wrapper)
 ```
 
 ### Backend Architecture
@@ -397,10 +428,12 @@ Components (components/)
 
 **Database Layer**:
 
-- **ORM**: Prisma with PostgreSQL 17
+- **ORM**: Prisma 6.15.0 with PostgreSQL 17
 - **Schema**: Normalized design with user progress tracking
 - **Queries**: Optimized joins and indexing for performance
 - **Migrations**: Version-controlled schema evolution
+- **Client Generation**: Custom output to `generated/prisma_client/`
+- **Health Monitoring**: Database connectivity checks via `/api/health`
 
 **Authentication Middleware**:
 
@@ -443,6 +476,60 @@ export function withAuth<T extends (...args: any[]) => any>(handler: T) {
 3. Successful login creates/updates user record
 4. JWT token issued for subsequent API authentication
 5. Middleware protects all practice and API routes
+
+---
+
+## Navigation System
+
+### Responsive Navigation Architecture
+
+**Implementation**: Adaptive navigation system with dedicated desktop and mobile components.
+
+**Components**:
+
+- **Desktop Navigation** (`components/DesktopNavigation.tsx`): Full-featured navigation bar with user profile integration
+- **Mobile Navigation** (`components/MobileNavigation.tsx`): Hamburger menu with touch-optimized interface
+- **Header Component** (`components/Header.tsx`): Main navigation wrapper with responsive behavior
+
+**Features**:
+
+- **Responsive Breakpoints**: Automatic switching between desktop/mobile layouts
+- **User Authentication State**: Dynamic menu items based on login status
+- **Active Route Highlighting**: Visual indication of current page
+- **Accessibility**: ARIA labels and keyboard navigation support
+- **Session Integration**: User profile display with sign-out functionality
+
+**Technical Implementation**:
+
+```typescript
+// Responsive navigation switching
+const Header = () => {
+  return (
+    <header className="bg-white shadow-sm border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Desktop Navigation - hidden on mobile */}
+          <div className="hidden md:block">
+            <DesktopNavigation />
+          </div>
+          
+          {/* Mobile Navigation - hidden on desktop */}
+          <div className="md:hidden">
+            <MobileNavigation />
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+```
+
+**User Experience**:
+
+- **Seamless Transitions**: Smooth switching between navigation modes
+- **Touch-Friendly**: Mobile interface optimized for finger navigation
+- **Visual Consistency**: Consistent branding and styling across devices
+- **Performance**: Minimal layout shifts during responsive transitions
 
 ---
 
