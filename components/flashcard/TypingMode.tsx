@@ -79,7 +79,7 @@ export default function TypingMode({
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="Type romaji equivalent..."
-          className={`mb-1 sm:mb-2 rounded-md border-2 ${
+          className={`w-full mb-1 sm:mb-2 rounded-md border-2 ${
             error ? "border-[#ae0d13]" : "border-[#705a39]"
           } px-3 sm:px-4 py-2 text-sm sm:text-base focus:border-[#d1622b] focus:outline-none bg-white text-[#403933] placeholder-[#705a39]`}
           disabled={isSubmitting}
