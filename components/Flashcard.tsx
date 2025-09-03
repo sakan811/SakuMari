@@ -67,11 +67,10 @@ export default function Flashcard() {
   if (loadingKana) {
     return (
       <div className="flex h-32 sm:h-64 items-center justify-center">
-        <div
+        <output
           className="h-8 w-8 sm:h-12 sm:w-12 animate-spin rounded-full border-2 sm:border-4 border-[#d1622b] border-t-transparent"
-          role="status"
           aria-label="Loading flashcards"
-        ></div>
+        ></output>
       </div>
     );
   }
