@@ -10,25 +10,15 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 ## Features
 
-For comprehensive technical documentation of all features, see [docs/features.md](docs/features.md).
+🔐 **Google OAuth Sign-In** • 🧠 **Smart Adaptive Learning** • ⚡ **Dual Practice Modes** • 📊 **Progress Dashboard** • 🤖 **AI Learning Coach**
 
-**Core Features**:
-
-- **Secure Authentication**: Google OAuth integration with session management
-- **Adaptive Learning**: Confidence-weighted character selection that prioritizes struggling kana
-- **Dual Practice Modes**: Typing input and multiple-choice with seamless mode switching
-- **Complete Analytics**: Real-time progress tracking with sortable, filterable dashboard
-- **AI Learning Assistant**: Personalized tips powered by Google Gemini AI
+*See [docs/features.md](docs/features.md) for detailed feature documentation.*
 
 ## Architecture
 
-For detailed system and component architecture documentation, see [docs/architecture.md](docs/architecture.md).
+Built with **Next.js 15** + **PostgreSQL 17** + **Google Gemini AI** using modern React patterns and responsive design.
 
-The architecture includes:
-
-- **System Overview**: Next.js 15 App Router with NextAuth.js v5, PostgreSQL 17, and Google Gemini AI integration
-- **Component Relationships**: Detailed component hierarchy and data flow patterns
-- **Design Patterns**: Context-based state management, responsive design, and adaptive learning algorithms
+*See [docs/architecture.md](docs/architecture.md) for technical architecture details.*
 
 ## Package Manager
 
