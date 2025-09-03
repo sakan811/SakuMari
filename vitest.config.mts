@@ -11,8 +11,8 @@ export default defineConfig({
     include: ["__tests__/**/*.test.{ts,tsx}"],
     exclude: ["node_modules", "dist", ".next", "__tests__/db"],
     coverage: {
-      provider: "v8",
-      reporter: ["text", "json", "html"],
+      provider: "istanbul",
+      reporter: ["text", "lcov"],
       reportsDirectory: "./coverage",
       exclude: [
         "node_modules/",
