@@ -83,6 +83,9 @@ flowchart TD
     FlashcardProvider --> Flashcard["🃏 Flashcard<br/>Main Practice Interface<br/>Dual Input Mode Support"]
 
     Flashcard --> ModeSelector["⌨️ ModeSelector<br/>Input Mode Toggle<br/>Typing vs Multiple Choice"]
+    Flashcard --> TypingMode["🔤 TypingMode<br/>Typing Practice Interface<br/>Input Validation & Submission"]
+    Flashcard --> MultipleChoiceMode["📝 MultipleChoiceMode<br/>Multiple Choice Interface<br/>Choice Selection & Validation"]
+    Flashcard --> FlashcardFeedback["✅ FlashcardFeedback<br/>Result Display<br/>Correct/Incorrect Feedback"]
     Flashcard --> MultipleChoice["📝 MultipleChoice<br/>Multiple Choice Interface<br/>Answer Selection UI"]
 
     %% Dashboard and Progress Components
@@ -112,6 +115,9 @@ flowchart TD
     Dashboard -.-> ButtonLink
     ModeSelector -.-> Button
     MultipleChoice -.-> Button
+    TypingMode -.-> Button
+    MultipleChoiceMode -.-> Button
+    FlashcardFeedback -.-> Button
     Flashcard -.-> Button
 
     %% Context Provider Relationships
@@ -129,7 +135,7 @@ flowchart TD
     classDef customHook fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,stroke-dasharray: 5 5
 
     class SessionProviders,HomePage,FlashcardApp,Header,DesktopNavigation,MobileNavigation coreComponent
-    class Flashcard,ModeSelector,MultipleChoice,FlashcardProvider practiceComponent
+    class Flashcard,ModeSelector,MultipleChoice,FlashcardProvider,TypingMode,MultipleChoiceMode,FlashcardFeedback practiceComponent
     class Dashboard,StatsSummary,CharacterProgressTable,SortableTableHeader,CharacterTableRow,TipsModal dashboardComponent
     class Button,ButtonLink uiComponent
     class FlashcardProvider,SessionProviders contextProvider
@@ -175,6 +181,9 @@ flowchart TD
 - **FlashcardProvider**: Context provider for flashcard logic and adaptive algorithm
 - **Flashcard**: Main practice interface with dual input modes
 - **ModeSelector**: Toggle between typing and multiple-choice modes
+- **TypingMode**: Handles typing practice interface and validation
+- **MultipleChoiceMode**: Handles multiple choice practice interface and validation
+- **FlashcardFeedback**: Displays results and feedback for user answers
 - **MultipleChoice**: Multiple-choice answer interface
 
 #### Dashboard Components
@@ -293,26 +302,31 @@ flowchart TD
 ### App Router Key Features
 
 #### File-based Routing
+
 - **Automatic Route Creation**: Each `page.tsx` file automatically becomes a route
 - **Nested Routes**: Folder structure maps directly to URL structure
 - **Layout Inheritance**: `layout.tsx` files provide shared UI across route segments
 
 #### Server and Client Components
+
 - **Server Components**: Default rendering on the server for better performance
 - **Client Components**: Interactive components with `"use client"` directive
 - **Hybrid Rendering**: Seamless integration of server and client components
 
 #### API Route Integration
+
 - **Co-located APIs**: API routes live alongside pages for better organization
 - **Route Handlers**: Modern `route.ts` files replace legacy API pages
 - **Dynamic Routes**: `[...nextauth]` enables catch-all authentication routes
 
 #### Metadata and SEO
+
 - **Page-level Metadata**: Each page can export metadata for SEO optimization
 - **Dynamic Generation**: `sitemap.ts` and `robots.ts` generate SEO files automatically
 - **Structured Data**: JSON-LD schema markup for search engines
 
 #### Performance Optimizations
+
 - **Automatic Code Splitting**: Routes are automatically split for optimal loading
 - **Server-side Rendering**: Enhanced SSR capabilities with React Server Components
 - **Static Generation**: Build-time optimization for non-dynamic content

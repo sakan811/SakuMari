@@ -17,13 +17,14 @@
 
 "use client";
 
-import React from "react";
-import { useState, useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { useFlashcard } from "./FlashcardProvider";
 import ModeSelector from "./ModeSelector";
-import MultipleChoice from "./MultipleChoice";
 import { commonBackgrounds } from "@/lib/backgrounds";
 import type { InteractionMode } from "@/types/common";
+import TypingMode from "./flashcard/TypingMode";
+import MultipleChoiceMode from "./flashcard/MultipleChoiceMode";
+import FlashcardFeedback from "./flashcard/FlashcardFeedback";
 
 export default function Flashcard() {
   const {
@@ -34,98 +35,33 @@ export default function Flashcard() {
     nextCard,
     interactionMode,
     setInteractionMode,
-    choices,
     isSubmitting,
   } = useFlashcard();
-
-  // Typing mode state
-  const [answer, setAnswer] = useState("");
-
-  // Multiple choice mode state
-  const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
-
-  const [error, setError] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Focus input when component mounts, when card changes, or after result is cleared
-  useEffect(() => {
-    if (
-      inputRef.current &&
-      !loadingKana &&
-      currentKana &&
-      !result &&
-      !isSubmitting &&
-      interactionMode === "typing"
-    ) {
-      inputRef.current.focus();
-    }
-  }, [currentKana, loadingKana, result, isSubmitting, interactionMode]);
 
   // Handle Enter key when result is shown
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === "Enter" && result && !isSubmitting) {
-        nextCard();
-        setAnswer("");
-        setSelectedChoice(null);
-        setError("");
+        handleNextCard();
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [result, nextCard, isSubmitting]);
-
-  // Clear state when switching modes
-  useEffect(() => {
-    setAnswer("");
-    setSelectedChoice(null);
-    setError("");
-  }, [interactionMode]);
-
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (isSubmitting) return;
-
-    let userAnswer: string;
-
-    if (interactionMode === "typing") {
-      // Validate the answer isn't empty
-      if (!answer.trim()) {
-        setError("Please enter an answer");
-        return;
-      }
-      userAnswer = answer.trim();
-    } else {
-      // Multiple choice validation
-      if (selectedChoice === null) {
-        setError("Please select an answer");
-        return;
-      }
-      userAnswer = choices[selectedChoice];
-    }
-
-    setError(""); // Clear any previous errors
-    await submitAnswer(userAnswer);
-  };
-
-  const handleNextCard = () => {
-    nextCard();
-    setAnswer("");
-    setSelectedChoice(null);
-    setError("");
-  };
+  }, [result, isSubmitting]);
 
   const handleModeChange = (mode: InteractionMode) => {
     if (isSubmitting || result) return;
     setInteractionMode(mode);
-    // State will be cleared by useEffect
   };
 
-  const handleChoiceSelect = (index: number) => {
-    if (isSubmitting || result) return;
-    setSelectedChoice(index);
-    setError("");
+  const handleSubmit = async (answer: string) => {
+    if (isSubmitting) return;
+    await submitAnswer(answer);
+  };
+
+  const handleNextCard = () => {
+    nextCard();
   };
 
   if (loadingKana) {
@@ -171,93 +107,23 @@ export default function Flashcard() {
           </h2>
         </div>
 
-        {result && (
-          <div
-            className={`mb-3 sm:mb-4 rounded-md p-2 sm:p-3 text-center border-2 ${
-              result === "correct"
-                ? "bg-green-50 text-green-800 border-green-300"
-                : "bg-[#ae0d13] text-white border-[#950a1e]"
-            }`}
-          >
-            <p className="text-sm sm:text-lg font-semibold">
-              {result === "correct" ? "Correct!" : "Incorrect!"}
-            </p>
-            <p className="text-xs sm:text-base">
-              The correct answer is: <strong>{currentKana.romaji}</strong>
-            </p>
-          </div>
-        )}
-
-        {!result ? (
-          <div className="mt-auto flex flex-col space-y-2 sm:space-y-0">
-            {interactionMode === "typing" ? (
-              /* Typing Mode - Existing functionality */
-              <>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={answer}
-                  onChange={(e) => {
-                    setAnswer(e.target.value);
-                    if (error && e.target.value.trim()) {
-                      setError("");
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSubmit();
-                    }
-                  }}
-                  placeholder="Type romaji equivalent..."
-                  className={`mb-1 sm:mb-2 rounded-md border-2 ${
-                    error ? "border-[#ae0d13]" : "border-[#705a39]"
-                  } px-3 sm:px-4 py-2 text-sm sm:text-base focus:border-[#d1622b] focus:outline-none bg-white text-[#403933] placeholder-[#705a39]`}
-                  disabled={isSubmitting}
-                  autoFocus
-                />
-                {error && (
-                  <div className="mb-1 sm:mb-2 text-[#ae0d13] text-xs sm:text-sm font-medium">
-                    {error}
-                  </div>
-                )}
-              </>
-            ) : (
-              /* Multiple Choice Mode - New functionality */
-              <div className="mb-4">
-                <MultipleChoice
-                  choices={choices}
-                  selectedChoice={selectedChoice}
-                  onChoiceSelect={handleChoiceSelect}
-                  disabled={isSubmitting}
-                  error={error}
-                />
-              </div>
-            )}
-
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className={`rounded-md px-3 sm:px-4 py-2 text-sm sm:text-base font-medium text-white transition-all duration-200 border-2 ${
-                isSubmitting
-                  ? "bg-[#705a39] cursor-not-allowed border-[#705a39]"
-                  : "bg-[#d1622b] hover:bg-[#ae0d13] border-[#d1622b] hover:border-[#ae0d13] shadow-lg hover:shadow-xl transform hover:scale-105"
-              }`}
-            >
-              {isSubmitting ? "Submitting..." : "Submit"}
-            </button>
-          </div>
+        {result ? (
+          <FlashcardFeedback onNextCard={handleNextCard} isSubmitting={isSubmitting} />
         ) : (
-          <button
-            onClick={handleNextCard}
-            disabled={isSubmitting}
-            className={`rounded-md px-3 sm:px-4 py-2 text-sm sm:text-base font-medium text-white transition-all duration-200 border-2 ${
-              isSubmitting
-                ? "bg-[#705a39] cursor-not-allowed border-[#705a39]"
-                : "bg-[#d1622b] hover:bg-[#ae0d13] border-[#d1622b] hover:border-[#ae0d13] shadow-lg hover:shadow-xl transform hover:scale-105"
-            }`}
-          >
-            {isSubmitting ? "Loading..." : "Next Card"}
-          </button>
+          <div className="mt-auto">
+            {interactionMode === "typing" ? (
+              <TypingMode 
+                currentKana={currentKana} 
+                onSubmit={handleSubmit} 
+                isSubmitting={isSubmitting} 
+              />
+            ) : (
+              <MultipleChoiceMode 
+                onSubmit={handleSubmit} 
+                isSubmitting={isSubmitting} 
+              />
+            )}
+          </div>
         )}
       </div>
     </div>
