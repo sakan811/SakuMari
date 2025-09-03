@@ -27,6 +27,18 @@ export default defineConfig({
       provider: "istanbul",
       reporter: ["text", "lcov"],
       reportsDirectory: "./coverage-db",
+      exclude: [
+        "node_modules/",
+        "__tests__/",
+        "**/*.d.ts",
+        "next.config.js",
+        "vitest.config.mts",
+        "vitest.config.db.mts",
+        "prisma/",
+        "scripts/",
+        "public/",
+        "styles/",
+      ],
     },
   },
 });
