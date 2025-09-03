@@ -182,9 +182,11 @@ function checkLicenseHeaders(filePath) {
   }
 }
 
-function processDirectory(dirPath, operation, rootPath = process.cwd()) {
-  const items = fs.readdirSync(dirPath);
-  const stats = {
+/**
+ * Creates an empty stats object for tracking processing results
+ */
+function createEmptyStats() {
+  return {
     processed: 0,
     modified: 0,
     skipped: 0,
@@ -192,49 +194,106 @@ function processDirectory(dirPath, operation, rootPath = process.cwd()) {
     withHeaders: 0,
     withoutHeaders: 0,
   };
+}
+
+/**
+ * Merges two stats objects by summing all properties
+ */
+function mergeStats(target, source) {
+  target.processed += source.processed;
+  target.modified += source.modified;
+  target.skipped += source.skipped;
+  target.errors += source.errors;
+  target.withHeaders += source.withHeaders;
+  target.withoutHeaders += source.withoutHeaders;
+}
+
+/**
+ * Executes the specified operation on a file and returns the result
+ */
+function executeFileOperation(filePath, operation) {
+  switch (operation) {
+    case "add":
+      return addLicenseHeader(filePath);
+    case "remove":
+      return removeLicenseHeader(filePath);
+    case "check":
+      return checkLicenseHeaders(filePath);
+    default:
+      throw new Error(`Unknown operation: ${operation}`);
+  }
+}
+
+/**
+ * Updates stats based on file operation result
+ */
+function updateStatsFromResult(stats, result, operation) {
+  if (result.modified) stats.modified++;
+  if (result.skipped) stats.skipped++;
+  if (result.error) stats.errors++;
+  
+  if (operation === "check") {
+    if (result.hasHeader) stats.withHeaders++;
+    else stats.withoutHeaders++;
+  }
+}
+
+/**
+ * Processes a single file with the specified operation
+ */
+function processFile(filePath, operation, stats) {
+  stats.processed++;
+  const result = executeFileOperation(filePath, operation);
+  updateStatsFromResult(stats, result, operation);
+}
+
+/**
+ * Processes a single directory recursively
+ */
+function processSubdirectory(dirPath, operation, rootPath, stats) {
+  const subStats = processDirectory(dirPath, operation, rootPath);
+  mergeStats(stats, subStats);
+}
+
+/**
+ * Handles directory processing logic
+ */
+function handleDirectory(item, itemPath, operation, rootPath, stats) {
+  if (shouldSkipDirectory(item, itemPath, rootPath)) {
+    const relativePath = path.relative(rootPath, itemPath);
+    console.log(`⏭️ Skipping directory: ${relativePath}`);
+    return;
+  }
+  
+  processSubdirectory(itemPath, operation, rootPath, stats);
+}
+
+/**
+ * Processes a single item (file or directory)
+ */
+function processItem(item, dirPath, operation, rootPath, stats) {
+  const itemPath = path.join(dirPath, item);
+  
+  try {
+    const stat = fs.statSync(itemPath);
+    
+    if (stat.isDirectory()) {
+      handleDirectory(item, itemPath, operation, rootPath, stats);
+    } else if (stat.isFile() && shouldProcessFile(itemPath)) {
+      processFile(itemPath, operation, stats);
+    }
+  } catch (error) {
+    console.error(`✗ Error accessing ${itemPath}:`, error.message);
+    stats.errors++;
+  }
+}
+
+function processDirectory(dirPath, operation, rootPath = process.cwd()) {
+  const items = fs.readdirSync(dirPath);
+  const stats = createEmptyStats();
 
   for (const item of items) {
-    const itemPath = path.join(dirPath, item);
-
-    try {
-      const stat = fs.statSync(itemPath);
-
-      if (stat.isDirectory()) {
-        if (!shouldSkipDirectory(item, itemPath, rootPath)) {
-          const subStats = processDirectory(itemPath, operation, rootPath);
-          stats.processed += subStats.processed;
-          stats.modified += subStats.modified;
-          stats.skipped += subStats.skipped;
-          stats.errors += subStats.errors;
-          stats.withHeaders += subStats.withHeaders;
-          stats.withoutHeaders += subStats.withoutHeaders;
-        } else {
-          // Optional: log skipped directories for debugging
-          const relativePath = path.relative(rootPath, itemPath);
-          console.log(`⏭️ Skipping directory: ${relativePath}`);
-        }
-      } else if (stat.isFile() && shouldProcessFile(itemPath)) {
-        stats.processed++;
-
-        let result;
-        if (operation === "add") {
-          result = addLicenseHeader(itemPath);
-        } else if (operation === "remove") {
-          result = removeLicenseHeader(itemPath);
-        } else if (operation === "check") {
-          result = checkLicenseHeaders(itemPath);
-          if (result.hasHeader) stats.withHeaders++;
-          else stats.withoutHeaders++;
-        }
-
-        if (result.modified) stats.modified++;
-        if (result.skipped) stats.skipped++;
-        if (result.error) stats.errors++;
-      }
-    } catch (error) {
-      console.error(`✗ Error accessing ${itemPath}:`, error.message);
-      stats.errors++;
-    }
+    processItem(item, dirPath, operation, rootPath, stats);
   }
 
   return stats;
