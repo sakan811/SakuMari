@@ -96,12 +96,29 @@ async function generateTips(
       .filter((p) => p.attempts > 0 && p.accuracy >= 0.9)
       .slice(0, 5);
 
-    const progressContext = `
-User Progress:
-${strugglingKana.length > 0 ? `Needs Practice: ${strugglingKana.map((p) => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
-${progressingKana.length > 0 ? `Making Progress: ${progressingKana.map((p) => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
-${masteringKana.length > 0 ? `Mastering: ${masteringKana.map((p) => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`).join(", ")}` : ""}
-`;
+    // Helper function to format kana characters with accuracy percentages
+    const formatKanaList = (kanaProgress: typeof userProgress) => {
+      return kanaProgress
+        .map((p) => `${p.kana.character} (${Math.round(p.accuracy * 100)}%)`)
+        .join(", ");
+    };
+
+    // Build progress sections conditionally
+    const progressSections: string[] = ["User Progress:"];
+    
+    if (strugglingKana.length > 0) {
+      progressSections.push(`Needs Practice: ${formatKanaList(strugglingKana)}`);
+    }
+    
+    if (progressingKana.length > 0) {
+      progressSections.push(`Making Progress: ${formatKanaList(progressingKana)}`);
+    }
+    
+    if (masteringKana.length > 0) {
+      progressSections.push(`Mastering: ${formatKanaList(masteringKana)}`);
+    }
+
+    const progressContext = progressSections.join("\n");
 
     // Format conversation history for context
     const conversationContext =
