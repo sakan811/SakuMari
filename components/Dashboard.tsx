@@ -57,12 +57,9 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className={commonBackgrounds.dashboard}>
-        <div
-          className="flex h-32 sm:h-64 items-center justify-center"
-          role="status"
-        >
+        <output className="flex h-32 sm:h-64 items-center justify-center">
           <div className="h-8 w-8 sm:h-12 sm:w-12 animate-spin rounded-full border-2 sm:border-4 border-[#d1622b] border-t-transparent"></div>
-        </div>
+        </output>
       </div>
     );
   }
