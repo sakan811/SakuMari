@@ -4,9 +4,15 @@ import "@testing-library/jest-dom/vitest";
 
 // Mock ResizeObserver which isn't available in test environment
 global.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() {
+    // Mock implementation
+  }
+  unobserve() {
+    // Mock implementation
+  }
+  disconnect() {
+    // Mock implementation
+  }
 };
 
 // Mock window.matchMedia
