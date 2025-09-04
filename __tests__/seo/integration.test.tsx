@@ -159,7 +159,9 @@ describe("SEO Integration Tests", () => {
       expect(
         await screen.findByText(/master hiragana and katakana/i),
       ).toBeInTheDocument();
-      expect(await screen.findByText(/interactive practice/i)).toBeInTheDocument();
+      expect(
+        await screen.findByText(/interactive practice/i),
+      ).toBeInTheDocument();
     });
 
     it("should have consistent navigation structure", async () => {
@@ -209,7 +211,9 @@ describe("SEO Integration Tests", () => {
       render(<HomePage />);
 
       // Check for proper semantic structure
-      expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
+      expect(
+        await screen.findByRole("heading", { level: 1 }),
+      ).toBeInTheDocument();
       expect(
         (await screen.findAllByRole("heading", { level: 2 })).length,
       ).toBeGreaterThan(0);

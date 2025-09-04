@@ -87,7 +87,7 @@ vi.mock("next/image", () => ({
 
 describe("MobileNavigation", () => {
   const mockSetMobileMenuOpen = vi.fn();
-  
+
   const defaultProps = {
     session: null,
     status: "unauthenticated" as const,
@@ -113,7 +113,7 @@ describe("MobileNavigation", () => {
   describe("Menu Visibility", () => {
     test("returns null when mobileMenuOpen is false", () => {
       const { container } = render(
-        <MobileNavigation {...defaultProps} mobileMenuOpen={false} />
+        <MobileNavigation {...defaultProps} mobileMenuOpen={false} />,
       );
 
       expect(container.firstChild).toBeNull();
@@ -138,12 +138,16 @@ describe("MobileNavigation", () => {
       render(<MobileNavigation {...authenticatedProps} />);
 
       // Check for Hiragana link
-      const hiraganaLink = screen.getByRole("link", { name: /ひらがな Hiragana/ });
+      const hiraganaLink = screen.getByRole("link", {
+        name: /ひらがな Hiragana/,
+      });
       expect(hiraganaLink).toBeInTheDocument();
       expect(hiraganaLink.getAttribute("href")).toBe("/hiragana");
 
       // Check for Katakana link
-      const katakanaLink = screen.getByRole("link", { name: /カタカナ Katakana/ });
+      const katakanaLink = screen.getByRole("link", {
+        name: /カタカナ Katakana/,
+      });
       expect(katakanaLink).toBeInTheDocument();
       expect(katakanaLink.getAttribute("href")).toBe("/katakana");
 
@@ -175,7 +179,15 @@ describe("MobileNavigation", () => {
       const avatar = screen.getByAltText("Profile");
       expect(avatar).toBeInTheDocument();
       expect(avatar).toHaveAttribute("src", "https://example.com/avatar.jpg");
-      expect(avatar).toHaveClass("w-6", "h-6", "sm:w-8", "sm:h-8", "rounded-full", "border-2", "border-[#fad182]");
+      expect(avatar).toHaveClass(
+        "w-6",
+        "h-6",
+        "sm:w-8",
+        "sm:h-8",
+        "rounded-full",
+        "border-2",
+        "border-[#fad182]",
+      );
 
       // Check user name display
       expect(screen.getByText("John Doe")).toBeInTheDocument();
@@ -191,7 +203,7 @@ describe("MobileNavigation", () => {
         <MobileNavigation
           {...authenticatedProps}
           session={sessionWithoutImage}
-        />
+        />,
       );
 
       // Should show first letter of name as initial
@@ -212,7 +224,7 @@ describe("MobileNavigation", () => {
         <MobileNavigation
           {...authenticatedProps}
           session={sessionWithoutName}
-        />
+        />,
       );
 
       // Should show 'U' as fallback initial
@@ -229,7 +241,7 @@ describe("MobileNavigation", () => {
         <MobileNavigation
           {...authenticatedProps}
           session={sessionWithEmptyName}
-        />
+        />,
       );
 
       // Should show 'U' as fallback initial for empty string
@@ -260,7 +272,7 @@ describe("MobileNavigation", () => {
         "pt-3",
         "sm:pt-4",
         "border-t",
-        "border-[#fad182]/30"
+        "border-[#fad182]/30",
       );
 
       // Check dashboard link has special styling
@@ -269,7 +281,7 @@ describe("MobileNavigation", () => {
         "bg-[#d1622b]",
         "hover:bg-[#ae0d13]",
         "border-[#d1622b]",
-        "hover:border-[#ae0d13]"
+        "hover:border-[#ae0d13]",
       );
     });
   });
@@ -283,10 +295,12 @@ describe("MobileNavigation", () => {
     test("renders Google sign-in button when credentials enabled", () => {
       render(<MobileNavigation {...credentialsEnabledProps} />);
 
-      const googleButton = screen.getByRole("button", { name: /Sign In with Google/ });
+      const googleButton = screen.getByRole("button", {
+        name: /Sign In with Google/,
+      });
       expect(googleButton).toBeInTheDocument();
       expect(googleButton).toHaveClass("bg-[#4285f4]", "hover:bg-[#3367d6]");
-      
+
       // Check for Google icon (SVG)
       const googleIcon = googleButton.querySelector("svg");
       expect(googleIcon).toBeInTheDocument();
@@ -296,14 +310,16 @@ describe("MobileNavigation", () => {
     test("renders credentials sign-in button when credentials enabled", () => {
       render(<MobileNavigation {...credentialsEnabledProps} />);
 
-      const credentialsButton = screen.getByRole("button", { name: /Sign In with Credentials/ });
+      const credentialsButton = screen.getByRole("button", {
+        name: /Sign In with Credentials/,
+      });
       expect(credentialsButton).toBeInTheDocument();
       expect(credentialsButton).toHaveClass(
         "bg-[#403933]",
         "hover:bg-[#705a39]",
         "text-[#fad182]",
         "border-2",
-        "border-[#d1622b]"
+        "border-[#d1622b]",
       );
 
       // Check for user icon (SVG)
@@ -316,7 +332,7 @@ describe("MobileNavigation", () => {
       render(<MobileNavigation {...credentialsEnabledProps} />);
 
       expect(screen.getByText("or")).toBeInTheDocument();
-      
+
       // Check separator styling
       const separator = screen.getByText("or").parentElement;
       expect(separator).toHaveClass("flex", "items-center", "gap-2");
@@ -325,7 +341,9 @@ describe("MobileNavigation", () => {
     test("handles Google sign-in button click", () => {
       render(<MobileNavigation {...credentialsEnabledProps} />);
 
-      const googleButton = screen.getByRole("button", { name: /Sign In with Google/ });
+      const googleButton = screen.getByRole("button", {
+        name: /Sign In with Google/,
+      });
       fireEvent.click(googleButton);
 
       // Test lines 47-48: handleSignIn function
@@ -336,7 +354,9 @@ describe("MobileNavigation", () => {
     test("handles credentials sign-in button click", () => {
       render(<MobileNavigation {...credentialsEnabledProps} />);
 
-      const credentialsButton = screen.getByRole("button", { name: /Sign In with Credentials/ });
+      const credentialsButton = screen.getByRole("button", {
+        name: /Sign In with Credentials/,
+      });
       fireEvent.click(credentialsButton);
 
       // Test lines 47-48: handleSignIn function with different provider
@@ -346,10 +366,7 @@ describe("MobileNavigation", () => {
 
     test("disables buttons during loading state", () => {
       render(
-        <MobileNavigation
-          {...credentialsEnabledProps}
-          status="loading"
-        />
+        <MobileNavigation {...credentialsEnabledProps} status="loading" />,
       );
 
       const buttons = screen.getAllByRole("button", { name: /Loading.../ });
@@ -358,7 +375,10 @@ describe("MobileNavigation", () => {
       // Both buttons should be disabled
       buttons.forEach((button) => {
         expect(button).toBeDisabled();
-        expect(button).toHaveClass("disabled:opacity-50", "disabled:cursor-not-allowed");
+        expect(button).toHaveClass(
+          "disabled:opacity-50",
+          "disabled:cursor-not-allowed",
+        );
       });
 
       // First button should be Google (blue background)
@@ -369,10 +389,7 @@ describe("MobileNavigation", () => {
 
     test("shows 'Loading...' text during loading state", () => {
       render(
-        <MobileNavigation
-          {...credentialsEnabledProps}
-          status="loading"
-        />
+        <MobileNavigation {...credentialsEnabledProps} status="loading" />,
       );
 
       // Should have two "Loading..." buttons
@@ -383,8 +400,12 @@ describe("MobileNavigation", () => {
     test("buttons are not disabled when status is not loading", () => {
       render(<MobileNavigation {...credentialsEnabledProps} />);
 
-      const googleButton = screen.getByRole("button", { name: /Sign In with Google/ });
-      const credentialsButton = screen.getByRole("button", { name: /Sign In with Credentials/ });
+      const googleButton = screen.getByRole("button", {
+        name: /Sign In with Google/,
+      });
+      const credentialsButton = screen.getByRole("button", {
+        name: /Sign In with Credentials/,
+      });
 
       expect(googleButton).not.toBeDisabled();
       expect(credentialsButton).not.toBeDisabled();
@@ -395,7 +416,9 @@ describe("MobileNavigation", () => {
     test("renders only Google sign-in button when credentials disabled", () => {
       render(<MobileNavigation {...defaultProps} />);
 
-      const googleButton = screen.getByRole("button", { name: /Sign In with Google/ });
+      const googleButton = screen.getByRole("button", {
+        name: /Sign In with Google/,
+      });
       expect(googleButton).toBeInTheDocument();
       expect(googleButton).toHaveClass(
         "text-[#fad182]",
@@ -404,18 +427,22 @@ describe("MobileNavigation", () => {
         "hover:bg-[#ae0d13]",
         "border-2",
         "border-[#d1622b]",
-        "hover:border-[#ae0d13]"
+        "hover:border-[#ae0d13]",
       );
 
       // Should not render credentials button or separator
-      expect(screen.queryByRole("button", { name: /Sign In with Credentials/ })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /Sign In with Credentials/ }),
+      ).not.toBeInTheDocument();
       expect(screen.queryByText("or")).not.toBeInTheDocument();
     });
 
     test("handles Google sign-in button click in default state", () => {
       render(<MobileNavigation {...defaultProps} />);
 
-      const googleButton = screen.getByRole("button", { name: /Sign In with Google/ });
+      const googleButton = screen.getByRole("button", {
+        name: /Sign In with Google/,
+      });
       fireEvent.click(googleButton);
 
       expect(mockSignIn).toHaveBeenCalledWith("google");
@@ -423,25 +450,18 @@ describe("MobileNavigation", () => {
     });
 
     test("disables Google button during loading in default state", () => {
-      render(
-        <MobileNavigation
-          {...defaultProps}
-          status="loading"
-        />
-      );
+      render(<MobileNavigation {...defaultProps} status="loading" />);
 
       const button = screen.getByRole("button", { name: /Loading.../ });
       expect(button).toBeDisabled();
-      expect(button).toHaveClass("disabled:opacity-50", "disabled:cursor-not-allowed");
+      expect(button).toHaveClass(
+        "disabled:opacity-50",
+        "disabled:cursor-not-allowed",
+      );
     });
 
     test("shows 'Loading...' text during loading in default state", () => {
-      render(
-        <MobileNavigation
-          {...defaultProps}
-          status="loading"
-        />
-      );
+      render(<MobileNavigation {...defaultProps} status="loading" />);
 
       expect(screen.getByText("Loading...")).toBeInTheDocument();
       expect(screen.queryByText("Sign In with Google")).not.toBeInTheDocument();
@@ -451,9 +471,11 @@ describe("MobileNavigation", () => {
   describe("Edge Cases and Prop Variations", () => {
     test("handles null session gracefully", () => {
       render(<MobileNavigation {...defaultProps} session={null} />);
-      
+
       expect(screen.getByRole("navigation")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Sign In with Google/ })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /Sign In with Google/ }),
+      ).toBeInTheDocument();
     });
 
     test("handles undefined user in session", () => {
@@ -467,24 +489,28 @@ describe("MobileNavigation", () => {
           {...defaultProps}
           session={sessionWithUndefinedUser}
           status="authenticated"
-        />
+        />,
       );
 
       expect(screen.getByRole("navigation")).toBeInTheDocument();
       // When session exists but user is undefined, it still renders authenticated state
-      expect(screen.getByRole("link", { name: /ひらがな Hiragana/ })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Sign Out" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: /ひらがな Hiragana/ }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Sign Out" }),
+      ).toBeInTheDocument();
       // Should show fallback initial 'U' for undefined user
       expect(screen.getByText("U")).toBeInTheDocument();
     });
 
     test("handles all loading states correctly", () => {
       const states = ["loading", "authenticated", "unauthenticated"] as const;
-      
+
       states.forEach((status) => {
         vi.clearAllMocks();
         const { rerender } = render(
-          <MobileNavigation {...defaultProps} status={status} />
+          <MobileNavigation {...defaultProps} status={status} />,
         );
 
         if (status === "loading") {
@@ -520,20 +546,34 @@ describe("MobileNavigation", () => {
       rerender(<MobileNavigation {...defaultProps} status="loading" />);
       expect(screen.getByText("Loading...")).toBeInTheDocument();
 
-      rerender(<MobileNavigation {...defaultProps} status="authenticated" session={mockSession} />);
-      expect(screen.getByRole("link", { name: /ひらがな Hiragana/ })).toBeInTheDocument();
+      rerender(
+        <MobileNavigation
+          {...defaultProps}
+          status="authenticated"
+          session={mockSession}
+        />,
+      );
+      expect(
+        screen.getByRole("link", { name: /ひらがな Hiragana/ }),
+      ).toBeInTheDocument();
 
-      rerender(<MobileNavigation {...defaultProps} credentialsEnabled={true} />);
-      expect(screen.getByRole("button", { name: /Sign In with Credentials/ })).toBeInTheDocument();
+      rerender(
+        <MobileNavigation {...defaultProps} credentialsEnabled={true} />,
+      );
+      expect(
+        screen.getByRole("button", { name: /Sign In with Credentials/ }),
+      ).toBeInTheDocument();
     });
 
     test("preserves button functionality across re-renders", () => {
       const { rerender } = render(
-        <MobileNavigation {...defaultProps} credentialsEnabled={true} />
+        <MobileNavigation {...defaultProps} credentialsEnabled={true} />,
       );
 
       // Click before re-render
-      fireEvent.click(screen.getByRole("button", { name: /Sign In with Google/ }));
+      fireEvent.click(
+        screen.getByRole("button", { name: /Sign In with Google/ }),
+      );
       expect(mockSignIn).toHaveBeenCalledWith("google");
       expect(mockSetMobileMenuOpen).toHaveBeenCalledWith(false);
 
@@ -543,12 +583,12 @@ describe("MobileNavigation", () => {
           {...defaultProps}
           credentialsEnabled={true}
           status="loading"
-        />
+        />,
       );
 
       // Buttons should be disabled during loading
       const buttons = screen.getAllByRole("button");
-      buttons.forEach(button => {
+      buttons.forEach((button) => {
         expect(button).toBeDisabled();
       });
     });
@@ -558,13 +598,23 @@ describe("MobileNavigation", () => {
     test("applies consistent navigation classes across all states", () => {
       const testCases = [
         { props: { ...defaultProps }, description: "default" },
-        { props: { ...defaultProps, credentialsEnabled: true }, description: "credentials enabled" },
-        { props: { ...defaultProps, session: mockSession, status: "authenticated" as const }, description: "authenticated" },
+        {
+          props: { ...defaultProps, credentialsEnabled: true },
+          description: "credentials enabled",
+        },
+        {
+          props: {
+            ...defaultProps,
+            session: mockSession,
+            status: "authenticated" as const,
+          },
+          description: "authenticated",
+        },
       ];
 
       testCases.forEach(({ props, description }) => {
         const { rerender } = render(<MobileNavigation {...props} />);
-        
+
         const navigation = screen.getByRole("navigation");
         expect(navigation, `Failed for ${description} state`).toHaveClass(
           "lg:hidden",
@@ -573,7 +623,7 @@ describe("MobileNavigation", () => {
           "pt-3",
           "sm:pt-4",
           "border-t",
-          "border-[#fad182]/30"
+          "border-[#fad182]/30",
         );
 
         // Clean up for next test
@@ -582,7 +632,13 @@ describe("MobileNavigation", () => {
     });
 
     test("applies responsive classes correctly", () => {
-      render(<MobileNavigation {...defaultProps} session={mockSession} status="authenticated" />);
+      render(
+        <MobileNavigation
+          {...defaultProps}
+          session={mockSession}
+          status="authenticated"
+        />,
+      );
 
       // Check responsive classes on various elements
       const profileImage = screen.getByAltText("Profile");
