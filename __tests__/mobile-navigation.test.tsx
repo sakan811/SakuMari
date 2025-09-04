@@ -53,28 +53,32 @@ vi.mock("next/link", () => ({
 // Mock next/image
 vi.mock("next/image", () => ({
   default: ({
-    _src,
+    src,
     alt,
     width,
     height,
     className,
-    _unoptimized,
-    _referrerPolicy,
+    unoptimized,
+    referrerPolicy,
+    ...props
   }: {
-    _src: string;
+    src: string;
     alt: string;
     width?: number;
     height?: number;
     className?: string;
-    _unoptimized?: boolean;
-    _referrerPolicy?: string;
-  }) => (
-    <div
-      data-testid="mock-image"
-      style={{ width, height }}
+    unoptimized?: boolean;
+    referrerPolicy?: string;
+  } & React.ImgHTMLAttributes<HTMLImageElement>) => (
+    <img
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
       className={className}
-      role="img"
-      aria-label={alt}
+      referrerPolicy={referrerPolicy}
+      data-testid="mock-image"
+      {...props}
     />
   ),
 }));
@@ -168,7 +172,7 @@ describe("MobileNavigation", () => {
 
       const avatar = screen.getByAltText("Profile");
       expect(avatar).toBeInTheDocument();
-      expect(avatar.getAttribute("src")).toBe("https://example.com/avatar.jpg");
+      expect(avatar).toHaveAttribute("src", "https://example.com/avatar.jpg");
       expect(avatar).toHaveClass("w-6", "h-6", "sm:w-8", "sm:h-8", "rounded-full", "border-2", "border-[#fad182]");
 
       // Check user name display
@@ -586,7 +590,7 @@ describe("MobileNavigation", () => {
       expect(userName).toHaveClass("text-sm", "sm:text-base");
 
       const navigation = screen.getByRole("navigation");
-      const container = navigation.querySelector(".flex.flex-col.space-y-2");
+      const container = navigation.querySelector(".flex.flex-col");
       expect(container).toHaveClass("space-y-2", "sm:space-y-3");
     });
   });
