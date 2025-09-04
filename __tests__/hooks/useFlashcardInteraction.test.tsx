@@ -456,7 +456,7 @@ describe("useFlashcardInteraction Hook", () => {
 
   describe("Keyboard Event Handling (lines 87-96)", () => {
     test("handles Enter key when result is shown", () => {
-      const { result } = renderHook(() =>
+      const { result: _result } = renderHook(() =>
         useFlashcardInteraction({
           ...defaultProps,
           nextCard: mockNextCard,
@@ -475,7 +475,7 @@ describe("useFlashcardInteraction Hook", () => {
     });
 
     test("ignores Enter key when result is null", () => {
-      const { result } = renderHook(() =>
+      const { result: _result } = renderHook(() =>
         useFlashcardInteraction({
           ...defaultProps,
           nextCard: mockNextCard,
@@ -494,7 +494,7 @@ describe("useFlashcardInteraction Hook", () => {
     });
 
     test("ignores Enter key when isSubmitting is true", () => {
-      const { result } = renderHook(() =>
+      const { result: _result } = renderHook(() =>
         useFlashcardInteraction({
           ...defaultProps,
           nextCard: mockNextCard,
@@ -513,7 +513,7 @@ describe("useFlashcardInteraction Hook", () => {
     });
 
     test("ignores non-Enter keys", () => {
-      const { result } = renderHook(() =>
+      const { result: _result } = renderHook(() =>
         useFlashcardInteraction({
           ...defaultProps,
           nextCard: mockNextCard,
