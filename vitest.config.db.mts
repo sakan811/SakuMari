@@ -40,7 +40,7 @@ export default defineConfig({
         "eslint.config.mjs",
         "**.config.{js,ts,mts,mjs}",
         ".next/",
-        "generated/"
+        "generated/",
       ],
     },
   },

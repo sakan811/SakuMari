@@ -38,7 +38,7 @@ const mockGoogleProvider = vi.fn((config) => ({
 }));
 
 const mockCredentialsProvider = vi.fn((config) => ({
-  id: "credentials", 
+  id: "credentials",
   name: "Email & Password",
   type: "credentials",
   authorize: config.authorize,
@@ -57,15 +57,17 @@ const mockNextAuth = vi.fn((config) => ({
 // Mock all dependencies
 vi.mock("next-auth", () => ({ default: mockNextAuth }));
 vi.mock("next-auth/providers/google", () => ({ default: mockGoogleProvider }));
-vi.mock("next-auth/providers/credentials", () => ({ default: mockCredentialsProvider }));
+vi.mock("next-auth/providers/credentials", () => ({
+  default: mockCredentialsProvider,
+}));
 vi.mock("@auth/prisma-adapter", () => ({ PrismaAdapter: mockPrismaAdapter }));
 
 describe("Auth Configuration Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset environment to clean state
-    Object.keys(process.env).forEach(key => {
-      if (key.startsWith('AUTH_') || key.startsWith('CREDS_')) {
+    Object.keys(process.env).forEach((key) => {
+      if (key.startsWith("AUTH_") || key.startsWith("CREDS_")) {
         delete process.env[key];
       }
     });
@@ -80,34 +82,34 @@ describe("Auth Configuration Tests", () => {
   describe("isCredentialsProviderEnabled function (lines 77-79)", () => {
     test("returns true when CREDS_PROVIDER is 'true'", async () => {
       process.env.CREDS_PROVIDER = "true";
-      
+
       // Import after setting env vars to test actual function
       const { isCredentialsProviderEnabled } = await import("@/lib/auth");
-      
+
       expect(isCredentialsProviderEnabled()).toBe(true);
     });
 
     test("returns false when CREDS_PROVIDER is not set", async () => {
       delete process.env.CREDS_PROVIDER;
-      
+
       const { isCredentialsProviderEnabled } = await import("@/lib/auth");
-      
+
       expect(isCredentialsProviderEnabled()).toBe(false);
     });
 
     test("returns false when CREDS_PROVIDER is 'false'", async () => {
       process.env.CREDS_PROVIDER = "false";
-      
+
       const { isCredentialsProviderEnabled } = await import("@/lib/auth");
-      
+
       expect(isCredentialsProviderEnabled()).toBe(false);
     });
 
     test("returns false when CREDS_PROVIDER is empty string", async () => {
       process.env.CREDS_PROVIDER = "";
-      
+
       const { isCredentialsProviderEnabled } = await import("@/lib/auth");
-      
+
       expect(isCredentialsProviderEnabled()).toBe(false);
     });
   });
@@ -122,7 +124,7 @@ describe("Auth Configuration Tests", () => {
     test("Google provider is configured with correct environment variables", async () => {
       // Import auth module to trigger provider creation
       await import("@/lib/auth");
-      
+
       // Verify Google provider was called with correct config
       expect(mockGoogleProvider).toHaveBeenCalledWith({
         clientId: "test-google-id",
@@ -133,10 +135,10 @@ describe("Auth Configuration Tests", () => {
     test("Google provider handles undefined environment variables", async () => {
       delete process.env.AUTH_GOOGLE_ID;
       delete process.env.AUTH_GOOGLE_SECRET;
-      
+
       // Should still create provider (will get undefined values)
       await import("@/lib/auth");
-      
+
       expect(mockGoogleProvider).toHaveBeenCalledWith({
         clientId: undefined,
         clientSecret: undefined,
@@ -155,7 +157,7 @@ describe("Auth Configuration Tests", () => {
 
     test("credentials provider is configured with correct structure", async () => {
       await import("@/lib/auth");
-      
+
       expect(mockCredentialsProvider).toHaveBeenCalledWith({
         id: "credentials",
         name: "Email & Password",
@@ -169,16 +171,16 @@ describe("Auth Configuration Tests", () => {
 
     test("authorize function returns user for valid test credentials", async () => {
       await import("@/lib/auth");
-      
+
       // Get the authorize function from the mock call
       const authorizeCall = mockCredentialsProvider.mock.calls[0][0];
       const authorize = authorizeCall.authorize;
-      
+
       const result = await authorize({
         email: "test@sakumari.local",
         password: "TestPassword123!",
       });
-      
+
       expect(result).toEqual({
         id: "test-user-e2e",
         email: "test@sakumari.local",
@@ -189,30 +191,30 @@ describe("Auth Configuration Tests", () => {
 
     test("authorize function returns null for invalid credentials", async () => {
       await import("@/lib/auth");
-      
+
       const authorizeCall = mockCredentialsProvider.mock.calls[0][0];
       const authorize = authorizeCall.authorize;
-      
+
       const result = await authorize({
         email: "wrong@email.com",
         password: "WrongPassword",
       });
-      
+
       expect(result).toBeNull();
     });
 
     test("authorize function returns null for missing credentials", async () => {
       await import("@/lib/auth");
-      
+
       const authorizeCall = mockCredentialsProvider.mock.calls[0][0];
       const authorize = authorizeCall.authorize;
-      
+
       // Test missing email
       expect(await authorize({ password: "TestPassword123!" })).toBeNull();
-      
+
       // Test missing password
       expect(await authorize({ email: "test@sakumari.local" })).toBeNull();
-      
+
       // Test no credentials
       expect(await authorize({})).toBeNull();
     });
@@ -220,18 +222,18 @@ describe("Auth Configuration Tests", () => {
     test("authorize function uses environment variable defaults", async () => {
       delete process.env.CREDS_TEST_EMAIL;
       delete process.env.CREDS_TEST_PASSWORD;
-      
+
       await import("@/lib/auth");
-      
+
       const authorizeCall = mockCredentialsProvider.mock.calls[0][0];
       const authorize = authorizeCall.authorize;
-      
+
       // Should use default values
       const result = await authorize({
         email: "test@sakumari.local",
         password: "TestPassword123!",
       });
-      
+
       expect(result).toEqual({
         id: "test-user-e2e",
         email: "test@sakumari.local",
@@ -249,9 +251,9 @@ describe("Auth Configuration Tests", () => {
 
     test("includes only Google provider when credentials provider is disabled", async () => {
       delete process.env.CREDS_PROVIDER;
-      
+
       await import("@/lib/auth");
-      
+
       // Should be called with array containing only Google provider
       const nextAuthCall = mockNextAuth.mock.calls[0][0];
       expect(nextAuthCall.providers).toHaveLength(1);
@@ -266,9 +268,9 @@ describe("Auth Configuration Tests", () => {
 
     test("includes both Google and credentials providers when credentials provider is enabled", async () => {
       process.env.CREDS_PROVIDER = "true";
-      
+
       await import("@/lib/auth");
-      
+
       const nextAuthCall = mockNextAuth.mock.calls[0][0];
       expect(nextAuthCall.providers).toHaveLength(2);
       expect(nextAuthCall.providers[0].id).toBe("google");
@@ -285,7 +287,7 @@ describe("Auth Configuration Tests", () => {
 
     test("NextAuth is configured with PrismaAdapter", async () => {
       await import("@/lib/auth");
-      
+
       const nextAuthCall = mockNextAuth.mock.calls[0][0];
       expect(nextAuthCall.adapter).toEqual({ name: "PrismaAdapter" });
       expect(mockPrismaAdapter).toHaveBeenCalled();
@@ -293,7 +295,7 @@ describe("Auth Configuration Tests", () => {
 
     test("session configuration is correct", async () => {
       await import("@/lib/auth");
-      
+
       const nextAuthCall = mockNextAuth.mock.calls[0][0];
       expect(nextAuthCall.session).toEqual({
         strategy: "jwt",
@@ -303,7 +305,7 @@ describe("Auth Configuration Tests", () => {
 
     test("trustHost is enabled", async () => {
       await import("@/lib/auth");
-      
+
       const nextAuthCall = mockNextAuth.mock.calls[0][0];
       expect(nextAuthCall.trustHost).toBe(true);
     });
@@ -311,7 +313,7 @@ describe("Auth Configuration Tests", () => {
     test("cookie configuration for development (secure: false)", async () => {
       // NODE_ENV is set to "test" by test runner, which !== "production"
       await import("@/lib/auth");
-      
+
       const nextAuthCall = mockNextAuth.mock.calls[0][0];
       expect(nextAuthCall.cookies.pkceCodeVerifier.options.secure).toBe(false);
       expect(nextAuthCall.cookies.state.options.secure).toBe(false);
@@ -320,29 +322,29 @@ describe("Auth Configuration Tests", () => {
     test("cookie configuration for production (secure: true)", async () => {
       // Use Object.defineProperty to safely override NODE_ENV
       const originalNodeEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'production',
-        configurable: true
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: "production",
+        configurable: true,
       });
-      
+
       await import("@/lib/auth");
-      
+
       const nextAuthCall = mockNextAuth.mock.calls[0][0];
       expect(nextAuthCall.cookies.pkceCodeVerifier.options.secure).toBe(true);
       expect(nextAuthCall.cookies.state.options.secure).toBe(true);
-      
+
       // Restore original value
-      Object.defineProperty(process.env, 'NODE_ENV', {
+      Object.defineProperty(process.env, "NODE_ENV", {
         value: originalNodeEnv,
-        configurable: true
+        configurable: true,
       });
     });
 
     test("cookie configuration structure is complete", async () => {
       await import("@/lib/auth");
-      
+
       const nextAuthCall = mockNextAuth.mock.calls[0][0];
-      
+
       expect(nextAuthCall.cookies.pkceCodeVerifier).toEqual({
         name: "next-auth.pkce.code_verifier",
         options: {
@@ -352,7 +354,7 @@ describe("Auth Configuration Tests", () => {
           secure: false, // test environment (NODE_ENV !== "production")
         },
       });
-      
+
       expect(nextAuthCall.cookies.state).toEqual({
         name: "next-auth.state",
         options: {
@@ -366,41 +368,41 @@ describe("Auth Configuration Tests", () => {
 
     test("JWT callback injects user ID into token", async () => {
       await import("@/lib/auth");
-      
+
       const nextAuthCall = mockNextAuth.mock.calls[0][0];
       const jwtCallback = nextAuthCall.callbacks.jwt;
-      
+
       const token = {};
       const user = { id: "user123" };
-      
+
       const result = jwtCallback({ token, user });
       expect(result).toEqual({ id: "user123" });
     });
 
     test("JWT callback preserves token when no user provided", async () => {
       await import("@/lib/auth");
-      
+
       const nextAuthCall = mockNextAuth.mock.calls[0][0];
       const jwtCallback = nextAuthCall.callbacks.jwt;
-      
+
       const token = { id: "existing-id", other: "data" };
-      
+
       const result = jwtCallback({ token });
       expect(result).toEqual({ id: "existing-id", other: "data" });
     });
 
     test("session callback injects user ID from token", async () => {
       await import("@/lib/auth");
-      
+
       const nextAuthCall = mockNextAuth.mock.calls[0][0];
       const sessionCallback = nextAuthCall.callbacks.session;
-      
+
       const session = {
         user: { name: "Test User", email: "test@example.com" },
         expires: "2024-01-01",
       };
       const token = { id: "user123" };
-      
+
       const result = sessionCallback({ session, token });
       expect(result).toEqual({
         ...session,
@@ -416,7 +418,7 @@ describe("Auth Configuration Tests", () => {
     test("Google provider handles missing environment variables", async () => {
       delete process.env.AUTH_GOOGLE_ID;
       delete process.env.AUTH_GOOGLE_SECRET;
-      
+
       // Should not throw when importing auth config with undefined env vars
       expect(async () => {
         await import("@/lib/auth");
@@ -427,18 +429,18 @@ describe("Auth Configuration Tests", () => {
       process.env.CREDS_TEST_EMAIL = "";
       process.env.CREDS_TEST_PASSWORD = "";
       process.env.CREDS_PROVIDER = "true";
-      
+
       await import("@/lib/auth");
-      
+
       const authorizeCall = mockCredentialsProvider.mock.calls[0][0];
       const authorize = authorizeCall.authorize;
-      
+
       // Should use defaults when env vars are empty
       const result = await authorize({
         email: "test@sakumari.local",
         password: "TestPassword123!",
       });
-      
+
       expect(result).toEqual({
         id: "test-user-e2e",
         email: "test@sakumari.local",
@@ -463,8 +465,9 @@ describe("Auth Module Exports", () => {
   });
 
   test("auth module exports all required functions", async () => {
-    const { handlers, auth, signIn, signOut, isCredentialsProviderEnabled } = await import("@/lib/auth");
-    
+    const { handlers, auth, signIn, signOut, isCredentialsProviderEnabled } =
+      await import("@/lib/auth");
+
     expect(handlers).toBeDefined();
     expect(auth).toBeDefined();
     expect(signIn).toBeDefined();

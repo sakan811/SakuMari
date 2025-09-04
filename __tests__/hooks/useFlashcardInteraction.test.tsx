@@ -173,10 +173,9 @@ describe("useFlashcardInteraction Hook", () => {
   describe("Input Focus Management (lines 63-74)", () => {
     test("focuses input when all conditions are met for typing mode", () => {
       const mockFocus = vi.fn();
-      
+
       const { result, rerender } = renderHook(
-        (props: UseFlashcardInteractionProps) =>
-          useFlashcardInteraction(props),
+        (props: UseFlashcardInteractionProps) => useFlashcardInteraction(props),
         {
           initialProps: {
             ...defaultProps,
@@ -301,13 +300,16 @@ describe("useFlashcardInteraction Hook", () => {
     test("focuses input when currentKana changes", () => {
       const mockFocus = vi.fn();
       const { result, rerender } = renderHook(
-        (props: UseFlashcardInteractionProps) =>
-          useFlashcardInteraction(props),
+        (props: UseFlashcardInteractionProps) => useFlashcardInteraction(props),
         {
           initialProps: {
             ...defaultProps,
             nextCard: mockNextCard,
-            currentKana: mockKanaData({ id: "1", character: "あ", romaji: "a" }),
+            currentKana: mockKanaData({
+              id: "1",
+              character: "あ",
+              romaji: "a",
+            }),
             interactionMode: "typing",
             loadingKana: false,
             result: null,
@@ -352,8 +354,7 @@ describe("useFlashcardInteraction Hook", () => {
     test("focuses input when result changes from present to null", () => {
       const mockFocus = vi.fn();
       const { result, rerender } = renderHook(
-        (props: UseFlashcardInteractionProps) =>
-          useFlashcardInteraction(props),
+        (props: UseFlashcardInteractionProps) => useFlashcardInteraction(props),
         {
           initialProps: {
             ...defaultProps,
@@ -430,8 +431,7 @@ describe("useFlashcardInteraction Hook", () => {
 
     test("handleNextCard is memoized correctly", () => {
       const { result, rerender } = renderHook(
-        (props: UseFlashcardInteractionProps) =>
-          useFlashcardInteraction(props),
+        (props: UseFlashcardInteractionProps) => useFlashcardInteraction(props),
         {
           initialProps: { ...defaultProps, nextCard: mockNextCard },
         },
@@ -556,8 +556,7 @@ describe("useFlashcardInteraction Hook", () => {
 
     test("updates event handler when dependencies change", () => {
       const { rerender } = renderHook(
-        (props: UseFlashcardInteractionProps) =>
-          useFlashcardInteraction(props),
+        (props: UseFlashcardInteractionProps) => useFlashcardInteraction(props),
         {
           initialProps: {
             ...defaultProps,
@@ -593,8 +592,7 @@ describe("useFlashcardInteraction Hook", () => {
   describe("Mode Switching Effect (lines 99-105)", () => {
     test("resets state when switching from typing to multiple-choice", () => {
       const { result, rerender } = renderHook(
-        (props: UseFlashcardInteractionProps) =>
-          useFlashcardInteraction(props),
+        (props: UseFlashcardInteractionProps) => useFlashcardInteraction(props),
         {
           initialProps: {
             ...defaultProps,
@@ -634,8 +632,7 @@ describe("useFlashcardInteraction Hook", () => {
 
     test("resets state when switching from multiple-choice to typing", () => {
       const { result, rerender } = renderHook(
-        (props: UseFlashcardInteractionProps) =>
-          useFlashcardInteraction(props),
+        (props: UseFlashcardInteractionProps) => useFlashcardInteraction(props),
         {
           initialProps: {
             ...defaultProps,
@@ -669,8 +666,7 @@ describe("useFlashcardInteraction Hook", () => {
 
     test("does not reset state when mode does not change", () => {
       const { result, rerender } = renderHook(
-        (props: UseFlashcardInteractionProps) =>
-          useFlashcardInteraction(props),
+        (props: UseFlashcardInteractionProps) => useFlashcardInteraction(props),
         {
           initialProps: {
             ...defaultProps,
@@ -934,7 +930,9 @@ describe("useFlashcardInteraction Hook", () => {
         }),
       );
 
-      const mockFailingSubmit = vi.fn().mockRejectedValue(new Error("Submit failed"));
+      const mockFailingSubmit = vi
+        .fn()
+        .mockRejectedValue(new Error("Submit failed"));
 
       // Set answer
       act(() => {
@@ -945,7 +943,7 @@ describe("useFlashcardInteraction Hook", () => {
       await expect(
         act(async () => {
           await result.current.handleSubmit(mockFailingSubmit, mockChoices);
-        })
+        }),
       ).rejects.toThrow("Submit failed");
 
       expect(mockFailingSubmit).toHaveBeenCalledWith("test");
@@ -1198,8 +1196,7 @@ describe("useFlashcardInteraction Hook", () => {
 
     test("mode switching workflow", () => {
       const { result, rerender } = renderHook(
-        (props: UseFlashcardInteractionProps) =>
-          useFlashcardInteraction(props),
+        (props: UseFlashcardInteractionProps) => useFlashcardInteraction(props),
         {
           initialProps: {
             ...defaultProps,
@@ -1302,8 +1299,7 @@ describe("useFlashcardInteraction Hook", () => {
 
     test("preserves inputRef across rerenders", () => {
       const { result, rerender } = renderHook(
-        (props: UseFlashcardInteractionProps) =>
-          useFlashcardInteraction(props),
+        (props: UseFlashcardInteractionProps) => useFlashcardInteraction(props),
         {
           initialProps: { ...defaultProps, nextCard: mockNextCard },
         },

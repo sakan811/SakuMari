@@ -16,7 +16,7 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 📊 **Progress Tracking** - See your improvement with detailed analytics  
 🤖 **AI Tips** - Get personalized learning advice from Google Gemini
 
-*For detailed technical documentation, see [docs/features.md](docs/features.md)*
+_For detailed technical documentation, see [docs/features.md](docs/features.md)_
 
 ## Architecture
 
@@ -24,7 +24,7 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 
 **Key Components:** Adaptive FlashcardProvider → Practice/Dashboard Pages → API Layer → Database
 
-*For detailed architecture documentation, see [docs/architecture.md](docs/architecture.md)*
+_For detailed architecture documentation, see [docs/architecture.md](docs/architecture.md)_
 
 ## Package Manager
 
