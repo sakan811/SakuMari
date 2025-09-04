@@ -15,11 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { describe, test, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import React from "react";
 import { MobileNavigation } from "@/components/MobileNavigation";
-import Image from "next/image";
 
 // Use vi.hoisted to declare mock functions that can be used in vi.mock
 const { mockSignIn, mockSignOut } = vi.hoisted(() => ({
@@ -33,81 +32,88 @@ vi.mock("next-auth/react", () => ({
   signOut: mockSignOut,
 }));
 
-// Mock next/link
+// Mock next/link with proper className forwarding
 vi.mock("next/link", () => ({
   default: ({
     children,
     href,
     onClick,
+    className,
     ...props
   }: {
     children: React.ReactNode;
     href: string;
     onClick?: () => void;
+    className?: string;
+    [key: string]: unknown;
   }) => (
-    <a href={href} onClick={onClick} {...props}>
+    <a href={href} onClick={onClick} className={className} {...props}>
       {children}
     </a>
   ),
 }));
 
-// Mock next/image
+// Simplified next/image mock
 vi.mock("next/image", () => ({
   default: ({
     src,
     alt,
-    width,
-    height,
     className,
-    unoptimized,
-    referrerPolicy,
-    ...props
   }: {
     src: string;
     alt: string;
-    width?: number;
-    height?: number;
     className?: string;
-    unoptimized?: boolean;
-    referrerPolicy?: string;
-  } & React.ImgHTMLAttributes<HTMLImageElement>) => (
-    <Image
-      src={src}
-      alt={alt}
-      width={width}
-      height={height}
-      className={className}
-      unoptimized={unoptimized}
-      referrerPolicy={referrerPolicy}
-      data-testid="mock-image"
-      {...props}
-    />
+  }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={alt} className={className} data-testid="mock-image" />
   ),
 }));
 
+interface MobileNavigationProps {
+  session: {
+    user?: {
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+    };
+  } | null;
+  status: "loading" | "authenticated" | "unauthenticated";
+  credentialsEnabled: boolean;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
+}
+
 describe("MobileNavigation", () => {
-  const mockSetMobileMenuOpen = vi.fn();
-
-  const defaultProps = {
-    session: null,
-    status: "unauthenticated" as const,
-    credentialsEnabled: false,
-    mobileMenuOpen: true,
-    setMobileMenuOpen: mockSetMobileMenuOpen,
-  };
-
-  const mockSession = {
-    user: {
-      id: "user123",
-      name: "John Doe",
-      email: "john@example.com",
-      image: "https://example.com/avatar.jpg",
-    },
-    expires: "2025-12-31T23:59:59.999Z",
-  };
+  let mockSetMobileMenuOpen: ReturnType<typeof vi.fn>;
+  let defaultProps: MobileNavigationProps;
+  let mockSession: NonNullable<MobileNavigationProps["session"]>;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    cleanup();
+
+    // Create fresh instances for each test to prevent memory leaks
+    mockSetMobileMenuOpen = vi.fn();
+
+    defaultProps = {
+      session: null,
+      status: "unauthenticated",
+      credentialsEnabled: false,
+      mobileMenuOpen: true,
+      setMobileMenuOpen: mockSetMobileMenuOpen,
+    };
+
+    mockSession = {
+      user: {
+        name: "John Doe",
+        email: "john@example.com",
+        image: "https://example.com/avatar.jpg",
+      },
+    };
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   describe("Menu Visibility", () => {
@@ -128,11 +134,15 @@ describe("MobileNavigation", () => {
   });
 
   describe("Authenticated User State (lines 56-112)", () => {
-    const authenticatedProps = {
-      ...defaultProps,
-      session: mockSession,
-      status: "authenticated" as const,
-    };
+    let authenticatedProps: MobileNavigationProps;
+
+    beforeEach(() => {
+      authenticatedProps = {
+        ...defaultProps,
+        session: mockSession,
+        status: "authenticated",
+      };
+    });
 
     test("renders navigation links for authenticated user", () => {
       render(<MobileNavigation {...authenticatedProps} />);
@@ -194,16 +204,18 @@ describe("MobileNavigation", () => {
     });
 
     test("displays user initials when image is not available", () => {
-      const sessionWithoutImage = {
-        ...mockSession,
-        user: { ...mockSession.user, image: null },
+      const testSession = {
+        user: {
+          id: "user123",
+          name: "John Doe",
+          email: "john@example.com",
+          image: null,
+        },
+        expires: "2025-12-31T23:59:59.999Z",
       };
 
       render(
-        <MobileNavigation
-          {...authenticatedProps}
-          session={sessionWithoutImage}
-        />,
+        <MobileNavigation {...authenticatedProps} session={testSession} />,
       );
 
       // Should show first letter of name as initial
@@ -215,16 +227,18 @@ describe("MobileNavigation", () => {
     });
 
     test("displays 'U' as fallback when name is not available", () => {
-      const sessionWithoutName = {
-        ...mockSession,
-        user: { ...mockSession.user, name: null, image: null },
+      const testSession = {
+        user: {
+          id: "user123",
+          name: null,
+          email: "john@example.com",
+          image: null,
+        },
+        expires: "2025-12-31T23:59:59.999Z",
       };
 
       render(
-        <MobileNavigation
-          {...authenticatedProps}
-          session={sessionWithoutName}
-        />,
+        <MobileNavigation {...authenticatedProps} session={testSession} />,
       );
 
       // Should show 'U' as fallback initial
@@ -232,16 +246,18 @@ describe("MobileNavigation", () => {
     });
 
     test("handles empty name string", () => {
-      const sessionWithEmptyName = {
-        ...mockSession,
-        user: { ...mockSession.user, name: "", image: null },
+      const testSession = {
+        user: {
+          id: "user123",
+          name: "",
+          email: "john@example.com",
+          image: null,
+        },
+        expires: "2025-12-31T23:59:59.999Z",
       };
 
       render(
-        <MobileNavigation
-          {...authenticatedProps}
-          session={sessionWithEmptyName}
-        />,
+        <MobileNavigation {...authenticatedProps} session={testSession} />,
       );
 
       // Should show 'U' as fallback initial for empty string
@@ -280,6 +296,7 @@ describe("MobileNavigation", () => {
       expect(dashboardLink).toHaveClass(
         "bg-[#d1622b]",
         "hover:bg-[#ae0d13]",
+        "border-2",
         "border-[#d1622b]",
         "hover:border-[#ae0d13]",
       );
@@ -287,10 +304,14 @@ describe("MobileNavigation", () => {
   });
 
   describe("Credentials Enabled State (lines 115-173)", () => {
-    const credentialsEnabledProps = {
-      ...defaultProps,
-      credentialsEnabled: true,
-    };
+    let credentialsEnabledProps: MobileNavigationProps;
+
+    beforeEach(() => {
+      credentialsEnabledProps = {
+        ...defaultProps,
+        credentialsEnabled: true,
+      };
+    });
 
     test("renders Google sign-in button when credentials enabled", () => {
       render(<MobileNavigation {...credentialsEnabledProps} />);
@@ -479,7 +500,7 @@ describe("MobileNavigation", () => {
     });
 
     test("handles undefined user in session", () => {
-      const sessionWithUndefinedUser = {
+      const testSession = {
         user: undefined,
         expires: "2025-12-31T23:59:59.999Z",
       };
@@ -487,7 +508,7 @@ describe("MobileNavigation", () => {
       render(
         <MobileNavigation
           {...defaultProps}
-          session={sessionWithUndefinedUser}
+          session={testSession}
           status="authenticated"
         />,
       );
@@ -509,9 +530,9 @@ describe("MobileNavigation", () => {
 
       states.forEach((status) => {
         vi.clearAllMocks();
-        const { rerender } = render(
-          <MobileNavigation {...defaultProps} status={status} />,
-        );
+        cleanup();
+
+        render(<MobileNavigation {...defaultProps} status={status} />);
 
         if (status === "loading") {
           expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -523,8 +544,7 @@ describe("MobileNavigation", () => {
           expect(buttons[0]).not.toBeDisabled();
         }
 
-        // Clean up for next iteration
-        rerender(<div></div>);
+        cleanup();
       });
     });
 
@@ -540,12 +560,13 @@ describe("MobileNavigation", () => {
     });
 
     test("handles rapid state changes", () => {
-      const { rerender } = render(<MobileNavigation {...defaultProps} />);
-
-      // Simulate rapid state changes
-      rerender(<MobileNavigation {...defaultProps} status="loading" />);
+      // Test loading state
+      const { rerender } = render(
+        <MobileNavigation {...defaultProps} status="loading" />,
+      );
       expect(screen.getByText("Loading...")).toBeInTheDocument();
 
+      // Test authenticated state
       rerender(
         <MobileNavigation
           {...defaultProps}
@@ -557,6 +578,7 @@ describe("MobileNavigation", () => {
         screen.getByRole("link", { name: /ひらがな Hiragana/ }),
       ).toBeInTheDocument();
 
+      // Test credentials enabled state
       rerender(
         <MobileNavigation {...defaultProps} credentialsEnabled={true} />,
       );
@@ -571,13 +593,14 @@ describe("MobileNavigation", () => {
       );
 
       // Click before re-render
-      fireEvent.click(
-        screen.getByRole("button", { name: /Sign In with Google/ }),
-      );
+      const googleButton = screen.getByRole("button", {
+        name: /Sign In with Google/,
+      });
+      fireEvent.click(googleButton);
       expect(mockSignIn).toHaveBeenCalledWith("google");
       expect(mockSetMobileMenuOpen).toHaveBeenCalledWith(false);
 
-      // Re-render with different props
+      // Re-render with loading state
       rerender(
         <MobileNavigation
           {...defaultProps}
@@ -587,8 +610,8 @@ describe("MobileNavigation", () => {
       );
 
       // Buttons should be disabled during loading
-      const buttons = screen.getAllByRole("button");
-      buttons.forEach((button) => {
+      const loadingButtons = screen.getAllByRole("button");
+      loadingButtons.forEach((button) => {
         expect(button).toBeDisabled();
       });
     });
@@ -596,39 +619,35 @@ describe("MobileNavigation", () => {
 
   describe("CSS Classes and Styling", () => {
     test("applies consistent navigation classes across all states", () => {
-      const testCases = [
-        { props: { ...defaultProps }, description: "default" },
-        {
-          props: { ...defaultProps, credentialsEnabled: true },
-          description: "credentials enabled",
-        },
-        {
-          props: {
-            ...defaultProps,
-            session: mockSession,
-            status: "authenticated" as const,
-          },
-          description: "authenticated",
-        },
+      const expectedClasses = [
+        "lg:hidden",
+        "mt-3",
+        "sm:mt-4",
+        "pt-3",
+        "sm:pt-4",
+        "border-t",
+        "border-[#fad182]/30",
       ];
 
-      testCases.forEach(({ props, description }) => {
-        const { rerender } = render(<MobileNavigation {...props} />);
+      // Test default state
+      render(<MobileNavigation {...defaultProps} />);
+      expect(screen.getByRole("navigation")).toHaveClass(...expectedClasses);
+      cleanup();
 
-        const navigation = screen.getByRole("navigation");
-        expect(navigation, `Failed for ${description} state`).toHaveClass(
-          "lg:hidden",
-          "mt-3",
-          "sm:mt-4",
-          "pt-3",
-          "sm:pt-4",
-          "border-t",
-          "border-[#fad182]/30",
-        );
+      // Test credentials enabled state
+      render(<MobileNavigation {...defaultProps} credentialsEnabled={true} />);
+      expect(screen.getByRole("navigation")).toHaveClass(...expectedClasses);
+      cleanup();
 
-        // Clean up for next test
-        rerender(<div></div>);
-      });
+      // Test authenticated state
+      render(
+        <MobileNavigation
+          {...defaultProps}
+          session={mockSession}
+          status="authenticated"
+        />,
+      );
+      expect(screen.getByRole("navigation")).toHaveClass(...expectedClasses);
     });
 
     test("applies responsive classes correctly", () => {
