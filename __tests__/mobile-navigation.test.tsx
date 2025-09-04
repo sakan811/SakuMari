@@ -59,7 +59,7 @@ vi.mock("next/image", () => ({
     width,
     height,
     className,
-    _unoptimized,
+    unoptimized,
     referrerPolicy,
     ...props
   }: {
@@ -77,7 +77,7 @@ vi.mock("next/image", () => ({
       width={width}
       height={height}
       className={className}
-      unoptimized={_unoptimized}
+      unoptimized={unoptimized}
       referrerPolicy={referrerPolicy}
       data-testid="mock-image"
       {...props}
