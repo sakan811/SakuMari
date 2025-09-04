@@ -21,6 +21,7 @@ import {
   ReactNode,
   cloneElement,
   isValidElement,
+  Attributes,
 } from "react";
 
 // Base button styles constant
@@ -98,16 +99,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // Handle asChild pattern - render the child element with button styling
     if (asChild && isValidElement(children)) {
       return cloneElement(children, {
-        ...(children.props as any),
+        ...(children.props as Partial<Record<string, unknown>>),
         className: [
           buttonClasses,
-          (children.props as { className?: string }).className,
+          (children.props as { className?: string | undefined }).className,
         ]
           .filter(Boolean)
           .join(" "),
         ref,
         ...props,
-      } as any);
+      } as Partial<Record<string, unknown>> & Attributes);
     }
 
     return (
