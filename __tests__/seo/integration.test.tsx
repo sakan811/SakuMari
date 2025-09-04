@@ -73,22 +73,22 @@ describe("SEO Integration Tests", () => {
   });
 
   describe("Page Rendering with SEO Structure", () => {
-    it("should render home page with proper semantic structure", () => {
+    it("should render home page with proper semantic structure", async () => {
       render(<HomePage />);
 
       // Check for main heading
-      const mainHeading = screen.getByRole("heading", { level: 1 });
+      const mainHeading = await screen.findByRole("heading", { level: 1 });
       expect(mainHeading).toHaveTextContent("🌸 SakuMari 🌸");
 
       // Check for navigation links with proper text
       expect(
-        screen.getByRole("link", { name: /hiragana practice/i }),
+        await screen.findByRole("link", { name: /hiragana practice/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("link", { name: /katakana practice/i }),
+        await screen.findByRole("link", { name: /katakana practice/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("link", { name: /view your progress/i }),
+        await screen.findByRole("link", { name: /view your progress/i }),
       ).toBeInTheDocument();
     });
 
@@ -114,68 +114,68 @@ describe("SEO Integration Tests", () => {
   });
 
   describe("Content Quality for SEO", () => {
-    it("should have descriptive link text for better SEO", () => {
+    it("should have descriptive link text for better SEO", async () => {
       render(<HomePage />);
 
       // Check that links have descriptive text, not just "click here"
-      const hiraganaLink = screen.getByRole("link", {
+      const hiraganaLink = await screen.findByRole("link", {
         name: /hiragana practice/i,
       });
       expect(hiraganaLink).toHaveTextContent(/practice.*hiragana.*characters/i);
 
-      const katakanaLink = screen.getByRole("link", {
+      const katakanaLink = await screen.findByRole("link", {
         name: /katakana practice/i,
       });
       expect(katakanaLink).toHaveTextContent(/practice.*katakana.*characters/i);
     });
 
-    it("should have proper heading hierarchy", () => {
+    it("should have proper heading hierarchy", async () => {
       render(<HomePage />);
 
       // Check heading levels are properly structured for SEO
-      const h1 = screen.getByRole("heading", { level: 1 });
+      const h1 = await screen.findByRole("heading", { level: 1 });
       expect(h1).toBeInTheDocument();
 
-      const h2s = screen.getAllByRole("heading", { level: 2 });
+      const h2s = await screen.findAllByRole("heading", { level: 2 });
       expect(h2s.length).toBeGreaterThan(0);
     });
 
-    it("should include Japanese characters for language-specific SEO", () => {
+    it("should include Japanese characters for language-specific SEO", async () => {
       render(<HomePage />);
 
       // Check that actual Japanese characters are included for better language SEO
-      expect(screen.getByText(/ひらがな/)).toBeInTheDocument(); // Hiragana
-      expect(screen.getByText(/カタカナ/)).toBeInTheDocument(); // Katakana
-      expect(screen.getByText("あいう")).toBeInTheDocument(); // Sample Hiragana
-      expect(screen.getByText("アイウ")).toBeInTheDocument(); // Sample Katakana
+      expect(await screen.findByText(/ひらがな/)).toBeInTheDocument(); // Hiragana
+      expect(await screen.findByText(/カタカナ/)).toBeInTheDocument(); // Katakana
+      expect(await screen.findByText("あいう")).toBeInTheDocument(); // Sample Hiragana
+      expect(await screen.findByText("アイウ")).toBeInTheDocument(); // Sample Katakana
     });
   });
 
   describe("User Experience and SEO Alignment", () => {
-    it("should provide clear value proposition for SEO", () => {
+    it("should provide clear value proposition for SEO", async () => {
       render(<HomePage />);
 
       // Check for clear value proposition that aligns with meta descriptions
       expect(
-        screen.getByText(/master hiragana and katakana/i),
+        await screen.findByText(/master hiragana and katakana/i),
       ).toBeInTheDocument();
-      expect(screen.getByText(/interactive practice/i)).toBeInTheDocument();
+      expect(await screen.findByText(/interactive practice/i)).toBeInTheDocument();
     });
 
-    it("should have consistent navigation structure", () => {
+    it("should have consistent navigation structure", async () => {
       render(<HomePage />);
 
       // Check navigation consistency for better user experience and SEO
-      expect(screen.getByTestId("header")).toBeInTheDocument();
+      expect(await screen.findByTestId("header")).toBeInTheDocument();
 
       // Verify navigation links are present
-      const hiraganaLink = screen.getByRole("link", {
+      const hiraganaLink = await screen.findByRole("link", {
         name: /hiragana practice/i,
       });
-      const katakanaLink = screen.getByRole("link", {
+      const katakanaLink = await screen.findByRole("link", {
         name: /katakana practice/i,
       });
-      const dashboardLink = screen.getByRole("link", {
+      const dashboardLink = await screen.findByRole("link", {
         name: /view your progress/i,
       });
 
@@ -186,11 +186,11 @@ describe("SEO Integration Tests", () => {
   });
 
   describe("Accessibility and SEO Alignment", () => {
-    it("should have accessible content that also benefits SEO", () => {
+    it("should have accessible content that also benefits SEO", async () => {
       render(<HomePage />);
 
       // Check for alt text equivalents in content structure
-      const practiceCards = screen.getAllByRole("link");
+      const practiceCards = await screen.findAllByRole("link");
       const contentfulCards = practiceCards.filter(
         (card) => card.textContent && card.textContent.length > 10,
       );
@@ -205,15 +205,15 @@ describe("SEO Integration Tests", () => {
       });
     });
 
-    it("should use semantic HTML structure", () => {
+    it("should use semantic HTML structure", async () => {
       render(<HomePage />);
 
       // Check for proper semantic structure
-      expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
+      expect(await screen.findByRole("heading", { level: 1 })).toBeInTheDocument();
       expect(
-        screen.getAllByRole("heading", { level: 2 }).length,
+        (await screen.findAllByRole("heading", { level: 2 })).length,
       ).toBeGreaterThan(0);
-      expect(screen.getAllByRole("link").length).toBeGreaterThan(0);
+      expect((await screen.findAllByRole("link")).length).toBeGreaterThan(0);
     });
   });
 
