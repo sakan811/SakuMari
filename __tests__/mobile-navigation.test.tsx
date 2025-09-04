@@ -19,6 +19,7 @@ import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
 import { MobileNavigation } from "@/components/MobileNavigation";
+import Image from "next/image";
 
 // Use vi.hoisted to declare mock functions that can be used in vi.mock
 const { mockSignIn, mockSignOut } = vi.hoisted(() => ({
@@ -58,7 +59,7 @@ vi.mock("next/image", () => ({
     width,
     height,
     className,
-    unoptimized,
+    _unoptimized,
     referrerPolicy,
     ...props
   }: {
@@ -70,12 +71,13 @@ vi.mock("next/image", () => ({
     unoptimized?: boolean;
     referrerPolicy?: string;
   } & React.ImgHTMLAttributes<HTMLImageElement>) => (
-    <img
+    <Image
       src={src}
       alt={alt}
       width={width}
       height={height}
       className={className}
+      unoptimized={_unoptimized}
       referrerPolicy={referrerPolicy}
       data-testid="mock-image"
       {...props}
