@@ -311,7 +311,7 @@ describe("TipsModal", () => {
 
     // Wait for completion
     await waitFor(() => {
-      expect(screen.getByText("Test")).toBeTruthy();
+      expect(screen.getByTestId("assistant-message")).toHaveTextContent("Test");
     });
   });
 
