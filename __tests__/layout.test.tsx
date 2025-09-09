@@ -63,13 +63,13 @@ describe("RootLayout", () => {
   });
 
   test("renders structured data script tag with proper JSON-LD content", () => {
-    const { container } = render(
+    const { container: _container } = render(
       <RootLayout>
         <div>Test Content</div>
       </RootLayout>
     );
 
-    const scriptElement = container.querySelector('script[type="application/ld+json"]');
+    const scriptElement = _container.querySelector('script[type="application/ld+json"]');
     expect(scriptElement).toBeInTheDocument();
 
     // Parse and validate the JSON-LD content

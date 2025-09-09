@@ -22,9 +22,9 @@ vi.mock("next/server", async () => {
 
 // Mock the auth function
 vi.mock("@/lib/auth", () => ({
-  auth: vi.fn((handler) => {
+  auth: vi.fn((handler: (req: NextRequest) => NextResponse) => {
     // Return a function that directly calls the handler and returns a resolved promise
-    return (req: NextRequest, _context: { params: Record<string, string> }): Promise<NextResponse> => {
+    return (req: NextRequest, _context: { params: Promise<Record<string, string>> }): Promise<NextResponse> => {
       const result = handler(req);
       return Promise.resolve(result);
     };
@@ -58,7 +58,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockRedirect).toHaveBeenCalledWith(
         new URL("/", "http://localhost:3000/hiragana"),
@@ -84,7 +84,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockRedirect).toHaveBeenCalledWith(
         new URL("/", "http://localhost:3000/katakana"),
@@ -110,7 +110,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockRedirect).toHaveBeenCalledWith(
         new URL("/", "http://localhost:3000/dashboard"),
@@ -136,7 +136,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockRedirect).toHaveBeenCalledWith(
         new URL("/", "http://localhost:3000/api/flashcards"),
@@ -162,7 +162,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockRedirect).toHaveBeenCalledWith(
         new URL("/", "http://localhost:3000/api/stats"),
@@ -190,7 +190,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockNext).toHaveBeenCalled();
       expect(NextResponse.redirect).not.toHaveBeenCalled();
@@ -215,7 +215,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockNext).toHaveBeenCalled();
       expect(NextResponse.redirect).not.toHaveBeenCalled();
@@ -240,7 +240,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockNext).toHaveBeenCalled();
       expect(NextResponse.redirect).not.toHaveBeenCalled();
@@ -267,7 +267,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockNext).toHaveBeenCalled();
       expect(NextResponse.redirect).not.toHaveBeenCalled();
@@ -292,7 +292,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockNext).toHaveBeenCalled();
       expect(NextResponse.redirect).not.toHaveBeenCalled();
@@ -319,7 +319,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockNext).toHaveBeenCalled();
       expect(NextResponse.redirect).not.toHaveBeenCalled();
@@ -344,7 +344,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockNext).toHaveBeenCalled();
       expect(NextResponse.redirect).not.toHaveBeenCalled();
@@ -370,7 +370,7 @@ describe("Middleware", () => {
         });
   
         // Call the middleware handler with the mock request and context with params
-        await middlewareHandler(mockRequest, { params: {} });
+        await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
   
         expect(mockRedirect).toHaveBeenCalledWith(
           new URL("/", "http://localhost:3000/protected-route"),
@@ -400,7 +400,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockRedirect).toHaveBeenCalledWith(
         new URL("/", "http://localhost:3000/dashboard"),
@@ -426,7 +426,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockRedirect).toHaveBeenCalledWith(
         new URL("/", "http://localhost:3000/dashboard"),
@@ -452,7 +452,7 @@ describe("Middleware", () => {
       });
 
       // Call the middleware handler with the mock request and context with params
-      await middlewareHandler(mockRequest, { params: {} });
+      await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockRedirect).toHaveBeenCalledWith(
         new URL("/", "http://localhost:3000/dashboard"),

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi as _vi } from "vitest";
 import { bg, createBg, backgrounds } from "@/lib/backgrounds";
 
 describe("bg", () => {
