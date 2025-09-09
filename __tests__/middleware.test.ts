@@ -24,7 +24,7 @@ vi.mock("next/server", async () => {
 vi.mock("@/lib/auth", () => ({
   auth: vi.fn((handler) => {
     // Return a function that directly calls the handler and returns a resolved promise
-    return (req: any, context: any): Promise<any> => {
+    return (req: NextRequest, _context: { params: Record<string, string> }): Promise<NextResponse> => {
       const result = handler(req);
       return Promise.resolve(result);
     };

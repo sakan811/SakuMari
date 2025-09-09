@@ -41,7 +41,7 @@ vi.mock("next/server", () => ({
 }));
 
 // Import the modules to test after mocking
-import { ApiError, createErrorResponse, withErrorHandler, ApiErrors, TipsApiErrors } from "@/lib/api-errors";
+import { ApiError, createErrorResponse as _createErrorResponse, withErrorHandler, ApiErrors, TipsApiErrors } from "@/lib/api-errors";
 
 describe("ApiError", () => {
   describe("constructor", () => {

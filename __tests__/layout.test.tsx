@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import React from "react";
 import { describe, test, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import RootLayout from "../app/layout";
@@ -35,7 +36,7 @@ vi.mock("next-auth/react", () => ({
 
 describe("RootLayout", () => {
   test("renders layout structure correctly", () => {
-    const { container } = render(
+    const { container: _container } = render(
       <RootLayout>
         <div>Test Content</div>
       </RootLayout>
@@ -47,7 +48,7 @@ describe("RootLayout", () => {
   });
 
   test("renders body content with correct structure", () => {
-    const { container } = render(
+    const { container: _container } = render(
       <RootLayout>
         <div>Test Content</div>
       </RootLayout>
@@ -95,7 +96,7 @@ describe("RootLayout", () => {
   });
 
   test("renders mocked Providers component wrapping children", () => {
-    const { container, getByTestId } = render(
+    const { container: _container, getByTestId } = render(
       <RootLayout>
         <div data-testid="test-child">Test Content</div>
       </RootLayout>
