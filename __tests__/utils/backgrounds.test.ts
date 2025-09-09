@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { bg, createBg, backgrounds } from "@/lib/backgrounds";
 
 describe("bg", () => {
@@ -33,7 +33,7 @@ describe("bg", () => {
 
   it("should combine string background class with additional classes when provided", () => {
     // Mock a string background to test the string code path with additional classes
-    const originalBackgrounds = { ...backgrounds };
+    const _originalBackgrounds = { ...backgrounds };
     // @ts-ignore - Temporarily adding a string background for testing
     backgrounds.stringBg = "bg-blue-500";
     
@@ -78,7 +78,7 @@ describe("bg", () => {
 describe("createBg", () => {
   it("should create a background generator for string backgrounds", () => {
     // Mock a string background to test the string code path
-    const originalBackgrounds = { ...backgrounds };
+    const _originalBackgrounds = { ...backgrounds };
     // @ts-ignore - Temporarily adding a string background for testing
     backgrounds.stringBg = "bg-blue-500";
     
