@@ -85,6 +85,42 @@ describe("Health API Route", () => {
       expect(data.version).toBe(process.env.npm_package_version || "1.0.0");
     });
 
+    test("uses fallback version when npm_package_version is undefined", async () => {
+      // Mock successful database query
+      mockPrisma.$queryRaw.mockResolvedValue([1]);
+
+      // Temporarily remove npm_package_version from environment
+      const originalVersion = process.env.npm_package_version;
+      delete process.env.npm_package_version;
+
+      const response = await GET();
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.version).toBe("1.0.0");
+
+      // Restore the original environment variable
+      process.env.npm_package_version = originalVersion;
+    });
+
+    test("handles non-Error objects in error message extraction", async () => {
+      // Mock failed database query with a non-Error object
+      mockPrisma.$queryRaw.mockRejectedValue("String error message");
+
+      const response = await GET();
+      const data = await response.json();
+
+      expect(response.status).toBe(503);
+      expect(data).toEqual({
+        status: "unhealthy",
+        timestamp: expect.any(String),
+        uptime: expect.any(Number),
+        environment: process.env.NODE_ENV,
+        database: "disconnected",
+        error: "Unknown error",
+      });
+    });
+
     test("includes correct response structure for healthy state", async () => {
       // Mock successful database query
       mockPrisma.$queryRaw.mockResolvedValue([1]);
