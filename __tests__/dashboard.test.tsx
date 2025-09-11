@@ -73,6 +73,55 @@ describe("Dashboard Component", () => {
     expect(screen.getByText("あ")).toBeTruthy();
   });
 
+  test("filters by katakana type", async () => {
+    // This test covers lines 48-51 in Dashboard.tsx - the katakana filter logic
+    render(<Dashboard />);
+
+    await waitFor(() => screen.getByText("Your Progress"));
+
+    // Verify both characters are initially visible
+    expect(screen.getByText("あ")).toBeTruthy();
+    expect(screen.getByText("ア")).toBeTruthy();
+
+    // Click Katakana filter using test-id
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("filter-katakana"));
+    });
+
+    // Hiragana character should no longer be visible
+    expect(screen.queryByText("あ")).toBeNull();
+
+    // Katakana character should still be visible
+    expect(screen.getByText("ア")).toBeTruthy();
+  });
+
+  test("filters by all kana type", async () => {
+    render(<Dashboard />);
+
+    await waitFor(() => screen.getByText("Your Progress"));
+
+    // Verify both characters are initially visible
+    expect(screen.getByText("あ")).toBeTruthy();
+    expect(screen.getByText("ア")).toBeTruthy();
+
+    // Click Hiragana filter first
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("filter-hiragana"));
+    });
+
+    // Katakana character should no longer be visible
+    expect(screen.queryByText("ア")).toBeNull();
+
+    // Click All filter to show both again
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("filter-all"));
+    });
+
+    // Both characters should be visible again
+    expect(screen.getByText("あ")).toBeTruthy();
+    expect(screen.getByText("ア")).toBeTruthy();
+  });
+
   test("sorts data by columns", async () => {
     render(<Dashboard />);
 

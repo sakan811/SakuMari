@@ -334,4 +334,58 @@ describe("TipsApiErrors", () => {
       });
     });
   });
+  // Tests from api-errors-uncovered.test.ts
+  describe("GEMINI_API_KEY error handling", () => {
+    it("handles generic Error instances with 'GEMINI_API_KEY' message", async () => {
+      const genericError = new Error("Missing GEMINI_API_KEY environment variable");
+      const handler = vi.fn().mockRejectedValue(genericError);
+
+      const wrappedHandler = withErrorHandler(handler);
+      const result = await wrappedHandler();
+
+      expect(result.status).toBe(503);
+      const responseData = await result.json();
+      expect(responseData.error).toBe("AI service not configured. Please contact support.");
+      expect(responseData.code).toBe("AI_SERVICE_UNAVAILABLE");
+    });
+
+    it("handles generic Error instances with 'GEMINI_API_KEY' in the middle of message", async () => {
+      const genericError = new Error("Error: GEMINI_API_KEY is not set in environment");
+      const handler = vi.fn().mockRejectedValue(genericError);
+
+      const wrappedHandler = withErrorHandler(handler);
+      const result = await wrappedHandler();
+
+      expect(result.status).toBe(503);
+      const responseData = await result.json();
+      expect(responseData.error).toBe("AI service not configured. Please contact support.");
+      expect(responseData.code).toBe("AI_SERVICE_UNAVAILABLE");
+    });
+
+    it("does not handle other error messages with 'gemini_api_key' (case sensitive)", async () => {
+      const genericError = new Error("Missing gemini_api_key environment variable");
+      const handler = vi.fn().mockRejectedValue(genericError);
+
+      const wrappedHandler = withErrorHandler(handler);
+      const result = await wrappedHandler();
+
+      expect(result.status).toBe(500);
+      const responseData = await result.json();
+      expect(responseData.error).toBe("Internal server error");
+      expect(responseData.code).toBe("INTERNAL_ERROR");
+    });
+
+    it("handles other errors normally when GEMINI_API_KEY is not in message", async () => {
+      const genericError = new Error("Some other error");
+      const handler = vi.fn().mockRejectedValue(genericError);
+
+      const wrappedHandler = withErrorHandler(handler);
+      const result = await wrappedHandler();
+
+      expect(result.status).toBe(500);
+      const responseData = await result.json();
+      expect(responseData.error).toBe("Internal server error");
+      expect(responseData.code).toBe("INTERNAL_ERROR");
+    });
+  });
 });
