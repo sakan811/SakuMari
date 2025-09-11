@@ -61,8 +61,8 @@ describe("Button Component", () => {
 
     const button = screen.getByText("Disabled Button");
     expect(button).toBeDisabled();
-    expect(button).toHaveClass("opacity-50");
-    expect(button).toHaveClass("cursor-not-allowed");
+    expect(button).toHaveClass("disabled:opacity-50");
+    expect(button).toHaveClass("disabled:cursor-not-allowed");
   });
 
   // Tests from button-uncovered.test.tsx

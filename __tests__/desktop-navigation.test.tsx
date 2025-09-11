@@ -236,7 +236,7 @@ describe("DesktopNavigation", () => {
       expect(googleButton).toHaveClass(
         "bg-[#d1622b]",
         "hover:bg-[#ae0d13]",
-        "text-white",
+        "text-[#fad182]",
       );
 
       // Click sign in button
@@ -249,7 +249,7 @@ describe("DesktopNavigation", () => {
         <DesktopNavigation {...defaultProps} status="loading" />,
       );
 
-      const button = screen.getByRole("button", { name: "Sign In" });
+      const button = screen.getByRole("button", { name: "⌛ Sign In" });
       expect(button).toBeDisabled();
       expect(button).toHaveClass("disabled:opacity-50");
     });
@@ -267,7 +267,7 @@ describe("DesktopNavigation", () => {
       expect(credentialsButton).toHaveClass(
         "bg-[#d1622b]",
         "hover:bg-[#ae0d13]",
-        "text-white",
+        "text-[#fad182]",
       );
 
       // Click sign in button
@@ -284,7 +284,7 @@ describe("DesktopNavigation", () => {
         />,
       );
 
-      const button = screen.getByRole("button", { name: "Sign In" });
+      const button = screen.getByRole("button", { name: "⌛ Sign In" });
       expect(button).toBeDisabled();
       expect(button).toHaveClass("disabled:opacity-50");
     });
@@ -298,8 +298,9 @@ describe("DesktopNavigation", () => {
         />,
       );
 
-      const button = screen.getByRole("button", { name: "Sign In" });
-      expect(button).toHaveAttribute("loading", "true");
+      const button = screen.getByRole("button", { name: "⌛ Sign In" });
+      // Verify the loading spinner is present
+      expect(button.querySelector(".animate-spin")).toBeInTheDocument();
     });
   });
 
