@@ -451,5 +451,107 @@ describe("Tips API Route", async () => {
       // Verify timestamp is valid ISO string
       expect(new Date(data.timestamp).toISOString()).toBe(data.timestamp);
     });
+
+    test("handles import error when Google Generative AI fails to load", async () => {
+      // Setup
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
+      vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
+      
+      // Temporarily override the mock to throw an error during import
+      const originalMock = mockGoogleGenerativeAI;
+      mockGoogleGenerativeAI.mockImplementation(() => {
+        throw new Error("Failed to initialize AI service");
+      });
+      
+      // Spy on console.error
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      
+      const request = new NextRequest("http://localhost/api/tips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userQuery: "How to learn kana?" }),
+      });
+
+      // Execute
+      const response = await POST(request);
+      const data = await response.json();
+
+      // Verify
+      expect(response.status).toBe(500);
+      expect(data.error).toBe(
+        "Unable to generate learning tips. Please try again later.",
+      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error generating kana learning tips:",
+        expect.any(Error)
+      );
+      
+      // Restore console.error and original mock
+      consoleErrorSpy.mockRestore();
+      mockGoogleGenerativeAI.mockImplementation(originalMock);
+    });
+
+    test("includes progressing kana in AI prompt when user has kana with accuracy between 0.7 and 0.9", async () => {
+      const mockUserProgress = [
+        {
+          id: "progress-1",
+          kana_id: "kana-1",
+          user_id: "user123",
+          attempts: 10,
+          correct_attempts: 3,
+          accuracy: 0.3, // Struggling
+          kana: { character: "あ", romaji: "a" },
+        },
+        {
+          id: "progress-2",
+          kana_id: "kana-2",
+          user_id: "user123",
+          attempts: 10,
+          correct_attempts: 8,
+          accuracy: 0.8, // Progressing
+          kana: { character: "か", romaji: "ka" },
+        },
+        {
+          id: "progress-3",
+          kana_id: "kana-3",
+          user_id: "user123",
+          attempts: 10,
+          correct_attempts: 10,
+          accuracy: 1.0, // Mastered
+          kana: { character: "さ", romaji: "sa" },
+        },
+      ];
+
+      // Override the mock to return context-aware response
+      mockGenerateContent.mockResolvedValue({
+        response: {
+          text: vi.fn().mockReturnValue("Context-aware response with progressing kana"),
+        },
+      });
+
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
+      vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue(
+        mockUserProgress,
+      );
+
+      const request = new NextRequest("http://localhost/api/tips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userQuery: "Help me improve" }),
+      });
+
+      await POST(request);
+
+      // Verify AI was called with context including user progress
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        expect.stringContaining("Needs Practice: あ (30%)"),
+      );
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        expect.stringContaining("Making Progress: か (80%)"),
+      );
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        expect.stringContaining("Mastering: さ (100%)"),
+      );
+    });
   });
 });

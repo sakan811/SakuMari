@@ -580,5 +580,39 @@ describe("Flashcard Submit API - Database Operations", () => {
       // Restore console.error
       consoleErrorSpy.mockRestore();
     });
+
+    test("handles generic Error instance that doesn't match specific error messages", async () => {
+      // Setup
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
+      mockPrisma.$executeRaw.mockRejectedValue(new Error("Generic database error"));
+      
+      // Spy on console.error
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      
+      const request = new NextRequest("http://localhost/api/flashcards/submit", {
+        method: "POST",
+        body: JSON.stringify({ kanaId: "test-1", isCorrect: true }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      // Execute
+      const response = await POST(request);
+      const responseData = await response.json();
+
+      // Verify
+      expect(response.status).toBe(500);
+      expect(responseData).toEqual({
+        error: "Failed to submit flashcard answer",
+        code: "INTERNAL_ERROR",
+      });
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error submitting answer:",
+        expect.any(Error)
+      );
+      expect(mockPrisma.$executeRaw).toHaveBeenCalledTimes(1);
+      
+      // Restore console.error
+      consoleErrorSpy.mockRestore();
+    });
   });
 });
