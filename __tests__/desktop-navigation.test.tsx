@@ -158,8 +158,9 @@ describe("DesktopNavigation", () => {
         "border-[#fad182]",
       );
 
-      // Check user name display
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
+      // Check for Sign Out button instead of user name
+      const signOutButton = screen.getByRole("button", { name: "Sign Out" });
+      expect(signOutButton).toBeInTheDocument();
     });
 
     test("displays user initials when image is not available", () => {
@@ -183,8 +184,9 @@ describe("DesktopNavigation", () => {
       expect(screen.getByText("J")).toBeInTheDocument();
       expect(screen.queryByAltText("Profile")).not.toBeInTheDocument();
 
-      // Check user name still displayed
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
+      // Check for Sign Out button instead of user name
+      const signOutButton = screen.getByRole("button", { name: "Sign Out" });
+      expect(signOutButton).toBeInTheDocument();
     });
 
     test("displays 'U' as fallback when name is not available", () => {
