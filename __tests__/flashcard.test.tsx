@@ -463,4 +463,80 @@ describe("Flashcard Component", () => {
     // For this test, we're verifying the logic that would prevent selection
     expect(screen.getByText("Submitting...")).toBeDefined();
   });
+
+  describe("handleModeChange function", () => {
+    test("should not change mode when submitting", () => {
+      const setInteractionMode = vi.fn();
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
+        mockFlashcardProvider({
+          currentKana: mockKana.basic,
+          isSubmitting: true,
+          setInteractionMode,
+          interactionMode: "typing",
+          choices: ["a", "ka", "sa", "ta"],
+        }),
+      );
+
+      render(<Flashcard />);
+
+      // Simulate mode change when submitting
+      const typingButton = screen.getByTestId("typing-button");
+      const multipleChoiceButton = screen.getByTestId("multiple-choice-button");
+      
+      // Click on the multiple choice button to trigger mode change
+      fireEvent.click(multipleChoiceButton);
+      
+      // The mode change should not happen when submitting
+      expect(setInteractionMode).not.toHaveBeenCalled();
+    });
+
+    test("should not change mode when result is shown", () => {
+      const setInteractionMode = vi.fn();
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
+        mockFlashcardProvider({
+          currentKana: mockKana.basic,
+          result: "correct",
+          setInteractionMode,
+          interactionMode: "typing",
+          choices: ["a", "ka", "sa", "ta"],
+        }),
+      );
+
+      render(<Flashcard />);
+
+      // Simulate mode change when result is shown
+      const typingButton = screen.getByTestId("typing-button");
+      const multipleChoiceButton = screen.getByTestId("multiple-choice-button");
+      
+      // Click on the multiple choice button to trigger mode change
+      fireEvent.click(multipleChoiceButton);
+      
+      // The mode change should not happen when result is shown
+      expect(setInteractionMode).not.toHaveBeenCalled();
+    });
+
+    test("should change mode when not submitting and no result is shown", () => {
+      const setInteractionMode = vi.fn();
+      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
+        mockFlashcardProvider({
+          currentKana: mockKana.basic,
+          setInteractionMode,
+          interactionMode: "typing",
+          choices: ["a", "ka", "sa", "ta"],
+        }),
+      );
+
+      render(<Flashcard />);
+
+      // Simulate mode change when not submitting and no result
+      const typingButton = screen.getByTestId("typing-button");
+      const multipleChoiceButton = screen.getByTestId("multiple-choice-button");
+      
+      // Click on the multiple choice button to trigger mode change
+      fireEvent.click(multipleChoiceButton);
+      
+      // The mode change should happen when not submitting and no result
+      expect(setInteractionMode).toHaveBeenCalledWith("multiple-choice");
+    });
+  });
 });

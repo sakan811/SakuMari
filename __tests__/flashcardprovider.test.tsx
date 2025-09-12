@@ -250,5 +250,126 @@ describe("FlashcardProvider", () => {
         expect(capturedContext.result).toBe("incorrect");
       });
     });
+  
+    describe("generateChoices function", () => {
+      it("handles empty kanaData array by setting choices to empty array and returning early", async () => {
+        // Mock successful API response with empty array
+        mockFetch.mockResolvedValue({
+          ok: true,
+          json: async () => [],
+        });
+  
+        let capturedContext: any;
+        const onContext = (context: any) => {
+          capturedContext = context;
+        };
+  
+        render(
+          <FlashcardProvider>
+            <TestComponent onContext={onContext} />
+          </FlashcardProvider>,
+        );
+  
+        await waitFor(() => {
+          expect(capturedContext).toBeDefined();
+          expect(capturedContext.choices).toEqual([]);
+        });
+  
+        // Test that when nextCard is called with empty kanaList, choices remain empty
+        await act(async () => {
+          capturedContext.nextCard();
+        });
+  
+        await waitFor(() => {
+          expect(capturedContext.choices).toEqual([]);
+        });
+      });
+  
+      it("directly tests generateChoices with empty kanaData", async () => {
+        // First, mock with data to initialize the provider properly
+        mockFetch.mockResolvedValue({
+          ok: true,
+          json: async () => [
+            { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
+          ],
+        });
+  
+        let capturedContext: any;
+        const onContext = (context: any) => {
+          capturedContext = context;
+        };
+  
+        // Create a test component that allows us to switch to multiple-choice mode
+        function MultipleChoiceTestComponent({ onContext }: { onContext: (context: any) => void }) {
+          const context = useFlashcard();
+          React.useEffect(() => {
+            onContext(context);
+          }, [context, onContext]);
+          
+          return (
+            <div>
+              <button data-testid="next-card" onClick={context.nextCard}>
+                Next Card
+              </button>
+              <button data-testid="submit-answer" onClick={() => context.submitAnswer("test")}>
+                Submit Answer
+              </button>
+              <button
+                data-testid="set-multiple-choice"
+                onClick={() => context.setInteractionMode("multiple-choice")}
+              >
+                Set Multiple Choice
+              </button>
+            </div>
+          );
+        }
+  
+        const { getByTestId, rerender } = render(
+          <FlashcardProvider>
+            <MultipleChoiceTestComponent onContext={onContext} />
+          </FlashcardProvider>,
+        );
+  
+        // Wait for the provider to initialize with data
+        await waitFor(() => {
+          expect(capturedContext).toBeDefined();
+          expect(capturedContext.loadingKana).toBe(false);
+        });
+  
+        // Switch to multiple-choice mode
+        await act(async () => {
+          getByTestId("set-multiple-choice").click();
+        });
+  
+        // Now change the mock to return empty data
+        mockFetch.mockResolvedValue({
+          ok: true,
+          json: async () => [],
+        });
+  
+        // Trigger a refetch by changing kanaType prop
+        rerender(
+          <FlashcardProvider kanaType="hiragana">
+            <MultipleChoiceTestComponent onContext={onContext} />
+          </FlashcardProvider>,
+        );
+  
+        // Wait for the new data to be fetched
+        await waitFor(() => {
+          expect(capturedContext.loadingKana).toBe(false);
+        });
+  
+        // Now click next card to trigger generateChoices with empty kanaData
+        // This should trigger the guard clause at lines 162-163
+        await act(async () => {
+          getByTestId("next-card").click();
+        });
+  
+        // Verify that choices is an empty array
+        await waitFor(() => {
+          expect(capturedContext.choices).toEqual([]);
+        });
+      });
+    });
   });
 });
