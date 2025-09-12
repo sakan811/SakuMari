@@ -653,5 +653,114 @@ describe("Flashcard Submit API - Database Operations", () => {
       // Restore console.error
       consoleErrorSpy.mockRestore();
     });
+
+    test("handles generic JSON parsing error that doesn't contain 'Invalid JSON' message", async () => {
+      // Setup
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
+      
+      // Create a request with malformed JSON that will cause JSON parsing to fail
+      // with an error message that doesn't contain "Invalid JSON"
+      const request = new NextRequest("http://localhost/api/flashcards/submit", {
+        method: "POST",
+        body: "{ malformed: json, missing: closing brace",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      // Spy on console.error
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      
+      // Execute
+      const response = await POST(request);
+      const responseData = await response.json();
+
+      // Verify
+      expect(response.status).toBe(400);
+      expect(responseData).toEqual({
+        error: "Invalid request format",
+        code: "BAD_REQUEST",
+      });
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error submitting answer:",
+        expect.any(Error)
+      );
+      expect(mockPrisma.$executeRaw).not.toHaveBeenCalled();
+      
+      // Restore console.error
+      consoleErrorSpy.mockRestore();
+    });
+
+    test("handles Error instance that doesn't contain 'Invalid JSON' in message to cover line 74", async () => {
+      // Setup
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
+      
+      // Create a request with valid JSON
+      const request = new NextRequest("http://localhost/api/flashcards/submit", {
+        method: "POST",
+        body: JSON.stringify({ kanaId: "test-1", isCorrect: true }),
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      // Make prisma.$executeRaw throw an error that doesn't contain "Invalid JSON"
+      mockPrisma.$executeRaw.mockRejectedValue(new Error("Database connection failed"));
+      
+      // Spy on console.error
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      
+      // Execute
+      const response = await POST(request);
+      const responseData = await response.json();
+
+      // Verify
+      expect(response.status).toBe(500); // Should be 500 since the error doesn't contain "Invalid JSON"
+      expect(responseData).toEqual({
+        error: "Failed to submit flashcard answer",
+        code: "INTERNAL_ERROR",
+      });
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error submitting answer:",
+        expect.any(Error)
+      );
+      expect(mockPrisma.$executeRaw).toHaveBeenCalledTimes(1);
+      
+      // Restore console.error
+      consoleErrorSpy.mockRestore();
+    });
+
+    test("handles non-Error object to cover line 74 where error instanceof Error is false", async () => {
+      // Setup
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
+      
+      // Create a request with valid JSON
+      const request = new NextRequest("http://localhost/api/flashcards/submit", {
+        method: "POST",
+        body: JSON.stringify({ kanaId: "test-1", isCorrect: true }),
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      // Make prisma.$executeRaw throw a non-Error object (a string in this case)
+      mockPrisma.$executeRaw.mockRejectedValue("Database connection failed");
+      
+      // Spy on console.error
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      
+      // Execute
+      const response = await POST(request);
+      const responseData = await response.json();
+
+      // Verify
+      expect(response.status).toBe(500); // Should be 500 since the error is not an Error instance
+      expect(responseData).toEqual({
+        error: "Failed to submit flashcard answer",
+        code: "INTERNAL_ERROR",
+      });
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error submitting answer:",
+        "Database connection failed"
+      );
+      expect(mockPrisma.$executeRaw).toHaveBeenCalledTimes(1);
+      
+      // Restore console.error
+      consoleErrorSpy.mockRestore();
+    });
   });
 });
