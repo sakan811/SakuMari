@@ -71,7 +71,11 @@ export function FlashcardProvider({
 
   // Select a kana using confidence-weighted selection (solves first-success penalty)
   const selectRandomKana = useCallback((data: KanaWithAccuracy[]) => {
-    if (!data.length) return;
+    if (!data.length) {
+      setCurrentKana(null);
+      setChoices([]);
+      return;
+    }
 
     // Calculate confidence-aware weights
     const weights = data.map((kana) => {
@@ -149,6 +153,9 @@ export function FlashcardProvider({
   useEffect(() => {
     if (!hasFetched.current) {
       hasFetched.current = true;
+      fetchKanaData();
+    } else if (kanaType) {
+      // If kanaType changes, fetch new data
       fetchKanaData();
     }
   }, [kanaType, fetchKanaData]);
