@@ -25,6 +25,7 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useSorting } from "@/hooks/useSorting";
 import { StatsSummary } from "./StatsSummary";
 import { CharacterProgressTable } from "./CharacterProgressTable";
+import { filterKanaByType } from "@/lib/kana-filter";
 import type { KanaWithAccuracy } from "@/types/common";
 
 export default function Dashboard() {
@@ -36,20 +37,7 @@ export default function Dashboard() {
     useSorting<KanaWithAccuracy>("accuracy", "asc");
 
   // Filter stats based on selected filter
-  const filteredStats = stats.filter((kana) => {
-    if (filter === "all") return true;
-
-    const charCode = kana.character.charCodeAt(0);
-    const isHiragana = charCode >= 0x3040 && charCode <= 0x309f;
-    const isKatakana = charCode >= 0x30a0 && charCode <= 0x30ff;
-
-    if (filter === "hiragana") {
-      return isHiragana;
-    } else if (filter === "katakana") {
-      return isKatakana;
-    }
-    return false;
-  });
+  const filteredStats = stats.filter((kana) => filterKanaByType(kana, filter));
 
   // Sort the filtered stats
   const sortedFilteredStats = sortedData(filteredStats);
