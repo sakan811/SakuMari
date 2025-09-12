@@ -615,7 +615,7 @@ describe("Flashcard Submit API - Database Operations", () => {
       consoleErrorSpy.mockRestore();
     });
 
-    test("handles Error instance without 'Invalid JSON' message to cover line 74", async () => {
+    test("handles Error instance without 'Invalid JSON' message to cover line 74 - returns 400", async () => {
       // Setup
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
       
@@ -639,10 +639,10 @@ describe("Flashcard Submit API - Database Operations", () => {
       const responseData = await response.json();
 
       // Verify
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400);
       expect(responseData).toEqual({
-        error: "Failed to submit flashcard answer",
-        code: "INTERNAL_ERROR",
+        error: "Invalid request format",
+        code: "BAD_REQUEST",
       });
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         "Error submitting answer:",
