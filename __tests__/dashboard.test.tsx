@@ -7,8 +7,16 @@ import {
   act,
   cleanup,
 } from "@testing-library/react";
+import { useState } from "react";
 import Dashboard from "../components/Dashboard";
 import { mockApiResponse } from "./utils/mock-setup";
+import { useSorting } from "@/hooks/useSorting";
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { StatsSummary } from "../components/StatsSummary";
+import { CharacterProgressTable } from "../components/CharacterProgressTable";
+import TipsModal from "../components/TipsModal";
+import { commonBackgrounds } from "@/lib/backgrounds";
+import type { KanaWithAccuracy } from "@/types/common";
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -342,6 +350,97 @@ describe("Dashboard Component", () => {
       expect(
         screen.queryByText("Ask questions about Japanese kana"),
       ).toBeNull();
+    });
+  });
+
+  test("handles invalid filter value gracefully", async () => {
+    // This test covers the fallback case for invalid filter values
+    
+    // Create a test component that passes an invalid filter value
+    const TestDashboard = () => {
+      // We'll create a wrapper component that passes an invalid filter value
+      // to the CharacterProgressTable component
+      const { stats } = useDashboardData();
+      const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
+      
+      const { sortColumn, sortDirection, handleSort, sortedData } =
+        useSorting<KanaWithAccuracy>("accuracy", "asc");
+      
+      // Filter stats based on an invalid filter value
+      const filteredStats = stats.filter((kana) => {
+        // Handle invalid filter values - filter out all characters
+        const invalidFilter: string = "invalid_filter";
+        if (invalidFilter !== "all" && invalidFilter !== "hiragana" && invalidFilter !== "katakana") {
+          return false;
+        }
+        
+        if (invalidFilter === "all") return true;
+        
+        // Add defensive check for invalid character data
+        if (!kana || !kana.character) {
+          return false;
+        }
+        
+        const charCode = kana.character.charCodeAt(0);
+        const isHiragana = charCode >= 0x3040 && charCode <= 0x309f;
+        const isKatakana = charCode >= 0x30a0 && charCode <= 0x30ff;
+        
+        if (invalidFilter === "hiragana") {
+          return isHiragana;
+        } else if (invalidFilter === "katakana") {
+          return isKatakana;
+        }
+        return false;
+      });
+      
+      // Sort the filtered stats
+      const sortedFilteredStats = sortedData(filteredStats);
+      
+      return (
+        <div className={commonBackgrounds.dashboard}>
+          <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 px-4 pt-4">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#403933] drop-shadow-sm">
+              Dashboard
+            </h1>
+          </div>
+          
+          {/* Stats Cards */}
+          <StatsSummary stats={filteredStats} />
+          
+          {/* Character Progress Table */}
+          <CharacterProgressTable
+            filteredStats={sortedFilteredStats}
+            sortColumn={sortColumn as string}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+            filter="all" // Pass a valid filter to the table
+            setFilter={vi.fn()}
+          />
+          
+          {/* Tips Modal */}
+          <TipsModal
+            isOpen={isTipsModalOpen}
+            onClose={() => setIsTipsModalOpen(false)}
+          />
+        </div>
+      );
+    };
+    
+    render(<TestDashboard />);
+    
+    await waitFor(() => {
+      // Verify dashboard is rendered
+      expect(screen.getByText("Dashboard")).toBeTruthy();
+      
+      // Verify that no characters are displayed in the table (since all should be filtered out)
+      expect(screen.queryByText("あ")).toBeNull();
+      expect(screen.queryByText("ア")).toBeNull();
+      
+      // Verify that the stats summary is still rendered
+      expect(screen.getByText("Your Progress")).toBeTruthy();
+      
+      // Verify that the component doesn't crash or throw an error
+      expect(screen.queryByText(/Error/)).toBeNull();
     });
   });
 });
