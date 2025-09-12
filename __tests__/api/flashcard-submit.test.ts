@@ -24,14 +24,14 @@ import { mockSession } from "../utils/mock-setup";
 const { mockAuth, mockPrisma } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
   mockPrisma: {
-    $executeRaw: vi.fn((strings: readonly string[], ...values: any[]) => {
+    $executeRaw: vi.fn((strings: readonly string[], ...values: unknown[]) => {
       // Create a mock object that simulates the tagged template literal structure
       // Also store the strings and values for later inspection
       return {
         strings,
         values,
       };
-    }) as any,
+    }) as ReturnType<typeof vi.fn>,
   },
 }));
 
@@ -64,7 +64,7 @@ describe("Flashcard Submit API - Database Operations", () => {
       
       // Verify the SQL parameters for INSERT case
       const mockCall = mockPrisma.$executeRaw.mock.calls[0];
-      const callResult = mockPrisma.$executeRaw.mock.results[0].value;
+      const _callResult = mockPrisma.$executeRaw.mock.results[0].value;
       const strings = mockCall[0];
       const values = mockCall.slice(1);
       const fullSql = strings.join('');
@@ -391,14 +391,14 @@ describe("Flashcard Submit API - Database Operations", () => {
         
         // Mock $executeRaw to return a promise that resolves after a delay
         let executeRawResolved = false;
-        mockPrisma.$executeRaw.mockImplementation((strings: readonly string[], ...values: any[]) => {
+        mockPrisma.$executeRaw.mockImplementation((strings: readonly string[], ...values: unknown[]) => {
           return new Promise((resolve) => {
             setTimeout(() => {
               executeRawResolved = true;
               resolve({ strings, values });
             }, 10);
           });
-        }) as any;
+        }) as ReturnType<typeof vi.fn>;
 
         const request = new NextRequest("http://localhost/api/flashcards/submit", {
           method: "POST",
@@ -628,7 +628,7 @@ describe("Flashcard Submit API - Database Operations", () => {
       });
       
       // Mock the request.json() method to throw an Error with a different message
-      const originalJson = requestWithJsonError.json;
+      const _originalJson = requestWithJsonError.json;
       requestWithJsonError.json = vi.fn().mockRejectedValue(new Error("Unexpected token"));
       
       // Spy on console.error
