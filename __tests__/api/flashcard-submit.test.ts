@@ -614,5 +614,44 @@ describe("Flashcard Submit API - Database Operations", () => {
       // Restore console.error
       consoleErrorSpy.mockRestore();
     });
+
+    test("handles Error instance without 'Invalid JSON' message to cover line 74", async () => {
+      // Setup
+      mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
+      
+      // Create a mock request that will throw an Error instance during JSON parsing
+      // but with a message that doesn't contain "Invalid JSON"
+      const requestWithJsonError = new NextRequest("http://localhost/api/flashcards/submit", {
+        method: "POST",
+        body: "{ invalid json }",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      // Mock the request.json() method to throw an Error with a different message
+      const originalJson = requestWithJsonError.json;
+      requestWithJsonError.json = vi.fn().mockRejectedValue(new Error("Unexpected token"));
+      
+      // Spy on console.error
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      
+      // Execute
+      const response = await POST(requestWithJsonError);
+      const responseData = await response.json();
+
+      // Verify
+      expect(response.status).toBe(500);
+      expect(responseData).toEqual({
+        error: "Failed to submit flashcard answer",
+        code: "INTERNAL_ERROR",
+      });
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error submitting answer:",
+        expect.any(Error)
+      );
+      expect(mockPrisma.$executeRaw).not.toHaveBeenCalled();
+      
+      // Restore console.error
+      consoleErrorSpy.mockRestore();
+    });
   });
 });
