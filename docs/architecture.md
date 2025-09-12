@@ -10,9 +10,10 @@
 
 - **Authentication:** Google OAuth + session management with 30-day JWT cookies
 - **Pages:** HomePage, Practice (Hiragana/Katakana), Dashboard
-- **State Management:** FlashcardProvider context with adaptive learning algorithm
-- **Data Layer:** Prisma ORM with type-safe PostgreSQL queries
+- **State Management:** FlashcardProvider context with confidence-weighted adaptive learning algorithm
+- **Data Layer:** Prisma ORM with type-safe PostgreSQL queries + custom Prisma client generation
 - **AI Integration:** Google Gemini for personalized learning recommendations
+- **Utilities:** Kana filtering system, API middleware, error handling, background management
 
 ## Component Architecture
 
@@ -26,9 +27,9 @@
 
 **State Management:**
 
-- **FlashcardProvider:** Adaptive learning algorithm + flashcard state
+- **FlashcardProvider:** Confidence-weighted adaptive learning algorithm + flashcard state
 - **SessionProviders:** NextAuth.js authentication context
-- **Custom Hooks:** `useDashboardData`, `useSorting`, `useAuthStatus`
+- **Custom Hooks:** `useDashboardData`, `useSorting`, `useAuthStatus`, `useFlashcardInteraction`
 
 **Component Groups:**
 
@@ -56,7 +57,8 @@
 
 - **Navigation** - Desktop/Mobile responsive menus
 - **Table** - Sortable headers, data rows
-- **Buttons** - Consistent interface elements
+- **Buttons** - Consistent interface elements (`/components/ui/` directory)
+- **Filtering** - Filter buttons for character type selection (all/hiragana/katakana)
 
 **Responsive Strategy:** Mobile-first design with progressive enhancement
 
@@ -82,9 +84,28 @@ app/
 ├── hiragana/page.tsx     # Hiragana practice
 ├── katakana/page.tsx     # Katakana practice
 ├── dashboard/page.tsx    # Progress dashboard
+├── globals.css           # Global styles
+├── layout.tsx            # Root layout
+├── robots.ts             # SEO configuration
+├── sitemap.ts            # Dynamic sitemap
 └── api/
     ├── auth/[...nextauth]/route.ts
     ├── stats/route.ts
     ├── flashcards/submit/route.ts
-    └── tips/route.ts
+    ├── tips/route.ts
+    └── health/route.ts
+```
+
+**Libraries & Utilities:**
+
+```
+lib/
+├── auth.ts               # NextAuth.js configuration
+├── prisma.ts             # Database client setup
+├── env.ts                # Environment variable management
+├── api-errors.ts         # API error handling
+├── api-middleware.ts     # API middleware functions
+├── backgrounds.ts        # Background management
+├── metadata.ts           # SEO & metadata configuration
+└── kana-filter.ts        # Character filtering utilities
 ```
