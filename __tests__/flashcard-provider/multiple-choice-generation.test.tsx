@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { render, act, waitFor } from "@testing-library/react";
+import { render, act, waitFor, renderHook } from "@testing-library/react";
 import {
   FlashcardProvider,
   useFlashcard,
@@ -324,4 +324,12 @@ describe("FlashcardProvider - Multiple Choice Generation", () => {
       }
     });
   });
-});
+
+  // Create wrapper for renderHook
+  const createWrapper = () => {
+    return ({ children }: { children: React.ReactNode }) => (
+      <FlashcardProvider>{children}</FlashcardProvider>
+    );
+  };
+
+  });

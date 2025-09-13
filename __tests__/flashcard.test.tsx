@@ -477,4 +477,86 @@ describe("Flashcard Component", () => {
     // and the multiple choice component should be rendered
     expect(screen.queryByPlaceholderText("Type romaji equivalent...")).toBeNull();
   });
+
+  describe("Choice selection in multiple choice mode", () => {
+    // Test choice selection when allowed
+    test("should select choice when allowed (neither isSubmitting nor result is true)", () => {
+      setupProvider(createMockProvider({ 
+        currentKana: MOCK_KANA, 
+        interactionMode: "multiple-choice",
+        choices: ["あ", "い", "う", "え"]
+      }));
+
+      render(<Flashcard />);
+
+      // Simulate clicking the first choice button
+      const choiceButton = screen.getByTestId("choice-button-0");
+      fireEvent.click(choiceButton);
+      
+      // Verify the choice was selected by checking if the button has the selected styling
+      expect(choiceButton).toHaveClass("border-[#d1622b]", "bg-[#fad182]/40");
+    });
+
+    // Test choice selection when blocked by submitting state
+    test("should not select choice when isSubmitting is true", () => {
+      setupProvider(createMockProvider({ 
+        currentKana: MOCK_KANA, 
+        interactionMode: "multiple-choice",
+        isSubmitting: true,
+        choices: ["あ", "い", "う", "え"]
+      }));
+
+      render(<Flashcard />);
+
+      // Simulate clicking the first choice button
+      const choiceButton = screen.getByTestId("choice-button-0");
+      fireEvent.click(choiceButton);
+      
+      // Verify the choice was not selected (button should not have selected styling)
+      expect(choiceButton).not.toHaveClass("border-[#d1622b]", "bg-[#fad182]/40");
+      expect(choiceButton).toHaveClass("border-[#705a39]", "bg-white");
+    });
+
+    // Test choice selection when blocked by result (correct)
+    test("should not select choice when result is shown (correct)", () => {
+      setupProvider(createMockProvider({ 
+        currentKana: MOCK_KANA, 
+        interactionMode: "multiple-choice",
+        result: "correct",
+        choices: ["あ", "い", "う", "え"]
+      }));
+
+      render(<Flashcard />);
+
+      // When result is shown, multiple choice buttons should not be rendered at all
+      expect(screen.queryByTestId("choice-button-0")).toBeNull();
+      expect(screen.queryByTestId("choice-button-1")).toBeNull();
+      expect(screen.queryByTestId("choice-button-2")).toBeNull();
+      expect(screen.queryByTestId("choice-button-3")).toBeNull();
+      
+      // Instead, the result message should be shown
+      expect(screen.getByText("Correct!")).toBeInTheDocument();
+    });
+
+    // Test choice selection when blocked by result (incorrect)
+    test("should not select choice when result is shown (incorrect)", () => {
+      setupProvider(createMockProvider({ 
+        currentKana: MOCK_KANA, 
+        interactionMode: "multiple-choice",
+        result: "incorrect",
+        choices: ["あ", "い", "う", "え"]
+      }));
+
+      render(<Flashcard />);
+
+      // When result is shown, multiple choice buttons should not be rendered at all
+      expect(screen.queryByTestId("choice-button-0")).toBeNull();
+      expect(screen.queryByTestId("choice-button-1")).toBeNull();
+      expect(screen.queryByTestId("choice-button-2")).toBeNull();
+      expect(screen.queryByTestId("choice-button-3")).toBeNull();
+      
+      // Instead, the result message should be shown
+      expect(screen.getByText("Incorrect!")).toBeInTheDocument();
+    });
+  });
 });
