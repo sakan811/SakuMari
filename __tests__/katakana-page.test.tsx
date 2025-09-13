@@ -1,6 +1,7 @@
 import { describe, test, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import KatakanaPage from "../app/katakana/page";
+import { createKanaPageTests } from "./utils/page-test-utils";
 
 // Mock FlashcardApp component
 vi.mock("@/components/FlashcardApp", () => ({
@@ -31,3 +32,13 @@ describe("Katakana Page", () => {
     expect(() => render(<KatakanaPage />)).not.toThrow();
   });
 });
+
+// Create additional test suite using shared utilities
+createKanaPageTests(
+  "Katakana",
+  "katakana",
+  () => {
+    // Additional shared test logic can go here
+    expect("katakana").toBe("katakana");
+  }
+);

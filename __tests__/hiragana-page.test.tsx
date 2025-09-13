@@ -1,6 +1,7 @@
 import { describe, test, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import HiraganaPage from "../app/hiragana/page";
+import { createKanaPageTests } from "./utils/page-test-utils";
 
 // Mock FlashcardApp component
 vi.mock("@/components/FlashcardApp", () => ({
@@ -31,3 +32,13 @@ describe("Hiragana Page", () => {
     expect(() => render(<HiraganaPage />)).not.toThrow();
   });
 });
+
+// Create additional test suite using shared utilities
+createKanaPageTests(
+  "Hiragana",
+  "hiragana",
+  () => {
+    // Additional shared test logic can go here
+    expect("hiragana").toBe("hiragana");
+  }
+);
