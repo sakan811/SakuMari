@@ -76,6 +76,18 @@ export default function Flashcard() {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [result, nextCard, isSubmitting]);
 
+  const handleModeChange = (mode: InteractionMode) => {
+    if (isSubmitting || result) return;
+    setInteractionMode(mode);
+    // State will be cleared by useEffect
+  };
+
+  const handleChoiceSelect = (index: number) => {
+    if (isSubmitting || result) return;
+    setSelectedChoice(index);
+    setError("");
+  };
+
   // Clear state when switching modes
   useEffect(() => {
     setAnswer("");
@@ -116,18 +128,7 @@ export default function Flashcard() {
     setError("");
   };
 
-  const handleModeChange = (mode: InteractionMode) => {
-    if (isSubmitting || result) return;
-    setInteractionMode(mode);
-    // State will be cleared by useEffect
-  };
-
-  const handleChoiceSelect = (index: number) => {
-    if (isSubmitting || result) return;
-    setSelectedChoice(index);
-    setError("");
-  };
-
+  
   if (loadingKana) {
     return (
       <div className="flex h-32 sm:h-64 items-center justify-center">
