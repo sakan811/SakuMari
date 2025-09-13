@@ -28,7 +28,7 @@ import React, {
 
 import type { KanaWithAccuracy, InteractionMode } from "@/types/common";
 
-type FlashcardContextType = {
+export type FlashcardContextType = {
   currentKana: KanaWithAccuracy | null;
   loadingKana: boolean;
   submitAnswer: (_: string) => Promise<void>;
