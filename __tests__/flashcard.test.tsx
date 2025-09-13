@@ -2,63 +2,75 @@ import { describe, test, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Flashcard from "../components/Flashcard";
 import { useFlashcard } from "../components/FlashcardProvider";
-import { mockFlashcardProvider } from "./utils/mock-setup";
-import { mockKana } from "./utils/test-helpers";
+import { mockFlashcardProvider, mockKanaData } from "./utils/mock-setup";
 
 vi.mock("../components/FlashcardProvider", () => ({
   useFlashcard: vi.fn(),
 }));
 
+// Test configuration constants
+const DEFAULT_CHOICES = ["a", "ka", "sa", "ta"];
+const DEFAULT_INTERACTION_MODE = "typing" as const;
+const MOCK_KANA = mockKanaData();
+
+type FlashcardProviderMock = ReturnType<typeof mockFlashcardProvider>;
+
+// Helper functions for test setup
+function createMockProvider(overrides: Partial<FlashcardProviderMock> = {}): FlashcardProviderMock {
+  return mockFlashcardProvider({
+    interactionMode: DEFAULT_INTERACTION_MODE,
+    choices: DEFAULT_CHOICES,
+    ...overrides,
+  });
+}
+
+function setupProvider(mockProvider: FlashcardProviderMock) {
+  (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(mockProvider);
+}
+
+function getSubmitButton() {
+  return screen.getByRole("button", { name: "Submit" });
+}
+
+function getNextButton() {
+  return screen.getByRole("button", { name: "Next Card" });
+}
+
+function getInputField() {
+  return screen.getByPlaceholderText("Type romaji equivalent...");
+}
+
+function getMultipleChoiceButton() {
+  return screen.getByTestId("multiple-choice-button");
+}
+
+
 describe("Flashcard Component", () => {
   beforeEach(() => {
-    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockFlashcardProvider({
-        interactionMode: "typing",
-        choices: ["a", "ka", "sa", "ta"],
-      }),
-    );
+    setupProvider(createMockProvider());
   });
 
   test("shows loading state", () => {
-    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockFlashcardProvider({
-        loadingKana: true,
-        interactionMode: "typing",
-        choices: ["a", "ka", "sa", "ta"],
-      }),
-    );
+    setupProvider(createMockProvider({ loadingKana: true }));
     render(<Flashcard />);
     expect(screen.getByRole("status")).toBeDefined();
   });
 
   test("shows empty state when no cards", () => {
-    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockFlashcardProvider({
-        interactionMode: "typing",
-        choices: ["a", "ka", "sa", "ta"],
-      }),
-    );
     render(<Flashcard />);
     expect(screen.getByText("No flashcards available.")).toBeDefined();
   });
 
   test("renders flashcard and handles submission", async () => {
     const submitAnswer = vi.fn();
-    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockFlashcardProvider({
-        currentKana: mockKana.basic,
-        submitAnswer,
-        interactionMode: "typing",
-        choices: ["a", "ka", "sa", "ta"],
-      }),
-    );
+    setupProvider(createMockProvider({ currentKana: MOCK_KANA, submitAnswer }));
 
     render(<Flashcard />);
 
     expect(screen.getByText("あ")).toBeDefined();
 
-    const input = screen.getByPlaceholderText("Type romaji equivalent...");
-    const submitButton = screen.getByRole("button", { name: "Submit" });
+    const input = getInputField();
+    const submitButton = getSubmitButton();
 
     fireEvent.change(input, { target: { value: "a" } });
     fireEvent.click(submitButton);
@@ -68,54 +80,33 @@ describe("Flashcard Component", () => {
 
   test("shows results and handles next card", () => {
     const nextCard = vi.fn();
-    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockFlashcardProvider({
-        currentKana: mockKana.basic,
-        result: "correct",
-        nextCard,
-        interactionMode: "typing",
-        choices: ["a", "ka", "sa", "ta"],
-      }),
-    );
+    setupProvider(createMockProvider({ currentKana: MOCK_KANA, result: "correct", nextCard }));
 
     render(<Flashcard />);
 
     expect(screen.getByText("Correct!")).toBeDefined();
 
-    fireEvent.click(screen.getByRole("button", { name: "Next Card" }));
+    fireEvent.click(getNextButton());
     expect(nextCard).toHaveBeenCalled();
   });
 
   test("validates empty input", () => {
-    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockFlashcardProvider({
-        currentKana: mockKana.basic,
-        interactionMode: "typing",
-        choices: ["a", "ka", "sa", "ta"],
-      }),
-    );
+    setupProvider(createMockProvider({ currentKana: MOCK_KANA }));
 
     render(<Flashcard />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+    fireEvent.click(getSubmitButton());
     expect(screen.getByText("Please enter an answer")).toBeDefined();
   });
 
   describe("Keyboard Navigation", () => {
     test("submits answer when Enter is pressed in typing mode", () => {
       const submitAnswer = vi.fn();
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          submitAnswer,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, submitAnswer }));
 
       render(<Flashcard />);
 
-      const input = screen.getByPlaceholderText("Type romaji equivalent...");
+      const input = getInputField();
       fireEvent.change(input, { target: { value: "a" } });
       fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
 
@@ -124,15 +115,7 @@ describe("Flashcard Component", () => {
 
     test("advances to next card when Enter is pressed after result is shown", () => {
       const nextCard = vi.fn();
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          result: "correct",
-          nextCard,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, result: "correct", nextCard }));
 
       render(<Flashcard />);
 
@@ -142,14 +125,7 @@ describe("Flashcard Component", () => {
 
     test("does not advance to next card when Enter is pressed without result", () => {
       const nextCard = vi.fn();
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          nextCard,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, nextCard }));
 
       render(<Flashcard />);
 
@@ -158,22 +134,16 @@ describe("Flashcard Component", () => {
     });
 
     test("clears error when user starts typing", () => {
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA }));
 
       render(<Flashcard />);
 
       // First trigger an error
-      fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+      fireEvent.click(getSubmitButton());
       expect(screen.getByText("Please enter an answer")).toBeDefined();
 
       // Then start typing to clear the error
-      const input = screen.getByPlaceholderText("Type romaji equivalent...");
+      const input = getInputField();
       fireEvent.change(input, { target: { value: "a" } });
 
       expect(screen.queryByText("Please enter an answer")).toBeNull();
@@ -182,18 +152,11 @@ describe("Flashcard Component", () => {
 
   describe("Disabled States", () => {
     test("disables input and submit button when processing", () => {
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-          isSubmitting: true,
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, isSubmitting: true }));
 
       render(<Flashcard />);
 
-      const input = screen.getByPlaceholderText("Type romaji equivalent...");
+      const input = getInputField();
       const submitButton = screen.getByRole("button", {
         name: "Submitting...",
       });
@@ -205,15 +168,7 @@ describe("Flashcard Component", () => {
     });
 
     test("disables next card button when processing", () => {
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          result: "correct",
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-          isSubmitting: true,
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, result: "correct", isSubmitting: true }));
 
       render(<Flashcard />);
 
@@ -224,19 +179,11 @@ describe("Flashcard Component", () => {
 
     test("prevents multiple submissions when processing", () => {
       const submitAnswer = vi.fn();
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          submitAnswer,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-          isSubmitting: true,
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, submitAnswer, isSubmitting: true }));
 
       render(<Flashcard />);
 
-      const input = screen.getByPlaceholderText("Type romaji equivalent...");
+      const input = getInputField();
       const submitButton = screen.getByRole("button", {
         name: "Submitting...",
       });
@@ -252,19 +199,11 @@ describe("Flashcard Component", () => {
 
     test("prevents keyboard submission when processing", () => {
       const submitAnswer = vi.fn();
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          submitAnswer,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-          isSubmitting: true,
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, submitAnswer, isSubmitting: true }));
 
       render(<Flashcard />);
 
-      const input = screen.getByPlaceholderText("Type romaji equivalent...");
+      const input = getInputField();
       fireEvent.change(input, { target: { value: "a" } });
 
       // Enter presses should be ignored while processing
@@ -275,16 +214,7 @@ describe("Flashcard Component", () => {
 
     test("prevents next card action when processing", () => {
       const nextCard = vi.fn();
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          result: "correct",
-          nextCard,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-          isSubmitting: true,
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, result: "correct", nextCard, isSubmitting: true }));
 
       render(<Flashcard />);
 
@@ -297,33 +227,23 @@ describe("Flashcard Component", () => {
 
   describe("Multiple Choice Mode", () => {
     test("validates empty selection in multiple choice mode", () => {
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          interactionMode: "multiple-choice",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, interactionMode: "multiple-choice" }));
 
       render(<Flashcard />);
 
-      fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+      fireEvent.click(getSubmitButton());
       expect(screen.getByText("Please select an answer")).toBeDefined();
     });
 
     test("clears error when user selects a choice", () => {
-      const mockProvider = mockFlashcardProvider({
-        currentKana: mockKana.basic,
-        interactionMode: "multiple-choice",
-        choices: ["a", "ka", "sa", "ta"],
-      });
+      const mockProvider = createMockProvider({ currentKana: MOCK_KANA, interactionMode: "multiple-choice" });
 
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(mockProvider);
+      setupProvider(mockProvider);
 
       render(<Flashcard />);
 
       // First trigger an error
-      fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+      fireEvent.click(getSubmitButton());
       expect(screen.getByText("Please select an answer")).toBeDefined();
 
       // Mock a choice selection to clear the error
@@ -335,34 +255,20 @@ describe("Flashcard Component", () => {
   describe("Mode Switching", () => {
     test("clears state when switching between modes", () => {
       const setInteractionMode = vi.fn();
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          interactionMode: "typing",
-          setInteractionMode,
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, setInteractionMode }));
 
       const { unmount } = render(<Flashcard />);
 
-      const input = screen.getByPlaceholderText("Type romaji equivalent...");
+      const input = getInputField();
 
       // Enter empty text and trigger an error
       fireEvent.change(input, { target: { value: "" } });
-      fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+      fireEvent.click(getSubmitButton());
       expect(screen.getByText("Please enter an answer")).toBeDefined();
 
       // Unmount and switch modes
       unmount();
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          interactionMode: "multiple-choice",
-          setInteractionMode,
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, interactionMode: "multiple-choice", setInteractionMode }));
 
       // Re-render with new mode
       render(<Flashcard />);
@@ -371,18 +277,10 @@ describe("Flashcard Component", () => {
       expect(screen.queryByText("Please enter an answer")).toBeNull();
     });
   });
-  // Tests from flashcard-uncovered.test.tsx
+  // Tests for mode change restrictions
   test("disables mode change when submitting or showing result", () => {
     const setInteractionMode = vi.fn();
-    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockFlashcardProvider({
-        currentKana: mockKana.basic,
-        result: "correct",
-        setInteractionMode,
-        interactionMode: "typing",
-        choices: ["a", "ka", "sa", "ta"],
-      }),
-    );
+    setupProvider(createMockProvider({ currentKana: MOCK_KANA, result: "correct", setInteractionMode }));
 
     render(<Flashcard />);
 
@@ -399,15 +297,7 @@ describe("Flashcard Component", () => {
 
   test("disables mode change when submitting", () => {
     const setInteractionMode = vi.fn();
-    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockFlashcardProvider({
-        currentKana: mockKana.basic,
-        isSubmitting: true,
-        setInteractionMode,
-        interactionMode: "typing",
-        choices: ["a", "ka", "sa", "ta"],
-      }),
-    );
+    setupProvider(createMockProvider({ currentKana: MOCK_KANA, isSubmitting: true, setInteractionMode }));
 
     render(<Flashcard />);
 
@@ -423,14 +313,7 @@ describe("Flashcard Component", () => {
   });
 
   test("disables choice selection when submitting or showing result", () => {
-    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockFlashcardProvider({
-        currentKana: mockKana.basic,
-        result: "correct",
-        interactionMode: "multiple-choice",
-        choices: ["a", "ka", "sa", "ta"],
-      }),
-    );
+    setupProvider(createMockProvider({ currentKana: MOCK_KANA, result: "correct", interactionMode: "multiple-choice" }));
 
     render(<Flashcard />);
 
@@ -444,14 +327,7 @@ describe("Flashcard Component", () => {
   });
 
   test("disables choice selection when submitting", () => {
-    (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockFlashcardProvider({
-        currentKana: mockKana.basic,
-        isSubmitting: true,
-        interactionMode: "multiple-choice",
-        choices: ["a", "ka", "sa", "ta"],
-      }),
-    );
+    setupProvider(createMockProvider({ currentKana: MOCK_KANA, isSubmitting: true, interactionMode: "multiple-choice" }));
 
     render(<Flashcard />);
 
@@ -465,174 +341,57 @@ describe("Flashcard Component", () => {
   });
 
   describe("handleModeChange function", () => {
-    test("should not change mode when submitting", () => {
+    // Test mode change when allowed
+    test("should change mode when allowed (neither isSubmitting nor result is true)", () => {
       const setInteractionMode = vi.fn();
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          isSubmitting: true,
-          setInteractionMode,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, setInteractionMode }));
 
       render(<Flashcard />);
 
-      // Simulate mode change when submitting
-      const typingButton = screen.getByTestId("typing-button");
-      const multipleChoiceButton = screen.getByTestId("multiple-choice-button");
-      
-      // Click on the multiple choice button to trigger mode change
-      fireEvent.click(multipleChoiceButton);
-      
-      // The mode change should not happen when submitting
-      expect(setInteractionMode).not.toHaveBeenCalled();
-    });
-
-    test("should not change mode when result is shown", () => {
-      const setInteractionMode = vi.fn();
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          result: "correct",
-          setInteractionMode,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Simulate mode change when result is shown
-      const typingButton = screen.getByTestId("typing-button");
-      const multipleChoiceButton = screen.getByTestId("multiple-choice-button");
-      
-      // Click on the multiple choice button to trigger mode change
-      fireEvent.click(multipleChoiceButton);
-      
-      // The mode change should not happen when result is shown
-      expect(setInteractionMode).not.toHaveBeenCalled();
-    });
-
-    test("should change mode when not submitting and no result is shown", () => {
-      const setInteractionMode = vi.fn();
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          setInteractionMode,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Simulate mode change when not submitting and no result
-      const typingButton = screen.getByTestId("typing-button");
-      const multipleChoiceButton = screen.getByTestId("multiple-choice-button");
-      
-      // Click on the multiple choice button to trigger mode change
-      fireEvent.click(multipleChoiceButton);
-      
-      // The mode change should happen when not submitting and no result
+      fireEvent.click(getMultipleChoiceButton());
       expect(setInteractionMode).toHaveBeenCalledWith("multiple-choice");
     });
-  });
 
-  describe("handleModeChange function specific coverage", () => {
-    test("should not call setInteractionMode when isSubmitting is true", () => {
+    // Test mode change when blocked by submitting state
+    test("should not change mode when isSubmitting is true", () => {
       const setInteractionMode = vi.fn();
-      const nextCard = vi.fn();
-      const submitAnswer = vi.fn();
-      
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          isSubmitting: true,
-          setInteractionMode,
-          nextCard,
-          submitAnswer,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, setInteractionMode, isSubmitting: true }));
 
       render(<Flashcard />);
 
-      // Simulate the handleModeChange function being called internally
-      // This tests the guard clause: if (isSubmitting || result) return;
+      fireEvent.click(getMultipleChoiceButton());
       expect(setInteractionMode).not.toHaveBeenCalled();
     });
 
-    test("should not call setInteractionMode when result is shown (correct)", () => {
+    // Test mode change when blocked by result (correct)
+    test("should not change mode when result is shown (correct)", () => {
       const setInteractionMode = vi.fn();
-      const nextCard = vi.fn();
-      const submitAnswer = vi.fn();
-      
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          result: "correct",
-          setInteractionMode,
-          nextCard,
-          submitAnswer,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, setInteractionMode, result: "correct" }));
 
       render(<Flashcard />);
 
-      // Simulate the handleModeChange function being called internally
-      // This tests the guard clause: if (isSubmitting || result) return;
+      fireEvent.click(getMultipleChoiceButton());
       expect(setInteractionMode).not.toHaveBeenCalled();
     });
 
-    test("should not call setInteractionMode when result is shown (incorrect)", () => {
+    // Test mode change when blocked by result (incorrect)
+    test("should not change mode when result is shown (incorrect)", () => {
       const setInteractionMode = vi.fn();
-      const nextCard = vi.fn();
-      const submitAnswer = vi.fn();
-      
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          result: "incorrect",
-          setInteractionMode,
-          nextCard,
-          submitAnswer,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, setInteractionMode, result: "incorrect" }));
 
       render(<Flashcard />);
 
-      // Simulate the handleModeChange function being called internally
-      // This tests the guard clause: if (isSubmitting || result) return;
+      fireEvent.click(getMultipleChoiceButton());
       expect(setInteractionMode).not.toHaveBeenCalled();
     });
 
+    // Test that setInteractionMode function is available
     test("should call setInteractionMode when not submitting and no result", () => {
       const setInteractionMode = vi.fn();
-      const nextCard = vi.fn();
-      const submitAnswer = vi.fn();
-      
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          setInteractionMode,
-          nextCard,
-          submitAnswer,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, setInteractionMode }));
 
       render(<Flashcard />);
 
-      // In normal circumstances, the ModeSelector component would call handleModeChange
-      // For this test, we verify that setInteractionMode is available and would be called
       expect(setInteractionMode).toBeDefined();
     });
   });
@@ -640,20 +399,11 @@ describe("Flashcard Component", () => {
   describe("Enter key handling in typing mode", () => {
     test("should call handleSubmit when Enter key is pressed in typing mode input", () => {
       const submitAnswer = vi.fn();
-      const handleSubmit = vi.fn();
-      
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          submitAnswer,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, submitAnswer }));
 
       render(<Flashcard />);
 
-      const input = screen.getByPlaceholderText("Type romaji equivalent...");
+      const input = getInputField();
       
       // This test covers the onKeyDown handler at line 207:
       // onKeyDown={(e) => { if (e.key === "Enter") { handleSubmit(); } }}
@@ -666,19 +416,11 @@ describe("Flashcard Component", () => {
 
     test("should not call handleSubmit when other keys are pressed", () => {
       const submitAnswer = vi.fn();
-      
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          submitAnswer,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, submitAnswer }));
 
       render(<Flashcard />);
 
-      const input = screen.getByPlaceholderText("Type romaji equivalent...");
+      const input = getInputField();
       
       fireEvent.change(input, { target: { value: "a" } });
       fireEvent.keyDown(input, { key: "Escape", code: "Escape" });
@@ -689,24 +431,50 @@ describe("Flashcard Component", () => {
 
     test("should not call handleSubmit when Enter is pressed on empty input", () => {
       const submitAnswer = vi.fn();
-      
-      (useFlashcard as ReturnType<typeof vi.fn>).mockReturnValue(
-        mockFlashcardProvider({
-          currentKana: mockKana.basic,
-          submitAnswer,
-          interactionMode: "typing",
-          choices: ["a", "ka", "sa", "ta"],
-        }),
-      );
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA, submitAnswer }));
 
       render(<Flashcard />);
 
-      const input = screen.getByPlaceholderText("Type romaji equivalent...");
+      const input = getInputField();
       
       fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
 
       expect(submitAnswer).not.toHaveBeenCalled();
       expect(screen.getByText("Please enter an answer")).toBeInTheDocument();
     });
+  });
+
+  test("should clear state variables after mode change", () => {
+    const setInteractionMode = vi.fn();
+    setupProvider(createMockProvider({ currentKana: MOCK_KANA, setInteractionMode }));
+
+    const { rerender } = render(<Flashcard />);
+
+    // Set some state values
+    const input = getInputField();
+    fireEvent.change(input, { target: { value: "" } });
+    
+    // Trigger an error by submitting empty input
+    fireEvent.click(getSubmitButton());
+    expect(screen.getByText("Please enter an answer")).toBeInTheDocument();
+
+    // Now set a valid value
+    fireEvent.change(input, { target: { value: "a" } });
+    
+    // Change mode to multiple-choice
+    fireEvent.click(getMultipleChoiceButton());
+    expect(setInteractionMode).toHaveBeenCalledWith("multiple-choice");
+
+    // Re-render with the new mode
+    setupProvider(createMockProvider({ currentKana: MOCK_KANA, setInteractionMode, interactionMode: "multiple-choice" }));
+    rerender(<Flashcard />);
+
+    // Verify that state has been cleared
+    // The error should be cleared
+    expect(screen.queryByText("Please enter an answer")).toBeNull();
+    
+    // The input should be cleared (since we're now in multiple-choice mode)
+    // and the multiple choice component should be rendered
+    expect(screen.queryByPlaceholderText("Type romaji equivalent...")).toBeNull();
   });
 });

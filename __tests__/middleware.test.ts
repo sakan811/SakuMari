@@ -21,8 +21,8 @@ vi.mock("next/server", async () => {
 });
 
 // Import the actual middleware function
-let middleware: any;
-let config: any;
+let middleware: unknown;
+let config: { matcher: string[] };
 
 // Mock the auth function to allow actual middleware execution
 vi.mock("@/lib/auth", () => ({
@@ -64,7 +64,7 @@ describe("Middleware", () => {
       mockRedirect.mockReturnValue({} as NextResponse);
 
       // Call the actual middleware function with the mock request
-      await middleware(mockRequest, { params: Promise.resolve({}) });
+      await (middleware as (req: NextRequest, context: { params: Promise<Record<string, string>> }) => Promise<NextResponse>)(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockRedirect).toHaveBeenCalledWith(
         new URL("/", `http://localhost:3000${pathname}`),
@@ -88,7 +88,7 @@ describe("Middleware", () => {
       mockNext.mockReturnValue({} as NextResponse);
 
       // Call the actual middleware function with the mock request
-      await middleware(mockRequest, { params: Promise.resolve({}) });
+      await (middleware as (req: NextRequest, context: { params: Promise<Record<string, string>> }) => Promise<NextResponse>)(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockNext).toHaveBeenCalled();
       expect(NextResponse.redirect).not.toHaveBeenCalled();
@@ -110,7 +110,7 @@ describe("Middleware", () => {
       mockNext.mockReturnValue({} as NextResponse);
 
       // Call the actual middleware function with the mock request
-      await middleware(mockRequest, { params: Promise.resolve({}) });
+      await (middleware as (req: NextRequest, context: { params: Promise<Record<string, string>> }) => Promise<NextResponse>)(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockNext).toHaveBeenCalled();
       expect(NextResponse.redirect).not.toHaveBeenCalled();
@@ -132,7 +132,7 @@ describe("Middleware", () => {
       mockNext.mockReturnValue({} as NextResponse);
 
       // Call the actual middleware function with the mock request
-      await middleware(mockRequest, { params: Promise.resolve({}) });
+      await (middleware as (req: NextRequest, context: { params: Promise<Record<string, string>> }) => Promise<NextResponse>)(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockNext).toHaveBeenCalled();
       expect(NextResponse.redirect).not.toHaveBeenCalled();
@@ -184,7 +184,7 @@ describe("Middleware", () => {
       mockRedirect.mockReturnValue({} as NextResponse);
 
       // Call the actual middleware function with the mock request
-      await middleware(mockRequest, { params: Promise.resolve({}) });
+      await (middleware as (req: NextRequest, context: { params: Promise<Record<string, string>> }) => Promise<NextResponse>)(mockRequest, { params: Promise.resolve({}) });
 
       expect(mockRedirect).toHaveBeenCalledWith(
         new URL("/", "http://localhost:3000/dashboard"),
@@ -237,7 +237,7 @@ describe("Middleware", () => {
         mockRedirect.mockReturnValue({} as NextResponse);
 
         // Call the actual middleware function with the mock request
-        await middleware(mockRequest, { params: Promise.resolve({}) });
+        await (middleware as (req: NextRequest, context: { params: Promise<Record<string, string>> }) => Promise<NextResponse>)(mockRequest, { params: Promise.resolve({}) });
 
         expect(mockRedirect).toHaveBeenCalledWith(
           new URL("/", `http://localhost:3000${pathname}`),
@@ -263,7 +263,7 @@ describe("Middleware", () => {
         mockNext.mockReturnValue({} as NextResponse);
 
         // Call the actual middleware function with the mock request
-        await middleware(mockRequest, { params: Promise.resolve({}) });
+        await (middleware as (req: NextRequest, context: { params: Promise<Record<string, string>> }) => Promise<NextResponse>)(mockRequest, { params: Promise.resolve({}) });
 
         expect(mockNext).toHaveBeenCalled();
         expect(NextResponse.redirect).not.toHaveBeenCalled();
@@ -287,7 +287,7 @@ describe("Middleware", () => {
         mockNext.mockReturnValue({} as NextResponse);
 
         // Call the actual middleware function with the mock request
-        await middleware(mockRequest, { params: Promise.resolve({}) });
+        await (middleware as (req: NextRequest, context: { params: Promise<Record<string, string>> }) => Promise<NextResponse>)(mockRequest, { params: Promise.resolve({}) });
 
         expect(mockNext).toHaveBeenCalled();
         expect(NextResponse.redirect).not.toHaveBeenCalled();
