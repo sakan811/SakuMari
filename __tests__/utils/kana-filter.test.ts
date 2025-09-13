@@ -16,7 +16,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { filterKanaByType, KanaFilter } from "@/lib/kana-filter";
+import { filterKanaByType } from "@/lib/kana-filter";
 import type { KanaWithAccuracy } from "@/types/common";
 
 describe("filterKanaByType", () => {
@@ -214,6 +214,30 @@ describe("filterKanaByType", () => {
         expect(filterKanaByType(kana, "hiragana")).toBe(false);
         expect(filterKanaByType(kana, "katakana")).toBe(true);
         expect(filterKanaByType(kana, "all")).toBe(true);
+      });
+    });
+  });
+
+  describe("invalid filter values", () => {
+    it("should return false for invalid filter values", () => {
+      // Test with invalid filter values that would fall through to line 41
+      const invalidFilters = ["invalid", "unknown", "test", "", null, undefined] as any[];
+      
+      invalidFilters.forEach((filter) => {
+        // @ts-ignore - Testing invalid input
+        const result = filterKanaByType(hiraganaKana, filter);
+        expect(result).toBe(false);
+      });
+    });
+
+    it("should return false for case-sensitive invalid filter values", () => {
+      // Test with case variations that should not match
+      const caseInvalidFilters = ["Hiragana", "Katakana", "ALL", "All", "hIRAGANA", "kATAKANA"];
+      
+      caseInvalidFilters.forEach((filter) => {
+        // @ts-ignore - Testing invalid input
+        const result = filterKanaByType(hiraganaKana, filter);
+        expect(result).toBe(false);
       });
     });
   });

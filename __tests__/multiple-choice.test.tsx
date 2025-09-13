@@ -220,4 +220,53 @@ describe("MultipleChoice Component", () => {
       expect(screen.getAllByText("ka")).toHaveLength(2);
     });
   });
+
+  describe("Default Prop Values", () => {
+    test("should use default value for disabled prop when not provided", () => {
+      render(<MultipleChoice {...defaultProps} disabled={undefined} />);
+
+      mockChoices.forEach((choice) => {
+        const button = screen.getByText(choice).closest("button");
+        expect(button).not.toBeDisabled();
+        expect(button).toHaveAttribute("tabIndex", "0");
+      });
+    });
+
+    test("should use default value for disabled prop when omitted", () => {
+      const propsWithoutDisabled = {
+        choices: mockChoices,
+        selectedChoice: null,
+        onChoiceSelect: mockOnChoiceSelect,
+        error: undefined,
+      };
+
+      render(<MultipleChoice {...propsWithoutDisabled} />);
+
+      mockChoices.forEach((choice) => {
+        const button = screen.getByText(choice).closest("button");
+        expect(button).not.toBeDisabled();
+        expect(button).toHaveAttribute("tabIndex", "0");
+      });
+    });
+
+    test("should handle explicit disabled prop override", () => {
+      render(<MultipleChoice {...defaultProps} disabled={true} />);
+
+      mockChoices.forEach((choice) => {
+        const button = screen.getByText(choice).closest("button");
+        expect(button).toBeDisabled();
+        expect(button).toHaveAttribute("tabIndex", "-1");
+      });
+    });
+
+    test("should handle explicit disabled prop set to false", () => {
+      render(<MultipleChoice {...defaultProps} disabled={false} />);
+
+      mockChoices.forEach((choice) => {
+        const button = screen.getByText(choice).closest("button");
+        expect(button).not.toBeDisabled();
+        expect(button).toHaveAttribute("tabIndex", "0");
+      });
+    });
+  });
 });

@@ -466,6 +466,36 @@ describe("TipsModal", () => {
     });
   });
 
+  test("handles unmounted component during error processing", async () => {
+    const { unmount } = render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const input = screen.getByPlaceholderText(
+      "Ask about kana learning techniques...",
+    );
+    const submitButton = screen.getByRole("button", { name: "Ask" });
+
+    // Simulate component unmounting during API call
+    mockFetch.mockImplementationOnce(() => {
+      unmount(); // Unmount component while API is processing
+      return Promise.resolve({
+        ok: false,
+        status: 500,
+        json: async () => ({ error: "Test error" }),
+      });
+    });
+
+    fireEvent.change(input, { target: { value: "Test question" } });
+    fireEvent.click(submitButton);
+
+    // Wait for async operations to complete
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    });
+
+    // Component should be unmounted without throwing errors
+    expect(screen.queryByText("Test error")).not.toBeInTheDocument();
+  });
+
   test("handles JSON parsing error", async () => {
     const errorResponse = {
       ok: false,
@@ -498,6 +528,110 @@ describe("TipsModal", () => {
       status: 400,
       json: async () => {
         throw "String error";
+      },
+    };
+
+    mockFetch.mockResolvedValue(errorResponse);
+
+    render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const input = screen.getByPlaceholderText(
+      "Ask about kana learning techniques...",
+    );
+    const submitButton = screen.getByRole("button", { name: "Ask" });
+
+    fireEvent.change(input, { target: { value: "Test question" } });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+    });
+  });
+
+  test("handles null error object", async () => {
+    const errorResponse = {
+      ok: false,
+      status: 400,
+      json: async () => {
+        throw null;
+      },
+    };
+
+    mockFetch.mockResolvedValue(errorResponse);
+
+    render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const input = screen.getByPlaceholderText(
+      "Ask about kana learning techniques...",
+    );
+    const submitButton = screen.getByRole("button", { name: "Ask" });
+
+    fireEvent.change(input, { target: { value: "Test question" } });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+    });
+  });
+
+  test("handles undefined error object", async () => {
+    const errorResponse = {
+      ok: false,
+      status: 400,
+      json: async () => {
+        throw undefined;
+      },
+    };
+
+    mockFetch.mockResolvedValue(errorResponse);
+
+    render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const input = screen.getByPlaceholderText(
+      "Ask about kana learning techniques...",
+    );
+    const submitButton = screen.getByRole("button", { name: "Ask" });
+
+    fireEvent.change(input, { target: { value: "Test question" } });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+    });
+  });
+
+  test("handles number error object", async () => {
+    const errorResponse = {
+      ok: false,
+      status: 400,
+      json: async () => {
+        throw 500;
+      },
+    };
+
+    mockFetch.mockResolvedValue(errorResponse);
+
+    render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const input = screen.getByPlaceholderText(
+      "Ask about kana learning techniques...",
+    );
+    const submitButton = screen.getByRole("button", { name: "Ask" });
+
+    fireEvent.change(input, { target: { value: "Test question" } });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+    });
+  });
+
+  test("handles object error without message property", async () => {
+    const errorResponse = {
+      ok: false,
+      status: 400,
+      json: async () => {
+        throw { code: "CUSTOM_ERROR", status: 400 };
       },
     };
 
