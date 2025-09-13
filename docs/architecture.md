@@ -29,7 +29,7 @@
 
 - **FlashcardProvider:** Confidence-weighted adaptive learning algorithm + flashcard state
 - **SessionProviders:** NextAuth.js authentication context
-- **Custom Hooks:** `useDashboardData`, `useSorting`, `useAuthStatus`, `useFlashcardInteraction`
+- **Custom Hooks:** `useDashboardData`, `useSorting`, `useAuthStatus`, `useFlashcardInteraction`, `useFlashcardHandlers`
 
 **Component Groups:**
 
@@ -43,8 +43,8 @@
 ### Practice Components
 
 - **Flashcard** - Dual input modes (typing/multiple-choice)
-- **ModeSelector** - Input mode toggle
-- **MultipleChoice** - Multiple-choice interface
+- **ModeSelector** - Input mode toggle (managed by useFlashcardHandlers)
+- **MultipleChoice** - Multiple-choice interface (managed by useFlashcardHandlers)
 
 ### Dashboard Components
 
@@ -86,6 +86,7 @@ app/
 ├── dashboard/page.tsx    # Progress dashboard
 ├── globals.css           # Global styles
 ├── layout.tsx            # Root layout
+├── middleware.ts         # Route protection middleware
 ├── robots.ts             # SEO configuration
 ├── sitemap.ts            # Dynamic sitemap
 └── api/
@@ -108,4 +109,30 @@ lib/
 ├── backgrounds.ts        # Background management
 ├── metadata.ts           # SEO & metadata configuration
 └── kana-filter.ts        # Character filtering utilities
+```
+
+**Custom Hooks:**
+
+```
+hooks/
+├── useAuthStatus.ts          # Authentication state management
+├── useDashboardData.ts       # Dashboard data fetching
+├── useFlashcardInteraction.ts # Flashcard interaction logic
+├── useFlashcardHandlers.ts   # Flashcard mode and choice selection handlers
+└── useSorting.ts             # Table sorting functionality
+```
+
+**Test Infrastructure:**
+
+```
+__tests__/
+├── api/                      # API endpoint tests
+├── auth/                     # Authentication flow tests
+├── db/                       # Database operation tests with isolated SQLite
+├── e2e/                      # End-to-end Playwright tests
+├── flashcard-provider/       # Provider logic tests
+├── hooks/                    # Custom hooks tests
+├── seo/                      # SEO and metadata tests
+├── utils/                    # Test helpers and utilities
+└── use-flashcard-handlers.test.ts # Legacy location (to be moved to hooks/)
 ```
