@@ -46,7 +46,7 @@ describe("Prisma Client Configuration", () => {
     process.env = { ...originalEnv };
     
     // Reset global object
-    delete (global as any).prisma;
+    delete (global as typeof globalThis & { prisma?: unknown }).prisma;
     
     // Default mock implementation for getDatabaseUrls
     mockGetDatabaseUrls.mockReturnValue({
@@ -60,7 +60,7 @@ describe("Prisma Client Configuration", () => {
     process.env = originalEnv;
     
     // Clean up global prisma
-    delete (global as any).prisma;
+    delete (global as typeof globalThis & { prisma?: unknown }).prisma;
     
     // Reset all environment stubs
     vi.unstubAllEnvs();
@@ -166,7 +166,7 @@ describe("Prisma Client Configuration", () => {
     vi.stubEnv("NODE_ENV", "development");
 
     // Clear any existing global prisma
-    delete (global as any).prisma;
+    delete (global as typeof globalThis & { prisma?: unknown }).prisma;
 
     // Import the module after setting up mocks
     const { prisma } = await import("@/lib/prisma");
@@ -180,13 +180,13 @@ describe("Prisma Client Configuration", () => {
     vi.stubEnv("NODE_ENV", "production");
 
     // Clear any existing global prisma
-    delete (global as any).prisma;
+    delete (global as typeof globalThis & { prisma?: unknown }).prisma;
 
     // Import the module after setting up mocks
     await import("@/lib/prisma");
 
     // Verify global prisma was not set
-    expect((global as any).prisma).toBeUndefined();
+    expect((global as typeof globalThis & { prisma?: unknown }).prisma).toBeUndefined();
   });
 
   it("should use the correct database URL from getDatabaseUrls", async () => {

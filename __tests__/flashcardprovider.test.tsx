@@ -5,6 +5,8 @@ import {
   FlashcardProvider,
   useFlashcard,
 } from "../components/FlashcardProvider";
+import MultipleChoice from "../components/MultipleChoice";
+import type { FlashcardContextType } from "../components/FlashcardProvider";
 
 // Mock fetch for API calls
 const mockFetch = vi.fn();
@@ -61,7 +63,7 @@ describe("FlashcardProvider", () => {
     ];
 
     // Test component to access provider context
-    function TestComponent({ onContext }: { onContext: (context: any) => void }) {
+    function TestComponent({ onContext }: { onContext: (context: FlashcardContextType | undefined) => void }) {
       const context = useFlashcard();
       React.useEffect(() => {
         onContext(context);
@@ -75,6 +77,12 @@ describe("FlashcardProvider", () => {
           <button data-testid="submit-answer" onClick={() => context.submitAnswer("test")}>
             Submit Answer
           </button>
+          <button
+            data-testid="set-multiple-choice"
+            onClick={() => context.setInteractionMode("multiple-choice")}
+          >
+            Set Multiple Choice
+          </button>
         </div>
       );
     }
@@ -87,8 +95,8 @@ describe("FlashcardProvider", () => {
         json: async () => [],
       });
 
-      let capturedContext: any;
-      const onContext = (context: any) => {
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
         capturedContext = context;
       };
 
@@ -111,8 +119,8 @@ describe("FlashcardProvider", () => {
         json: async () => ({ invalid: "data" }),
       });
 
-      let capturedContext: any;
-      const onContext = (context: any) => {
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
         capturedContext = context;
       };
 
@@ -135,8 +143,8 @@ describe("FlashcardProvider", () => {
         json: async () => [],
       });
 
-      let capturedContext: any;
-      const onContext = (context: any) => {
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
         capturedContext = context;
       };
 
@@ -175,8 +183,8 @@ describe("FlashcardProvider", () => {
         });
       });
 
-      let capturedContext: any;
-      const onContext = (context: any) => {
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
         capturedContext = context;
       };
 
@@ -222,8 +230,8 @@ describe("FlashcardProvider", () => {
         });
       });
 
-      let capturedContext: any;
-      const onContext = (context: any) => {
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
         capturedContext = context;
       };
 
@@ -259,8 +267,8 @@ describe("FlashcardProvider", () => {
           json: async () => [],
         });
   
-        let capturedContext: any;
-        const onContext = (context: any) => {
+        let capturedContext: FlashcardContextType | undefined;
+        const onContext = (context: FlashcardContextType | undefined) => {
           capturedContext = context;
         };
   
@@ -294,13 +302,13 @@ describe("FlashcardProvider", () => {
           ],
         });
   
-        let capturedContext: any;
-        const onContext = (context: any) => {
+        let capturedContext: FlashcardContextType | undefined;
+        const onContext = (context: FlashcardContextType | undefined) => {
           capturedContext = context;
         };
   
         // Create a test component that allows us to switch to multiple-choice mode
-        function MultipleChoiceTestComponent({ onContext }: { onContext: (context: any) => void }) {
+        function MultipleChoiceTestComponent({ onContext }: { onContext: (context: FlashcardContextType | undefined) => void }) {
           const context = useFlashcard();
           React.useEffect(() => {
             onContext(context);
@@ -360,7 +368,7 @@ describe("FlashcardProvider", () => {
         });
   
         // Now click next card to trigger generateChoices with empty kanaData
-        // This should trigger the guard clause at lines 162-163
+        // This should trigger the guard clause at lines 169-170
         await act(async () => {
           getByTestId("next-card").click();
         });
@@ -370,17 +378,190 @@ describe("FlashcardProvider", () => {
           expect(capturedContext.choices).toEqual([]);
         });
       });
+
+      it("should execute lines 169-170 when generateChoices is called with empty kanaData", async () => {
+        let capturedContext: FlashcardContextType | undefined;
+        const onContext = (context: FlashcardContextType | undefined) => {
+          capturedContext = context;
+        };
+
+        const { getByTestId, rerender } = render(
+          <FlashcardProvider>
+            <TestComponent onContext={onContext} />
+          </FlashcardProvider>,
+        );
+
+        // Wait for the provider to initialize with data
+        await waitFor(() => {
+          expect(capturedContext).toBeDefined();
+          expect(capturedContext.loadingKana).toBe(false);
+        });
+
+        // Switch to multiple-choice mode
+        await act(async () => {
+          getByTestId("set-multiple-choice").click();
+        });
+
+        // Now change the mock to return empty data
+        mockFetch.mockResolvedValue({
+          ok: true,
+          json: async () => [],
+        });
+
+        // Trigger a refetch by changing kanaType prop
+        rerender(
+          <FlashcardProvider kanaType="hiragana">
+            <TestComponent onContext={onContext} />
+          </FlashcardProvider>,
+        );
+
+        // Wait for the new data to be fetched
+        await waitFor(() => {
+          expect(capturedContext.loadingKana).toBe(false);
+        });
+
+        // Now click next card to trigger generateChoices with empty kanaData
+        // This should trigger the guard clause at lines 169-170
+        await act(async () => {
+          getByTestId("next-card").click();
+        });
+
+        // Verify that choices is an empty array
+        expect(capturedContext.choices).toEqual([]);
+        
+        // Verify that currentKana is null when kanaData is empty
+        expect(capturedContext.currentKana).toBeNull();
+      });
+    });
+  });
+
+  describe("Empty Data Handling", () => {
+    // Test component that includes MultipleChoice
+    function TestWithMultipleChoice({ onContext }: { onContext: (context: FlashcardContextType | undefined) => void }) {
+      const context = useFlashcard();
+      React.useEffect(() => {
+        onContext(context);
+      }, [context, onContext]);
+      
+      return (
+        <div>
+          <button data-testid="next-card" onClick={context.nextCard}>
+            Next Card
+          </button>
+          <button
+            data-testid="set-multiple-choice"
+            onClick={() => context.setInteractionMode("multiple-choice")}
+          >
+            Set Multiple Choice
+          </button>
+          <MultipleChoice
+            choices={context.choices}
+            selectedChoice={null}
+            onChoiceSelect={vi.fn()}
+          />
+        </div>
+      );
+    }
+
+    // Test component to access provider context (reused from above)
+    function TestComponent({ onContext }: { onContext: (context: FlashcardContextType | undefined) => void }) {
+      const context = useFlashcard();
+      React.useEffect(() => {
+        onContext(context);
+      }, [context, onContext]);
+      
+      return (
+        <div>
+          <button data-testid="next-card" onClick={context.nextCard}>
+            Next Card
+          </button>
+          <button data-testid="submit-answer" onClick={() => context.submitAnswer("test")}>
+            Submit Answer
+          </button>
+          <button
+            data-testid="set-multiple-choice"
+            onClick={() => context.setInteractionMode("multiple-choice")}
+          >
+            Set Multiple Choice
+          </button>
+        </div>
+      );
+    }
+
+    it("should handle filtered empty data when filtering by kana type", async () => {
+      // Mock API returning data that will be filtered out
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => [
+          { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
+          { id: "2", character: "い", romaji: "i", accuracy: 0.3 },
+        ],
+      });
+
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
+        capturedContext = context;
+      };
+
+      // Request katakana but API only returns hiragana
+      render(
+        <FlashcardProvider kanaType="katakana">
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+        expect(capturedContext.currentKana).toBeNull();
+        expect(capturedContext.choices).toEqual([]);
+      });
     });
 
-    test("should handle generateChoices with empty kanaData array by setting choices to empty array and returning early", async () => {
-      // Mock successful API response with empty array
+    it("should handle MultipleChoice component with empty choices array", async () => {
+      // Mock API returning empty array
       mockFetch.mockResolvedValue({
         ok: true,
         json: async () => [],
       });
 
-      let capturedContext: any;
-      const onContext = (context: any) => {
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
+        capturedContext = context;
+      };
+
+      const { getByText } = render(
+        <FlashcardProvider>
+          <TestWithMultipleChoice onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.choices).toEqual([]);
+      });
+
+      // Verify MultipleChoice shows loading state when choices is empty
+      expect(getByText("Loading choices...")).toBeInTheDocument();
+
+      // Switch to multiple-choice mode
+      await act(async () => {
+        capturedContext.setInteractionMode("multiple-choice");
+      });
+
+      // Verify MultipleChoice still shows loading state
+      expect(getByText("Loading choices...")).toBeInTheDocument();
+    });
+
+    it("should handle empty kana data in selectRandomKana function", async () => {
+      // Mock API returning empty array
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => [],
+      });
+
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
         capturedContext = context;
       };
 
@@ -392,101 +573,19 @@ describe("FlashcardProvider", () => {
 
       await waitFor(() => {
         expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+        expect(capturedContext.currentKana).toBeNull();
         expect(capturedContext.choices).toEqual([]);
       });
 
-      // Test that when nextCard is called with empty kanaList, choices remain empty
+      // Test that selectRandomKana handles empty data correctly
+      // This is called internally by fetchKanaData
       await act(async () => {
         capturedContext.nextCard();
       });
 
       await waitFor(() => {
-        expect(capturedContext.choices).toEqual([]);
-      });
-    });
-
-    test("should test generateChoices function directly with empty kanaData", async () => {
-      // First, mock with data to initialize the provider properly
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => [
-          { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
-        ],
-      });
-
-      let capturedContext: any;
-      const onContext = (context: any) => {
-        capturedContext = context;
-      };
-
-      // Create a test component that allows us to switch to multiple-choice mode
-      function MultipleChoiceTestComponent({ onContext }: { onContext: (context: any) => void }) {
-        const context = useFlashcard();
-        React.useEffect(() => {
-          onContext(context);
-        }, [context, onContext]);
-        
-        return (
-          <div>
-            <button data-testid="next-card" onClick={context.nextCard}>
-              Next Card
-            </button>
-            <button data-testid="submit-answer" onClick={() => context.submitAnswer("test")}>
-              Submit Answer
-            </button>
-            <button
-              data-testid="set-multiple-choice"
-              onClick={() => context.setInteractionMode("multiple-choice")}
-            >
-              Set Multiple Choice
-            </button>
-          </div>
-        );
-      }
-
-      const { getByTestId, rerender } = render(
-        <FlashcardProvider>
-          <MultipleChoiceTestComponent onContext={onContext} />
-        </FlashcardProvider>,
-      );
-
-      // Wait for the provider to initialize with data
-      await waitFor(() => {
-        expect(capturedContext).toBeDefined();
-        expect(capturedContext.loadingKana).toBe(false);
-      });
-
-      // Switch to multiple-choice mode
-      await act(async () => {
-        getByTestId("set-multiple-choice").click();
-      });
-
-      // Now change the mock to return empty data
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => [],
-      });
-
-      // Trigger a refetch by changing kanaType prop
-      rerender(
-        <FlashcardProvider kanaType="hiragana">
-          <MultipleChoiceTestComponent onContext={onContext} />
-        </FlashcardProvider>,
-      );
-
-      // Wait for the new data to be fetched
-      await waitFor(() => {
-        expect(capturedContext.loadingKana).toBe(false);
-      });
-
-      // Now click next card to trigger generateChoices with empty kanaData
-      // This should trigger the guard clause at lines 169-170
-      await act(async () => {
-        getByTestId("next-card").click();
-      });
-
-      // Verify that choices is an empty array
-      await waitFor(() => {
+        expect(capturedContext.currentKana).toBeNull();
         expect(capturedContext.choices).toEqual([]);
       });
     });

@@ -221,7 +221,7 @@ describe("filterKanaByType", () => {
   describe("invalid filter values", () => {
     it("should return false for invalid filter values", () => {
       // Test with invalid filter values that would fall through to line 41
-      const invalidFilters = ["invalid", "unknown", "test", "", null, undefined] as any[];
+      const invalidFilters = ["invalid", "unknown", "test", "", null, undefined] as (string | null | undefined)[];
       
       invalidFilters.forEach((filter) => {
         // @ts-ignore - Testing invalid input
