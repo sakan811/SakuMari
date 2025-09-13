@@ -20,10 +20,10 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { useFlashcard } from "./FlashcardProvider";
+import { useFlashcardHandlers } from "../hooks/useFlashcardHandlers";
 import ModeSelector from "./ModeSelector";
 import MultipleChoice from "./MultipleChoice";
 import { commonBackgrounds } from "@/lib/backgrounds";
-import type { InteractionMode } from "@/types/common";
 
 export default function Flashcard() {
   const {
@@ -76,17 +76,13 @@ export default function Flashcard() {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [result, nextCard, isSubmitting]);
 
-  const handleModeChange = (mode: InteractionMode) => {
-    if (isSubmitting || result) return;
-    setInteractionMode(mode);
-    // State will be cleared by useEffect
-  };
-
-  const handleChoiceSelect = (index: number) => {
-    if (isSubmitting || result) return;
-    setSelectedChoice(index);
-    setError("");
-  };
+  const { handleModeChange, handleChoiceSelect } = useFlashcardHandlers({
+    isSubmitting,
+    result,
+    setInteractionMode,
+    setSelectedChoice,
+    setError,
+  });
 
   // Clear state when switching modes
   useEffect(() => {
