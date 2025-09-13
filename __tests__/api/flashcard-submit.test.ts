@@ -19,7 +19,6 @@ import { describe, test, expect, vi, beforeEach } from "vitest";
 import { POST } from "../../app/api/flashcards/submit/route";
 import { NextRequest } from "next/server";
 import {
-  setupApiTestEnvironment,
   createFlashcardSubmitRequest,
   setupDatabaseError,
 } from "../utils/api-test-setup";
@@ -34,11 +33,31 @@ import {
   expectSqlParameters,
 } from "../utils/test-assertions";
 
-const { mockAuth, mockPrisma, beforeEach: setupBeforeEach } = setupApiTestEnvironment();
+// Create mocks directly in the test file
+const { mockAuth, mockPrisma } = vi.hoisted(() => ({
+  mockAuth: vi.fn(),
+  mockPrisma: {
+    $queryRaw: vi.fn(),
+    $executeRaw: vi.fn(),
+    kana: {
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
+    },
+    kanaProgress: {
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
+      upsert: vi.fn(),
+    },
+  },
+}));
+
+// Mock the modules
+vi.mock("@/lib/auth", () => ({ auth: mockAuth }));
+vi.mock("@/lib/prisma", () => ({ prisma: mockPrisma }));
 
 describe("Flashcard Submit API", () => {
   beforeEach(() => {
-    setupBeforeEach();
+    vi.clearAllMocks();
   });
 
   describe("Database Operations", () => {
