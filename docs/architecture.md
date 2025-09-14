@@ -88,15 +88,18 @@ app/
 ├── dashboard/page.tsx    # Progress dashboard
 ├── globals.css           # Global styles
 ├── layout.tsx            # Root layout
-├── middleware.ts         # Route protection middleware
 ├── robots.ts             # SEO configuration
 ├── sitemap.ts            # Dynamic sitemap
 └── api/
-    ├── auth/[...nextauth]/route.ts
+    ├── auth/
+    │   ├── [...nextauth]/route.ts
+    │   └── providers/route.ts
     ├── stats/route.ts
-    ├── flashcards/submit/route.ts
+    ├── flashcards/
+    │   └── submit/route.ts
     ├── tips/route.ts
     └── health/route.ts
+middleware.ts             # Route protection middleware (root level)
 ```
 
 **Libraries & Utilities:**
@@ -110,7 +113,8 @@ lib/
 ├── api-middleware.ts     # API middleware functions
 ├── backgrounds.ts        # Background management
 ├── metadata.ts           # SEO & metadata configuration
-└── kana-filter.ts        # Character filtering utilities
+├── kana-filter.ts        # Character filtering utilities
+└── flashcard-submit-utils.ts # Flashcard submission utilities
 ```
 
 **Custom Hooks:**
@@ -135,6 +139,5 @@ __tests__/
 ├── flashcard-provider/       # Provider logic tests
 ├── hooks/                    # Custom hooks tests
 ├── seo/                      # SEO and metadata tests
-├── utils/                    # Test helpers and utilities
-└── use-flashcard-handlers.test.ts # Legacy location (to be moved to hooks/)
+└── utils/                    # Test helpers and utilities
 ```
