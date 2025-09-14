@@ -21,29 +21,15 @@ import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// Mock all dependencies
+// Mock next-auth/react only (keep real utility functions)
 vi.mock("next-auth/react");
 vi.mock("@/lib/should-fetch-kana-data", () => ({
   shouldFetchKanaData: vi.fn(),
-}));
-vi.mock("@/lib/flashcard-utils", () => ({
-  calculateKanaWeights: vi.fn(),
-  selectKanaByWeight: vi.fn(),
-  generateChoicesArray: vi.fn(),
-  filterKanaByType: vi.fn(),
-  shouldPreventSubmission: vi.fn(),
 }));
 
 import { FlashcardProvider, useFlashcard } from "@/components/FlashcardProvider";
 import type { KanaWithAccuracy } from "@/types/common";
 import { shouldFetchKanaData } from "@/lib/should-fetch-kana-data";
-import {
-  calculateKanaWeights,
-  selectKanaByWeight,
-  generateChoicesArray,
-  filterKanaByType,
-  shouldPreventSubmission,
-} from "@/lib/flashcard-utils";
 
 // Test component that uses the context
 const TestComponent = () => {
@@ -69,19 +55,12 @@ describe("FlashcardProvider", () => {
     { id: "2", character: "か", romaji: "ka", accuracy: 0.6, attempts: 5, correct_attempts: 3 },
   ];
 
-  const mockWeights = [0.8, 0.6];
-  const mockChoices = ["a", "ka", "sa", "ta"];
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     // Setup default mock implementations
     (shouldFetchKanaData as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData);
-    (calculateKanaWeights as ReturnType<typeof vi.fn>).mockReturnValue(mockWeights);
-    (selectKanaByWeight as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData[0]);
-    (generateChoicesArray as ReturnType<typeof vi.fn>).mockReturnValue(mockChoices);
-    (shouldPreventSubmission as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
     // Mock fetch
     global.fetch = vi.fn();
@@ -170,10 +149,14 @@ describe("FlashcardProvider", () => {
 
   describe("selectRandomKana function", () => {
     it("should handle empty data array (line 142-146)", async () => {
-      (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue([]);
+      // Mock fetch to return empty array
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([]),
+      });
 
       render(
-        <FlashcardProvider>
+        <FlashcardProvider _resetHasFetched={true}>
           <TestComponent />
         </FlashcardProvider>
       );
@@ -185,9 +168,19 @@ describe("FlashcardProvider", () => {
     });
 
     it("should select kana and generate choices for non-empty array (line 148-153)", async () => {
+      // Create test data with enough items for 4 choices
+      const extendedKanaData: KanaWithAccuracy[] = [
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.8, attempts: 5, correct_attempts: 4 },
+        { id: "2", character: "か", romaji: "ka", accuracy: 0.6, attempts: 5, correct_attempts: 3 },
+        { id: "3", character: "さ", romaji: "sa", accuracy: 0.7, attempts: 5, correct_attempts: 4 },
+        { id: "4", character: "た", romaji: "ta", accuracy: 0.5, attempts: 5, correct_attempts: 3 },
+        { id: "5", character: "な", romaji: "na", accuracy: 0.9, attempts: 5, correct_attempts: 5 },
+      ];
+
+      // Mock fetch to return test data
       (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockKanaData),
+        json: () => Promise.resolve(extendedKanaData),
       });
 
       render(
@@ -197,22 +190,27 @@ describe("FlashcardProvider", () => {
       );
 
       await waitFor(() => {
-        expect(calculateKanaWeights).toHaveBeenCalledWith(mockKanaData);
-        expect(selectKanaByWeight).toHaveBeenCalledWith(mockKanaData, mockWeights);
-        expect(generateChoicesArray).toHaveBeenCalledWith(mockKanaData[0], mockKanaData);
-        expect(screen.getByTestId("current-kana")).toHaveTextContent("a");
-        expect(screen.getByTestId("choices")).toHaveTextContent("a,ka,sa,ta");
+        // Verify that current kana is set (it should be one of the mockKanaData items)
+        const currentKanaElement = screen.getByTestId("current-kana");
+        expect(currentKanaElement).not.toHaveTextContent("null");
+
+        // Verify that choices are generated (should be an array with 4 items)
+        const choicesElement = screen.getByTestId("choices");
+        const choicesText = choicesElement.textContent;
+        expect(choicesText).not.toBe("");
+
+        // Choices should be comma-separated and contain 4 items
+        const choicesArray = choicesText?.split(",");
+        expect(choicesArray).toHaveLength(4);
+
+        // The current kana's romaji should be in the choices
+        const currentKanaRomaji = currentKanaElement.textContent;
+        expect(choicesArray).toContain(currentKanaRomaji);
       });
     });
 
-    it("should call utility functions in correct order for kana selection", async () => {
-      const mockSelectedKana = { id: "1", character: "あ", romaji: "a", accuracy: 0.8, attempts: 5, correct_attempts: 4 };
-
-      (calculateKanaWeights as ReturnType<typeof vi.fn>).mockReturnValue([0.8, 0.2]);
-      (selectKanaByWeight as ReturnType<typeof vi.fn>).mockReturnValue(mockSelectedKana);
-      (generateChoicesArray as ReturnType<typeof vi.fn>).mockReturnValue(["a", "i", "u", "e"]);
-
-      // Mock fetch to return valid data since data will be fetched
+    it("should integrate utility functions correctly for kana selection", async () => {
+      // Mock fetch to return valid data
       (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(mockKanaData),
@@ -225,25 +223,119 @@ describe("FlashcardProvider", () => {
       );
 
       await waitFor(() => {
-        expect(calculateKanaWeights).toHaveBeenCalledTimes(1);
-        expect(selectKanaByWeight).toHaveBeenCalledTimes(1);
-        expect(generateChoicesArray).toHaveBeenCalledTimes(1);
+        // Verify that the utility functions work together correctly
+        const currentKanaElement = screen.getByTestId("current-kana");
+        const choicesElement = screen.getByTestId("choices");
 
-        const callOrder = [
-          (calculateKanaWeights as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0],
-          (selectKanaByWeight as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0],
-          (generateChoicesArray as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0]
-        ];
+        // Current kana should be one of our mock data items
+        const currentKanaText = currentKanaElement.textContent;
+        expect(mockKanaData.some(kana => kana.romaji === currentKanaText)).toBe(true);
 
-        expect(callOrder[0]).toBeLessThan(callOrder[1]);
-        expect(callOrder[1]).toBeLessThan(callOrder[2]);
+        // Choices should be generated and include the current kana
+        const choicesText = choicesElement.textContent;
+        expect(choicesText).toContain(currentKanaText || "");
+
+        // Should have exactly 4 choices (or fewer if not enough data)
+        const choicesArray = choicesText?.split(",") || [];
+        expect(choicesArray.length).toBeGreaterThan(0);
+        expect(choicesArray.length).toBeLessThanOrEqual(4);
+      });
+    });
+
+    it("should test lines 148-153 with deterministic behavior", async () => {
+      // Create test data with predictable weights
+      const predictableKanaData: KanaWithAccuracy[] = [
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.1, attempts: 10, correct_attempts: 1 }, // Low accuracy = high weight
+        { id: "2", character: "い", romaji: "i", accuracy: 0.9, attempts: 10, correct_attempts: 9 }, // High accuracy = low weight
+      ];
+
+      // Mock Math.random to ensure predictable selection
+      const originalRandom = Math.random;
+      Math.random = vi.fn().mockReturnValue(0.1); // Low value to select first item
+
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(predictableKanaData),
+      });
+
+      render(
+        <FlashcardProvider _resetHasFetched={true}>
+          <TestComponent />
+        </FlashcardProvider>
+      );
+
+      await waitFor(() => {
+        // The first kana should be selected due to higher weight and low random value
+        const currentKanaElement = screen.getByTestId("current-kana");
+        expect(currentKanaElement).toHaveTextContent("a");
+
+        // Choices should be generated and include the correct answer
+        const choicesElement = screen.getByTestId("choices");
+        const choicesText = choicesElement.textContent;
+        expect(choicesText).toContain("a");
+
+        // Should have 2 choices (1 correct + 1 wrong since we only have 2 items)
+        const choicesArray = choicesText?.split(",") || [];
+        expect(choicesArray.length).toBe(2);
+      });
+
+      Math.random = originalRandom;
+    });
+
+    it("should directly test selectRandomKana with empty data (lines 143-145)", async () => {
+      // Mock fetch to return empty array initially
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([]),
+      });
+
+      render(
+        <FlashcardProvider _resetHasFetched={true}>
+          <TestComponent />
+        </FlashcardProvider>
+      );
+
+      await waitFor(() => {
+        // Should have null current kana and empty choices when data is empty
+        expect(screen.getByTestId("current-kana")).toHaveTextContent("null");
+        expect(screen.getByTestId("choices")).toHaveTextContent("");
+      });
+    });
+
+    it("should test selectRandomKana directly with empty data via nextCard (lines 143-145)", async () => {
+      const user = userEvent.setup();
+
+      // Mock fetch to return empty array
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([]),
+      });
+
+      render(
+        <FlashcardProvider _resetHasFetched={true}>
+          <TestComponent />
+        </FlashcardProvider>
+      );
+
+      // Wait for initial load with empty data
+      await waitFor(() => {
+        expect(screen.getByTestId("current-kana")).toHaveTextContent("null");
+        expect(screen.getByTestId("choices")).toHaveTextContent("");
+      });
+
+      // Click next card to trigger selectRandomKana with empty data
+      await user.click(screen.getByText("Next Card"));
+
+      // Verify that the state remains the same (null kana, empty choices)
+      await waitFor(() => {
+        expect(screen.getByTestId("current-kana")).toHaveTextContent("null");
+        expect(screen.getByTestId("choices")).toHaveTextContent("");
       });
     });
   });
 
   describe("submitAnswer function", () => {
     it("should handle API HTTP error during submission (line 185-187)", async () => {
-      (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData);
       (fetch as ReturnType<typeof vi.fn>)
         .mockResolvedValueOnce({
           ok: true,
@@ -278,7 +370,6 @@ describe("FlashcardProvider", () => {
     });
 
     it("should handle network error during submission (line 191-194)", async () => {
-      (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData);
       (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockKanaData),
@@ -306,6 +397,18 @@ describe("FlashcardProvider", () => {
   describe("nextCard function", () => {
     it("should reset result and select new kana (line 202-203)", async () => {
       const user = userEvent.setup();
+
+      // Mock fetch to return data for both initial load and submission
+      (fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockKanaData),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ correct: true }),
+        });
+
       render(
         <FlashcardProvider>
           <TestComponent />
@@ -334,12 +437,25 @@ describe("FlashcardProvider", () => {
   describe("interaction mode handling", () => {
     it("should set interaction mode (line 209)", async () => {
       const user = userEvent.setup();
+
+      // Mock fetch to return valid data
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockKanaData),
+      });
+
       render(
         <FlashcardProvider>
           <TestComponent />
         </FlashcardProvider>
       );
 
+      // Wait for loading to complete
+      await waitFor(() => {
+        expect(screen.getByTestId("loading")).toHaveTextContent("loaded");
+      });
+
+      // Test that the mode buttons can be clicked without errors
       await user.click(screen.getByText("Choice Mode"));
       // The mode change would be reflected in the context, but our test component
       // doesn't display it. The important part is that the function doesn't error.
@@ -350,10 +466,17 @@ describe("FlashcardProvider", () => {
   });
 
   describe("kanaType filtering", () => {
-    it("should call filterKanaByType with correct kanaType", async () => {
+    it("should filter kana by type correctly when kanaType is specified", async () => {
+      // Create test data with both hiragana and katakana
+      const mixedKanaData: KanaWithAccuracy[] = [
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.8, attempts: 5, correct_attempts: 4 }, // Hiragana
+        { id: "2", character: "ア", romaji: "ka", accuracy: 0.6, attempts: 5, correct_attempts: 3 }, // Katakana
+        { id: "3", character: "い", romaji: "i", accuracy: 0.7, attempts: 5, correct_attempts: 4 }, // Hiragana
+      ];
+
       (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockKanaData),
+        json: () => Promise.resolve(mixedKanaData),
       });
 
       render(
@@ -363,14 +486,26 @@ describe("FlashcardProvider", () => {
       );
 
       await waitFor(() => {
-        expect(filterKanaByType).toHaveBeenCalledWith(mockKanaData, "hiragana");
+        // Current kana should be a hiragana character
+        const currentKanaElement = screen.getByTestId("current-kana");
+        const currentKanaText = currentKanaElement.textContent;
+
+        // Should be one of the hiragana characters
+        expect(["a", "i"]).toContain(currentKanaText);
+        expect(currentKanaText).not.toBe("null");
       });
     });
 
-    it("should not call filterKanaByType when kanaType is undefined", async () => {
+    it("should include all kana types when kanaType is undefined", async () => {
+      // Create test data with both hiragana and katakana
+      const mixedKanaData: KanaWithAccuracy[] = [
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.8, attempts: 5, correct_attempts: 4 }, // Hiragana
+        { id: "2", character: "ア", romaji: "ka", accuracy: 0.6, attempts: 5, correct_attempts: 3 }, // Katakana
+      ];
+
       (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockKanaData),
+        json: () => Promise.resolve(mixedKanaData),
       });
 
       render(
@@ -380,15 +515,24 @@ describe("FlashcardProvider", () => {
       );
 
       await waitFor(() => {
-        expect(filterKanaByType).toHaveBeenCalledWith(mockKanaData, undefined);
+        // Current kana could be either hiragana or katakana
+        const currentKanaElement = screen.getByTestId("current-kana");
+        const currentKanaText = currentKanaElement.textContent;
+
+        // Should be one of the available characters
+        expect(["a", "ka"]).toContain(currentKanaText);
+        expect(currentKanaText).not.toBe("null");
       });
     });
   });
 
   describe("shouldPreventSubmission guard", () => {
-    it("should not submit when shouldPreventSubmission returns true", async () => {
-      (shouldPreventSubmission as ReturnType<typeof vi.fn>).mockReturnValue(true);
-      (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData);
+    it("should not submit when shouldPreventSubmission conditions are met", async () => {
+      // Test with empty data to simulate no current kana
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([]), // Empty array means no current kana
+      });
 
       const user = userEvent.setup();
       render(
@@ -399,12 +543,13 @@ describe("FlashcardProvider", () => {
 
       await waitFor(() => {
         expect(screen.getByTestId("loading")).toHaveTextContent("loaded");
+        expect(screen.getByTestId("current-kana")).toHaveTextContent("null");
       });
 
       await user.click(screen.getByText("Submit Answer"));
 
-      // Verify fetch was not called due to prevention
-      expect(fetch).toHaveBeenCalledTimes(1); // Only the initial fetch
+      // Verify fetch was only called once (initial load) since submission should be prevented
+      expect(fetch).toHaveBeenCalledTimes(1);
     });
   });
 });
