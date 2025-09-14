@@ -12,8 +12,8 @@ describe("Flashcard Utils", () => {
   describe("calculateKanaWeights", () => {
     it("should give high priority to new characters (attempts = 0)", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0, attempts: 0 },
-        { id: "2", character: "い", romaji: "i", accuracy: 0.5, attempts: 5 },
+        { id: "1", character: "あ", romaji: "a", accuracy: 0, attempts: 0, correct_attempts: 0 },
+        { id: "2", character: "い", romaji: "i", accuracy: 0.5, attempts: 5, correct_attempts: 3 },
       ];
 
       const weights = calculateKanaWeights(kanaList);
@@ -27,8 +27,8 @@ describe("Flashcard Utils", () => {
 
     it("should calculate accuracy weight correctly", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.3, attempts: 5 },
-        { id: "2", character: "い", romaji: "i", accuracy: 0.7, attempts: 5 },
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.3, attempts: 5, correct_attempts: 2 },
+        { id: "2", character: "い", romaji: "i", accuracy: 0.7, attempts: 5, correct_attempts: 4 },
       ];
 
       const weights = calculateKanaWeights(kanaList);
@@ -41,9 +41,9 @@ describe("Flashcard Utils", () => {
 
     it("should apply confidence boost for high accuracy with few attempts", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.9, attempts: 1 }, // Gets boost
-        { id: "2", character: "い", romaji: "i", accuracy: 0.9, attempts: 5 }, // No boost
-        { id: "3", character: "う", romaji: "u", accuracy: 0.7, attempts: 1 }, // No boost (accuracy too low)
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.9, attempts: 1, correct_attempts: 1 }, // Gets boost
+        { id: "2", character: "い", romaji: "i", accuracy: 0.9, attempts: 5, correct_attempts: 5 }, // No boost
+        { id: "3", character: "う", romaji: "u", accuracy: 0.7, attempts: 1, correct_attempts: 1 }, // No boost (accuracy too low)
       ];
 
       const weights = calculateKanaWeights(kanaList);
@@ -58,7 +58,7 @@ describe("Flashcard Utils", () => {
 
     it("should handle edge case with maximum accuracy", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 1.0, attempts: 2 },
+        { id: "1", character: "あ", romaji: "a", accuracy: 1.0, attempts: 2, correct_attempts: 2 },
       ];
 
       const weights = calculateKanaWeights(kanaList);
@@ -70,7 +70,7 @@ describe("Flashcard Utils", () => {
 
     it("should apply minimum weight threshold", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.95, attempts: 10 },
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.95, attempts: 10, correct_attempts: 10 },
       ];
 
       const weights = calculateKanaWeights(kanaList);
@@ -88,7 +88,7 @@ describe("Flashcard Utils", () => {
 
     it("should return null for mismatched array lengths", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5 },
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3 },
       ];
       const weights = [0.5, 0.3]; // Different length
 
@@ -98,7 +98,7 @@ describe("Flashcard Utils", () => {
 
     it("should return null for empty weights", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5 },
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3 },
       ];
 
       const result = selectKanaByWeight(kanaList, []);
@@ -107,8 +107,8 @@ describe("Flashcard Utils", () => {
 
     it("should select kana based on weighted probability", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5 },
-        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5 },
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3 },
+        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5, correct_attempts: 2 },
       ];
       const weights = [0.7, 0.3]; // First kana has higher weight
 
@@ -130,8 +130,8 @@ describe("Flashcard Utils", () => {
 
     it("should fallback to last kana if no selection is made", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5 },
-        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5 },
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3 },
+        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5, correct_attempts: 2 },
       ];
       const weights = [0.1, 0.1];
 
@@ -149,8 +149,8 @@ describe("Flashcard Utils", () => {
   describe("filterKanaByType", () => {
     it("should return original array when no kanaType specified", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5 },
-        { id: "2", character: "ア", romaji: "a", accuracy: 0.3, attempts: 5 },
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3 },
+        { id: "2", character: "ア", romaji: "a", accuracy: 0.3, attempts: 5, correct_attempts: 2 },
       ];
 
       const result = filterKanaByType(kanaList);
@@ -159,9 +159,9 @@ describe("Flashcard Utils", () => {
 
     it("should filter hiragana characters correctly", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5 }, // Hiragana
-        { id: "2", character: "ア", romaji: "a", accuracy: 0.3, attempts: 5 }, // Katakana
-        { id: "3", character: "い", romaji: "i", accuracy: 0.7, attempts: 5 }, // Hiragana
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3 }, // Hiragana
+        { id: "2", character: "ア", romaji: "a", accuracy: 0.3, attempts: 5, correct_attempts: 2 }, // Katakana
+        { id: "3", character: "い", romaji: "i", accuracy: 0.7, attempts: 5, correct_attempts: 4 }, // Hiragana
       ];
 
       const result = filterKanaByType(kanaList, "hiragana");
@@ -171,9 +171,9 @@ describe("Flashcard Utils", () => {
 
     it("should filter katakana characters correctly", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5 }, // Hiragana
-        { id: "2", character: "ア", romaji: "a", accuracy: 0.3, attempts: 5 }, // Katakana
-        { id: "3", character: "イ", romaji: "i", accuracy: 0.7, attempts: 5 }, // Katakana
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3 }, // Hiragana
+        { id: "2", character: "ア", romaji: "a", accuracy: 0.3, attempts: 5, correct_attempts: 2 }, // Katakana
+        { id: "3", character: "イ", romaji: "i", accuracy: 0.7, attempts: 5, correct_attempts: 4 }, // Katakana
       ];
 
       const result = filterKanaByType(kanaList, "katakana");
@@ -183,8 +183,8 @@ describe("Flashcard Utils", () => {
 
     it("should return empty array when no characters match the type", () => {
       const kanaList: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5 }, // Hiragana
-        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5 }, // Hiragana
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3 }, // Hiragana
+        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5, correct_attempts: 2 }, // Hiragana
       ];
 
       const result = filterKanaByType(kanaList, "katakana");
@@ -200,7 +200,7 @@ describe("Flashcard Utils", () => {
 
     it("should prevent submission when isSubmitting is true", () => {
       const kana: KanaWithAccuracy = {
-        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5,
+        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3,
       };
       const result = shouldPreventSubmission(kana, true);
       expect(result).toBe(true);
@@ -208,7 +208,7 @@ describe("Flashcard Utils", () => {
 
     it("should allow submission when currentKana exists and not submitting", () => {
       const kana: KanaWithAccuracy = {
-        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5,
+        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3,
       };
       const result = shouldPreventSubmission(kana, false);
       expect(result).toBe(false);
@@ -223,7 +223,7 @@ describe("Flashcard Utils", () => {
   describe("generateChoicesArray", () => {
     it("should return empty array for empty kanaData", () => {
       const correctKana: KanaWithAccuracy = {
-        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5,
+        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3,
       };
 
       const result = generateChoicesArray(correctKana, []);
@@ -232,7 +232,7 @@ describe("Flashcard Utils", () => {
 
     it("should return only correct answer when no other kana available", () => {
       const correctKana: KanaWithAccuracy = {
-        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5,
+        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3,
       };
 
       const result = generateChoicesArray(correctKana, [correctKana]);
@@ -241,13 +241,13 @@ describe("Flashcard Utils", () => {
 
     it("should generate choices with correct answer and wrong answers", () => {
       const correctKana: KanaWithAccuracy = {
-        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5,
+        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3,
       };
       const kanaData: KanaWithAccuracy[] = [
         correctKana,
-        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5 },
-        { id: "3", character: "う", romaji: "u", accuracy: 0.7, attempts: 5 },
-        { id: "4", character: "え", romaji: "e", accuracy: 0.4, attempts: 5 },
+        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5, correct_attempts: 2 },
+        { id: "3", character: "う", romaji: "u", accuracy: 0.7, attempts: 5, correct_attempts: 4 },
+        { id: "4", character: "え", romaji: "e", accuracy: 0.4, attempts: 5, correct_attempts: 2 },
       ];
 
       const result = generateChoicesArray(correctKana, kanaData);
@@ -261,15 +261,15 @@ describe("Flashcard Utils", () => {
 
     it("should handle duplicate romaji values correctly", () => {
       const correctKana: KanaWithAccuracy = {
-        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5,
+        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3,
       };
       const kanaData: KanaWithAccuracy[] = [
         correctKana,
-        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5 },
-        { id: "3", character: "う", romaji: "i", accuracy: 0.7, attempts: 5 }, // Duplicate romaji
-        { id: "4", character: "え", romaji: "e", accuracy: 0.4, attempts: 5 },
-        { id: "5", character: "お", romaji: "u", accuracy: 0.6, attempts: 5 },
-        { id: "6", character: "か", romaji: "ka", accuracy: 0.8, attempts: 5 },
+        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5, correct_attempts: 2 },
+        { id: "3", character: "う", romaji: "i", accuracy: 0.7, attempts: 5, correct_attempts: 4 }, // Duplicate romaji
+        { id: "4", character: "え", romaji: "e", accuracy: 0.4, attempts: 5, correct_attempts: 2 },
+        { id: "5", character: "お", romaji: "u", accuracy: 0.6, attempts: 5, correct_attempts: 3 },
+        { id: "6", character: "か", romaji: "ka", accuracy: 0.8, attempts: 5, correct_attempts: 4 },
       ];
 
       // Mock Math.random to make the test deterministic
@@ -289,12 +289,12 @@ describe("Flashcard Utils", () => {
 
     it("should return only what's available when less than 3 wrong answers", () => {
       const correctKana: KanaWithAccuracy = {
-        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5,
+        id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5, correct_attempts: 3,
       };
       const kanaData: KanaWithAccuracy[] = [
         correctKana,
-        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5 },
-        { id: "3", character: "う", romaji: "u", accuracy: 0.7, attempts: 5 },
+        { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5, correct_attempts: 2 },
+        { id: "3", character: "う", romaji: "u", accuracy: 0.7, attempts: 5, correct_attempts: 4 },
       ];
 
       const result = generateChoicesArray(correctKana, kanaData);
