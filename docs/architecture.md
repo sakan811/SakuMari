@@ -82,39 +82,42 @@
 
 ```
 app/
-├── page.tsx              # Homepage
-├── hiragana/page.tsx     # Hiragana practice
-├── katakana/page.tsx     # Katakana practice
-├── dashboard/page.tsx    # Progress dashboard
-├── globals.css           # Global styles
-├── layout.tsx            # Root layout
+├── page.tsx              # Homepage with SEO metadata
+├── layout.tsx            # Root layout with comprehensive metadata
+├── globals.css           # Global styles and Tailwind imports
 ├── robots.ts             # SEO configuration
 ├── sitemap.ts            # Dynamic sitemap
+├── favicon.ico           # Site favicon
+├── hiragana/page.tsx     # Hiragana practice (protected)
+├── katakana/page.tsx     # Katakana practice (protected)
+├── dashboard/page.tsx    # Progress dashboard (protected)
 └── api/
     ├── auth/
-    │   ├── [...nextauth]/route.ts
-    │   └── providers/route.ts
-    ├── stats/route.ts
+    │   ├── [...nextauth]/route.ts      # NextAuth.js authentication
+    │   └── providers/route.ts          # Available auth providers
+    ├── stats/route.ts                  # Progress data API (protected)
     ├── flashcards/
-    │   └── submit/route.ts
-    ├── tips/route.ts
-    └── health/route.ts
-middleware.ts             # Route protection middleware (root level)
+    │   └── submit/route.ts             # Answer processing (protected)
+    ├── tips/route.ts                   # AI learning tips (protected)
+    └── health/route.ts                 # System health monitoring
+middleware.ts                           # Route protection middleware
 ```
 
 **Libraries & Utilities:**
 
 ```
 lib/
-├── auth.ts               # NextAuth.js configuration
-├── prisma.ts             # Database client setup
-├── env.ts                # Environment variable management
-├── api-errors.ts         # API error handling
-├── api-middleware.ts     # API middleware functions
-├── backgrounds.ts        # Background management
-├── metadata.ts           # SEO & metadata configuration
-├── kana-filter.ts        # Character filtering utilities
-└── flashcard-submit-utils.ts # Flashcard submission utilities
+├── auth.ts                     # NextAuth.js configuration
+├── prisma.ts                   # Database client setup
+├── env.ts                      # Environment variable management
+├── api-errors.ts               # API error handling
+├── api-middleware.ts           # API middleware functions
+├── backgrounds.ts              # Background management
+├── metadata.ts                 # SEO & metadata configuration
+├── kana-filter.ts              # Character filtering utilities
+├── flashcard-submit-utils.ts   # Flashcard submission utilities
+├── flashcard-utils.ts          # Flashcard helper functions
+└── should-fetch-kana-data.ts   # Data fetching utilities
 ```
 
 **Custom Hooks:**
