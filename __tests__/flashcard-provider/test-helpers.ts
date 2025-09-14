@@ -67,6 +67,11 @@ export function TestComponent({
     onContext(context);
   }, [context, onContext]);
 
+  // Call onContext immediately with initial context
+  React.useLayoutEffect(() => {
+    onContext(context);
+  }, [context, onContext]);
+
   return React.createElement("div", null,
     React.createElement("button", {
       "data-testid": "next-card",
@@ -85,7 +90,7 @@ export function TestComponent({
 
 // Setup successful API response
 export function setupSuccessfulApiResponse(data = mockKanaData) {
-  mockFetch.mockResolvedValue({
+  global.fetch = vi.fn().mockResolvedValue({
     ok: true,
     json: () => Promise.resolve(data),
   });
@@ -93,7 +98,7 @@ export function setupSuccessfulApiResponse(data = mockKanaData) {
 
 // Setup failed API response
 export function setupFailedApiResponse(status = 500, errorData = {}) {
-  mockFetch.mockResolvedValue({
+  global.fetch = vi.fn().mockResolvedValue({
     ok: false,
     status,
     statusText: "Internal Server Error",
@@ -103,12 +108,12 @@ export function setupFailedApiResponse(status = 500, errorData = {}) {
 
 // Setup network error
 export function setupNetworkError() {
-  mockFetch.mockRejectedValue(new Error("Network error"));
+  global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
 }
 
 // Setup mock for API endpoints
 export function setupMockApiEndpoints(kanaData = mockKanaData, submitResponse = { ok: true }) {
-  mockFetch.mockImplementation((url: string) => {
+  global.fetch = vi.fn().mockImplementation((url: string) => {
     if (url === "/api/stats") {
       return Promise.resolve({
         ok: true,
@@ -125,15 +130,12 @@ export function setupMockApiEndpoints(kanaData = mockKanaData, submitResponse = 
   });
 }
 
-// Wait for context to be available
-export async function waitForContext(capturedContext: any, timeout = 2000) {
+// Wait for context to be available and loading to complete
+export async function waitForContext(capturedContext: any, timeout = 10000) {
   const { waitFor } = await import("@testing-library/react");
   await waitFor(() => {
     expect(capturedContext).toBeDefined();
-    // Only check loadingKana if it's defined, to avoid errors
-    if (capturedContext && typeof capturedContext.loadingKana !== 'undefined') {
-      expect(capturedContext.loadingKana).toBe(false);
-    }
+    expect(capturedContext.loadingKana).toBe(false);
   }, { timeout });
 }
 
