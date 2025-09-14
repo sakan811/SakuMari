@@ -526,7 +526,7 @@ describe("FlashcardProvider", () => {
         ],
       });
 
-      // Change kanaType prop to trigger refetch (this covers line 159)
+      // Change kanaType prop to trigger refetch (this covers the kanaType branch in useEffect)
       rerender(
         <FlashcardProvider kanaType="katakana">
           <TestComponent onContext={onContext} />
@@ -540,6 +540,167 @@ describe("FlashcardProvider", () => {
 
       // Should have called fetch again due to kanaType change
       expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it("should trigger kanaType branch in useEffect when hasFetched is true", async () => {
+      // This test specifically targets the branch coverage for kanaType changes
+
+      // Mock initial API response for hiragana
+      const initialMock = mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => [
+          { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
+          { id: "2", character: "い", romaji: "i", accuracy: 0.3 },
+        ],
+      });
+
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
+        capturedContext = context;
+      };
+
+      // First render with hiragana (initial fetch)
+      const { rerender } = render(
+        <FlashcardProvider kanaType="hiragana">
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait for initial load to complete (hasFetched.current becomes true)
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      // Now change to katakana (this should trigger the kanaType branch)
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => [
+          { id: "3", character: "ア", romaji: "a", accuracy: 0.7 },
+          { id: "4", character: "イ", romaji: "i", accuracy: 0.4 },
+        ],
+      });
+
+      // Change kanaType prop - this should trigger the kanaType branch
+      // since hasFetched.current is now true
+      rerender(
+        <FlashcardProvider kanaType="katakana">
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait for the second fetch to complete
+      await waitFor(() => {
+        expect(capturedContext.loadingKana).toBe(false);
+      });
+
+      // Should have called fetch twice - once for initial, once for kanaType change
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it("should not fetch when hasFetched is true and kanaType is undefined", async () => {
+      // This test specifically targets the case where shouldFetch is false:
+      // hasFetched.current is true AND kanaType is undefined
+
+      // Mock initial API response
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => [
+          { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
+        ],
+      });
+
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
+        capturedContext = context;
+      };
+
+      // First render without kanaType (initial fetch)
+      const { rerender } = render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait for initial load to complete (hasFetched.current becomes true)
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      // Reset mock to track if it gets called again
+      mockFetch.mockClear();
+
+      // Re-render with same props (no kanaType) - should NOT trigger another fetch
+      // This should make shouldFetch = false (hasFetched.current is true AND kanaType is undefined)
+      rerender(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait a bit to ensure no additional fetch was triggered
+      await waitFor(() => {
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 100 });
+
+      // Should NOT have called fetch again
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("should cover the false branch of shouldFetch condition", async () => {
+      // This test specifically targets line 126 - the if (shouldFetch) statement
+      // We need to ensure the false branch is executed
+
+      // Mock initial API response
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => [
+          { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
+        ],
+      });
+
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
+        capturedContext = context;
+      };
+
+      // First render - initial fetch happens
+      const { rerender } = render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait for initial fetch to complete
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      // Clear mock to track subsequent calls
+      mockFetch.mockClear();
+
+      // Now re-render with identical props - this should trigger useEffect
+      // but shouldFetch should be false, so line 126 if (shouldFetch)
+      // should evaluate to false and skip the fetch
+      rerender(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Add a small delay to ensure useEffect runs
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Verify fetch was NOT called again (proving the false branch was taken)
+      expect(mockFetch).not.toHaveBeenCalled();
     });
 
     it("should prevent submission when currentKana is null", async () => {
@@ -733,6 +894,110 @@ describe("FlashcardProvider", () => {
         expect(capturedContext.currentKana).toBeNull();
         expect(capturedContext.choices).toEqual([]);
       });
+    });
+
+    // Test the shouldFetchKanaData helper function
+    it("should test shouldFetchKanaData helper function branches", async () => {
+      // Mock API response
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => [
+          { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
+        ],
+      });
+
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
+        capturedContext = context;
+      };
+
+      // First render - this will trigger the initial fetch
+      const { rerender } = render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait for initial fetch to complete
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      });
+
+      // Clear mock to track subsequent calls
+      mockFetch.mockClear();
+
+      // Test the false branch by re-rendering with identical props
+      // This should trigger useEffect but shouldFetchKanaData should return false
+      rerender(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Add delay to ensure useEffect runs
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Verify fetch was NOT called again (proving false branch was taken)
+      expect(mockFetch).not.toHaveBeenCalled();
+
+      // Now test the true branch by changing kanaType
+      rerender(
+        <FlashcardProvider kanaType="hiragana">
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait for the fetch to complete
+      await waitFor(() => {
+        expect(mockFetch).toHaveBeenCalled();
+      });
+    });
+
+    // Test to specifically cover the false branch of the if statement
+    it("should cover the false branch of shouldFetchKanaData condition", async () => {
+      // Mock API response
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => [
+          { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
+        ],
+      });
+
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
+        capturedContext = context;
+      };
+
+      // First render to establish hasFetched.current = true
+      const { rerender } = render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait for initial fetch to complete
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      });
+
+      // Clear mock calls to track subsequent fetches
+      mockFetch.mockClear();
+
+      // Re-render with identical props - this should trigger useEffect
+      // but shouldFetchKanaData should return false (hasFetched.current = true, kanaType = undefined)
+      rerender(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Add a small delay to ensure useEffect has time to run
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Verify that fetch was NOT called again, proving the false branch was taken
+      expect(mockFetch).not.toHaveBeenCalled();
     });
   });
 });
