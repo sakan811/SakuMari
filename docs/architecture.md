@@ -76,6 +76,8 @@
 - **SEO Optimized:** Dynamic `sitemap.ts`, `robots.ts`, and page-level metadata
 - **Performance:** Automatic code splitting, SSR, and static generation
 
+## Project Structure Overview
+
 **Route Structure:**
 
 ```
