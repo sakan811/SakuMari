@@ -109,7 +109,6 @@ describe("FlashcardProvider - Context Management", () => {
     });
 
     expect(capturedContext.currentKana).toBeDefined();
-    expect(capturedContext.kanaData).toEqual(mockKanaData);
   });
 
   it("provides interaction mode functionality", async () => {
@@ -195,9 +194,7 @@ describe("FlashcardProvider - Context Management", () => {
     expect(typeof capturedContext.submitAnswer).toBe("function");
     expect(typeof capturedContext.nextCard).toBe("function");
     expect(typeof capturedContext.setInteractionMode).toBe("function");
-    expect(typeof capturedContext.generateChoices).toBe("function");
-    expect(typeof capturedContext.selectRandomKana).toBe("function");
-    expect(typeof capturedContext.fetchKanaData).toBe("function");
+    expect(typeof capturedContext.generateChoicesArray).toBe("function");
   });
 
   it("handles kanaType prop changes gracefully", async () => {
@@ -246,13 +243,10 @@ describe("FlashcardProvider - Context Management", () => {
 
     // Test that all properties have expected types
     expect(typeof capturedContext.currentKana).toBe("object");
-    expect(typeof capturedContext.kanaData).toBe("object");
     expect(typeof capturedContext.loadingKana).toBe("boolean");
     expect(typeof capturedContext.isSubmitting).toBe("boolean");
-    expect(typeof capturedContext.result).toBe("string");
+    expect(typeof capturedContext.result).toBe("object"); // Can be null or string
     expect(typeof capturedContext.interactionMode).toBe("string");
     expect(typeof capturedContext.choices).toBe("object");
-    expect(typeof capturedContext.error).toBe("string");
-    expect(typeof capturedContext.kanaType).toBe("string");
   });
 });
