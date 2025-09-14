@@ -24,8 +24,6 @@ import {
   setupMockApiEndpoints,
   mockKanaData,
   waitForContext,
-  runParameterizedTests,
-  type TestCase,
 } from "./test-helpers";
 
 describe("FlashcardProvider - Submission Logic", () => {
@@ -373,67 +371,47 @@ describe("FlashcardProvider - Submission Logic", () => {
     });
 
     it("handles different answer types correctly", async () => {
-      const answerTestCases: TestCase[] = [
-        {
-          name: "handles romaji answers",
-          data: mockKanaData,
-          expectedBehavior: "should submit romaji answers",
-        },
-        {
-          name: "handles hiragana answers",
-          data: mockKanaData,
-          expectedBehavior: "should submit hiragana answers",
-        },
-        {
-          name: "handles katakana answers",
-          data: mockKanaData,
-          expectedBehavior: "should submit katakana answers",
-        },
-      ];
-
-      runParameterizedTests(answerTestCases, async (testCase) => {
-        const mockFetchImpl = vi.fn();
-        global.fetch = mockFetchImpl.mockImplementation((url: string) => {
-          if (url === "/api/stats") {
-            return Promise.resolve({
-              ok: true,
-              json: async () => testCase.data,
-            });
-          } else if (url === "/api/flashcards/submit") {
-            return Promise.resolve({
-              ok: true,
-              json: async () => ({ success: true }),
-            });
-          }
+      const mockFetchImpl = vi.fn();
+      global.fetch = mockFetchImpl.mockImplementation((url: string) => {
+        if (url === "/api/stats") {
           return Promise.resolve({
-            ok: false,
-            status: 404,
-            json: async () => ({}),
+            ok: true,
+            json: async () => mockKanaData,
           });
+        } else if (url === "/api/flashcards/submit") {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ success: true }),
+          });
+        }
+        return Promise.resolve({
+          ok: false,
+          status: 404,
+          json: async () => ({}),
         });
-
-        let capturedContext: any;
-        const onContext = (context: any) => {
-          capturedContext = context;
-        };
-
-        const { getByTestId } = render(
-          <FlashcardProvider>
-            <TestComponent onContext={onContext} />
-          </FlashcardProvider>,
-        );
-
-        await waitForContext(capturedContext);
-
-        // Submit answer
-        await act(async () => {
-          getByTestId("submit-answer").click();
-        });
-
-        // Should have submitted successfully
-        const submitCall = mockFetchImpl.mock.calls.find(call => call[0] === "/api/flashcards/submit");
-        expect(submitCall).toBeDefined();
       });
+
+      let capturedContext: any;
+      const onContext = (context: any) => {
+        capturedContext = context;
+      };
+
+      const { getByTestId } = render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      await waitForContext(capturedContext);
+
+      // Submit answer
+      await act(async () => {
+        getByTestId("submit-answer").click();
+      });
+
+      // Should have submitted successfully
+      const submitCall = mockFetchImpl.mock.calls.find(call => call[0] === "/api/flashcards/submit");
+      expect(submitCall).toBeDefined();
     });
   });
 
