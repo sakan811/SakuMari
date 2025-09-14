@@ -69,7 +69,7 @@ export const pageTestUtils = {
   /**
    * Validates that a component doesn't throw when instantiated
    */
-  expectComponentDoesNotThrow: (componentFactory: () => any) => {
+  expectComponentDoesNotThrow: (componentFactory: () => unknown) => {
     expect(() => {
       const component = componentFactory();
       expect(component).toBeTruthy();
@@ -79,7 +79,7 @@ export const pageTestUtils = {
   /**
    * Validates expected page properties
    */
-  expectPageProperties: (properties: Record<string, any>) => {
+  expectPageProperties: (properties: Record<string, unknown>) => {
     Object.entries(properties).forEach(([key, value]) => {
       expect(properties[key]).toBe(value);
     });

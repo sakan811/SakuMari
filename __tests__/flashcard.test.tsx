@@ -416,7 +416,8 @@ describe("Flashcard Component", () => {
       const setInteractionMode = vi.fn();
       const handleModeChange = vi.fn().mockImplementation((mode: "typing" | "multiple-choice") => {
         // This mocks the actual handleModeChange function logic from lines 120-123
-        if (true) return; // Simulating isSubmitting = true
+        const isSubmitting = true; // Simulating isSubmitting = true
+        if (isSubmitting) return;
         setInteractionMode(mode);
       });
       
@@ -437,8 +438,10 @@ describe("Flashcard Component", () => {
       const setInteractionMode = vi.fn();
       const handleModeChange = vi.fn().mockImplementation((mode: "typing" | "multiple-choice") => {
         // This mocks the actual handleModeChange function logic from lines 120-123
-        if (false) return; // Simulating isSubmitting = false
-        if (true) return; // Simulating result exists
+        const isSubmitting = false; // Simulating isSubmitting = false
+        const hasResult = true; // Simulating result exists
+        if (isSubmitting) return;
+        if (hasResult) return;
         setInteractionMode(mode);
       });
       
@@ -459,8 +462,10 @@ describe("Flashcard Component", () => {
       const setInteractionMode = vi.fn();
       const handleModeChange = vi.fn().mockImplementation((mode: "typing" | "multiple-choice") => {
         // This mocks the actual handleModeChange function logic from lines 120-123
-        if (false) return; // Simulating isSubmitting = false
-        if (false) return; // Simulating result = null
+        const isSubmitting = false; // Simulating isSubmitting = false
+        const hasResult = false; // Simulating result = null
+        if (isSubmitting) return;
+        if (hasResult) return;
         setInteractionMode(mode);
       });
       
@@ -566,7 +571,8 @@ describe("Flashcard Component", () => {
       const setError = vi.fn();
       const handleChoiceSelect = vi.fn().mockImplementation((index: number) => {
         // This mocks the actual handleChoiceSelect function logic from lines 125-129
-        if (true) return; // Simulating isSubmitting = true
+        const isSubmitting = true; // Simulating isSubmitting = true
+        if (isSubmitting) return;
         setSelectedChoice(index);
         setError("");
       });
@@ -590,8 +596,10 @@ describe("Flashcard Component", () => {
       const setError = vi.fn();
       const handleChoiceSelect = vi.fn().mockImplementation((index: number) => {
         // This mocks the actual handleChoiceSelect function logic from lines 125-129
-        if (false) return; // Simulating isSubmitting = false
-        if (true) return; // Simulating result exists
+        const isSubmitting = false; // Simulating isSubmitting = false
+        const hasResult = true; // Simulating result exists
+        if (isSubmitting) return;
+        if (hasResult) return;
         setSelectedChoice(index);
         setError("");
       });
@@ -615,8 +623,10 @@ describe("Flashcard Component", () => {
       const setError = vi.fn();
       const handleChoiceSelect = vi.fn().mockImplementation((index: number) => {
         // This mocks the actual handleChoiceSelect function logic from lines 125-129
-        if (false) return; // Simulating isSubmitting = false
-        if (false) return; // Simulating result = null
+        const isSubmitting = false; // Simulating isSubmitting = false
+        const hasResult = false; // Simulating result = null
+        if (isSubmitting) return;
+        if (hasResult) return;
         setSelectedChoice(index);
         setError("");
       });
@@ -638,8 +648,10 @@ describe("Flashcard Component", () => {
       const setError = vi.fn();
       const handleChoiceSelect = vi.fn().mockImplementation((index: number) => {
         // This mocks the actual handleChoiceSelect function logic from lines 125-129
-        if (false) return; // Simulating isSubmitting = false
-        if (false) return; // Simulating result = null
+        const isSubmitting = false; // Simulating isSubmitting = false
+        const hasResult = false; // Simulating result = null
+        if (isSubmitting) return;
+        if (hasResult) return;
         vi.fn()(index); // Mock setSelectedChoice
         setError("");
       });
@@ -662,8 +674,10 @@ describe("Flashcard Component", () => {
       const setError = vi.fn();
       const handleChoiceSelect = vi.fn().mockImplementation((index: number) => {
         // This mocks the actual handleChoiceSelect function logic from lines 125-129
-        if (false) return; // Simulating isSubmitting = false
-        if (false) return; // Simulating result = null
+        const isSubmitting = false; // Simulating isSubmitting = false
+        const hasResult = false; // Simulating result = null
+        if (isSubmitting) return;
+        if (hasResult) return;
         setSelectedChoice(index);
         setError("");
       });

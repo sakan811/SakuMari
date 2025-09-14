@@ -1,9 +1,11 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, act, waitFor, renderHook } from "@testing-library/react";
+import React from "react";
 import {
   FlashcardProvider,
   useFlashcard,
 } from "@/components/FlashcardProvider";
+import type { KanaWithAccuracy } from "@/types/common";
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -331,7 +333,7 @@ describe("FlashcardProvider - Multiple Choice Generation", () => {
     });
 
     const correctKana = { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 10, correct_attempts: 5 };
-    const emptyKanaData: any[] = [];
+    const emptyKanaData: KanaWithAccuracy[] = [];
 
     const choices = result.current.generateChoicesArray(correctKana, emptyKanaData);
     expect(choices).toEqual([]);
@@ -359,11 +361,11 @@ describe("FlashcardProvider - Multiple Choice Generation", () => {
     expect(choices.length).toBeLessThanOrEqual(4);
   });
 
-  // Create wrapper for renderHook
   const createWrapper = () => {
-    return ({ children }: { children: React.ReactNode }) => (
+    const Wrapper = ({ children }: { children: React.ReactNode }) => (
       <FlashcardProvider>{children}</FlashcardProvider>
     );
+    Wrapper.displayName = "TestWrapper";
+    return Wrapper;
   };
-
-  });
+});
