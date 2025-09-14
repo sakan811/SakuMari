@@ -26,8 +26,6 @@ import {
   setupMockApiEndpoints,
   mockKanaData,
   waitForContext,
-  runParameterizedTests,
-  type TestCase,
 } from "./test-helpers";
 
 describe("FlashcardProvider - Error Handling", () => {
@@ -54,7 +52,11 @@ describe("FlashcardProvider - Error Handling", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
       expect(capturedContext.loadingKana).toBe(false);
     });
 
@@ -75,7 +77,11 @@ describe("FlashcardProvider - Error Handling", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
       expect(capturedContext.loadingKana).toBe(false);
     });
 
@@ -93,7 +99,11 @@ describe("FlashcardProvider - Error Handling", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
       expect(capturedContext.loadingKana).toBe(false);
     });
 
@@ -116,7 +126,11 @@ describe("FlashcardProvider - Error Handling", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Submit answer and wait for result
       await act(async () => {
@@ -157,7 +171,11 @@ describe("FlashcardProvider - Error Handling", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Submit answer and wait for result
       await act(async () => {
@@ -172,45 +190,68 @@ describe("FlashcardProvider - Error Handling", () => {
   });
 
   describe("Edge Case Handling", () => {
-    const errorTestCases: TestCase[] = [
-      {
-        name: "handles null response from API",
-        data: [],
-        expectedBehavior: "should gracefully handle null response",
-        setup: () => {
-          global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => null,
-          });
-        },
-      },
-      {
-        name: "handles undefined response from API",
-        data: [],
-        expectedBehavior: "should gracefully handle undefined response",
-        setup: () => {
-          global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => undefined,
-          });
-        },
-      },
-      {
-        name: "handles malformed JSON response",
-        data: [],
-        expectedBehavior: "should gracefully handle malformed JSON",
-        setup: () => {
-          global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => {
-              throw new Error("Invalid JSON");
-            },
-          });
-        },
-      },
-    ];
+    it("handles null response from API", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => null,
+      });
 
-    runParameterizedTests(errorTestCases, async (testCase) => {
+      let capturedContext: any;
+      const onContext = (context: any) => {
+        capturedContext = context;
+      };
+
+      render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      });
+
+      // Should not crash and should have reasonable defaults
+      expect(capturedContext.kanaData).toEqual([]);
+      expect(capturedContext.currentKana).toBeNull();
+    });
+
+    it("handles undefined response from API", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => undefined,
+      });
+
+      let capturedContext: any;
+      const onContext = (context: any) => {
+        capturedContext = context;
+      };
+
+      render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      });
+
+      // Should not crash and should have reasonable defaults
+      expect(capturedContext.kanaData).toEqual([]);
+      expect(capturedContext.currentKana).toBeNull();
+    });
+
+    it("handles malformed JSON response", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => {
+          throw new Error("Invalid JSON");
+        },
+      });
+
       let capturedContext: any;
       const onContext = (context: any) => {
         capturedContext = context;
@@ -252,7 +293,11 @@ describe("FlashcardProvider - Error Handling", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Submit multiple times quickly
       await act(async () => {
@@ -307,7 +352,11 @@ describe("FlashcardProvider - Error Handling", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // First submission (should fail)
       await act(async () => {
@@ -374,7 +423,11 @@ describe("FlashcardProvider - Error Handling", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Trigger error
       await act(async () => {

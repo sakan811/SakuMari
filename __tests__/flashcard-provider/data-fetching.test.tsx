@@ -24,8 +24,6 @@ import {
   setupSuccessfulApiResponse,
   mockKanaData,
   waitForContext,
-  runParameterizedTests,
-  type TestCase,
 } from "./test-helpers";
 
 describe("FlashcardProvider - Data Fetching", () => {
@@ -56,7 +54,11 @@ describe("FlashcardProvider - Data Fetching", () => {
       expect(capturedContext.loadingKana).toBe(true);
 
       // Should complete loading
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
       expect(capturedContext.loadingKana).toBe(false);
       expect(capturedContext.kanaData).toEqual(mockKanaData);
     });
@@ -99,7 +101,11 @@ describe("FlashcardProvider - Data Fetching", () => {
       expect(capturedContext.loadingKana).toBe(true);
 
       // Should complete loading
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
       expect(capturedContext.loadingKana).toBe(false);
     });
 
@@ -117,7 +123,11 @@ describe("FlashcardProvider - Data Fetching", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Should have selected a kana from the available data
       expect(capturedContext.currentKana).toBeDefined();
@@ -140,7 +150,11 @@ describe("FlashcardProvider - Data Fetching", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
       expect(global.fetch).toHaveBeenCalledTimes(1);
 
       // Setup new data for katakana
@@ -180,7 +194,11 @@ describe("FlashcardProvider - Data Fetching", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
       expect(global.fetch).toHaveBeenCalledTimes(1);
 
       // Re-render with same kanaType
@@ -215,7 +233,11 @@ describe("FlashcardProvider - Data Fetching", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
       expect(fetchCount).toBe(1);
 
       // Rapid kanaType changes
@@ -247,31 +269,13 @@ describe("FlashcardProvider - Data Fetching", () => {
   });
 
   describe("Fetch Prevention Logic", () => {
-    const fetchPreventionCases: TestCase[] = [
-      {
-        name: "prevents fetch when already fetched and no kanaType change",
-        data: mockKanaData,
-        expectedBehavior: "should not fetch data again",
-      },
-      {
-        name: "prevents duplicate fetch calls in rapid succession",
-        data: mockKanaData,
-        expectedBehavior: "should debounce fetch calls",
-      },
-      {
-        name: "handles undefined kanaType gracefully",
-        data: mockKanaData,
-        expectedBehavior: "should work without kanaType",
-      },
-    ];
-
-    runParameterizedTests(fetchPreventionCases, async (testCase) => {
+    it("prevents fetch when already fetched and no kanaType change", async () => {
       let fetchCount = 0;
       global.fetch = vi.fn().mockImplementation(() => {
         fetchCount++;
         return Promise.resolve({
           ok: true,
-          json: async () => testCase.data,
+          json: async () => mockKanaData,
         });
       });
 
@@ -286,7 +290,11 @@ describe("FlashcardProvider - Data Fetching", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
       const initialFetchCount = fetchCount;
 
       // Re-render multiple times
@@ -303,6 +311,83 @@ describe("FlashcardProvider - Data Fetching", () => {
 
       // Should not have made additional unnecessary fetches
       expect(fetchCount).toBe(initialFetchCount);
+    });
+
+    it("prevents duplicate fetch calls in rapid succession", async () => {
+      let fetchCount = 0;
+      global.fetch = vi.fn().mockImplementation(() => {
+        fetchCount++;
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockKanaData,
+        });
+      });
+
+      let capturedContext: any;
+      const onContext = (context: any) => {
+        capturedContext = context;
+      };
+
+      const { rerender } = render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
+      const initialFetchCount = fetchCount;
+
+      // Rapid re-renders
+      for (let i = 0; i < 3; i++) {
+        rerender(
+          <FlashcardProvider>
+            <TestComponent onContext={onContext} />
+          </FlashcardProvider>,
+        );
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 5));
+        });
+      }
+
+      // Should not have made additional fetches for rapid calls
+      expect(fetchCount).toBe(initialFetchCount);
+    });
+
+    it("handles undefined kanaType gracefully", async () => {
+      let fetchCount = 0;
+      global.fetch = vi.fn().mockImplementation(() => {
+        fetchCount++;
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockKanaData,
+        });
+      });
+
+      let capturedContext: any;
+      const onContext = (context: any) => {
+        capturedContext = context;
+      };
+
+      render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
+
+      // Should work normally without kanaType specified
+      expect(fetchCount).toBe(1);
+      expect(capturedContext.kanaData).toEqual(mockKanaData);
+      expect(capturedContext.loadingKana).toBe(false);
     });
   });
 
@@ -331,7 +416,11 @@ describe("FlashcardProvider - Data Fetching", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Should only have hiragana data
       expect(capturedContext.kanaData.length).toBe(2);
@@ -357,7 +446,11 @@ describe("FlashcardProvider - Data Fetching", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Should have all data when no type filter
       expect(capturedContext.kanaData).toEqual(mixedData);
@@ -396,7 +489,11 @@ describe("FlashcardProvider - Data Fetching", () => {
       expect(isFetching).toBe(true);
 
       // Should complete loading
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
       expect(capturedContext.loadingKana).toBe(false);
       expect(isFetching).toBe(false);
     });
@@ -419,7 +516,11 @@ describe("FlashcardProvider - Data Fetching", () => {
       expect(capturedContext.loadingKana).toBe(true);
 
       // Should complete and reset loading state
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
       expect(capturedContext.loadingKana).toBe(false);
     });
   });
