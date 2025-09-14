@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   calculateKanaWeights,
   selectKanaByWeight,
@@ -114,7 +114,7 @@ describe("Flashcard Utils", () => {
 
       // Mock Math.random to control selection
       const originalRandom = Math.random;
-      let callCount = 0;
+      let _callCount = 0;
       Math.random = vi.fn()
         .mockReturnValueOnce(0.5) // Should select first kana (0.5 < 0.7)
         .mockReturnValueOnce(0.8); // Should select second kana (0.8 - 0.7 = 0.1 <= 0.3)
