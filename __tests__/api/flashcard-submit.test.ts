@@ -77,7 +77,7 @@ describe("Flashcard Submit API", () => {
       expectCalledTimes(mockPrisma.$executeRaw, 1);
 
       // Verify the SQL parameters for INSERT case
-      const mockCall = mockPrisma.$executeRaw.mock.calls[0];
+      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [string[], ...unknown[]];
       expectSqlContains(mockCall, 'INSERT INTO "KanaProgress"');
       expectSqlContains(mockCall, 'ON CONFLICT (kana_id, user_id)');
       expectSqlParameters(mockCall, [
@@ -105,7 +105,7 @@ describe("Flashcard Submit API", () => {
       expectCalledTimes(mockPrisma.$executeRaw, 1);
 
       // Verify the SQL parameters for INSERT case with incorrect answer
-      const mockCall = mockPrisma.$executeRaw.mock.calls[0];
+      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [string[], ...unknown[]];
       expectSqlContains(mockCall, 'INSERT INTO "KanaProgress"');
       expectSqlContains(mockCall, 'ON CONFLICT (kana_id, user_id)');
       expectSqlParameters(mockCall, [
@@ -133,7 +133,7 @@ describe("Flashcard Submit API", () => {
       expectCalledTimes(mockPrisma.$executeRaw, 1);
 
       // Verify the SQL parameters for UPDATE case with correct answer
-      const mockCall = mockPrisma.$executeRaw.mock.calls[0];
+      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [string[], ...unknown[]];
       expectSqlContains(mockCall, 'ON CONFLICT (kana_id, user_id)');
       expectSqlContains(mockCall, 'DO UPDATE SET');
       expectSqlContains(mockCall, 'attempts = "KanaProgress".attempts + 1');
@@ -163,7 +163,7 @@ describe("Flashcard Submit API", () => {
       expectCalledTimes(mockPrisma.$executeRaw, 1);
 
       // Verify the SQL parameters for UPDATE case with incorrect answer
-      const mockCall = mockPrisma.$executeRaw.mock.calls[0];
+      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [string[], ...unknown[]];
       expectSqlContains(mockCall, 'ON CONFLICT (kana_id, user_id)');
       expectSqlContains(mockCall, 'DO UPDATE SET');
       expectSqlContains(mockCall, 'attempts = "KanaProgress".attempts + 1');
