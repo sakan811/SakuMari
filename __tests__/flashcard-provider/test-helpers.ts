@@ -90,10 +90,12 @@ export function TestComponent({
 
 // Setup successful API response
 export function setupSuccessfulApiResponse(data = mockKanaData) {
-  global.fetch = vi.fn().mockResolvedValue({
+  const mockResponse = {
     ok: true,
     json: () => Promise.resolve(data),
-  });
+  };
+  global.fetch = vi.fn().mockResolvedValue(mockResponse);
+  mockFetch.mockResolvedValue(mockResponse);
 }
 
 // Setup failed API response

@@ -8,29 +8,35 @@ describe("shouldFetchKanaData", () => {
     expect(shouldFetchKanaData(false, "katakana")).toBe(true);
   });
 
-  it("should return true when hasFetched is true but kanaType is provided", () => {
-    expect(shouldFetchKanaData(true, "hiragana")).toBe(true);
-    expect(shouldFetchKanaData(true, "katakana")).toBe(true);
+  it("should return true when kanaType differs from previousKanaType", () => {
+    expect(shouldFetchKanaData(true, "hiragana", undefined)).toBe(true);
+    expect(shouldFetchKanaData(true, "katakana", undefined)).toBe(true);
+    expect(shouldFetchKanaData(true, "hiragana", "katakana")).toBe(true);
+    expect(shouldFetchKanaData(true, "katakana", "hiragana")).toBe(true);
   });
 
-  it("should return false when hasFetched is true and kanaType is undefined", () => {
+  it("should return false when hasFetched is true and kanaType is same as previousKanaType", () => {
     expect(shouldFetchKanaData(true)).toBe(false);
-    expect(shouldFetchKanaData(true, undefined)).toBe(false);
+    expect(shouldFetchKanaData(true, undefined, undefined)).toBe(false);
+    expect(shouldFetchKanaData(true, "hiragana", "hiragana")).toBe(false);
+    expect(shouldFetchKanaData(true, "katakana", "katakana")).toBe(false);
   });
 
-  it("should handle all boolean combinations", () => {
+  it("should handle all combinations", () => {
     // Test all possible combinations
     const testCases = [
-      { hasFetched: false, kanaType: undefined, expected: true },
-      { hasFetched: false, kanaType: "hiragana", expected: true },
-      { hasFetched: false, kanaType: "katakana", expected: true },
-      { hasFetched: true, kanaType: undefined, expected: false },
-      { hasFetched: true, kanaType: "hiragana", expected: true },
-      { hasFetched: true, kanaType: "katakana", expected: true },
+      { hasFetched: false, kanaType: undefined, previousKanaType: undefined, expected: true },
+      { hasFetched: false, kanaType: "hiragana", previousKanaType: undefined, expected: true },
+      { hasFetched: false, kanaType: "katakana", previousKanaType: undefined, expected: true },
+      { hasFetched: true, kanaType: undefined, previousKanaType: undefined, expected: false },
+      { hasFetched: true, kanaType: "hiragana", previousKanaType: undefined, expected: true },
+      { hasFetched: true, kanaType: "katakana", previousKanaType: undefined, expected: true },
+      { hasFetched: true, kanaType: "hiragana", previousKanaType: "hiragana", expected: false },
+      { hasFetched: true, kanaType: "katakana", previousKanaType: "hiragana", expected: true },
     ];
 
-    testCases.forEach(({ hasFetched, kanaType, expected }) => {
-      expect(shouldFetchKanaData(hasFetched, kanaType)).toBe(expected);
+    testCases.forEach(({ hasFetched, kanaType, previousKanaType, expected }) => {
+      expect(shouldFetchKanaData(hasFetched, kanaType, previousKanaType)).toBe(expected);
     });
   });
 });
