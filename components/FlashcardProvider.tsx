@@ -34,6 +34,7 @@ import {
   filterKanaByType,
   shouldPreventSubmission,
 } from "@/lib/flashcard-utils";
+import { shouldFetchKanaData } from "@/lib/should-fetch-kana-data";
 
 export type FlashcardContextType = {
   currentKana: KanaWithAccuracy | null;
@@ -121,15 +122,13 @@ export function FlashcardProvider({
 
   // Prevent double fetch in React strict mode
   useEffect(() => {
-    if (!hasFetched.current) {
+    if (shouldFetchKanaData(hasFetched.current, kanaType)) {
       hasFetched.current = true;
-      fetchKanaData();
-    } else if (kanaType) {
-      // If kanaType changes, fetch new data
       fetchKanaData();
     }
   }, [kanaType, fetchKanaData]);
 
+  
   
   // Submit answer and update accuracy
   const submitAnswer = async (answer: string) => {
