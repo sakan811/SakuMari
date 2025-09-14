@@ -135,7 +135,7 @@ describe("FlashcardProvider", () => {
     });
 
     it("should handle API fetch error (line 121-126)", async () => {
-      (fetch as any).mockRejectedValue(new Error("Network error"));
+      (fetch as ReturnType<typeof vi.fn>).mockRejectedValue(new Error("Network error"));
 
       render(
         <FlashcardProvider>
@@ -209,7 +209,7 @@ describe("FlashcardProvider", () => {
   describe("submitAnswer function", () => {
     it("should handle API HTTP error during submission (line 185-187)", async () => {
       (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData);
-      (fetch as any)
+      (fetch as ReturnType<typeof vi.fn>)
         .mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve(mockKanaData),
@@ -239,7 +239,7 @@ describe("FlashcardProvider", () => {
 
     it("should handle network error during submission (line 191-194)", async () => {
       (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData);
-      (fetch as any).mockResolvedValueOnce({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockKanaData),
       }).mockRejectedValueOnce(new Error("Network error"));
