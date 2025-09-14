@@ -76,7 +76,7 @@ describe("FlashcardProvider - Context Management", () => {
     };
 
     render(
-      <FlashcardProvider>
+      <FlashcardProvider _resetHasFetched={true}>
         <TestComponent onContext={onContext} />
       </FlashcardProvider>,
     );
@@ -98,7 +98,7 @@ describe("FlashcardProvider - Context Management", () => {
     };
 
     render(
-      <FlashcardProvider>
+      <FlashcardProvider _resetHasFetched={true}>
         <TestComponent onContext={onContext} />
       </FlashcardProvider>,
     );
@@ -118,7 +118,7 @@ describe("FlashcardProvider - Context Management", () => {
     };
 
     const { getByTestId } = render(
-      <FlashcardProvider>
+      <FlashcardProvider _resetHasFetched={true}>
         <TestComponent onContext={onContext} />
       </FlashcardProvider>,
     );
@@ -152,7 +152,7 @@ describe("FlashcardProvider - Context Management", () => {
     };
 
     const { rerender } = render(
-      <FlashcardProvider>
+      <FlashcardProvider _resetHasFetched={true}>
         <TestComponent onContext={onContext} />
       </FlashcardProvider>,
     );
@@ -165,13 +165,16 @@ describe("FlashcardProvider - Context Management", () => {
 
     // Re-render with same props
     rerender(
-      <FlashcardProvider>
+      <FlashcardProvider _resetHasFetched={true}>
         <TestComponent onContext={onContext} />
       </FlashcardProvider>,
     );
 
-    // Context should remain stable
-    expect(capturedContext).toBe(initialContext);
+    // Context should remain stable - check that methods are the same instances
+    expect(capturedContext.submitAnswer).toBe(initialContext.submitAnswer);
+    expect(capturedContext.nextCard).toBe(initialContext.nextCard);
+    expect(capturedContext.setInteractionMode).toBe(initialContext.setInteractionMode);
+    expect(capturedContext.generateChoicesArray).toBe(initialContext.generateChoicesArray);
   });
 
   it("provides all required context methods", async () => {

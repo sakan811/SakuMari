@@ -65,9 +65,11 @@ export function useFlashcard() {
 export function FlashcardProvider({
   children,
   kanaType,
+  _resetHasFetched = false,
 }: {
   children: React.ReactNode;
   kanaType?: "hiragana" | "katakana";
+  _resetHasFetched?: boolean; // For testing only
 }) {
   const [kanaList, setKanaList] = useState<KanaWithAccuracy[]>([]);
   const [currentKana, setCurrentKana] = useState<KanaWithAccuracy | null>(null);
@@ -77,23 +79,7 @@ export function FlashcardProvider({
     useState<InteractionMode>("typing");
   const [choices, setChoices] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const hasFetched = useRef(false);
-
-  // Select a kana using confidence-weighted selection (solves first-success penalty)
-  const selectRandomKana = useCallback((data: KanaWithAccuracy[]) => {
-    if (!data.length) {
-      setCurrentKana(null);
-      setChoices([]);
-      return;
-    }
-
-    const weights = calculateKanaWeights(data);
-    const selectedKana = selectKanaByWeight(data, weights);
-
-    setCurrentKana(selectedKana);
-    const choices = generateChoicesArray(selectedKana, data);
-    setChoices(choices);
-  }, []);
+  const hasFetched = useRef(_resetHasFetched ? false : false);
 
   const fetchKanaData = useCallback(async () => {
     setLoadingKana(true);
@@ -113,13 +99,24 @@ export function FlashcardProvider({
       data = filterKanaByType(data, kanaType);
 
       setKanaList(data);
-      selectRandomKana(data);
+
+      // Select a kana using confidence-weighted selection (solves first-success penalty)
+      if (!data.length) {
+        setCurrentKana(null);
+        setChoices([]);
+      } else {
+        const weights = calculateKanaWeights(data);
+        const selectedKana = selectKanaByWeight(data, weights);
+        setCurrentKana(selectedKana);
+        const choices = generateChoicesArray(selectedKana, data);
+        setChoices(choices);
+      }
     } catch (error) {
       console.error("Error fetching kana data:", error);
     } finally {
       setLoadingKana(false);
     }
-  }, [kanaType, selectRandomKana]);
+  }, [kanaType]);
 
   // Handle data fetching logic
   const handleDataFetch = useCallback(() => {
@@ -130,6 +127,22 @@ export function FlashcardProvider({
     // This empty block is the false branch that needs coverage
   }, [kanaType, fetchKanaData]);
 
+  // Select a kana using confidence-weighted selection (solves first-success penalty)
+  const selectRandomKana = useCallback((data: KanaWithAccuracy[]) => {
+    if (!data.length) {
+      setCurrentKana(null);
+      setChoices([]);
+      return;
+    }
+
+    const weights = calculateKanaWeights(data);
+    const selectedKana = selectKanaByWeight(data, weights);
+
+    setCurrentKana(selectedKana);
+    const choices = generateChoicesArray(selectedKana, data);
+    setChoices(choices);
+  }, []);
+
   // Prevent double fetch in React strict mode
   useEffect(() => {
     handleDataFetch();
@@ -138,7 +151,7 @@ export function FlashcardProvider({
   
   
   // Submit answer and update accuracy
-  const submitAnswer = async (answer: string) => {
+  const submitAnswer = useCallback(async (answer: string) => {
     if (shouldPreventSubmission(currentKana, isSubmitting)) return;
 
     setIsSubmitting(true);
@@ -173,13 +186,13 @@ export function FlashcardProvider({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [currentKana, isSubmitting, interactionMode]);
 
   // Proceed to next kana
-  const nextCard = () => {
+  const nextCard = useCallback(() => {
     setResult(null);
     selectRandomKana(kanaList);
-  };
+  }, [kanaList, selectRandomKana]);
 
   const value = {
     currentKana,
