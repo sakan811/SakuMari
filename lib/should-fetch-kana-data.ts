@@ -19,7 +19,6 @@
  * Determines if kana data should be fetched based on fetch history and kana type
  * @param hasFetched - Whether data has been fetched before
  * @param kanaType - Optional kana type filter
- * @param previousKanaType - Previous kana type for comparison
  * @returns boolean indicating if data should be fetched
  */
 export function shouldFetchKanaData(
