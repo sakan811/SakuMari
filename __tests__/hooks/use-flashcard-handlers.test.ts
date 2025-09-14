@@ -17,7 +17,7 @@
 
 import { describe, test, expect, beforeEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useFlashcardHandlers } from "../hooks/useFlashcardHandlers";
+import { useFlashcardHandlers } from "../../hooks/useFlashcardHandlers";
 
 describe("useFlashcardHandlers Hook", () => {
   const mockSetInteractionMode = vi.fn();
