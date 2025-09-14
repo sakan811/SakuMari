@@ -47,6 +47,7 @@ export type FlashcardContextType = {
   choices: string[];
   isSubmitting: boolean;
   generateChoicesArray: (_: KanaWithAccuracy, __: KanaWithAccuracy[]) => string[];
+  kanaType?: "hiragana" | "katakana";
 };
 
 const FlashcardContext = createContext<FlashcardContextType | undefined>(
@@ -191,6 +192,7 @@ export function FlashcardProvider({
     choices,
     isSubmitting,
     generateChoicesArray,
+    kanaType,
   };
 
   return (
