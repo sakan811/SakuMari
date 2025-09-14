@@ -120,13 +120,19 @@ export function FlashcardProvider({
     }
   }, [kanaType, selectRandomKana]);
 
-  // Prevent double fetch in React strict mode
-  useEffect(() => {
+  // Handle data fetching logic
+  const handleDataFetch = useCallback(() => {
     if (shouldFetchKanaData(hasFetched.current, kanaType)) {
       hasFetched.current = true;
       fetchKanaData();
     }
+    // This empty block is the false branch that needs coverage
   }, [kanaType, fetchKanaData]);
+
+  // Prevent double fetch in React strict mode
+  useEffect(() => {
+    handleDataFetch();
+  }, [handleDataFetch]);
 
   
   
