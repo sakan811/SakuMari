@@ -17,7 +17,7 @@
  */
 
 import React from "react";
-import { render, screen, waitFor, act } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -35,7 +35,7 @@ vi.mock("@/lib/flashcard-utils", () => ({
 }));
 
 import { FlashcardProvider, useFlashcard } from "@/components/FlashcardProvider";
-import type { KanaWithAccuracy, InteractionMode } from "@/types/common";
+import type { KanaWithAccuracy } from "@/types/common";
 import { shouldFetchKanaData } from "@/lib/should-fetch-kana-data";
 import {
   calculateKanaWeights,
@@ -76,12 +76,12 @@ describe("FlashcardProvider", () => {
     vi.clearAllMocks();
 
     // Setup default mock implementations
-    (shouldFetchKanaData as any).mockReturnValue(true);
-    (filterKanaByType as any).mockReturnValue(mockKanaData);
-    (calculateKanaWeights as any).mockReturnValue(mockWeights);
-    (selectKanaByWeight as any).mockReturnValue(mockKanaData[0]);
-    (generateChoicesArray as any).mockReturnValue(mockChoices);
-    (shouldPreventSubmission as any).mockReturnValue(false);
+    (shouldFetchKanaData as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData);
+    (calculateKanaWeights as ReturnType<typeof vi.fn>).mockReturnValue(mockWeights);
+    (selectKanaByWeight as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData[0]);
+    (generateChoicesArray as ReturnType<typeof vi.fn>).mockReturnValue(mockChoices);
+    (shouldPreventSubmission as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
     // Mock fetch
     global.fetch = vi.fn();
@@ -101,7 +101,7 @@ describe("FlashcardProvider", () => {
 
   describe("data fetching with error handling", () => {
     it("should handle null/undefined API response (line 95-97)", async () => {
-      (fetch as any).mockResolvedValue({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(null),
       });
@@ -118,7 +118,7 @@ describe("FlashcardProvider", () => {
     });
 
     it("should handle non-array API response (line 100-102)", async () => {
-      (fetch as any).mockResolvedValue({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ not: "an-array" }),
       });
@@ -150,7 +150,7 @@ describe("FlashcardProvider", () => {
     });
 
     it("should handle API HTTP error (line 89-91)", async () => {
-      (fetch as any).mockResolvedValue({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: false,
         status: 500,
       });
@@ -170,7 +170,7 @@ describe("FlashcardProvider", () => {
 
   describe("selectRandomKana function", () => {
     it("should handle empty data array (line 142-146)", async () => {
-      (filterKanaByType as any).mockReturnValue([]);
+      (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue([]);
 
       render(
         <FlashcardProvider>
@@ -185,7 +185,7 @@ describe("FlashcardProvider", () => {
     });
 
     it("should select kana and generate choices for non-empty array (line 148-153)", async () => {
-      (fetch as any).mockResolvedValue({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(mockKanaData),
       });
@@ -208,7 +208,7 @@ describe("FlashcardProvider", () => {
 
   describe("submitAnswer function", () => {
     it("should handle API HTTP error during submission (line 185-187)", async () => {
-      (filterKanaByType as any).mockReturnValue(mockKanaData);
+      (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData);
       (fetch as any)
         .mockResolvedValueOnce({
           ok: true,
@@ -238,7 +238,7 @@ describe("FlashcardProvider", () => {
     });
 
     it("should handle network error during submission (line 191-194)", async () => {
-      (filterKanaByType as any).mockReturnValue(mockKanaData);
+      (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData);
       (fetch as any).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockKanaData),
@@ -311,7 +311,7 @@ describe("FlashcardProvider", () => {
 
   describe("kanaType filtering", () => {
     it("should call filterKanaByType with correct kanaType", async () => {
-      (fetch as any).mockResolvedValue({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(mockKanaData),
       });
@@ -328,7 +328,7 @@ describe("FlashcardProvider", () => {
     });
 
     it("should not call filterKanaByType when kanaType is undefined", async () => {
-      (fetch as any).mockResolvedValue({
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(mockKanaData),
       });
@@ -347,8 +347,8 @@ describe("FlashcardProvider", () => {
 
   describe("shouldPreventSubmission guard", () => {
     it("should not submit when shouldPreventSubmission returns true", async () => {
-      (shouldPreventSubmission as any).mockReturnValue(true);
-      (filterKanaByType as any).mockReturnValue(mockKanaData);
+      (shouldPreventSubmission as ReturnType<typeof vi.fn>).mockReturnValue(true);
+      (filterKanaByType as ReturnType<typeof vi.fn>).mockReturnValue(mockKanaData);
 
       const user = userEvent.setup();
       render(
