@@ -80,7 +80,7 @@ export function FlashcardProvider({
     useState<InteractionMode>("typing");
   const [choices, setChoices] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const hasFetched = useRef(_resetHasFetched ? false : false);
+  const hasFetched = useRef(_resetHasFetched ? false : true);
 
   const fetchKanaData = useCallback(async () => {
     setLoadingKana(true);
@@ -159,7 +159,6 @@ export function FlashcardProvider({
   }, [handleDataFetch]);
 
   
-  
   // Submit answer and update accuracy
   const submitAnswer = useCallback(async (answer: string) => {
     if (shouldPreventSubmission(currentKana, isSubmitting)) return;
@@ -204,6 +203,12 @@ export function FlashcardProvider({
     selectRandomKana(kanaList);
   }, [kanaList, selectRandomKana]);
 
+  
+  const handleSetInteractionMode = (mode: InteractionMode) => {
+    // Simple implementation for now - we'll add choice generation logic back if needed
+    setInteractionMode(mode);
+  };
+
   const value = {
     currentKana,
     kanaData: kanaList,
@@ -212,7 +217,7 @@ export function FlashcardProvider({
     result,
     nextCard,
     interactionMode,
-    setInteractionMode,
+    setInteractionMode: handleSetInteractionMode,
     choices,
     isSubmitting,
     generateChoicesArray,
