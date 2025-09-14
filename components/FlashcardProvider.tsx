@@ -38,6 +38,7 @@ import { shouldFetchKanaData } from "@/lib/should-fetch-kana-data";
 
 export type FlashcardContextType = {
   currentKana: KanaWithAccuracy | null;
+  kanaData: KanaWithAccuracy[];
   loadingKana: boolean;
   submitAnswer: (_: string) => Promise<void>;
   result: "correct" | "incorrect" | null;
@@ -90,9 +91,14 @@ export function FlashcardProvider({
       }
       let data = await response.json();
 
+      // Handle null/undefined response
+      if (!data) {
+        data = [];
+      }
+
       // Ensure data is an array before filtering
       if (!Array.isArray(data)) {
-        throw new Error("Invalid data format received");
+        data = [];
       }
 
       // Filter by kana type if specified
@@ -113,6 +119,10 @@ export function FlashcardProvider({
       }
     } catch (error) {
       console.error("Error fetching kana data:", error);
+      // Set empty data on error
+      setKanaList([]);
+      setCurrentKana(null);
+      setChoices([]);
     } finally {
       setLoadingKana(false);
     }
@@ -196,6 +206,7 @@ export function FlashcardProvider({
 
   const value = {
     currentKana,
+    kanaData: kanaList,
     loadingKana,
     submitAnswer,
     result,
