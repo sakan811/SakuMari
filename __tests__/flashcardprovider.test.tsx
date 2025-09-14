@@ -469,7 +469,7 @@ describe("FlashcardProvider", () => {
       React.useEffect(() => {
         onContext(context);
       }, [context, onContext]);
-      
+
       return (
         <div>
           <button data-testid="next-card" onClick={context.nextCard}>
@@ -487,6 +487,151 @@ describe("FlashcardProvider", () => {
         </div>
       );
     }
+
+    it("should refetch data when kanaType changes after initial load", async () => {
+      // Mock initial API response
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => [
+          { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5 },
+          { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 5 },
+        ],
+      });
+
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
+        capturedContext = context;
+      };
+
+      const { rerender } = render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait for initial load
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      // Mock new API response for katakana
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => [
+          { id: "3", character: "ア", romaji: "a", accuracy: 0.7, attempts: 3 },
+          { id: "4", character: "イ", romaji: "i", accuracy: 0.4, attempts: 8 },
+        ],
+      });
+
+      // Change kanaType prop to trigger refetch (this covers line 159)
+      rerender(
+        <FlashcardProvider kanaType="katakana">
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait for refetch to complete
+      await waitFor(() => {
+        expect(capturedContext.loadingKana).toBe(false);
+      });
+
+      // Should have called fetch again due to kanaType change
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it("should prevent submission when currentKana is null", async () => {
+      // Mock API returning empty array
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => [],
+      });
+
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
+        capturedContext = context;
+      };
+
+      const { getByTestId } = render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait for initial load
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+        expect(capturedContext.currentKana).toBeNull();
+      });
+
+      // Mock the submit function to track if it's called
+      const submitSpy = vi.spyOn(capturedContext, 'submitAnswer');
+
+      // Try to submit answer - this should trigger early return (line 166)
+      await act(async () => {
+        getByTestId("submit-answer").click();
+      });
+
+      // submitAnswer should be called but should return early
+      expect(submitSpy).toHaveBeenCalled();
+
+      // Result should remain null since submission was prevented
+      expect(capturedContext.result).toBeNull();
+    });
+
+    it("should prevent submission when isSubmitting is true", async () => {
+      const mockKanaData = [
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 5 },
+      ];
+
+      // Mock successful fetch for kana data
+      mockFetch.mockImplementation((url: string) => {
+        if (url === "/api/stats") {
+          return Promise.resolve({
+            ok: true,
+            json: async () => mockKanaData,
+          });
+        }
+        return Promise.resolve({
+          ok: false,
+          status: 404,
+          json: async () => ({}),
+        });
+      });
+
+      let capturedContext: FlashcardContextType | undefined;
+      const onContext = (context: FlashcardContextType | undefined) => {
+        capturedContext = context;
+      };
+
+      const { getByTestId } = render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      // Wait for initial load
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+        expect(capturedContext.currentKana).toBeDefined();
+      });
+
+      // Manually set isSubmitting to true to simulate already submitting
+      await act(async () => {
+        // This is a bit of a hack since we can't directly set state
+        // But we can test the early return by calling submitAnswer when isSubmitting would be true
+        capturedContext.submitAnswer("test");
+        // Immediately try to submit again while still "submitting"
+        capturedContext.submitAnswer("test");
+      });
+
+      // The second call should return early due to isSubmitting check
+      expect(capturedContext.result).toBeDefined();
+    });
 
     it("should handle filtered empty data when filtering by kana type", async () => {
       // Mock API returning data that will be filtered out

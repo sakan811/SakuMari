@@ -27,6 +27,13 @@ import React, {
 } from "react";
 
 import type { KanaWithAccuracy, InteractionMode } from "@/types/common";
+import {
+  calculateKanaWeights,
+  selectKanaByWeight,
+  generateChoicesArray,
+  filterKanaByType,
+  shouldPreventSubmission,
+} from "@/lib/flashcard-utils";
 
 export type FlashcardContextType = {
   currentKana: KanaWithAccuracy | null;
@@ -78,40 +85,8 @@ export function FlashcardProvider({
       return;
     }
 
-    // Calculate confidence-aware weights
-    const weights = data.map((kana) => {
-      // New characters get high priority
-      if (kana.attempts === 0) return 2.0;
-
-      // Base weight from accuracy (lower accuracy = higher weight)
-      const accuracyWeight = Math.max(1 - kana.accuracy, 0.1);
-
-      // Confidence boost for high accuracy + few attempts (prevents first-success penalty)
-      const confidenceBoost =
-        kana.attempts < 3 && kana.accuracy > 0.8
-          ? 1 + (3 - kana.attempts) * 0.5
-          : 1;
-
-      return accuracyWeight * confidenceBoost;
-    });
-
-    // Weighted random selection
-    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-    let randomVal = Math.random() * totalWeight;
-    let selectedKana = null;
-
-    for (let i = 0; i < data.length; i++) {
-      randomVal -= weights[i];
-      if (randomVal <= 0) {
-        selectedKana = data[i];
-        break;
-      }
-    }
-
-    // Fallback: if no kana was selected, select the last one
-    if (!selectedKana) {
-      selectedKana = data[data.length - 1];
-    }
+    const weights = calculateKanaWeights(data);
+    const selectedKana = selectKanaByWeight(data, weights);
 
     setCurrentKana(selectedKana);
     const choices = generateChoicesArray(selectedKana, data);
@@ -133,14 +108,7 @@ export function FlashcardProvider({
       }
 
       // Filter by kana type if specified
-      if (kanaType) {
-        data = data.filter((kana: KanaWithAccuracy) => {
-          const isHiragana =
-            kana.character.charCodeAt(0) >= 0x3040 &&
-            kana.character.charCodeAt(0) <= 0x309f;
-          return kanaType === "hiragana" ? isHiragana : !isHiragana;
-        });
-      }
+      data = filterKanaByType(data, kanaType);
 
       setKanaList(data);
       selectRandomKana(data);
@@ -163,39 +131,9 @@ export function FlashcardProvider({
   }, [kanaType, fetchKanaData]);
 
   
-  // Extracted utility function for testability
-  const generateChoicesArray = (
-    correctKana: KanaWithAccuracy,
-    kanaData: KanaWithAccuracy[],
-  ): string[] => {
-    if (!kanaData.length) {
-      return [];
-    }
-
-    const correctAnswer = correctKana.romaji;
-
-    // Get unique wrong answers from other kana (exclude duplicates)
-    const uniqueWrongAnswers = Array.from(
-      new Set(
-        kanaData
-          .filter((kana) => kana.romaji !== correctAnswer)
-          .map((kana) => kana.romaji),
-      ),
-    )
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
-
-    // Combine correct answer with wrong answers and shuffle
-    const allChoices = [correctAnswer, ...uniqueWrongAnswers].sort(
-      () => Math.random() - 0.5,
-    );
-
-    return allChoices;
-  };
-
   // Submit answer and update accuracy
   const submitAnswer = async (answer: string) => {
-    if (!currentKana || isSubmitting) return;
+    if (shouldPreventSubmission(currentKana, isSubmitting)) return;
 
     setIsSubmitting(true);
 
