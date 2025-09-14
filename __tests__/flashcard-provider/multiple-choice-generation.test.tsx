@@ -325,6 +325,40 @@ describe("FlashcardProvider - Multiple Choice Generation", () => {
     });
   });
 
+  test("generateChoicesArray returns empty array when kanaData is empty", () => {
+    const { result } = renderHook(() => useFlashcard(), {
+      wrapper: createWrapper(),
+    });
+
+    const correctKana = { id: "1", character: "あ", romaji: "a", accuracy: 0.5 };
+    const emptyKanaData: any[] = [];
+
+    const choices = result.current.generateChoicesArray(correctKana, emptyKanaData);
+    expect(choices).toEqual([]);
+  });
+
+  test("generateChoicesArray generates choices with valid kanaData", () => {
+    const { result } = renderHook(() => useFlashcard(), {
+      wrapper: createWrapper(),
+    });
+
+    const correctKana = { id: "1", character: "あ", romaji: "a", accuracy: 0.5 };
+    const kanaData = [
+      correctKana,
+      { id: "2", character: "い", romaji: "i", accuracy: 0.3 },
+      { id: "3", character: "う", romaji: "u", accuracy: 0.7 },
+      { id: "4", character: "え", romaji: "e", accuracy: 0.4 },
+      { id: "5", character: "お", romaji: "o", accuracy: 0.6 },
+    ];
+
+    const choices = result.current.generateChoicesArray(correctKana, kanaData);
+
+    // Should return array with correct answer included
+    expect(choices).toContain("a");
+    expect(choices.length).toBeGreaterThan(0);
+    expect(choices.length).toBeLessThanOrEqual(4);
+  });
+
   // Create wrapper for renderHook
   const createWrapper = () => {
     return ({ children }: { children: React.ReactNode }) => (

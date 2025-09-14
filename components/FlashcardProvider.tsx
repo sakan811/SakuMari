@@ -38,6 +38,7 @@ export type FlashcardContextType = {
   setInteractionMode: (_: InteractionMode) => void;
   choices: string[];
   isSubmitting: boolean;
+  generateChoicesArray: (_: KanaWithAccuracy, __: KanaWithAccuracy[]) => string[];
 };
 
 const FlashcardContext = createContext<FlashcardContextType | undefined>(
@@ -113,7 +114,8 @@ export function FlashcardProvider({
     }
 
     setCurrentKana(selectedKana);
-    generateChoices(selectedKana, data);
+    const choices = generateChoicesArray(selectedKana, data);
+    setChoices(choices);
   }, []);
 
   const fetchKanaData = useCallback(async () => {
@@ -160,14 +162,14 @@ export function FlashcardProvider({
     }
   }, [kanaType, fetchKanaData]);
 
-  // Generate choices for multiple choice mode
-  const generateChoices = (
+  
+  // Extracted utility function for testability
+  const generateChoicesArray = (
     correctKana: KanaWithAccuracy,
     kanaData: KanaWithAccuracy[],
-  ) => {
+  ): string[] => {
     if (!kanaData.length) {
-      setChoices([]);
-      return;
+      return [];
     }
 
     const correctAnswer = correctKana.romaji;
@@ -188,7 +190,7 @@ export function FlashcardProvider({
       () => Math.random() - 0.5,
     );
 
-    setChoices(allChoices);
+    return allChoices;
   };
 
   // Submit answer and update accuracy
@@ -245,6 +247,7 @@ export function FlashcardProvider({
     setInteractionMode,
     choices,
     isSubmitting,
+    generateChoicesArray,
   };
 
   return (
