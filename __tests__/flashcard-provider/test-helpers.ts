@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { vi } from "vitest";
+import { vi, expect } from "vitest";
 import type { FlashcardContextType } from "@/components/FlashcardProvider";
 
 // Mock fetch for API calls
@@ -41,6 +41,9 @@ export const zeroAccuracyKanaData = [
   { id: "2", character: "い", romaji: "i", accuracy: 0.0 },
 ];
 
+import React from "react";
+import { useFlashcard } from "@/components/FlashcardProvider";
+
 // Test component to access provider context
 export function TestComponent({
   onContext,
@@ -49,8 +52,7 @@ export function TestComponent({
   onContext: (context: FlashcardContextType | undefined) => void;
   showMultipleChoice?: boolean;
 }) {
-  const context = require("@/components/FlashcardProvider").useFlashcard();
-  const React = require("react");
+  const context = useFlashcard();
 
   React.useEffect(() => {
     onContext(context);
@@ -68,12 +70,7 @@ export function TestComponent({
     React.createElement("button", {
       "data-testid": "set-multiple-choice",
       onClick: () => context.setInteractionMode("multiple-choice")
-    }, "Set Multiple Choice"),
-    showMultipleChoice && React.createElement(require("@/components/MultipleChoice").default, {
-      choices: context.choices,
-      selectedChoice: null,
-      onChoiceSelect: vi.fn()
-    })
+    }, "Set Multiple Choice")
   );
 }
 
@@ -137,24 +134,3 @@ export function expectBasicContextProperties(context: any) {
   expect(context).toHaveProperty("result");
 }
 
-// Test parameterization utilities
-export interface TestCase {
-  name: string;
-  data: any[];
-  expectedBehavior: string;
-  setup?: () => void;
-}
-
-export function runParameterizedTests(
-  testCases: TestCase[],
-  testFn: (testCase: TestCase) => Promise<void> | void
-) {
-  testCases.forEach((testCase) => {
-    it(testCase.name, async () => {
-      if (testCase.setup) {
-        testCase.setup();
-      }
-      await testFn(testCase);
-    });
-  });
-}
