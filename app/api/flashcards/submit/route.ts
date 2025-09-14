@@ -18,17 +18,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
-import { ApiErrors, validateRequired, validateTypes } from "@/lib/api-errors";
-
-export function handleSubmissionError(error: unknown): NextResponse {
-  if (error instanceof Error) {
-    if (error.message.includes("Invalid JSON")) {
-      return ApiErrors.badRequest("Invalid request format");
-    }
-  }
-
-  return ApiErrors.internalError("Failed to submit flashcard answer");
-}
+import { validateRequired, validateTypes } from "@/lib/api-errors";
+import { handleSubmissionError } from "@/lib/flashcard-submit-utils";
 
 async function submitAnswer(
   request: NextRequest,

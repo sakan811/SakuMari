@@ -16,7 +16,8 @@
  */
 
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { POST, handleSubmissionError } from "../../app/api/flashcards/submit/route";
+import { POST } from "../../app/api/flashcards/submit/route";
+import { handleSubmissionError } from "../../lib/flashcard-submit-utils";
 import { NextRequest } from "next/server";
 import {
   createFlashcardSubmitRequest,
