@@ -49,7 +49,7 @@ export function createApiTestMocks() {
 /**
  * Creates a mock Prisma client with raw SQL support
  */
-export function createMockPrismaClient(overrides: any = {}) {
+export function createMockPrismaClient(overrides: Record<string, unknown> = {}) {
   return {
     $queryRaw: vi.fn(),
     $executeRaw: vi.fn(),
@@ -111,7 +111,7 @@ export function createUnauthenticatedSession() {
 export function createMockRequest(
   url: string,
   method: string = "GET",
-  body?: any,
+  body?: unknown,
   headers: Record<string, string> = {}
 ): NextRequest {
   const requestInit: RequestInit = {
@@ -135,7 +135,7 @@ export function createMockRequest(
 export function createFlashcardSubmitRequest(
   kanaId: string,
   isCorrect: boolean,
-  additionalData: Record<string, any> = {}
+  additionalData: Record<string, unknown> = {}
 ) {
   return createMockRequest(
     "http://localhost/api/flashcards/submit",
@@ -147,7 +147,7 @@ export function createFlashcardSubmitRequest(
 /**
  * Creates mock kana data for API responses
  */
-export function createMockKanaData(overrides: Partial<any> = {}) {
+export function createMockKanaData(overrides: Record<string, unknown> = {}) {
   return {
     id: "test-kana-id",
     character: "あ",
@@ -162,7 +162,7 @@ export function createMockKanaData(overrides: Partial<any> = {}) {
 /**
  * Creates mock kana progress data for API responses
  */
-export function createMockKanaProgressData(overrides: Partial<any> = {}) {
+export function createMockKanaProgressData(overrides: Record<string, unknown> = {}) {
   return {
     id: "test-progress-id",
     kana_id: "test-kana-id",
@@ -177,7 +177,7 @@ export function createMockKanaProgressData(overrides: Partial<any> = {}) {
 /**
  * Sets up database error scenario for API tests
  */
-export function setupDatabaseError(mockPrisma: any, errorMessage: string = "Database connection failed") {
+export function setupDatabaseError(mockPrisma: Record<string, unknown>, errorMessage: string = "Database connection failed") {
   mockPrisma.$queryRaw.mockRejectedValue(new Error(errorMessage));
   mockPrisma.$executeRaw.mockRejectedValue(new Error(errorMessage));
   mockPrisma.kana.findMany.mockRejectedValue(new Error(errorMessage));

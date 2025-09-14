@@ -16,6 +16,8 @@
  */
 
 import { expect } from "vitest";
+import React from "react";
+import type { Mock } from "vitest";
 
 /**
  * Asserts that a response has the expected HTTP status
@@ -75,7 +77,7 @@ export function expectNotFound(response: Response) {
 /**
  * Asserts that a response JSON body matches expected structure
  */
-export async function expectResponseJson(response: Response, expectedData: any) {
+export async function expectResponseJson(response: Response, expectedData: unknown) {
   const data = await response.json();
   expect(data).toEqual(expectedData);
   return data;
@@ -100,7 +102,7 @@ export async function expectResponseHasProperties(
  */
 export async function expectResponseMatchesPartial(
   response: Response,
-  partialData: any
+  partialData: Record<string, unknown>
 ) {
   const data = await response.json();
   expect(data).toMatchObject(partialData);
@@ -147,21 +149,21 @@ export function expectTextExists(text: string) {
 /**
  * Asserts that a mock function was called specific number of times
  */
-export function expectCalledTimes(mockFn: any, times: number) {
+export function expectCalledTimes(mockFn: Mock, times: number) {
   expect(mockFn).toHaveBeenCalledTimes(times);
 }
 
 /**
  * Asserts that a mock function was called with specific arguments
  */
-export function expectCalledWith(mockFn: any, ...args: any[]) {
+export function expectCalledWith(mockFn: Mock, ...args: unknown[]) {
   expect(mockFn).toHaveBeenCalledWith(...args);
 }
 
 /**
  * Asserts that a mock function was not called
  */
-export function expectNotCalled(mockFn: any) {
+export function expectNotCalled(mockFn: Mock) {
   expect(mockFn).not.toHaveBeenCalled();
 }
 
@@ -192,7 +194,7 @@ export function expectNonEmptyString(value: string) {
 /**
  * Asserts that an array has expected length
  */
-export function expectArrayLength(array: any[], expectedLength: number) {
+export function expectArrayLength(array: unknown[], expectedLength: number) {
   expect(Array.isArray(array)).toBe(true);
   expect(array).toHaveLength(expectedLength);
 }
@@ -200,8 +202,8 @@ export function expectArrayLength(array: any[], expectedLength: number) {
 /**
  * Asserts that SQL query contains specific text
  */
-export function expectSqlContains(sqlCall: any[], expectedText: string) {
-  const [strings, ...values] = sqlCall;
+export function expectSqlContains(sqlCall: [string[], ...unknown[]], expectedText: string) {
+  const [strings] = sqlCall;
   const fullSql = strings.join('');
   expect(fullSql).toContain(expectedText);
 }
@@ -209,7 +211,7 @@ export function expectSqlContains(sqlCall: any[], expectedText: string) {
 /**
  * Asserts that SQL query has expected parameters
  */
-export function expectSqlParameters(sqlCall: any[], expectedParams: any[]) {
+export function expectSqlParameters(sqlCall: [string[], ...unknown[]], expectedParams: unknown[]) {
   const values = sqlCall.slice(1);
   expect(values).toEqual(expectedParams);
 }
