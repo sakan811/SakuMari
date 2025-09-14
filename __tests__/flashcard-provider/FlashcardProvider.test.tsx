@@ -17,7 +17,7 @@
  */
 
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -204,6 +204,41 @@ describe("FlashcardProvider", () => {
         expect(screen.getByTestId("choices")).toHaveTextContent("a,ka,sa,ta");
       });
     });
+
+    it("should call utility functions in correct order for kana selection", async () => {
+      const mockSelectedKana = { id: "1", character: "あ", romaji: "a", accuracy: 0.8, attempts: 5, correct_attempts: 4 };
+
+      (calculateKanaWeights as ReturnType<typeof vi.fn>).mockReturnValue([0.8, 0.2]);
+      (selectKanaByWeight as ReturnType<typeof vi.fn>).mockReturnValue(mockSelectedKana);
+      (generateChoicesArray as ReturnType<typeof vi.fn>).mockReturnValue(["a", "i", "u", "e"]);
+
+      // Mock fetch to return valid data since data will be fetched
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockKanaData),
+      });
+
+      render(
+        <FlashcardProvider _resetHasFetched={true}>
+          <TestComponent />
+        </FlashcardProvider>
+      );
+
+      await waitFor(() => {
+        expect(calculateKanaWeights).toHaveBeenCalledTimes(1);
+        expect(selectKanaByWeight).toHaveBeenCalledTimes(1);
+        expect(generateChoicesArray).toHaveBeenCalledTimes(1);
+
+        const callOrder = [
+          (calculateKanaWeights as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0],
+          (selectKanaByWeight as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0],
+          (generateChoicesArray as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0]
+        ];
+
+        expect(callOrder[0]).toBeLessThan(callOrder[1]);
+        expect(callOrder[1]).toBeLessThan(callOrder[2]);
+      });
+    });
   });
 
   describe("submitAnswer function", () => {
@@ -226,14 +261,19 @@ describe("FlashcardProvider", () => {
         </FlashcardProvider>
       );
 
+      // Wait for initial load
       await waitFor(() => {
         expect(screen.getByTestId("loading")).toHaveTextContent("loaded");
       });
 
+      // Submit answer and wait for result with timeout
       await user.click(screen.getByText("Submit Answer"));
 
-      await waitFor(() => {
-        expect(screen.getByTestId("result")).toHaveTextContent("incorrect");
+      // Use act to ensure state updates are processed
+      await act(async () => {
+        await waitFor(() => {
+          expect(screen.getByTestId("result")).toHaveTextContent("incorrect");
+        }, { timeout: 3000 });
       });
     });
 

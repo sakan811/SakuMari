@@ -252,6 +252,18 @@ describe("Auth Configuration Tests", () => {
     test("includes only Google provider when credentials provider is disabled", async () => {
       delete process.env.CREDS_PROVIDER;
 
+      // Reset and re-import to ensure fresh environment
+      vi.resetModules();
+      vi.clearAllMocks();
+
+      // Re-setup mocks after reset
+      vi.mock("@/lib/prisma", () => ({
+        prisma: {
+          $connect: vi.fn(),
+          $disconnect: vi.fn(),
+        },
+      }));
+
       await import("@/lib/auth");
 
       // Should be called with array containing only Google provider
