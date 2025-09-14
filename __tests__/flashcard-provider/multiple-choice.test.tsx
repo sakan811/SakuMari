@@ -25,8 +25,6 @@ import {
   mockKanaData,
   emptyKanaData,
   waitForContext,
-  runParameterizedTests,
-  type TestCase,
 } from "./test-helpers";
 
 describe("FlashcardProvider - Multiple Choice", () => {
@@ -53,7 +51,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Should start with no choices
       expect(capturedContext.choices).toEqual([]);
@@ -82,7 +84,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Switch to multiple-choice mode
       await act(async () => {
@@ -108,7 +114,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Switch to multiple-choice mode
       await act(async () => {
@@ -134,7 +144,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Switch to multiple-choice mode
       await act(async () => {
@@ -159,7 +173,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Switch to multiple-choice mode
       await act(async () => {
@@ -201,7 +219,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Switch to multiple-choice mode
       await act(async () => {
@@ -236,7 +258,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Switch to multiple-choice mode
       await act(async () => {
@@ -254,32 +280,9 @@ describe("FlashcardProvider - Multiple Choice", () => {
   });
 
   describe("Edge Cases and Robustness", () => {
-    const edgeCaseTests: TestCase[] = [
-      {
-        name: "handles single kana in dataset",
-        data: [{ id: "1", character: "あ", romaji: "a", accuracy: 0.5 }],
-        expectedBehavior: "should generate limited choices",
-      },
-      {
-        name: "handles two kana in dataset",
-        data: [
-          { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
-          { id: "2", character: "い", romaji: "i", accuracy: 0.3 },
-        ],
-        expectedBehavior: "should generate both as choices",
-      },
-      {
-        name: "handles duplicate romaji values",
-        data: [
-          { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
-          { id: "2", character: "ア", romaji: "a", accuracy: 0.3 },
-        ],
-        expectedBehavior: "should handle duplicates gracefully",
-      },
-    ];
-
-    runParameterizedTests(edgeCaseTests, async (testCase) => {
-      setupSuccessfulApiResponse(testCase.data);
+    it("handles single kana in dataset", async () => {
+      const singleKanaData = [{ id: "1", character: "あ", romaji: "a", accuracy: 0.5 }];
+      setupSuccessfulApiResponse(singleKanaData);
 
       let capturedContext: any;
       const onContext = (context: any) => {
@@ -292,7 +295,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Switch to multiple-choice mode
       await act(async () => {
@@ -302,10 +309,77 @@ describe("FlashcardProvider - Multiple Choice", () => {
       // Should handle edge cases gracefully
       expect(Array.isArray(capturedContext.choices)).toBe(true);
       expect(capturedContext.choices.length).toBeLessThanOrEqual(4);
+      expect(capturedContext.choices.length).toBeGreaterThan(0);
+    });
 
-      if (testCase.data.length > 0) {
-        expect(capturedContext.choices.length).toBeGreaterThan(0);
-      }
+    it("handles two kana in dataset", async () => {
+      const twoKanaData = [
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
+        { id: "2", character: "い", romaji: "i", accuracy: 0.3 },
+      ];
+      setupSuccessfulApiResponse(twoKanaData);
+
+      let capturedContext: any;
+      const onContext = (context: any) => {
+        capturedContext = context;
+      };
+
+      render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
+
+      // Switch to multiple-choice mode
+      await act(async () => {
+        capturedContext.setInteractionMode("multiple-choice");
+      });
+
+      // Should handle edge cases gracefully
+      expect(Array.isArray(capturedContext.choices)).toBe(true);
+      expect(capturedContext.choices.length).toBeLessThanOrEqual(4);
+      expect(capturedContext.choices.length).toBeGreaterThan(0);
+    });
+
+    it("handles duplicate romaji values", async () => {
+      const duplicateData = [
+        { id: "1", character: "あ", romaji: "a", accuracy: 0.5 },
+        { id: "2", character: "ア", romaji: "a", accuracy: 0.3 },
+      ];
+      setupSuccessfulApiResponse(duplicateData);
+
+      let capturedContext: any;
+      const onContext = (context: any) => {
+        capturedContext = context;
+      };
+
+      render(
+        <FlashcardProvider>
+          <TestComponent onContext={onContext} />
+        </FlashcardProvider>,
+      );
+
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
+
+      // Switch to multiple-choice mode
+      await act(async () => {
+        capturedContext.setInteractionMode("multiple-choice");
+      });
+
+      // Should handle edge cases gracefully
+      expect(Array.isArray(capturedContext.choices)).toBe(true);
+      expect(capturedContext.choices.length).toBeLessThanOrEqual(4);
+      expect(capturedContext.choices.length).toBeGreaterThan(0);
     });
   });
 
@@ -324,7 +398,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Switch to multiple-choice mode
       await act(async () => {
@@ -362,7 +440,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Switch to multiple-choice mode
       await act(async () => {
@@ -411,7 +493,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Generate multiple choice sets to see distribution
       const allChoices: string[] = [];
@@ -450,7 +536,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Test multiple generations
       for (let i = 0; i < 5; i++) {
@@ -480,7 +570,11 @@ describe("FlashcardProvider - Multiple Choice", () => {
         </FlashcardProvider>,
       );
 
-      await waitForContext(capturedContext);
+      const { waitFor } = await import("@testing-library/react");
+      await waitFor(() => {
+        expect(capturedContext).toBeDefined();
+        expect(capturedContext.loadingKana).toBe(false);
+      }, { timeout: 15000 });
 
       // Generate multiple choice sets
       const choiceSets: string[][] = [];
