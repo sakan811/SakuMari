@@ -16,7 +16,6 @@
  */
 
 import { expect } from "vitest";
-import { Response } from "next/server";
 
 /**
  * Asserts that a response has the expected HTTP status

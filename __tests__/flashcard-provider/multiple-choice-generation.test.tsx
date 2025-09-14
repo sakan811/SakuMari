@@ -330,7 +330,7 @@ describe("FlashcardProvider - Multiple Choice Generation", () => {
       wrapper: createWrapper(),
     });
 
-    const correctKana = { id: "1", character: "あ", romaji: "a", accuracy: 0.5 };
+    const correctKana = { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 10, correct_attempts: 5 };
     const emptyKanaData: any[] = [];
 
     const choices = result.current.generateChoicesArray(correctKana, emptyKanaData);
@@ -342,13 +342,13 @@ describe("FlashcardProvider - Multiple Choice Generation", () => {
       wrapper: createWrapper(),
     });
 
-    const correctKana = { id: "1", character: "あ", romaji: "a", accuracy: 0.5 };
+    const correctKana = { id: "1", character: "あ", romaji: "a", accuracy: 0.5, attempts: 10, correct_attempts: 5 };
     const kanaData = [
       correctKana,
-      { id: "2", character: "い", romaji: "i", accuracy: 0.3 },
-      { id: "3", character: "う", romaji: "u", accuracy: 0.7 },
-      { id: "4", character: "え", romaji: "e", accuracy: 0.4 },
-      { id: "5", character: "お", romaji: "o", accuracy: 0.6 },
+      { id: "2", character: "い", romaji: "i", accuracy: 0.3, attempts: 10, correct_attempts: 3 },
+      { id: "3", character: "う", romaji: "u", accuracy: 0.7, attempts: 10, correct_attempts: 7 },
+      { id: "4", character: "え", romaji: "e", accuracy: 0.4, attempts: 10, correct_attempts: 4 },
+      { id: "5", character: "お", romaji: "o", accuracy: 0.6, attempts: 10, correct_attempts: 6 },
     ];
 
     const choices = result.current.generateChoicesArray(correctKana, kanaData);
