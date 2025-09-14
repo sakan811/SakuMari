@@ -177,7 +177,7 @@ export function createMockKanaProgressData(overrides: Record<string, unknown> = 
 /**
  * Sets up database error scenario for API tests
  */
-export function setupDatabaseError(mockPrisma: any, errorMessage: string = "Database connection failed") {
+export function setupDatabaseError(mockPrisma: ReturnType<typeof createMockPrismaClient>, errorMessage: string = "Database connection failed") {
   mockPrisma.$queryRaw.mockRejectedValue(new Error(errorMessage));
   mockPrisma.$executeRaw.mockRejectedValue(new Error(errorMessage));
   mockPrisma.kana.findMany.mockRejectedValue(new Error(errorMessage));
