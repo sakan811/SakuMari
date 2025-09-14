@@ -16,7 +16,7 @@
  */
 
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { POST } from "../../app/api/flashcards/submit/route";
+import { POST, handleSubmissionError } from "../../app/api/flashcards/submit/route";
 import { NextRequest } from "next/server";
 import {
   createFlashcardSubmitRequest,
@@ -456,6 +456,85 @@ describe("Flashcard Submit API", () => {
       // Verify
       expectBadRequest(response);
       expectNotCalled(mockPrisma.$executeRaw);
+    });
+  });
+
+  describe("Error Handling Function Tests", () => {
+    test("handleSubmissionError returns bad request for Invalid JSON error", () => {
+      // Setup
+      const error = new Error("Invalid JSON: Unexpected token");
+
+      // Execute
+      const response = handleSubmissionError(error);
+
+      // Verify
+      expectBadRequest(response);
+    });
+
+    test("handleSubmissionError returns bad request for error containing Invalid JSON", () => {
+      // Setup
+      const error = new Error("Something went wrong - Invalid JSON detected");
+
+      // Execute
+      const response = handleSubmissionError(error);
+
+      // Verify
+      expectBadRequest(response);
+    });
+
+    test("handleSubmissionError returns internal error for non-Error objects", () => {
+      // Setup
+      const error = "string error";
+
+      // Execute
+      const response = handleSubmissionError(error);
+
+      // Verify
+      expectServerError(response);
+    });
+
+    test("handleSubmissionError returns internal error for null", () => {
+      // Setup
+      const error = null;
+
+      // Execute
+      const response = handleSubmissionError(error);
+
+      // Verify
+      expectServerError(response);
+    });
+
+    test("handleSubmissionError returns internal error for undefined", () => {
+      // Setup
+      const error = undefined;
+
+      // Execute
+      const response = handleSubmissionError(error);
+
+      // Verify
+      expectServerError(response);
+    });
+
+    test("handleSubmissionError returns internal error for Error without Invalid JSON message", () => {
+      // Setup
+      const error = new Error("Database connection failed");
+
+      // Execute
+      const response = handleSubmissionError(error);
+
+      // Verify
+      expectServerError(response);
+    });
+
+    test("handleSubmissionError returns internal error for generic Error object", () => {
+      // Setup
+      const error = new Error("Some other error");
+
+      // Execute
+      const response = handleSubmissionError(error);
+
+      // Verify
+      expectServerError(response);
     });
   });
 });

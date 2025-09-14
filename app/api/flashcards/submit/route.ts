@@ -20,6 +20,16 @@ import { prisma } from "@/lib/prisma";
 import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
 import { ApiErrors, validateRequired, validateTypes } from "@/lib/api-errors";
 
+export function handleSubmissionError(error: unknown): NextResponse {
+  if (error instanceof Error) {
+    if (error.message.includes("Invalid JSON")) {
+      return ApiErrors.badRequest("Invalid request format");
+    }
+  }
+
+  return ApiErrors.internalError("Failed to submit flashcard answer");
+}
+
 async function submitAnswer(
   request: NextRequest,
   context: AuthenticatedContext,
@@ -56,8 +66,8 @@ async function submitAnswer(
         ${isCorrect ? 1 : 0},
         ${isCorrect ? 1.0 : 0.0}
       )
-      ON CONFLICT (kana_id, user_id) 
-      DO UPDATE SET 
+      ON CONFLICT (kana_id, user_id)
+      DO UPDATE SET
         attempts = "KanaProgress".attempts + 1,
         correct_attempts = "KanaProgress".correct_attempts + ${isCorrect ? 1 : 0},
         accuracy = (
@@ -70,14 +80,7 @@ async function submitAnswer(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error submitting answer:", error);
-
-    if (error instanceof Error) {
-      if (error.message.includes("Invalid JSON")) {
-        return ApiErrors.badRequest("Invalid request format");
-      }
-    }
-
-    return ApiErrors.internalError("Failed to submit flashcard answer");
+    return handleSubmissionError(error);
   }
 }
 
