@@ -264,12 +264,15 @@ describe("MobileNavigation", () => {
       expect(screen.getByText("U")).toBeInTheDocument();
     });
 
-    test("renders sign out button and handles click", () => {
+    test("renders sign out button and handles click", async () => {
       render(<MobileNavigation {...authenticatedProps} />);
 
       const signOutButton = screen.getByRole("button", { name: "Sign Out" });
       expect(signOutButton).toBeInTheDocument();
       expect(signOutButton).toHaveClass("text-[#fad182]", "hover:text-white");
+
+      // Mock signOut to return a resolved promise to prevent navigation
+      mockSignOut.mockResolvedValueOnce(undefined);
 
       // Click sign out button
       fireEvent.click(signOutButton);
