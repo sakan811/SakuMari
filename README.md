@@ -11,10 +11,15 @@ A modern web application for learning Japanese Hiragana and Katakana characters 
 ## Features
 
 🔐 **Secure Login** - Sign in with Google, practice safely  
+
 🧠 **Smart Learning** - Algorithm focuses on characters you struggle with most  
+
 ⌨️ **Dual Modes** - Type answers or choose from multiple-choice options  
+
 📊 **Progress Tracking** - See your improvement with detailed analytics  
+
 🤖 **AI Tips** - Get personalized learning advice from Google Gemini
+
 📱 **Mobile Responsive** - Learn on any device with our responsive design
 
 _For detailed technical documentation, see [docs/features.md](docs/features.md)_
