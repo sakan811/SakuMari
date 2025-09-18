@@ -62,202 +62,185 @@ vi.mock("next-auth/providers/credentials", () => ({
 }));
 vi.mock("@auth/prisma-adapter", () => ({ PrismaAdapter: mockPrismaAdapter }));
 
+// Helper functions
+const setupEnvironment = (envVars: Record<string, string>) => {
+  Object.keys(process.env).forEach((key) => {
+    if (key.startsWith("AUTH_") || key.startsWith("CREDS_") || key.startsWith("NEXTAUTH_") || key === "NODE_ENV") {
+      delete process.env[key];
+    }
+  });
+
+  Object.entries(envVars).forEach(([key, value]) => {
+    process.env[key] = value;
+  });
+};
+
+const getAuthConfig = async () => {
+  const { handlers } = await import("@/lib/auth");
+  return mockNextAuth.mock.calls[0][0];
+};
+
+const resetAndReSetupMocks = () => {
+  vi.resetModules();
+  vi.clearAllMocks();
+
+  vi.mock("@/lib/prisma", () => ({
+    prisma: {
+      $connect: vi.fn(),
+      $disconnect: vi.fn(),
+    },
+  }));
+  vi.mock("next-auth", () => ({ default: mockNextAuth }));
+  vi.mock("next-auth/providers/google", () => ({ default: mockGoogleProvider }));
+  vi.mock("next-auth/providers/credentials", () => ({
+    default: mockCredentialsProvider,
+  }));
+  vi.mock("@auth/prisma-adapter", () => ({ PrismaAdapter: mockPrismaAdapter }));
+};
+
+const testCookieConfiguration = async (envVars: Record<string, string>, expectedDomain: string | undefined) => {
+  setupEnvironment(envVars);
+  const config = await getAuthConfig();
+
+  expect(config.cookies.pkceCodeVerifier.options.domain).toBe(expectedDomain);
+  expect(config.cookies.state.options.domain).toBe(expectedDomain);
+};
+
+const testCookieSecureFlag = async (envVars: Record<string, string>, expectedSecure: boolean) => {
+  setupEnvironment(envVars);
+  const config = await getAuthConfig();
+
+  expect(config.cookies.pkceCodeVerifier.options.secure).toBe(expectedSecure);
+  expect(config.cookies.state.options.secure).toBe(expectedSecure);
+};
+
 describe("Google OAuth Redirect Callback Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset environment to clean state
-    Object.keys(process.env).forEach((key) => {
-      if (key.startsWith("AUTH_") || key.startsWith("CREDS_") || key.startsWith("NEXTAUTH_") || key === "NODE_ENV") {
-        delete process.env[key];
-      }
-    });
+    setupEnvironment({});
   });
 
   afterEach(() => {
-    // Restore original environment
     process.env = { ...originalEnv };
     vi.resetModules();
   });
 
   describe("getAuthUrl() function tests", () => {
-    test("returns AUTH_URL when set", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
+    test.each([
+      {
+        scenario: "returns AUTH_URL when set",
+        env: { AUTH_URL: "https://sakumari.com", NODE_ENV: "production" },
+        expectedDomain: "sakumari.com",
+      },
+      {
+        scenario: "ignores NEXTAUTH_URL when AUTH_URL is set",
+        env: { AUTH_URL: "https://auth.sakumari.com", NEXTAUTH_URL: "https://sakumari.com", NODE_ENV: "production" },
+        expectedDomain: "auth.sakumari.com",
+      },
+      {
+        scenario: "defaults to localhost when neither AUTH_URL nor NEXTAUTH_URL is set",
+        env: { NODE_ENV: "production" },
+        expectedDomain: "localhost:3000",
+      },
+      {
+        scenario: "handles URLs with http protocol correctly",
+        env: { AUTH_URL: "http://localhost:3000", NODE_ENV: "production" },
+        expectedDomain: "localhost:3000",
+      },
+      {
+        scenario: "handles URLs with https protocol correctly",
+        env: { AUTH_URL: "https://sakumari.com", NODE_ENV: "production" },
+        expectedDomain: "sakumari.com",
+      },
+      {
+        scenario: "handles URLs with port numbers correctly",
+        env: { AUTH_URL: "https://sakumari.com:3001", NODE_ENV: "production" },
+        expectedDomain: "sakumari.com:3001",
+      },
+      {
+        scenario: "handles complex subdomain URLs correctly",
+        env: { AUTH_URL: "https://app.staging.sakumari.com", NODE_ENV: "production" },
+        expectedDomain: "app.staging.sakumari.com",
+      },
+    ])("$scenario", async ({ env, expectedDomain }) => {
+      setupEnvironment(env);
+      const config = await getAuthConfig();
 
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // The function should be called internally, check the cookie domain which uses getAuthUrl()
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("sakumari.com");
-    });
-
-    test("ignores NEXTAUTH_URL when AUTH_URL is set", async () => {
-      process.env.AUTH_URL = "https://auth.sakumari.com";
-      process.env.NEXTAUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Should use AUTH_URL even when NEXTAUTH_URL is also set
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("auth.sakumari.com");
-    });
-
-    test("defaults to localhost when neither AUTH_URL nor NEXTAUTH_URL is set", async () => {
-      delete process.env.AUTH_URL;
-      delete process.env.NEXTAUTH_URL;
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Should default to localhost
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("localhost:3000");
-    });
-
-    test("handles URLs with http protocol correctly", async () => {
-      process.env.AUTH_URL = "http://localhost:3000";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Should remove http:// prefix
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("localhost:3000");
-    });
-
-    test("handles URLs with https protocol correctly", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Should remove https:// prefix
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("sakumari.com");
-    });
-
-    test("handles URLs with port numbers correctly", async () => {
-      process.env.AUTH_URL = "https://sakumari.com:3001";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Should include port number
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("sakumari.com:3001");
-    });
-
-    test("handles complex subdomain URLs correctly", async () => {
-      process.env.AUTH_URL = "https://app.staging.sakumari.com";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Should handle complex subdomains
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("app.staging.sakumari.com");
+      expect(config.cookies.pkceCodeVerifier.options.domain).toBe(expectedDomain);
     });
   });
 
   describe("Cookie configuration tests", () => {
-    test("cookie domain is undefined in development environment", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "development";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Domain should be undefined in development
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBeUndefined();
-      expect(config.cookies.state.options.domain).toBeUndefined();
-    });
-
-    test("cookie domain is set correctly in production environment", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Domain should be set in production
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("sakumari.com");
-      expect(config.cookies.state.options.domain).toBe("sakumari.com");
+    test.each([
+      {
+        scenario: "cookie domain is undefined in development environment",
+        env: { AUTH_URL: "https://sakumari.com", NODE_ENV: "development" },
+        expectedDomain: undefined,
+      },
+      {
+        scenario: "cookie domain is set correctly in production environment",
+        env: { AUTH_URL: "https://sakumari.com", NODE_ENV: "production" },
+        expectedDomain: "sakumari.com",
+      },
+    ])("$scenario", async ({ env, expectedDomain }) => {
+      await testCookieConfiguration(env, expectedDomain);
     });
 
     test("both pkceCodeVerifier and state cookies have same domain configuration", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
+      const env = { AUTH_URL: "https://sakumari.com", NODE_ENV: "production" };
+      setupEnvironment(env);
+      const config = await getAuthConfig();
 
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Both cookies should have consistent domain configuration
       expect(config.cookies.pkceCodeVerifier.options.domain).toBe(config.cookies.state.options.domain);
     });
 
-    test("cookie secure flag is false in development", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "development";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      expect(config.cookies.pkceCodeVerifier.options.secure).toBe(false);
-      expect(config.cookies.state.options.secure).toBe(false);
+    test.each([
+      {
+        scenario: "cookie secure flag is false in development",
+        env: { AUTH_URL: "https://sakumari.com", NODE_ENV: "development" },
+        expectedSecure: false,
+      },
+      {
+        scenario: "cookie secure flag is true in production",
+        env: { AUTH_URL: "https://sakumari.com", NODE_ENV: "production" },
+        expectedSecure: true,
+      },
+    ])("$scenario", async ({ env, expectedSecure }) => {
+      await testCookieSecureFlag(env, expectedSecure);
     });
 
-    test("cookie secure flag is true in production", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
+    const baseEnv = { AUTH_URL: "https://sakumari.com", NODE_ENV: "production" };
 
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
+    test.each([
+      {
+        scenario: "cookie sameSite is always lax",
+        property: "sameSite",
+        expectedValue: "lax",
+      },
+      {
+        scenario: "cookie httpOnly is always true",
+        property: "httpOnly",
+        expectedValue: true,
+      },
+      {
+        scenario: "cookie path is always root",
+        property: "path",
+        expectedValue: "/",
+      },
+    ])("$scenario", async ({ property, expectedValue }) => {
+      setupEnvironment(baseEnv);
+      const config = await getAuthConfig();
 
-      expect(config.cookies.pkceCodeVerifier.options.secure).toBe(true);
-      expect(config.cookies.state.options.secure).toBe(true);
-    });
-
-    test("cookie sameSite is always lax", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      expect(config.cookies.pkceCodeVerifier.options.sameSite).toBe("lax");
-      expect(config.cookies.state.options.sameSite).toBe("lax");
-    });
-
-    test("cookie httpOnly is always true", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      expect(config.cookies.pkceCodeVerifier.options.httpOnly).toBe(true);
-      expect(config.cookies.state.options.httpOnly).toBe(true);
-    });
-
-    test("cookie path is always root", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      expect(config.cookies.pkceCodeVerifier.options.path).toBe("/");
-      expect(config.cookies.state.options.path).toBe("/");
+      expect(config.cookies.pkceCodeVerifier.options[property]).toBe(expectedValue);
+      expect(config.cookies.state.options[property]).toBe(expectedValue);
     });
   });
 
   describe("OAuth flow tests", () => {
     test("Google OAuth provider is properly configured", async () => {
-      process.env.AUTH_GOOGLE_ID = "test-google-id";
-      process.env.AUTH_GOOGLE_SECRET = "test-google-secret";
-
-      const { handlers } = await import("@/lib/auth");
+      const env = { AUTH_GOOGLE_ID: "test-google-id", AUTH_GOOGLE_SECRET: "test-google-secret" };
+      setupEnvironment(env);
+      await getAuthConfig();
 
       expect(mockGoogleProvider).toHaveBeenCalledWith({
         clientId: "test-google-id",
@@ -266,46 +249,24 @@ describe("Google OAuth Redirect Callback Tests", () => {
     });
 
     test("OAuth flow uses correct base URL for redirects", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // The base URL should be correctly reflected in cookie domains
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("sakumari.com");
-      expect(config.cookies.state.options.domain).toBe("sakumari.com");
+      const env = { AUTH_URL: "https://sakumari.com", NODE_ENV: "production" };
+      await testCookieConfiguration(env, "sakumari.com");
     });
 
     test("OAuth cookies prevent cross-domain redirects", async () => {
-      // Simulate scenario where user logs out and logs back in
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
+      const env = { AUTH_URL: "https://sakumari.com", NODE_ENV: "production" };
 
       // First import (simulating initial login)
-      await import("@/lib/auth");
+      setupEnvironment(env);
+      await getAuthConfig();
       const firstConfig = mockNextAuth.mock.calls[0][0];
 
       // Reset modules to simulate logout/login cycle
-      vi.resetModules();
-      vi.clearAllMocks();
-
-      // Re-setup mocks
-      vi.mock("@/lib/prisma", () => ({
-        prisma: {
-          $connect: vi.fn(),
-          $disconnect: vi.fn(),
-        },
-      }));
-      vi.mock("next-auth", () => ({ default: mockNextAuth }));
-      vi.mock("next-auth/providers/google", () => ({ default: mockGoogleProvider }));
-      vi.mock("next-auth/providers/credentials", () => ({
-        default: mockCredentialsProvider,
-      }));
-      vi.mock("@auth/prisma-adapter", () => ({ PrismaAdapter: mockPrismaAdapter }));
+      resetAndReSetupMocks();
+      setupEnvironment(env);
 
       // Second import (simulating login after logout)
-      await import("@/lib/auth");
+      await getAuthConfig();
       const secondConfig = mockNextAuth.mock.calls[0][0];
 
       // Cookie configuration should be consistent across sessions
@@ -313,32 +274,24 @@ describe("Google OAuth Redirect Callback Tests", () => {
       expect(firstConfig.cookies.state.options.domain).toBe(secondConfig.cookies.state.options.domain);
     });
 
-    test("PKCE code verifier cookie has correct name and configuration", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
+    test.each([
+      {
+        scenario: "PKCE code verifier cookie has correct name and configuration",
+        cookieName: "pkceCodeVerifier",
+        expectedName: "next-auth.pkce.code_verifier",
+      },
+      {
+        scenario: "State cookie has correct name and configuration",
+        cookieName: "state",
+        expectedName: "next-auth.state",
+      },
+    ])("$scenario", async ({ cookieName, expectedName }) => {
+      const env = { AUTH_URL: "https://sakumari.com", NODE_ENV: "production" };
+      setupEnvironment(env);
+      const config = await getAuthConfig();
 
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      expect(config.cookies.pkceCodeVerifier.name).toBe("next-auth.pkce.code_verifier");
-      expect(config.cookies.pkceCodeVerifier.options).toEqual({
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: true,
-        domain: "sakumari.com",
-      });
-    });
-
-    test("State cookie has correct name and configuration", async () => {
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      expect(config.cookies.state.name).toBe("next-auth.state");
-      expect(config.cookies.state.options).toEqual({
+      expect(config.cookies[cookieName].name).toBe(expectedName);
+      expect(config.cookies[cookieName].options).toEqual({
         httpOnly: true,
         sameSite: "lax",
         path: "/",
@@ -349,63 +302,37 @@ describe("Google OAuth Redirect Callback Tests", () => {
   });
 
   describe("Environment variable combination tests", () => {
-    test("handles empty string environment variables", async () => {
-      process.env.AUTH_URL = "";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Empty string should result in localhost fallback
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("localhost:3000");
-    });
-
-    test("handles whitespace in environment variables", async () => {
-      process.env.AUTH_URL = "  https://sakumari.com  ";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Should preserve whitespace as-is (no trimming in implementation)
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("  https://sakumari.com  ");
-    });
-
-    test("handles malformed URLs gracefully", async () => {
-      process.env.AUTH_URL = "not-a-valid-url";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Should handle malformed URL without throwing
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("not-a-valid-url");
-    });
-
-    test("handles URL with query parameters", async () => {
-      process.env.AUTH_URL = "https://sakumari.com?param=value";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Should include query parameters in domain (behavior depends on implementation)
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("sakumari.com?param=value");
-    });
-
-    test("handles URL with path", async () => {
-      process.env.AUTH_URL = "https://sakumari.com/auth";
-      process.env.NODE_ENV = "production";
-
-      const { handlers } = await import("@/lib/auth");
-      const config = mockNextAuth.mock.calls[0][0];
-
-      // Should include path in domain (behavior depends on implementation)
-      expect(config.cookies.pkceCodeVerifier.options.domain).toBe("sakumari.com/auth");
+    test.each([
+      {
+        scenario: "handles empty string environment variables",
+        env: { AUTH_URL: "", NODE_ENV: "production" },
+        expectedDomain: "localhost:3000",
+      },
+      {
+        scenario: "handles whitespace in environment variables",
+        env: { AUTH_URL: "  https://sakumari.com  ", NODE_ENV: "production" },
+        expectedDomain: "  https://sakumari.com  ",
+      },
+      {
+        scenario: "handles malformed URLs gracefully",
+        env: { AUTH_URL: "not-a-valid-url", NODE_ENV: "production" },
+        expectedDomain: "not-a-valid-url",
+      },
+      {
+        scenario: "handles URL with query parameters",
+        env: { AUTH_URL: "https://sakumari.com?param=value", NODE_ENV: "production" },
+        expectedDomain: "sakumari.com?param=value",
+      },
+      {
+        scenario: "handles URL with path",
+        env: { AUTH_URL: "https://sakumari.com/auth", NODE_ENV: "production" },
+        expectedDomain: "sakumari.com/auth",
+      },
+    ])("$scenario", async ({ env, expectedDomain }) => {
+      await testCookieConfiguration(env, expectedDomain);
     });
 
     test("different production domains have different cookie domains", async () => {
-      // Test different production environments
       const testCases = [
         { url: "https://staging.sakumari.com", expected: "staging.sakumari.com" },
         { url: "https://app.sakumari.com", expected: "app.sakumari.com" },
@@ -413,59 +340,26 @@ describe("Google OAuth Redirect Callback Tests", () => {
       ];
 
       for (const testCase of testCases) {
-        // Reset environment for each test case
-        Object.keys(process.env).forEach((key) => {
-          if (key.startsWith("AUTH_") || key === "NODE_ENV") {
-            delete process.env[key];
-          }
-        });
-
-        process.env.AUTH_URL = testCase.url;
-        process.env.NODE_ENV = "production";
-
-        vi.resetModules();
-        vi.clearAllMocks();
-
-        // Re-setup mocks
-        vi.mock("@/lib/prisma", () => ({
-          prisma: {
-            $connect: vi.fn(),
-            $disconnect: vi.fn(),
-          },
-        }));
-        vi.mock("next-auth", () => ({ default: mockNextAuth }));
-        vi.mock("next-auth/providers/google", () => ({ default: mockGoogleProvider }));
-        vi.mock("next-auth/providers/credentials", () => ({
-          default: mockCredentialsProvider,
-        }));
-        vi.mock("@auth/prisma-adapter", () => ({ PrismaAdapter: mockPrismaAdapter }));
-
-        const { handlers } = await import("@/lib/auth");
-        const config = mockNextAuth.mock.calls[0][0];
-
-        expect(config.cookies.pkceCodeVerifier.options.domain).toBe(testCase.expected);
+        resetAndReSetupMocks();
+        const env = { AUTH_URL: testCase.url, NODE_ENV: "production" };
+        await testCookieConfiguration(env, testCase.expected);
       }
     });
   });
 
   describe("Integration tests for logout/login redirect issue", () => {
     test("simulates the production environment issue scenario", async () => {
-      // This test simulates the exact scenario described in the issue:
-      // 1. User is on production domain
-      // 2. User logs out
-      // 3. User tries to log back in
-      // 4. Cookies should cause correct redirect, not to localhost
-
       const productionDomain = "https://sakumari.com";
-
-      // Set up production environment
-      process.env.AUTH_URL = productionDomain;
-      process.env.NODE_ENV = "production";
-      process.env.AUTH_GOOGLE_ID = "test-google-id";
-      process.env.AUTH_GOOGLE_SECRET = "test-google-secret";
+      const baseEnv = {
+        AUTH_URL: productionDomain,
+        NODE_ENV: "production",
+        AUTH_GOOGLE_ID: "test-google-id",
+        AUTH_GOOGLE_SECRET: "test-google-secret",
+      };
 
       // Simulate initial login
-      await import("@/lib/auth");
+      setupEnvironment(baseEnv);
+      await getAuthConfig();
       const initialConfig = mockNextAuth.mock.calls[0][0];
 
       // Verify initial configuration uses production domain
@@ -473,30 +367,11 @@ describe("Google OAuth Redirect Callback Tests", () => {
       expect(initialConfig.cookies.state.options.domain).toBe("sakumari.com");
 
       // Reset to simulate logout (clear modules and mocks)
-      vi.resetModules();
-      vi.clearAllMocks();
+      resetAndReSetupMocks();
+      setupEnvironment(baseEnv);
 
-      // Re-setup mocks for second login attempt
-      vi.mock("@/lib/prisma", () => ({
-        prisma: {
-          $connect: vi.fn(),
-          $disconnect: vi.fn(),
-        },
-      }));
-      vi.mock("next-auth", () => ({ default: mockNextAuth }));
-      vi.mock("next-auth/providers/google", () => ({ default: mockGoogleProvider }));
-      vi.mock("next-auth/providers/credentials", () => ({
-        default: mockCredentialsProvider,
-      }));
-      vi.mock("@auth/prisma-adapter", () => ({ PrismaAdapter: mockPrismaAdapter }));
-
-      // Simulate login after logout - environment should still be production
-      process.env.AUTH_URL = productionDomain;
-      process.env.NODE_ENV = "production";
-      process.env.AUTH_GOOGLE_ID = "test-google-id";
-      process.env.AUTH_GOOGLE_SECRET = "test-google-secret";
-
-      await import("@/lib/auth");
+      // Simulate login after logout
+      await getAuthConfig();
       const secondConfig = mockNextAuth.mock.calls[0][0];
 
       // Critical: Second login should still use production domain, not localhost
@@ -510,63 +385,40 @@ describe("Google OAuth Redirect Callback Tests", () => {
 
     test("ensures cookie domain consistency across multiple auth cycles", async () => {
       const domain = "https://app.sakumari.com";
+      const baseEnv = {
+        AUTH_URL: domain,
+        NODE_ENV: "production",
+        AUTH_GOOGLE_ID: "test-google-id",
+        AUTH_GOOGLE_SECRET: "test-google-secret",
+      };
 
-      // Set up environment
-      process.env.AUTH_URL = domain;
-      process.env.NODE_ENV = "production";
-      process.env.AUTH_GOOGLE_ID = "test-google-id";
-      process.env.AUTH_GOOGLE_SECRET = "test-google-secret";
-
-      // Simulate multiple auth cycles (login, logout, login, logout, login)
+      // Simulate multiple auth cycles
       const authConfigs = [];
-
       for (let i = 0; i < 3; i++) {
-        // Reset modules to simulate new auth cycle
-        vi.resetModules();
-        vi.clearAllMocks();
-
-        // Re-setup mocks
-        vi.mock("@/lib/prisma", () => ({
-          prisma: {
-            $connect: vi.fn(),
-            $disconnect: vi.fn(),
-          },
-        }));
-        vi.mock("next-auth", () => ({ default: mockNextAuth }));
-        vi.mock("next-auth/providers/google", () => ({ default: mockGoogleProvider }));
-        vi.mock("next-auth/providers/credentials", () => ({
-          default: mockCredentialsProvider,
-        }));
-        vi.mock("@auth/prisma-adapter", () => ({ PrismaAdapter: mockPrismaAdapter }));
-
-        // Re-set environment variables
-        process.env.AUTH_URL = domain;
-        process.env.NODE_ENV = "production";
-        process.env.AUTH_GOOGLE_ID = "test-google-id";
-        process.env.AUTH_GOOGLE_SECRET = "test-google-secret";
-
-        await import("@/lib/auth");
+        resetAndReSetupMocks();
+        setupEnvironment(baseEnv);
+        await getAuthConfig();
         authConfigs.push(mockNextAuth.mock.calls[0][0]);
       }
 
       // All configurations should have the same domain
       const expectedDomain = "app.sakumari.com";
-      authConfigs.forEach((config, index) => {
+      authConfigs.forEach((config) => {
         expect(config.cookies.pkceCodeVerifier.options.domain).toBe(expectedDomain);
         expect(config.cookies.state.options.domain).toBe(expectedDomain);
       });
     });
 
     test("prevents localhost redirect in production when AUTH_URL is properly set", async () => {
-      // This is the core issue: ensuring that when AUTH_URL is set to production domain,
-      // cookies don't cause redirects to localhost
+      const env = {
+        AUTH_URL: "https://sakumari.com",
+        NODE_ENV: "production",
+        AUTH_GOOGLE_ID: "test-google-id",
+        AUTH_GOOGLE_SECRET: "test-google-secret",
+      };
 
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
-      process.env.AUTH_GOOGLE_ID = "test-google-id";
-      process.env.AUTH_GOOGLE_SECRET = "test-google-secret";
-
-      await import("@/lib/auth");
+      setupEnvironment(env);
+      await getAuthConfig();
       const config = mockNextAuth.mock.calls[0][0];
 
       // The critical test: cookie domain should NOT be localhost in production
@@ -579,42 +431,32 @@ describe("Google OAuth Redirect Callback Tests", () => {
     });
 
     test("handles environment variable changes between auth cycles", async () => {
-      // Test scenario where environment variables might change between sessions
+      const baseCredentials = {
+        AUTH_GOOGLE_ID: "test-google-id",
+        AUTH_GOOGLE_SECRET: "test-google-secret",
+      };
 
       // First cycle: staging environment
-      process.env.AUTH_URL = "https://staging.sakumari.com";
-      process.env.NODE_ENV = "production";
-      process.env.AUTH_GOOGLE_ID = "test-google-id";
-      process.env.AUTH_GOOGLE_SECRET = "test-google-secret";
-
-      await import("@/lib/auth");
+      const stagingEnv = {
+        ...baseCredentials,
+        AUTH_URL: "https://staging.sakumari.com",
+        NODE_ENV: "production",
+      };
+      setupEnvironment(stagingEnv);
+      await getAuthConfig();
       const stagingConfig = mockNextAuth.mock.calls[0][0];
 
       // Reset and switch to production
-      vi.resetModules();
-      vi.clearAllMocks();
-
-      // Re-setup mocks
-      vi.mock("@/lib/prisma", () => ({
-        prisma: {
-          $connect: vi.fn(),
-          $disconnect: vi.fn(),
-        },
-      }));
-      vi.mock("next-auth", () => ({ default: mockNextAuth }));
-      vi.mock("next-auth/providers/google", () => ({ default: mockGoogleProvider }));
-      vi.mock("next-auth/providers/credentials", () => ({
-        default: mockCredentialsProvider,
-      }));
-      vi.mock("@auth/prisma-adapter", () => ({ PrismaAdapter: mockPrismaAdapter }));
+      resetAndReSetupMocks();
 
       // Second cycle: production environment
-      process.env.AUTH_URL = "https://sakumari.com";
-      process.env.NODE_ENV = "production";
-      process.env.AUTH_GOOGLE_ID = "test-google-id";
-      process.env.AUTH_GOOGLE_SECRET = "test-google-secret";
-
-      await import("@/lib/auth");
+      const productionEnv = {
+        ...baseCredentials,
+        AUTH_URL: "https://sakumari.com",
+        NODE_ENV: "production",
+      };
+      setupEnvironment(productionEnv);
+      await getAuthConfig();
       const productionConfig = mockNextAuth.mock.calls[0][0];
 
       // Each environment should use its own domain
