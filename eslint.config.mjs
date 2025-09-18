@@ -7,7 +7,6 @@ import tseslint from "typescript-eslint";
 import eslintReact from "eslint-plugin-react";
 import eslintReactHooks from "eslint-plugin-react-hooks";
 import eslintNext from "@next/eslint-plugin-next";
-import eslintImport from "eslint-plugin-import";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,7 +32,6 @@ export default defineConfig([
       react: eslintReact,
       "react-hooks": eslintReactHooks,
       "@next/next": eslintNext,
-      import: eslintImport,
     },
     languageOptions: {
       parser: tseslint.parser,
