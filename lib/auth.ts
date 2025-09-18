@@ -22,6 +22,11 @@ import Credentials from "next-auth/providers/credentials";
 import type { Provider } from "next-auth/providers";
 import { prisma } from "@/lib/prisma";
 
+// Get the base URL for AUTH_URL
+const getAuthUrl = () => {
+  return process.env.AUTH_URL || "http://localhost:3000";
+};
+
 // Google OAuth provider
 const googleProvider = Google({
   clientId: process.env.AUTH_GOOGLE_ID!,
@@ -86,6 +91,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   trustHost: true,
+  basePath: "/api/auth",
   cookies: {
     pkceCodeVerifier: {
       name: "next-auth.pkce.code_verifier",
@@ -94,6 +100,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
+        domain: process.env.NODE_ENV === "production" ? getAuthUrl().replace(/^https?:\/\//, '') : undefined,
       },
     },
     state: {
@@ -103,6 +110,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
+        domain: process.env.NODE_ENV === "production" ? getAuthUrl().replace(/^https?:\/\//, '') : undefined,
       },
     },
   },
