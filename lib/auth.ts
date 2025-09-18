@@ -91,29 +91,42 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   trustHost: true,
-  basePath: "/api/auth",
-  cookies: {
-    pkceCodeVerifier: {
-      name: "next-auth.pkce.code_verifier",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        domain: process.env.NODE_ENV === "production" ? getAuthUrl().replace(/^https?:\/\//, '') : undefined,
-      },
-    },
-    state: {
-      name: "next-auth.state",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        domain: process.env.NODE_ENV === "production" ? getAuthUrl().replace(/^https?:\/\//, '') : undefined,
-      },
-    },
-  },
+  // basePath: "/api/auth",
+  // pages: {
+  //   signIn: "/",
+  // },
+  // cookies: {
+  //   pkceCodeVerifier: {
+  //     name: "next-auth.pkce.code_verifier",
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: "lax",
+  //       path: "/",
+  //       secure: process.env.NODE_ENV === "production",
+  //       domain: process.env.NODE_ENV === "production" ? getAuthUrl().replace(/^https?:\/\//, '') : undefined,
+  //     },
+  //   },
+  //   state: {
+  //     name: "next-auth.state",
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: "lax",
+  //       path: "/",
+  //       secure: process.env.NODE_ENV === "production",
+  //       domain: process.env.NODE_ENV === "production" ? getAuthUrl().replace(/^https?:\/\//, '') : undefined,
+  //     },
+  //   },
+  //   csrfToken: {
+  //     name: "next-auth.csrf-token",
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: "lax",
+  //       path: "/",
+  //       secure: process.env.NODE_ENV === "production",
+  //       domain: process.env.NODE_ENV === "production" ? getAuthUrl().replace(/^https?:\/\//, '') : undefined,
+  //     },
+  //   },
+  // },
   callbacks: {
     jwt: ({ token, user }) => {
       if (user) {
