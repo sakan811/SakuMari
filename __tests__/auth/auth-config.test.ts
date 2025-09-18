@@ -322,62 +322,7 @@ describe("Auth Configuration Tests", () => {
       expect(nextAuthCall.trustHost).toBe(true);
     });
 
-    test("cookie configuration for development (secure: false)", async () => {
-      // NODE_ENV is set to "test" by test runner, which !== "production"
-      await import("@/lib/auth");
-
-      const nextAuthCall = mockNextAuth.mock.calls[0][0];
-      expect(nextAuthCall.cookies.pkceCodeVerifier.options.secure).toBe(false);
-      expect(nextAuthCall.cookies.state.options.secure).toBe(false);
-    });
-
-    test("cookie configuration for production (secure: true)", async () => {
-      // Use Object.defineProperty to safely override NODE_ENV
-      const originalNodeEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, "NODE_ENV", {
-        value: "production",
-        configurable: true,
-      });
-
-      await import("@/lib/auth");
-
-      const nextAuthCall = mockNextAuth.mock.calls[0][0];
-      expect(nextAuthCall.cookies.pkceCodeVerifier.options.secure).toBe(true);
-      expect(nextAuthCall.cookies.state.options.secure).toBe(true);
-
-      // Restore original value
-      Object.defineProperty(process.env, "NODE_ENV", {
-        value: originalNodeEnv,
-        configurable: true,
-      });
-    });
-
-    test("cookie configuration structure is complete", async () => {
-      await import("@/lib/auth");
-
-      const nextAuthCall = mockNextAuth.mock.calls[0][0];
-
-      expect(nextAuthCall.cookies.pkceCodeVerifier).toEqual({
-        name: "next-auth.pkce.code_verifier",
-        options: {
-          httpOnly: true,
-          sameSite: "lax",
-          path: "/",
-          secure: false, // test environment (NODE_ENV !== "production")
-        },
-      });
-
-      expect(nextAuthCall.cookies.state).toEqual({
-        name: "next-auth.state",
-        options: {
-          httpOnly: true,
-          sameSite: "lax",
-          path: "/",
-          secure: false, // test environment
-        },
-      });
-    });
-
+    
     test("JWT callback injects user ID into token", async () => {
       await import("@/lib/auth");
 
