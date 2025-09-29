@@ -81,7 +81,7 @@ describe("DesktopNavigation", () => {
     status: "loading" | "authenticated" | "unauthenticated";
     credentialsEnabled: boolean;
   };
-  let mockSession: NonNullable<typeof defaultProps["session"]>;
+  let mockSession: NonNullable<(typeof defaultProps)["session"]>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -247,9 +247,7 @@ describe("DesktopNavigation", () => {
     });
 
     test("disables button during loading state", () => {
-      render(
-        <DesktopNavigation {...defaultProps} status="loading" />,
-      );
+      render(<DesktopNavigation {...defaultProps} status="loading" />);
 
       const button = screen.getByRole("button", { name: "⌛ Sign In" });
       expect(button).toBeDisabled();
@@ -260,9 +258,7 @@ describe("DesktopNavigation", () => {
   describe("Credentials Enabled State", () => {
     test("renders credentials sign-in button when credentials enabled", () => {
       // This test covers lines 99-102 in DesktopNavigation.tsx
-      render(
-        <DesktopNavigation {...defaultProps} credentialsEnabled={true} />,
-      );
+      render(<DesktopNavigation {...defaultProps} credentialsEnabled={true} />);
 
       const credentialsButton = screen.getByRole("button", { name: "Sign In" });
       expect(credentialsButton).toBeInTheDocument();

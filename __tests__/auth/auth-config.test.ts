@@ -322,7 +322,6 @@ describe("Auth Configuration Tests", () => {
       expect(nextAuthCall.trustHost).toBe(true);
     });
 
-    
     test("JWT callback injects user ID into token", async () => {
       await import("@/lib/auth");
 

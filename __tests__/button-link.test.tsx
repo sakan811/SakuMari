@@ -18,7 +18,7 @@ describe("ButtonLink", () => {
     render(
       <ButtonLink href="https://example.com" external={true}>
         External Link
-      </ButtonLink>
+      </ButtonLink>,
     );
 
     const link = screen.getByText("External Link");
@@ -29,7 +29,7 @@ describe("ButtonLink", () => {
     render(
       <ButtonLink href="https://example.com" external={true}>
         External Link
-      </ButtonLink>
+      </ButtonLink>,
     );
 
     const link = screen.getByText("External Link");
@@ -41,7 +41,7 @@ describe("ButtonLink", () => {
     render(
       <ButtonLink href="https://example.com" external={true}>
         External Link
-      </ButtonLink>
+      </ButtonLink>,
     );
 
     const link = screen.getByText("External Link");
@@ -52,7 +52,7 @@ describe("ButtonLink", () => {
     render(
       <ButtonLink href="https://example.com" external={true}>
         External Link Content
-      </ButtonLink>
+      </ButtonLink>,
     );
 
     expect(screen.getByText("External Link Content")).toBeInTheDocument();
@@ -66,7 +66,7 @@ describe("ButtonLink", () => {
         className="custom-class"
       >
         External Link
-      </ButtonLink>
+      </ButtonLink>,
     );
 
     const link = screen.getByText("External Link");
@@ -82,7 +82,7 @@ describe("ButtonLink", () => {
         data-testid="custom-link"
       >
         External Link
-      </ButtonLink>
+      </ButtonLink>,
     );
 
     const link = screen.getByTestId("custom-link");
@@ -91,13 +91,9 @@ describe("ButtonLink", () => {
 
   it("applies variant styles correctly for external links", () => {
     render(
-      <ButtonLink
-        href="https://example.com"
-        external={true}
-        variant="ghost"
-      >
+      <ButtonLink href="https://example.com" external={true} variant="ghost">
         Ghost External Link
-      </ButtonLink>
+      </ButtonLink>,
     );
 
     const link = screen.getByText("Ghost External Link");
@@ -107,13 +103,9 @@ describe("ButtonLink", () => {
 
   it("applies size styles correctly for external links", () => {
     render(
-      <ButtonLink
-        href="https://example.com"
-        external={true}
-        size="sm"
-      >
+      <ButtonLink href="https://example.com" external={true} size="sm">
         Small External Link
-      </ButtonLink>
+      </ButtonLink>,
     );
 
     const link = screen.getByText("Small External Link");
@@ -124,13 +116,9 @@ describe("ButtonLink", () => {
 
   it("applies fullWidth styles correctly for external links", () => {
     render(
-      <ButtonLink
-        href="https://example.com"
-        external={true}
-        fullWidth={true}
-      >
+      <ButtonLink href="https://example.com" external={true} fullWidth={true}>
         Full Width External Link
-      </ButtonLink>
+      </ButtonLink>,
     );
 
     const link = screen.getByText("Full Width External Link");
@@ -140,13 +128,9 @@ describe("ButtonLink", () => {
 
   it("applies animation styles correctly for external links", () => {
     render(
-      <ButtonLink
-        href="https://example.com"
-        external={true}
-        animation="scale"
-      >
+      <ButtonLink href="https://example.com" external={true} animation="scale">
         Animated External Link
-      </ButtonLink>
+      </ButtonLink>,
     );
 
     const link = screen.getByText("Animated External Link");

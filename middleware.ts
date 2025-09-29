@@ -20,7 +20,11 @@ import { auth } from "@/lib/auth";
 
 export default auth((req) => {
   // If user is not authenticated and trying to access protected routes
-  if ((!req.auth || (typeof req.auth === 'object' && Object.keys(req.auth).length === 0)) && req.nextUrl.pathname !== "/") {
+  if (
+    (!req.auth ||
+      (typeof req.auth === "object" && Object.keys(req.auth).length === 0)) &&
+    req.nextUrl.pathname !== "/"
+  ) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 

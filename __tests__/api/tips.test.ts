@@ -456,16 +456,18 @@ describe("Tips API Route", async () => {
       // Setup
       (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
-      
+
       // Temporarily override the mock to throw an error during import
       const originalMock = mockGoogleGenerativeAI;
       mockGoogleGenerativeAI.mockImplementation(() => {
         throw new Error("Failed to initialize AI service");
       });
-      
+
       // Spy on console.error
-      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
       const request = new NextRequest("http://localhost/api/tips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -483,9 +485,9 @@ describe("Tips API Route", async () => {
       );
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         "Error generating kana learning tips:",
-        expect.any(Error)
+        expect.any(Error),
       );
-      
+
       // Restore console.error and original mock
       consoleErrorSpy.mockRestore();
       mockGoogleGenerativeAI.mockImplementation(originalMock);
@@ -525,7 +527,9 @@ describe("Tips API Route", async () => {
       // Override the mock to return context-aware response
       mockGenerateContent.mockResolvedValue({
         response: {
-          text: vi.fn().mockReturnValue("Context-aware response with progressing kana"),
+          text: vi
+            .fn()
+            .mockReturnValue("Context-aware response with progressing kana"),
         },
       });
 

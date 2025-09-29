@@ -25,7 +25,10 @@ export type KanaFilter = "all" | "hiragana" | "katakana";
  * @param filter - The filter type to apply
  * @returns boolean indicating whether the kana should be included in the filtered results
  */
-export function filterKanaByType(kana: KanaWithAccuracy, filter: KanaFilter): boolean {
+export function filterKanaByType(
+  kana: KanaWithAccuracy,
+  filter: KanaFilter,
+): boolean {
   if (filter === "all") return true;
 
   const charCode = kana.character.charCodeAt(0);
@@ -37,6 +40,6 @@ export function filterKanaByType(kana: KanaWithAccuracy, filter: KanaFilter): bo
   } else if (filter === "katakana") {
     return isKatakana;
   }
-  
+
   return false;
 }

@@ -71,7 +71,7 @@ describe("StatsSummary Component", () => {
   describe("Calculation Logic Tests", () => {
     test("calculates averageAccuracy with empty stats array", () => {
       render(<StatsSummary stats={[]} />);
-      
+
       // When stats is empty, practicedStats.length is 0, so averageAccuracy should be 0
       const averageAccuracyElement = screen.getByText("0%");
       expect(averageAccuracyElement).toBeTruthy();
@@ -79,7 +79,7 @@ describe("StatsSummary Component", () => {
 
     test("calculates averageAccuracy with stats where no kana has been practiced", () => {
       render(<StatsSummary stats={mockStatsWithNoPractice} />);
-      
+
       // When no kana has been practiced (attempts = 0), practicedStats.length is 0, so averageAccuracy should be 0
       const averageAccuracyElement = screen.getByText("0%");
       expect(averageAccuracyElement).toBeTruthy();
@@ -87,7 +87,7 @@ describe("StatsSummary Component", () => {
 
     test("calculates averageAccuracy with stats where some kana have been practiced", () => {
       render(<StatsSummary stats={mockStats} />);
-      
+
       // practicedStats includes only kana with attempts > 0 (first two entries)
       // averageAccuracy = (0.8 + 0.6) / 2 = 0.7
       // Displayed as percentage with 1 decimal: 70.0%
@@ -97,17 +97,20 @@ describe("StatsSummary Component", () => {
 
     test("calculates totalAttempts with empty stats array", () => {
       render(<StatsSummary stats={[]} />);
-      
+
       // When stats is empty, totalAttempts should be 0
-      const totalAttemptsCard = screen.getByText("Total Attempts").closest("div");
-      const totalAttemptsElement = totalAttemptsCard?.querySelector("p.text-xl");
+      const totalAttemptsCard = screen
+        .getByText("Total Attempts")
+        .closest("div");
+      const totalAttemptsElement =
+        totalAttemptsCard?.querySelector("p.text-xl");
       expect(totalAttemptsElement).toBeTruthy();
       expect(totalAttemptsElement?.textContent).toBe("0");
     });
 
     test("calculates totalAttempts with stats containing various attempt counts", () => {
       render(<StatsSummary stats={mockStats} />);
-      
+
       // totalAttempts = 10 + 5 + 0 = 15
       const totalAttemptsElement = screen.getByText("15");
       expect(totalAttemptsElement).toBeTruthy();
@@ -117,19 +120,21 @@ describe("StatsSummary Component", () => {
   describe("Rendering Tests", () => {
     test("renders with correct structure", () => {
       render(<StatsSummary stats={mockStats} />);
-      
+
       // Main container
       const mainContainer = screen.getByText("Your Progress").closest("div");
       expect(mainContainer).toBeTruthy();
       expect(mainContainer?.className).toContain("rounded-lg");
       expect(mainContainer?.className).toContain("bg-white/90");
       expect(mainContainer?.className).toContain("backdrop-blur-sm");
-      
+
       // Title
       expect(screen.getByText("Your Progress")).toBeTruthy();
       expect(screen.getByText("Your Progress").className).toContain("text-lg");
-      expect(screen.getByText("Your Progress").className).toContain("font-semibold");
-      
+      expect(screen.getByText("Your Progress").className).toContain(
+        "font-semibold",
+      );
+
       // Grid container for cards
       const gridContainer = mainContainer?.querySelector("div");
       expect(gridContainer).toBeTruthy();
@@ -140,32 +145,37 @@ describe("StatsSummary Component", () => {
 
     test("renders three stat cards", () => {
       render(<StatsSummary stats={mockStats} />);
-      
+
       // Check that all three card titles are present
       expect(screen.getByText("Total Characters Practiced")).toBeTruthy();
       expect(screen.getByText("Average Accuracy")).toBeTruthy();
       expect(screen.getByText("Total Attempts")).toBeTruthy();
-      
+
       // Check that there are three cards by finding the stat containers
-      const cards = screen.getAllByText(/Total Characters Practiced|Average Accuracy|Total Attempts/)
-        .map(title => title.closest("div"))
-        .filter(card => card?.className.includes("rounded-md"));
-      
+      const cards = screen
+        .getAllByText(
+          /Total Characters Practiced|Average Accuracy|Total Attempts/,
+        )
+        .map((title) => title.closest("div"))
+        .filter((card) => card?.className.includes("rounded-md"));
+
       expect(cards.length).toBe(3);
     });
 
     test("applies correct styling classes", () => {
       render(<StatsSummary stats={mockStats} />);
-      
+
       // Check struggling card styling (Total Characters Practiced)
-      const strugglingCard = screen.getByText("Total Characters Practiced").closest("div");
+      const strugglingCard = screen
+        .getByText("Total Characters Practiced")
+        .closest("div");
       expect(strugglingCard?.className).toContain("rounded-md");
       expect(strugglingCard?.className).toContain("bg-gradient-to-br");
       expect(strugglingCard?.className).toContain("from-[#705a39]");
       expect(strugglingCard?.className).toContain("to-[#403933]");
       expect(strugglingCard?.className).toContain("border-2");
       expect(strugglingCard?.className).toContain("border-[#403933]");
-      
+
       // Check good card styling (Average Accuracy)
       const goodCard = screen.getByText("Average Accuracy").closest("div");
       expect(goodCard?.className).toContain("rounded-md");
@@ -174,7 +184,7 @@ describe("StatsSummary Component", () => {
       expect(goodCard?.className).toContain("to-green-700");
       expect(goodCard?.className).toContain("border-2");
       expect(goodCard?.className).toContain("border-green-700");
-      
+
       // Check excellent card styling (Total Attempts)
       const excellentCard = screen.getByText("Total Attempts").closest("div");
       expect(excellentCard?.className).toContain("rounded-md");
@@ -189,11 +199,14 @@ describe("StatsSummary Component", () => {
   describe("Data Display Tests", () => {
     test("displays Total Characters Practiced correctly", () => {
       render(<StatsSummary stats={mockStats} />);
-      
+
       // practicedStats includes only kana with attempts > 0 (first two entries)
       // So Total Characters Practiced should be 2
-      const totalCharactersCard = screen.getByText("Total Characters Practiced").closest("div");
-      const totalCharactersElement = totalCharactersCard?.querySelector("p.text-xl");
+      const totalCharactersCard = screen
+        .getByText("Total Characters Practiced")
+        .closest("div");
+      const totalCharactersElement =
+        totalCharactersCard?.querySelector("p.text-xl");
       expect(totalCharactersElement).toBeTruthy();
       expect(totalCharactersElement?.textContent).toBe("2");
       expect(totalCharactersElement?.className).toContain("text-xl");
@@ -203,12 +216,15 @@ describe("StatsSummary Component", () => {
 
     test("displays Average Accuracy correctly", () => {
       render(<StatsSummary stats={mockStats} />);
-      
+
       // practicedStats includes only kana with attempts > 0 (first two entries)
       // averageAccuracy = (0.8 + 0.6) / 2 = 0.7
       // Displayed as percentage with 1 decimal: 70.0%
-      const averageAccuracyCard = screen.getByText("Average Accuracy").closest("div");
-      const averageAccuracyElement = averageAccuracyCard?.querySelector("p.text-xl");
+      const averageAccuracyCard = screen
+        .getByText("Average Accuracy")
+        .closest("div");
+      const averageAccuracyElement =
+        averageAccuracyCard?.querySelector("p.text-xl");
       expect(averageAccuracyElement).toBeTruthy();
       expect(averageAccuracyElement?.textContent).toBe("70.0%");
       expect(averageAccuracyElement?.className).toContain("text-xl");
@@ -218,10 +234,13 @@ describe("StatsSummary Component", () => {
 
     test("displays Total Attempts correctly", () => {
       render(<StatsSummary stats={mockStats} />);
-      
+
       // totalAttempts = 10 + 5 + 0 = 15
-      const totalAttemptsCard = screen.getByText("Total Attempts").closest("div");
-      const totalAttemptsElement = totalAttemptsCard?.querySelector("p.text-xl");
+      const totalAttemptsCard = screen
+        .getByText("Total Attempts")
+        .closest("div");
+      const totalAttemptsElement =
+        totalAttemptsCard?.querySelector("p.text-xl");
       expect(totalAttemptsElement).toBeTruthy();
       expect(totalAttemptsElement?.textContent).toBe("15");
       expect(totalAttemptsElement?.className).toContain("text-xl");
@@ -231,49 +250,67 @@ describe("StatsSummary Component", () => {
 
     test("displays 0% accuracy when no kana have been practiced", () => {
       render(<StatsSummary stats={mockStatsWithNoPractice} />);
-      
+
       // When no kana has been practiced, accuracy should display as 0%
-      const averageAccuracyCard = screen.getByText("Average Accuracy").closest("div");
-      const averageAccuracyElement = averageAccuracyCard?.querySelector("p.text-xl");
+      const averageAccuracyCard = screen
+        .getByText("Average Accuracy")
+        .closest("div");
+      const averageAccuracyElement =
+        averageAccuracyCard?.querySelector("p.text-xl");
       expect(averageAccuracyElement).toBeTruthy();
       expect(averageAccuracyElement?.textContent).toBe("0%");
     });
 
     test("displays 0 for Total Characters Practiced when no kana have been practiced", () => {
       render(<StatsSummary stats={mockStatsWithNoPractice} />);
-      
+
       // When no kana has been practiced, Total Characters Practiced should be 0
-      const totalCharactersCard = screen.getByText("Total Characters Practiced").closest("div");
-      const totalCharactersElement = totalCharactersCard?.querySelector("p.text-xl");
+      const totalCharactersCard = screen
+        .getByText("Total Characters Practiced")
+        .closest("div");
+      const totalCharactersElement =
+        totalCharactersCard?.querySelector("p.text-xl");
       expect(totalCharactersElement).toBeTruthy();
       expect(totalCharactersElement?.textContent).toBe("0");
     });
 
     test("displays 0 for Total Attempts when no kana have been practiced", () => {
       render(<StatsSummary stats={mockStatsWithNoPractice} />);
-      
+
       // When no kana has been practiced, Total Attempts should be 0
-      const totalAttemptsCard = screen.getByText("Total Attempts").closest("div");
-      const totalAttemptsElement = totalAttemptsCard?.querySelector("p.text-xl");
+      const totalAttemptsCard = screen
+        .getByText("Total Attempts")
+        .closest("div");
+      const totalAttemptsElement =
+        totalAttemptsCard?.querySelector("p.text-xl");
       expect(totalAttemptsElement).toBeTruthy();
       expect(totalAttemptsElement?.textContent).toBe("0");
     });
 
     test("displays 0 for all stats when stats array is empty", () => {
       render(<StatsSummary stats={[]} />);
-      
+
       // When stats array is empty, all values should be 0
       // Check each stat individually to ensure we're getting the right elements
-      const totalCharactersCard = screen.getByText("Total Characters Practiced").closest("div");
-      const totalCharactersElement = totalCharactersCard?.querySelector("p.text-xl");
+      const totalCharactersCard = screen
+        .getByText("Total Characters Practiced")
+        .closest("div");
+      const totalCharactersElement =
+        totalCharactersCard?.querySelector("p.text-xl");
       expect(totalCharactersElement?.textContent).toBe("0");
-      
-      const averageAccuracyCard = screen.getByText("Average Accuracy").closest("div");
-      const averageAccuracyElement = averageAccuracyCard?.querySelector("p.text-xl");
+
+      const averageAccuracyCard = screen
+        .getByText("Average Accuracy")
+        .closest("div");
+      const averageAccuracyElement =
+        averageAccuracyCard?.querySelector("p.text-xl");
       expect(averageAccuracyElement?.textContent).toBe("0%");
-      
-      const totalAttemptsCard = screen.getByText("Total Attempts").closest("div");
-      const totalAttemptsElement = totalAttemptsCard?.querySelector("p.text-xl");
+
+      const totalAttemptsCard = screen
+        .getByText("Total Attempts")
+        .closest("div");
+      const totalAttemptsElement =
+        totalAttemptsCard?.querySelector("p.text-xl");
       expect(totalAttemptsElement?.textContent).toBe("0");
     });
   });

@@ -49,7 +49,7 @@ export default defineConfig({
         ".next/",
         "generated/",
         "coverage/lcov-report",
-        "__tests__/db/generated"
+        "__tests__/db/generated",
       ],
     },
   },

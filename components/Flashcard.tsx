@@ -124,7 +124,6 @@ export default function Flashcard() {
     setError("");
   };
 
-  
   if (loadingKana) {
     return (
       <div className="flex h-32 sm:h-64 items-center justify-center">

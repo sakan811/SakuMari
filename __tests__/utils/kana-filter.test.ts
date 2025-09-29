@@ -186,15 +186,27 @@ describe("filterKanaByType", () => {
 
   describe("comprehensive kana sets", () => {
     it("should correctly filter basic hiragana characters", () => {
-      const basicHiragana = ["あ", "か", "さ", "た", "な", "は", "ま", "や", "ら", "わ", "ん"];
-      
+      const basicHiragana = [
+        "あ",
+        "か",
+        "さ",
+        "た",
+        "な",
+        "は",
+        "ま",
+        "や",
+        "ら",
+        "わ",
+        "ん",
+      ];
+
       basicHiragana.forEach((char, index) => {
         const kana: KanaWithAccuracy = {
           ...hiraganaKana,
           character: char,
           id: `basic-hiragana-${index}`,
         };
-        
+
         expect(filterKanaByType(kana, "hiragana")).toBe(true);
         expect(filterKanaByType(kana, "katakana")).toBe(false);
         expect(filterKanaByType(kana, "all")).toBe(true);
@@ -202,15 +214,27 @@ describe("filterKanaByType", () => {
     });
 
     it("should correctly filter basic katakana characters", () => {
-      const basicKatakana = ["ア", "カ", "サ", "タ", "ナ", "ハ", "マ", "ヤ", "ラ", "ワ", "ン"];
-      
+      const basicKatakana = [
+        "ア",
+        "カ",
+        "サ",
+        "タ",
+        "ナ",
+        "ハ",
+        "マ",
+        "ヤ",
+        "ラ",
+        "ワ",
+        "ン",
+      ];
+
       basicKatakana.forEach((char, index) => {
         const kana: KanaWithAccuracy = {
           ...katakanaKana,
           character: char,
           id: `basic-katakana-${index}`,
         };
-        
+
         expect(filterKanaByType(kana, "hiragana")).toBe(false);
         expect(filterKanaByType(kana, "katakana")).toBe(true);
         expect(filterKanaByType(kana, "all")).toBe(true);
@@ -221,8 +245,15 @@ describe("filterKanaByType", () => {
   describe("invalid filter values", () => {
     it("should return false for invalid filter values", () => {
       // Test with invalid filter values that would fall through to line 41
-      const invalidFilters = ["invalid", "unknown", "test", "", null, undefined] as (string | null | undefined)[];
-      
+      const invalidFilters = [
+        "invalid",
+        "unknown",
+        "test",
+        "",
+        null,
+        undefined,
+      ] as (string | null | undefined)[];
+
       invalidFilters.forEach((filter) => {
         // @ts-ignore - Testing invalid input
         const result = filterKanaByType(hiraganaKana, filter);
@@ -232,8 +263,15 @@ describe("filterKanaByType", () => {
 
     it("should return false for case-sensitive invalid filter values", () => {
       // Test with case variations that should not match
-      const caseInvalidFilters = ["Hiragana", "Katakana", "ALL", "All", "hIRAGANA", "kATAKANA"];
-      
+      const caseInvalidFilters = [
+        "Hiragana",
+        "Katakana",
+        "ALL",
+        "All",
+        "hIRAGANA",
+        "kATAKANA",
+      ];
+
       caseInvalidFilters.forEach((filter) => {
         // @ts-ignore - Testing invalid input
         const result = filterKanaByType(hiraganaKana, filter);

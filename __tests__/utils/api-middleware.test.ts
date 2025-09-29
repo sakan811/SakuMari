@@ -60,9 +60,9 @@ describe("API Middleware", () => {
       const mockError = new Error("Authentication failed");
       mockAuth.mockRejectedValue(mockError);
 
-      const mockHandler = vi.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const mockHandler = vi
+        .fn()
+        .mockResolvedValue(NextResponse.json({ success: true }));
 
       const wrappedHandler = withAuth(mockHandler);
       const result = await wrappedHandler(new NextRequest("http://localhost"));
@@ -76,9 +76,9 @@ describe("API Middleware", () => {
     it("handles authentication errors with string errors", async () => {
       mockAuth.mockRejectedValue("String error");
 
-      const mockHandler = vi.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const mockHandler = vi
+        .fn()
+        .mockResolvedValue(NextResponse.json({ success: true }));
 
       const wrappedHandler = withAuth(mockHandler);
       const result = await wrappedHandler(new NextRequest("http://localhost"));
@@ -92,9 +92,9 @@ describe("API Middleware", () => {
     it("handles authentication errors with object errors", async () => {
       mockAuth.mockRejectedValue({ message: "Object error" });
 
-      const mockHandler = vi.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const mockHandler = vi
+        .fn()
+        .mockResolvedValue(NextResponse.json({ success: true }));
 
       const wrappedHandler = withAuth(mockHandler);
       const result = await wrappedHandler(new NextRequest("http://localhost"));
@@ -114,9 +114,9 @@ describe("API Middleware", () => {
         },
       });
 
-      const mockHandler = vi.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const mockHandler = vi
+        .fn()
+        .mockResolvedValue(NextResponse.json({ success: true }));
 
       const wrappedHandler = withAuthSimple(mockHandler);
       const result = await wrappedHandler(new NextRequest("http://localhost"));
@@ -131,9 +131,9 @@ describe("API Middleware", () => {
       const mockError = new Error("Authentication failed");
       mockAuth.mockRejectedValue(mockError);
 
-      const mockHandler = vi.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const mockHandler = vi
+        .fn()
+        .mockResolvedValue(NextResponse.json({ success: true }));
 
       const wrappedHandler = withAuthSimple(mockHandler);
       const result = await wrappedHandler(new NextRequest("http://localhost"));
@@ -147,9 +147,9 @@ describe("API Middleware", () => {
     it("returns unauthorized when session is missing", async () => {
       mockAuth.mockResolvedValue(null);
 
-      const mockHandler = vi.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const mockHandler = vi
+        .fn()
+        .mockResolvedValue(NextResponse.json({ success: true }));
 
       const wrappedHandler = withAuthSimple(mockHandler);
       const result = await wrappedHandler(new NextRequest("http://localhost"));
@@ -165,9 +165,9 @@ describe("API Middleware", () => {
         user: {}, // No id
       });
 
-      const mockHandler = vi.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const mockHandler = vi
+        .fn()
+        .mockResolvedValue(NextResponse.json({ success: true }));
 
       const wrappedHandler = withAuthSimple(mockHandler);
       const result = await wrappedHandler(new NextRequest("http://localhost"));

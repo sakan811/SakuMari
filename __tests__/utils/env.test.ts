@@ -39,8 +39,10 @@ describe("getDatabaseUrls", () => {
     const result = getDatabaseUrls();
 
     expect(result).toEqual({
-      POSTGRES_PRISMA_URL: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
-      POSTGRES_URL_NON_POOLING: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+      POSTGRES_PRISMA_URL:
+        "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+      POSTGRES_URL_NON_POOLING:
+        "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
     });
   });
 
@@ -55,8 +57,10 @@ describe("getDatabaseUrls", () => {
     const result = getDatabaseUrls();
 
     expect(result).toEqual({
-      POSTGRES_PRISMA_URL: "postgresql://testuser:testpass@testhost:5433/testdb",
-      POSTGRES_URL_NON_POOLING: "postgresql://testuser:testpass@testhost:5433/testdb",
+      POSTGRES_PRISMA_URL:
+        "postgresql://testuser:testpass@testhost:5433/testdb",
+      POSTGRES_URL_NON_POOLING:
+        "postgresql://testuser:testpass@testhost:5433/testdb",
     });
   });
 
@@ -69,8 +73,10 @@ describe("getDatabaseUrls", () => {
     const result = getDatabaseUrls();
 
     expect(result).toEqual({
-      POSTGRES_PRISMA_URL: "postgresql://customuser:custompass@localhost:5432/kana_flashcard",
-      POSTGRES_URL_NON_POOLING: "postgresql://customuser:custompass@localhost:5432/kana_flashcard",
+      POSTGRES_PRISMA_URL:
+        "postgresql://customuser:custompass@localhost:5432/kana_flashcard",
+      POSTGRES_URL_NON_POOLING:
+        "postgresql://customuser:custompass@localhost:5432/kana_flashcard",
     });
   });
 
@@ -86,8 +92,10 @@ describe("getDatabaseUrls", () => {
 
     // Empty strings should trigger the default values
     expect(result).toEqual({
-      POSTGRES_PRISMA_URL: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
-      POSTGRES_URL_NON_POOLING: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+      POSTGRES_PRISMA_URL:
+        "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+      POSTGRES_URL_NON_POOLING:
+        "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
     });
   });
 
@@ -106,7 +114,11 @@ describe("getDatabaseUrls", () => {
 
     const result = getDatabaseUrls();
 
-    expect(result.POSTGRES_PRISMA_URL).toBe("postgresql://postgres:test@pass#123@localhost:5432/kana_flashcard");
-    expect(result.POSTGRES_URL_NON_POOLING).toBe("postgresql://postgres:test@pass#123@localhost:5432/kana_flashcard");
+    expect(result.POSTGRES_PRISMA_URL).toBe(
+      "postgresql://postgres:test@pass#123@localhost:5432/kana_flashcard",
+    );
+    expect(result.POSTGRES_URL_NON_POOLING).toBe(
+      "postgresql://postgres:test@pass#123@localhost:5432/kana_flashcard",
+    );
   });
 });

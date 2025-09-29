@@ -36,10 +36,14 @@ describe("bg", () => {
     const _originalBackgrounds = { ...backgrounds };
     // @ts-ignore - Temporarily adding a string background for testing
     backgrounds.stringBg = "bg-blue-500";
-    
+
     try {
       const additionalClasses = "p-4 rounded-lg";
-      const result = bg("stringBg" as keyof typeof backgrounds, undefined, additionalClasses);
+      const result = bg(
+        "stringBg" as keyof typeof backgrounds,
+        undefined,
+        additionalClasses,
+      );
       expect(result).toBe(`bg-blue-500 ${additionalClasses}`);
     } finally {
       // Restore the original backgrounds
@@ -81,13 +85,13 @@ describe("createBg", () => {
     const _originalBackgrounds = { ...backgrounds };
     // @ts-ignore - Temporarily adding a string background for testing
     backgrounds.stringBg = "bg-blue-500";
-    
+
     try {
       const bgGenerator = createBg("stringBg" as keyof typeof backgrounds);
-      
+
       // The generator should be a function that takes no arguments
       expect(typeof bgGenerator).toBe("function");
-      
+
       // Test the generator
       // @ts-ignore - Testing the string background generator which takes no arguments
       const result = bgGenerator();
@@ -101,14 +105,14 @@ describe("createBg", () => {
 
   it("should create a background generator for object backgrounds", () => {
     const bgGenerator = createBg("main");
-    
+
     // The generator should be a function that takes a variant
     expect(typeof bgGenerator).toBe("function");
-    
+
     // Test with valid variant
     const result = bgGenerator("fullscreen");
     expect(result).toBe(backgrounds.main.fullscreen);
-    
+
     // Test with another valid variant
     const result2 = bgGenerator("simple");
     expect(result2).toBe(backgrounds.main.simple);
@@ -116,11 +120,11 @@ describe("createBg", () => {
 
   it("should create a background generator for button backgrounds", () => {
     const bgGenerator = createBg("button");
-    
+
     // Test with valid variant
     const result = bgGenerator("primary");
     expect(result).toBe(backgrounds.button.primary);
-    
+
     // Test with another valid variant
     const result2 = bgGenerator("brown");
     expect(result2).toBe(backgrounds.button.brown);
@@ -128,11 +132,11 @@ describe("createBg", () => {
 
   it("should create a background generator for card backgrounds", () => {
     const bgGenerator = createBg("card");
-    
+
     // Test with valid variant
     const result = bgGenerator("flashcard");
     expect(result).toBe(backgrounds.card.flashcard);
-    
+
     // Test with another valid variant
     const result2 = bgGenerator("overlay");
     expect(result2).toBe(backgrounds.card.overlay);
@@ -140,15 +144,15 @@ describe("createBg", () => {
 
   it("should create a background generator for progress backgrounds", () => {
     const bgGenerator = createBg("progress");
-    
+
     // Test with valid variant
     const result = bgGenerator("struggling");
     expect(result).toBe(backgrounds.progress.struggling);
-    
+
     // Test with another valid variant
     const result2 = bgGenerator("good");
     expect(result2).toBe(backgrounds.progress.good);
-    
+
     // Test with third valid variant
     const result3 = bgGenerator("excellent");
     expect(result3).toBe(backgrounds.progress.excellent);
@@ -156,7 +160,7 @@ describe("createBg", () => {
 
   it("should handle invalid variants when using generated functions", () => {
     const bgGenerator = createBg("main");
-    
+
     // @ts-expect-error - Testing invalid variant
     expect(() => bgGenerator("invalid")).not.toThrow();
   });

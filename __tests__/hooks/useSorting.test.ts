@@ -29,8 +29,8 @@ describe("useSorting Hook", () => {
   });
 
   test("uses provided sort direction when specified", () => {
-    const { result } = renderHook(() => 
-      useSorting<{ name: string }>("name", "desc")
+    const { result } = renderHook(() =>
+      useSorting<{ name: string }>("name", "desc"),
     );
 
     expect(result.current.sortColumn).toBe("name");
@@ -38,8 +38,8 @@ describe("useSorting Hook", () => {
   });
 
   test("toggles sort direction when same column is sorted", () => {
-    const { result } = renderHook(() => 
-      useSorting<{ name: string }>("name", "asc")
+    const { result } = renderHook(() =>
+      useSorting<{ name: string }>("name", "asc"),
     );
 
     // Initial state
@@ -66,15 +66,11 @@ describe("useSorting Hook", () => {
   });
 
   test("sorts string data correctly in ascending order", () => {
-    const { result } = renderHook(() => 
-      useSorting<{ name: string }>("name", "asc")
+    const { result } = renderHook(() =>
+      useSorting<{ name: string }>("name", "asc"),
     );
 
-    const testData = [
-      { name: "Charlie" },
-      { name: "Alice" },
-      { name: "Bob" },
-    ];
+    const testData = [{ name: "Charlie" }, { name: "Alice" }, { name: "Bob" }];
 
     const sortedData = result.current.sortedData(testData);
 
@@ -86,15 +82,11 @@ describe("useSorting Hook", () => {
   });
 
   test("sorts string data correctly in descending order", () => {
-    const { result } = renderHook(() => 
-      useSorting<{ name: string }>("name", "desc")
+    const { result } = renderHook(() =>
+      useSorting<{ name: string }>("name", "desc"),
     );
 
-    const testData = [
-      { name: "Charlie" },
-      { name: "Alice" },
-      { name: "Bob" },
-    ];
+    const testData = [{ name: "Charlie" }, { name: "Alice" }, { name: "Bob" }];
 
     const sortedData = result.current.sortedData(testData);
 
@@ -106,48 +98,32 @@ describe("useSorting Hook", () => {
   });
 
   test("sorts numeric data correctly in ascending order", () => {
-    const { result } = renderHook(() => 
-      useSorting<{ value: number }>("value", "asc")
+    const { result } = renderHook(() =>
+      useSorting<{ value: number }>("value", "asc"),
     );
 
-    const testData = [
-      { value: 30 },
-      { value: 10 },
-      { value: 20 },
-    ];
+    const testData = [{ value: 30 }, { value: 10 }, { value: 20 }];
 
     const sortedData = result.current.sortedData(testData);
 
-    expect(sortedData).toEqual([
-      { value: 10 },
-      { value: 20 },
-      { value: 30 },
-    ]);
+    expect(sortedData).toEqual([{ value: 10 }, { value: 20 }, { value: 30 }]);
   });
 
   test("sorts numeric data correctly in descending order", () => {
-    const { result } = renderHook(() => 
-      useSorting<{ value: number }>("value", "desc")
+    const { result } = renderHook(() =>
+      useSorting<{ value: number }>("value", "desc"),
     );
 
-    const testData = [
-      { value: 30 },
-      { value: 10 },
-      { value: 20 },
-    ];
+    const testData = [{ value: 30 }, { value: 10 }, { value: 20 }];
 
     const sortedData = result.current.sortedData(testData);
 
-    expect(sortedData).toEqual([
-      { value: 30 },
-      { value: 20 },
-      { value: 10 },
-    ]);
+    expect(sortedData).toEqual([{ value: 30 }, { value: 20 }, { value: 10 }]);
   });
 
   test("changes sort column and resets direction when new column is sorted", () => {
-    const { result } = renderHook(() => 
-      useSorting<{ name: string; age: number }>("name", "asc")
+    const { result } = renderHook(() =>
+      useSorting<{ name: string; age: number }>("name", "asc"),
     );
 
     // Initial state
@@ -165,15 +141,11 @@ describe("useSorting Hook", () => {
   });
 
   test("does not mutate original data array", () => {
-    const { result } = renderHook(() => 
-      useSorting<{ name: string }>("name", "asc")
+    const { result } = renderHook(() =>
+      useSorting<{ name: string }>("name", "asc"),
     );
 
-    const testData = [
-      { name: "Charlie" },
-      { name: "Alice" },
-      { name: "Bob" },
-    ];
+    const testData = [{ name: "Charlie" }, { name: "Alice" }, { name: "Bob" }];
 
     const sortedData = result.current.sortedData(testData);
 

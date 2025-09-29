@@ -39,7 +39,7 @@ describe("RootLayout", () => {
     const { container: _container } = render(
       <RootLayout>
         <div>Test Content</div>
-      </RootLayout>
+      </RootLayout>,
     );
 
     // The layout should render the Providers component
@@ -51,12 +51,12 @@ describe("RootLayout", () => {
     const { container: _container } = render(
       <RootLayout>
         <div>Test Content</div>
-      </RootLayout>
+      </RootLayout>,
     );
 
     // Check that the main content is rendered
     expect(screen.getByText("Test Content")).toBeInTheDocument();
-    
+
     // Check that the Providers component is wrapping the content
     const providersElement = screen.getByTestId("mock-providers");
     expect(providersElement).toContainElement(screen.getByText("Test Content"));
@@ -66,10 +66,12 @@ describe("RootLayout", () => {
     const { container: _container } = render(
       <RootLayout>
         <div>Test Content</div>
-      </RootLayout>
+      </RootLayout>,
     );
 
-    const scriptElement = _container.querySelector('script[type="application/ld+json"]');
+    const scriptElement = _container.querySelector(
+      'script[type="application/ld+json"]',
+    );
     expect(scriptElement).toBeInTheDocument();
 
     // Parse and validate the JSON-LD content
@@ -99,7 +101,7 @@ describe("RootLayout", () => {
     const { container: _container, getByTestId } = render(
       <RootLayout>
         <div data-testid="test-child">Test Content</div>
-      </RootLayout>
+      </RootLayout>,
     );
 
     // Check that the mocked Providers component is rendered
@@ -116,7 +118,7 @@ describe("RootLayout", () => {
     const { getByText } = render(
       <RootLayout>
         <div>Test Child Content</div>
-      </RootLayout>
+      </RootLayout>,
     );
 
     expect(getByText("Test Child Content")).toBeInTheDocument();

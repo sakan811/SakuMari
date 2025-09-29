@@ -38,17 +38,23 @@ export function useFlashcardHandlers({
   setSelectedChoice,
   setError,
 }: UseFlashcardHandlersProps): UseFlashcardHandlersReturn {
-  const handleModeChange = useCallback((mode: InteractionMode) => {
-    if (isSubmitting || result) return;
-    setInteractionMode(mode);
-    // State will be cleared by useEffect
-  }, [isSubmitting, result, setInteractionMode]);
+  const handleModeChange = useCallback(
+    (mode: InteractionMode) => {
+      if (isSubmitting || result) return;
+      setInteractionMode(mode);
+      // State will be cleared by useEffect
+    },
+    [isSubmitting, result, setInteractionMode],
+  );
 
-  const handleChoiceSelect = useCallback((index: number) => {
-    if (isSubmitting || result) return;
-    setSelectedChoice(index);
-    setError("");
-  }, [isSubmitting, result, setSelectedChoice, setError]);
+  const handleChoiceSelect = useCallback(
+    (index: number) => {
+      if (isSubmitting || result) return;
+      setSelectedChoice(index);
+      setError("");
+    },
+    [isSubmitting, result, setSelectedChoice, setError],
+  );
 
   return {
     handleModeChange,

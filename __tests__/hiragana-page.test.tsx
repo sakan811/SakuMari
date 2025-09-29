@@ -34,11 +34,7 @@ describe("Hiragana Page", () => {
 });
 
 // Create additional test suite using shared utilities
-createKanaPageTests(
-  "Hiragana",
-  "hiragana",
-  () => {
-    // Additional shared test logic can go here
-    expect("hiragana").toBe("hiragana");
-  }
-);
+createKanaPageTests("Hiragana", "hiragana", () => {
+  // Additional shared test logic can go here
+  expect("hiragana").toBe("hiragana");
+});

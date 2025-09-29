@@ -49,20 +49,22 @@ export function createApiTestMocks() {
 /**
  * Creates a mock Prisma client with raw SQL support
  */
-export function createMockPrismaClient(overrides: Record<string, unknown> = {}) {
+export function createMockPrismaClient(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     $queryRaw: vi.fn(),
     $executeRaw: vi.fn(),
     kana: {
       findMany: vi.fn(),
       findFirst: vi.fn(),
-      ...(overrides?.kana as Record<string, unknown> || {}),
+      ...((overrides?.kana as Record<string, unknown>) || {}),
     },
     kanaProgress: {
       findMany: vi.fn(),
       findFirst: vi.fn(),
       upsert: vi.fn(),
-      ...(overrides?.kanaProgress as Record<string, unknown> || {}),
+      ...((overrides?.kanaProgress as Record<string, unknown>) || {}),
     },
     ...overrides,
   };
@@ -112,7 +114,7 @@ export function createMockRequest(
   url: string,
   method: string = "GET",
   body?: unknown,
-  headers: Record<string, string> = {}
+  headers: Record<string, string> = {},
 ): NextRequest {
   const requestInit: RequestInit = {
     method,
@@ -135,13 +137,13 @@ export function createMockRequest(
 export function createFlashcardSubmitRequest(
   kanaId: string,
   isCorrect: boolean,
-  additionalData: Record<string, unknown> = {}
+  additionalData: Record<string, unknown> = {},
 ) {
-  return createMockRequest(
-    "http://localhost/api/flashcards/submit",
-    "POST",
-    { kanaId, isCorrect, ...additionalData }
-  );
+  return createMockRequest("http://localhost/api/flashcards/submit", "POST", {
+    kanaId,
+    isCorrect,
+    ...additionalData,
+  });
 }
 
 /**
@@ -162,7 +164,9 @@ export function createMockKanaData(overrides: Record<string, unknown> = {}) {
 /**
  * Creates mock kana progress data for API responses
  */
-export function createMockKanaProgressData(overrides: Record<string, unknown> = {}) {
+export function createMockKanaProgressData(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     id: "test-progress-id",
     kana_id: "test-kana-id",
@@ -177,7 +181,10 @@ export function createMockKanaProgressData(overrides: Record<string, unknown> = 
 /**
  * Sets up database error scenario for API tests
  */
-export function setupDatabaseError(mockPrisma: ReturnType<typeof createMockPrismaClient>, errorMessage: string = "Database connection failed") {
+export function setupDatabaseError(
+  mockPrisma: ReturnType<typeof createMockPrismaClient>,
+  errorMessage: string = "Database connection failed",
+) {
   mockPrisma.$queryRaw.mockRejectedValue(new Error(errorMessage));
   mockPrisma.$executeRaw.mockRejectedValue(new Error(errorMessage));
   mockPrisma.kana.findMany.mockRejectedValue(new Error(errorMessage));
