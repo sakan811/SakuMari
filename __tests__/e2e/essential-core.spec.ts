@@ -79,19 +79,19 @@ test.describe("Essential Core Functionality", () => {
     });
 
     test("should navigate to hiragana practice", async ({ page }) => {
-      await page.getByText("ひらがな Hiragana").click();
+      await page.getByRole("link", { name: "ひらがな Hiragana" }).first().click();
       await page.waitForURL("/hiragana");
       await expect(page.getByTestId("current-kana")).toBeVisible();
     });
 
     test("should navigate to katakana practice", async ({ page }) => {
-      await page.getByText("カタカナ Katakana").click();
+      await page.getByRole("link", { name: "カタカナ Katakana" }).first().click();
       await page.waitForURL("/katakana");
       await expect(page.getByTestId("current-kana")).toBeVisible();
     });
 
     test("should navigate to dashboard", async ({ page }) => {
-      await page.getByText("Dashboard").click();
+      await page.getByRole("link", { name: "📊 Dashboard" }).click();
       await page.waitForURL("/dashboard");
       await expect(page.getByText("Dashboard")).toBeVisible();
     });
