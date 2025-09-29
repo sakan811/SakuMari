@@ -139,6 +139,7 @@ test.describe("Essential Core Functionality", () => {
       const choices = await page.locator('[data-testid^="choice-button-"]').all();
       if (choices.length > 0) {
         await choices[0].click();
+        await page.getByRole("button", { name: "Submit" }).click();
         await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
       }
     });
