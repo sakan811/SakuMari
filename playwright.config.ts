@@ -12,7 +12,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : 4,
+  workers: process.env.CI ? 1 : 2,
   reporter: "html",
 
   // Playwright will manage the Next.js server
@@ -88,6 +88,25 @@ export default defineConfig({
       },
       dependencies: ["setup"],
       testIgnore: /.*seo-metadata\.spec\.ts/,
+    },
+    {
+      name: "mobile-chromium",
+      use: {
+        ...devices["iPhone 12"],
+        storageState: "playwright/.auth/user.json",
+        hasTouch: true,
+      },
+      dependencies: ["setup"],
+      testMatch: /.*mobile-.*authenticated\.spec\.ts/,
+    },
+    {
+      name: "mobile-chromium-unauth",
+      use: {
+        ...devices["iPhone 12"],
+        hasTouch: true,
+      },
+      testMatch: /.*mobile-.*\.spec\.ts/,
+      testIgnore: /.*mobile-.*authenticated\.spec\.ts/,
     },
   ],
 });
