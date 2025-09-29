@@ -2,16 +2,36 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Essential Core Functionality", () => {
   test.describe("Authentication", () => {
+    test.use({ storageState: { cookies: [], origins: [] } });
+
     test("should show Google OAuth option", async ({ page }) => {
       await page.goto("/");
-      await page.getByRole("button", { name: "Sign In" }).click();
+
+      // For mobile tests, we need to open the mobile menu first
+      const isMobile = page.viewportSize()?.width < 1024;
+      if (isMobile) {
+        await page.getByRole("button", { name: "Toggle mobile menu" }).click();
+        await page.getByRole("button", { name: "Sign In with Google" }).click();
+      } else {
+        await page.getByRole("button", { name: "Sign In" }).click();
+      }
+
       await page.waitForURL(/.*signin.*/);
       await expect(page.getByText("Sign In with Google")).toBeVisible();
     });
 
     test("should authenticate with credentials provider", async ({ page }) => {
       await page.goto("/");
-      await page.getByRole("button", { name: "Sign In" }).click();
+
+      // For mobile tests, we need to open the mobile menu first
+      const isMobile = page.viewportSize()?.width < 1024;
+      if (isMobile) {
+        await page.getByRole("button", { name: "Toggle mobile menu" }).click();
+        await page.getByRole("button", { name: "Sign In with Google" }).click();
+      } else {
+        await page.getByRole("button", { name: "Sign In" }).click();
+      }
+
       await page.waitForURL(/.*signin.*/);
       await page.fill('input[name="email"]', "test@sakumari.local");
       await page.fill('input[name="password"]', "TestPassword123!");
@@ -23,7 +43,16 @@ test.describe("Essential Core Functionality", () => {
     test("should show sign in options for unauthenticated users", async ({ page }) => {
       await page.goto("/");
       await expect(page.getByText("Welcome to SakuMari!")).toBeVisible();
-      await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible();
+
+      // For mobile tests, we need to open the mobile menu first
+      const isMobile = page.viewportSize()?.width < 1024;
+      if (isMobile) {
+        await page.getByRole("button", { name: "Toggle mobile menu" }).click();
+        await expect(page.getByRole("button", { name: "Sign In with Google" })).toBeVisible();
+        await expect(page.getByRole("button", { name: "Sign In with Credentials" })).toBeVisible();
+      } else {
+        await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible();
+      }
     });
   });
 
@@ -32,7 +61,16 @@ test.describe("Essential Core Functionality", () => {
 
     test.beforeEach(async ({ page }) => {
       await page.goto("/");
-      await page.getByRole("button", { name: "Sign In" }).click();
+
+      // For mobile tests, we need to open the mobile menu first
+      const isMobile = page.viewportSize()?.width < 1024;
+      if (isMobile) {
+        await page.getByRole("button", { name: "Toggle mobile menu" }).click();
+        await page.getByRole("button", { name: "Sign In with Google" }).click();
+      } else {
+        await page.getByRole("button", { name: "Sign In" }).click();
+      }
+
       await page.waitForURL(/.*signin.*/);
       await page.fill('input[name="email"]', "test@sakumari.local");
       await page.fill('input[name="password"]', "TestPassword123!");
@@ -64,7 +102,16 @@ test.describe("Essential Core Functionality", () => {
 
     test.beforeEach(async ({ page }) => {
       await page.goto("/");
-      await page.getByRole("button", { name: "Sign In" }).click();
+
+      // For mobile tests, we need to open the mobile menu first
+      const isMobile = page.viewportSize()?.width < 1024;
+      if (isMobile) {
+        await page.getByRole("button", { name: "Toggle mobile menu" }).click();
+        await page.getByRole("button", { name: "Sign In with Google" }).click();
+      } else {
+        await page.getByRole("button", { name: "Sign In" }).click();
+      }
+
       await page.waitForURL(/.*signin.*/);
       await page.fill('input[name="email"]', "test@sakumari.local");
       await page.fill('input[name="password"]', "TestPassword123!");
@@ -127,7 +174,16 @@ test.describe("Essential Core Functionality", () => {
 
     test.beforeEach(async ({ page }) => {
       await page.goto("/");
-      await page.getByRole("button", { name: "Sign In" }).click();
+
+      // For mobile tests, we need to open the mobile menu first
+      const isMobile = page.viewportSize()?.width < 1024;
+      if (isMobile) {
+        await page.getByRole("button", { name: "Toggle mobile menu" }).click();
+        await page.getByRole("button", { name: "Sign In with Google" }).click();
+      } else {
+        await page.getByRole("button", { name: "Sign In" }).click();
+      }
+
       await page.waitForURL(/.*signin.*/);
       await page.fill('input[name="email"]', "test@sakumari.local");
       await page.fill('input[name="password"]', "TestPassword123!");
