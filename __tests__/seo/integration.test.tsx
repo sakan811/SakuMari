@@ -157,11 +157,11 @@ describe("SEO Integration Tests", () => {
 
       // Check for clear value proposition that aligns with meta descriptions
       expect(
-        await screen.findByText(/master hiragana and katakana/i),
+        await screen.findByText(/master japanese characters/i),
       ).toBeInTheDocument();
       expect(
-        await screen.findByText(/interactive practice/i),
-      ).toBeInTheDocument();
+        await screen.findAllByText(/Practice the.*characters/i),
+      ).toHaveLength(2);
     });
 
     it("should have consistent navigation structure", async () => {
