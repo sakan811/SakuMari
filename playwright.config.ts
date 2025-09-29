@@ -46,24 +46,17 @@ export default defineConfig({
     },
 
     {
-      name: "seo-chromium",
-      use: {
-        ...devices["Desktop Chrome"],
-      },
-      testMatch: /.*seo-metadata\.spec\.ts/,
-    },
-
-    {
-      name: "chromium",
+      name: "desktop-essential",
       use: {
         ...devices["Desktop Chrome"],
         storageState: "playwright/.auth/user.json",
       },
       dependencies: ["setup"],
-      testIgnore: /.*seo-metadata\.spec\.ts/,
+      testMatch: /.*essential-.*\.spec\.ts$/,
     },
+
     {
-      name: "firefox",
+      name: "desktop-cross-browser",
       use: {
         ...devices["Desktop Firefox"],
         storageState: "playwright/.auth/user.json",
@@ -78,35 +71,26 @@ export default defineConfig({
         },
       },
       dependencies: ["setup"],
-      testIgnore: /.*seo-metadata\.spec\.ts/,
+      testMatch: /.*essential-.*\.spec\.ts$/,
     },
+
     {
-      name: "webkit",
-      use: {
-        ...devices["Desktop Safari"],
-        storageState: "playwright/.auth/user.json",
-      },
-      dependencies: ["setup"],
-      testIgnore: /.*seo-metadata\.spec\.ts/,
-    },
-    {
-      name: "mobile-chromium",
+      name: "mobile-essential",
       use: {
         ...devices["iPhone 12"],
         storageState: "playwright/.auth/user.json",
         hasTouch: true,
       },
       dependencies: ["setup"],
-      testMatch: /.*mobile-.*authenticated\.spec\.ts/,
+      testMatch: /.*essential-.*\.spec\.ts$/,
     },
+
     {
-      name: "mobile-chromium-unauth",
+      name: "seo-health",
       use: {
-        ...devices["iPhone 12"],
-        hasTouch: true,
+        ...devices["Desktop Chrome"],
       },
-      testMatch: /.*mobile-.*\.spec\.ts/,
-      testIgnore: /.*mobile-.*authenticated\.spec\.ts/,
+      testMatch: /.*seo-health\.spec\.ts$/,
     },
   ],
 });
