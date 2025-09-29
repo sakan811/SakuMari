@@ -91,7 +91,7 @@ test.describe("Essential Core Functionality", () => {
     });
 
     test("should navigate to dashboard", async ({ page }) => {
-      await page.getByRole("link", { name: "📊 Dashboard" }).click();
+      await page.getByRole("link", { name: "📊 View Your Progress" }).click();
       await page.waitForURL("/dashboard");
       await expect(page.getByText("Dashboard")).toBeVisible();
     });
@@ -204,7 +204,7 @@ test.describe("Essential Core Functionality", () => {
     test("should display progress dashboard", async ({ page }) => {
       await page.goto("/dashboard");
       await expect(page.getByText("Dashboard")).toBeVisible();
-      await expect(page.getByText("Progress Overview")).toBeVisible();
+      await expect(page.getByText("Your Progress")).toBeVisible();
     });
 
     test("should filter characters by type", async ({ page }) => {
