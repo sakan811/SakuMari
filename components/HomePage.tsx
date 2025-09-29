@@ -139,7 +139,8 @@ export default function HomePage() {
                   Learn Japanese Characters
                 </h3>
                 <p className="text-sm sm:text-base text-[#705a39]">
-                  Master both Hiragana and Katakana with our interactive flashcards
+                  Master both Hiragana and Katakana with our interactive
+                  flashcards
                 </p>
               </div>
               <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 sm:p-8 border-2 border-[#705a39] text-center">
@@ -148,7 +149,8 @@ export default function HomePage() {
                   Adaptive Learning
                 </h3>
                 <p className="text-sm sm:text-base text-[#705a39]">
-                  Smart algorithm focuses on characters you need the most practice with
+                  Smart algorithm focuses on characters you need the most
+                  practice with
                 </p>
               </div>
               <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 sm:p-8 border-2 border-[#705a39] text-center">
@@ -157,7 +159,8 @@ export default function HomePage() {
                   Progress Tracking
                 </h3>
                 <p className="text-sm sm:text-base text-[#705a39]">
-                  Track your learning journey with detailed statistics and achievements
+                  Track your learning journey with detailed statistics and
+                  achievements
                 </p>
               </div>
               <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 sm:p-8 border-2 border-[#705a39] text-center">
@@ -166,7 +169,8 @@ export default function HomePage() {
                   AI-Powered Tips
                 </h3>
                 <p className="text-sm sm:text-base text-[#705a39]">
-                  Get personalized learning recommendations powered by Google Gemini AI
+                  Get personalized learning recommendations powered by Google
+                  Gemini AI
                 </p>
               </div>
             </div>

@@ -47,7 +47,9 @@ test.describe("Performance and Critical Accessibility", () => {
       expect(loadTime).toBeLessThan(3000);
     });
 
-    test("should respond quickly to flashcard interactions", async ({ page }) => {
+    test("should respond quickly to flashcard interactions", async ({
+      page,
+    }) => {
       await page.goto("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
 
@@ -55,14 +57,18 @@ test.describe("Performance and Critical Accessibility", () => {
       await page.getByPlaceholder("Type romaji equivalent...").fill("a");
       const submitStartTime = Date.now();
       await page.getByRole("button", { name: "Submit" }).click();
-      await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
+      await expect(
+        page.getByText("Correct!").or(page.getByText("Incorrect!")),
+      ).toBeVisible();
       const responseTime = Date.now() - submitStartTime;
       expect(responseTime).toBeLessThan(1000);
 
       // Test next card response time
       const nextStartTime = Date.now();
       await page.getByRole("button", { name: "Next Card" }).click();
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeVisible();
       const nextResponseTime = Date.now() - nextStartTime;
       expect(nextResponseTime).toBeLessThan(1000);
     });
@@ -87,13 +93,17 @@ test.describe("Performance and Critical Accessibility", () => {
 
       // Test Tab navigation through interactive elements
       await page.keyboard.press("Tab");
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeFocused();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeFocused();
 
       await page.keyboard.press("Tab");
       await expect(page.getByRole("button", { name: "Submit" })).toBeFocused();
 
       await page.keyboard.press("Tab");
-      await expect(page.getByRole("button", { name: "Next Card" })).toBeFocused();
+      await expect(
+        page.getByRole("button", { name: "Next Card" }),
+      ).toBeFocused();
     });
 
     test("should have proper ARIA labels", async ({ page }) => {
@@ -148,7 +158,7 @@ test.describe("Performance and Critical Accessibility", () => {
         return {
           color: styles.color,
           backgroundColor: styles.backgroundColor,
-          fontSize: styles.fontSize
+          fontSize: styles.fontSize,
         };
       });
 
@@ -168,7 +178,9 @@ test.describe("Performance and Critical Accessibility", () => {
       // Test focus after form submission
       await inputField.fill("a");
       await page.getByRole("button", { name: "Submit" }).click();
-      await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
+      await expect(
+        page.getByText("Correct!").or(page.getByText("Incorrect!")),
+      ).toBeVisible();
 
       // Focus should move to next button or remain manageable
       const nextButton = page.getByRole("button", { name: "Next Card" });

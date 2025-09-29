@@ -40,7 +40,9 @@ test.describe("Essential Core Functionality", () => {
       await expect(page.getByText("ひらがな Hiragana Practice")).toBeVisible();
     });
 
-    test("should show sign in options for unauthenticated users", async ({ page }) => {
+    test("should show sign in options for unauthenticated users", async ({
+      page,
+    }) => {
       await page.goto("/");
       await expect(page.getByText("Welcome to SakuMari!")).toBeVisible();
 
@@ -48,10 +50,16 @@ test.describe("Essential Core Functionality", () => {
       const isMobile = page.viewportSize()?.width < 1024;
       if (isMobile) {
         await page.getByRole("button", { name: "Toggle mobile menu" }).click();
-        await expect(page.getByRole("button", { name: "Sign In with Google" })).toBeVisible();
-        await expect(page.getByRole("button", { name: "Sign In with Credentials" })).toBeVisible();
+        await expect(
+          page.getByRole("button", { name: "Sign In with Google" }),
+        ).toBeVisible();
+        await expect(
+          page.getByRole("button", { name: "Sign In with Credentials" }),
+        ).toBeVisible();
       } else {
-        await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible();
+        await expect(
+          page.getByRole("button", { name: "Sign In" }),
+        ).toBeVisible();
       }
     });
   });
@@ -79,13 +87,19 @@ test.describe("Essential Core Functionality", () => {
     });
 
     test("should navigate to hiragana practice", async ({ page }) => {
-      await page.getByRole("link", { name: "ひらがな Hiragana" }).first().click();
+      await page
+        .getByRole("link", { name: "ひらがな Hiragana" })
+        .first()
+        .click();
       await page.waitForURL("/hiragana");
       await expect(page.getByTestId("current-kana")).toBeVisible();
     });
 
     test("should navigate to katakana practice", async ({ page }) => {
-      await page.getByRole("link", { name: "カタカナ Katakana" }).first().click();
+      await page
+        .getByRole("link", { name: "カタカナ Katakana" })
+        .first()
+        .click();
       await page.waitForURL("/katakana");
       await expect(page.getByTestId("current-kana")).toBeVisible();
     });
@@ -125,10 +139,14 @@ test.describe("Essential Core Functionality", () => {
 
       await page.getByPlaceholder("Type romaji equivalent...").fill("a");
       await page.getByRole("button", { name: "Submit" }).click();
-      await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
+      await expect(
+        page.getByText("Correct!").or(page.getByText("Incorrect!")),
+      ).toBeVisible();
     });
 
-    test("should practice katakana in multiple choice mode", async ({ page }) => {
+    test("should practice katakana in multiple choice mode", async ({
+      page,
+    }) => {
       await page.goto("/katakana");
       await page.waitForSelector('[data-testid="current-kana"]');
 
@@ -136,11 +154,15 @@ test.describe("Essential Core Functionality", () => {
       await expect(page.getByText("Tap to select your answer")).toBeVisible();
 
       await page.waitForSelector('[data-testid^="choice-button-"]');
-      const choices = await page.locator('[data-testid^="choice-button-"]').all();
+      const choices = await page
+        .locator('[data-testid^="choice-button-"]')
+        .all();
       if (choices.length > 0) {
         await choices[0].click();
         await page.getByRole("button", { name: "Submit" }).click();
-        await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
+        await expect(
+          page.getByText("Correct!").or(page.getByText("Incorrect!")),
+        ).toBeVisible();
       }
     });
 
@@ -152,7 +174,9 @@ test.describe("Essential Core Functionality", () => {
       await expect(page.getByText("Tap to select your answer")).toBeVisible();
 
       await page.getByTestId("typing-button").click();
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeVisible();
     });
 
     test("should show next card after submission", async ({ page }) => {
@@ -212,7 +236,9 @@ test.describe("Essential Core Functionality", () => {
       await expect(page.getByText("Dashboard")).toBeVisible();
 
       // Test filtering functionality
-      const filterButtons = page.locator('button:has-text("All"), button:has-text("Hiragana"), button:has-text("Katakana")');
+      const filterButtons = page.locator(
+        'button:has-text("All"), button:has-text("Hiragana"), button:has-text("Katakana")',
+      );
       const count = await filterButtons.count();
       expect(count).toBeGreaterThan(0);
     });

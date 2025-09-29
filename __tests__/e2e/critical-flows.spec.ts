@@ -27,7 +27,9 @@ test.describe("Critical Integration Flows", () => {
         await page.waitForSelector('[data-testid="current-kana"]');
         await page.getByPlaceholder("Type romaji equivalent...").fill("a");
         await page.getByRole("button", { name: "Submit" }).click();
-        await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
+        await expect(
+          page.getByText("Correct!").or(page.getByText("Incorrect!")),
+        ).toBeVisible();
         await page.getByRole("button", { name: "Next Card" }).click();
       }
 
@@ -41,10 +43,14 @@ test.describe("Critical Integration Flows", () => {
         await page.getByTestId("multiple-choice-button").click();
         await expect(page.getByText("Tap to select your answer")).toBeVisible();
         await page.waitForSelector('[data-testid^="choice-button-"]');
-        const choices = await page.locator('[data-testid^="choice-button-"]').all();
+        const choices = await page
+          .locator('[data-testid^="choice-button-"]')
+          .all();
         if (choices.length > 0) {
           await choices[0].click();
-          await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
+          await expect(
+            page.getByText("Correct!").or(page.getByText("Incorrect!")),
+          ).toBeVisible();
           await page.getByRole("button", { name: "Next Card" }).click();
         }
       }
@@ -55,7 +61,9 @@ test.describe("Critical Integration Flows", () => {
       await expect(page.getByText("Progress Overview")).toBeVisible();
     });
 
-    test("should handle practice session with mode switching", async ({ page }) => {
+    test("should handle practice session with mode switching", async ({
+      page,
+    }) => {
       await page.goto("/");
       await page.getByRole("button", { name: "Sign In" }).click();
       await page.waitForURL(/.*signin.*/);
@@ -70,21 +78,29 @@ test.describe("Critical Integration Flows", () => {
       // Start with typing mode
       await page.getByPlaceholder("Type romaji equivalent...").fill("a");
       await page.getByRole("button", { name: "Submit" }).click();
-      await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
+      await expect(
+        page.getByText("Correct!").or(page.getByText("Incorrect!")),
+      ).toBeVisible();
 
       // Switch to multiple choice mode
       await page.getByTestId("multiple-choice-button").click();
       await expect(page.getByText("Tap to select your answer")).toBeVisible();
       await page.waitForSelector('[data-testid^="choice-button-"]');
-      const choices = await page.locator('[data-testid^="choice-button-"]').all();
+      const choices = await page
+        .locator('[data-testid^="choice-button-"]')
+        .all();
       if (choices.length > 0) {
         await choices[0].click();
-        await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
+        await expect(
+          page.getByText("Correct!").or(page.getByText("Incorrect!")),
+        ).toBeVisible();
       }
 
       // Switch back to typing mode
       await page.getByTestId("typing-button").click();
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeVisible();
     });
   });
 
@@ -120,7 +136,9 @@ test.describe("Critical Integration Flows", () => {
         await page.waitForSelector('[data-testid="current-kana"]');
         await page.getByPlaceholder("Type romaji equivalent...").fill("a");
         await page.getByRole("button", { name: "Submit" }).click();
-        await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
+        await expect(
+          page.getByText("Correct!").or(page.getByText("Incorrect!")),
+        ).toBeVisible();
         await page.getByRole("button", { name: "Next Card" }).click();
       }
 
@@ -200,7 +218,9 @@ test.describe("Critical Integration Flows", () => {
       await expect(page.getByTestId("current-kana")).toBeVisible();
     });
 
-    test("should handle protected route access for unauthenticated users", async ({ page }) => {
+    test("should handle protected route access for unauthenticated users", async ({
+      page,
+    }) => {
       // Try to access protected routes without authentication
       await page.goto("/hiragana");
       await page.waitForURL("/"); // Should redirect to home
