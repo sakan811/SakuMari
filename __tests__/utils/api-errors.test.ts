@@ -41,7 +41,12 @@ vi.mock("next/server", () => ({
 }));
 
 // Import the modules to test after mocking
-import { ApiError, withErrorHandler, ApiErrors, TipsApiErrors } from "@/lib/api-errors";
+import {
+  ApiError,
+  withErrorHandler,
+  ApiErrors,
+  TipsApiErrors,
+} from "@/lib/api-errors";
 
 describe("ApiError", () => {
   describe("constructor", () => {
@@ -49,9 +54,9 @@ describe("ApiError", () => {
       const message = "Test error message";
       const status = 400;
       const code = "TEST_ERROR";
-      
+
       const error = new ApiError(message, status, code);
-      
+
       expect(error.message).toBe(message);
       expect(error.status).toBe(status);
       expect(error.code).toBe(code);
@@ -61,9 +66,9 @@ describe("ApiError", () => {
     it("should work without the optional code parameter", () => {
       const message = "Test error message";
       const status = 404;
-      
+
       const error = new ApiError(message, status);
-      
+
       expect(error.message).toBe(message);
       expect(error.status).toBe(status);
       expect(error.code).toBeUndefined();
@@ -115,7 +120,9 @@ describe("withErrorHandler", () => {
   });
 
   it("should handle generic Error instances with 'GEMINI_API_KEY' message", async () => {
-    const genericError = new Error("Missing GEMINI_API_KEY environment variable");
+    const genericError = new Error(
+      "Missing GEMINI_API_KEY environment variable",
+    );
     const handler = vi.fn().mockRejectedValue(genericError);
 
     const wrappedHandler = withErrorHandler(handler);
@@ -123,7 +130,9 @@ describe("withErrorHandler", () => {
 
     expect(result.status).toBe(503);
     const responseData = await result.json();
-    expect(responseData.error).toBe("AI service not configured. Please contact support.");
+    expect(responseData.error).toBe(
+      "AI service not configured. Please contact support.",
+    );
     expect(responseData.code).toBe("AI_SERVICE_UNAVAILABLE");
   });
 
@@ -145,7 +154,7 @@ describe("ApiErrors", () => {
   describe("unauthorized", () => {
     it("should return an unauthorized error response", () => {
       const response = ApiErrors.unauthorized();
-      
+
       expect(response.status).toBe(401);
       expect(response.json()).resolves.toEqual({
         error: "Unauthorized",
@@ -158,7 +167,7 @@ describe("ApiErrors", () => {
     it("should return a not found error response with a resource", () => {
       const resource = "User";
       const response = ApiErrors.notFound(resource);
-      
+
       expect(response.status).toBe(404);
       expect(response.json()).resolves.toEqual({
         error: "User not found",
@@ -168,7 +177,7 @@ describe("ApiErrors", () => {
 
     it("should return a not found error response without a resource", () => {
       const response = ApiErrors.notFound();
-      
+
       expect(response.status).toBe(404);
       expect(response.json()).resolves.toEqual({
         error: "Resource not found",
@@ -181,7 +190,7 @@ describe("ApiErrors", () => {
     it("should return a service unavailable error response with a custom message", () => {
       const customMessage = "Database maintenance in progress";
       const response = ApiErrors.serviceUnavailable(customMessage);
-      
+
       expect(response.status).toBe(503);
       expect(response.json()).resolves.toEqual({
         error: "Database maintenance in progress",
@@ -191,19 +200,19 @@ describe("ApiErrors", () => {
 
     it("should return a service unavailable error response with default message", () => {
       const response = ApiErrors.serviceUnavailable();
-      
+
       expect(response.status).toBe(503);
       expect(response.json()).resolves.toEqual({
         error: "Service temporarily unavailable",
         code: "SERVICE_UNAVAILABLE",
       });
     });
-  
+
     describe("badRequest", () => {
       it("should return a bad request error response with a custom message", () => {
         const message = "Invalid input data";
         const response = ApiErrors.badRequest(message);
-        
+
         expect(response.status).toBe(400);
         expect(response.json()).resolves.toEqual({
           error: "Invalid input data",
@@ -211,22 +220,22 @@ describe("ApiErrors", () => {
         });
       });
     });
-  
+
     describe("internalError", () => {
       it("should return an internal error response with a custom message", () => {
         const message = "Database connection failed";
         const response = ApiErrors.internalError(message);
-        
+
         expect(response.status).toBe(500);
         expect(response.json()).resolves.toEqual({
           error: "Database connection failed",
           code: "INTERNAL_ERROR",
         });
       });
-  
+
       it("should return an internal error response with default message", () => {
         const response = ApiErrors.internalError();
-        
+
         expect(response.status).toBe(500);
         expect(response.json()).resolves.toEqual({
           error: "Internal server error",
@@ -235,12 +244,12 @@ describe("ApiErrors", () => {
       });
     });
   });
-  
+
   describe("badRequest", () => {
     it("should return a bad request error response with a custom message", () => {
       const message = "Invalid input data";
       const response = ApiErrors.badRequest(message);
-      
+
       expect(response.status).toBe(400);
       expect(response.json()).resolves.toEqual({
         error: "Invalid input data",
@@ -253,7 +262,7 @@ describe("ApiErrors", () => {
     it("should return an internal error response with a custom message", () => {
       const message = "Database connection failed";
       const response = ApiErrors.internalError(message);
-      
+
       expect(response.status).toBe(500);
       expect(response.json()).resolves.toEqual({
         error: "Database connection failed",
@@ -263,7 +272,7 @@ describe("ApiErrors", () => {
 
     it("should return an internal error response with default message", () => {
       const response = ApiErrors.internalError();
-      
+
       expect(response.status).toBe(500);
       expect(response.json()).resolves.toEqual({
         error: "Internal server error",
@@ -277,7 +286,7 @@ describe("TipsApiErrors", () => {
   describe("missingUserQuery", () => {
     it("should return a missing user query error response", () => {
       const response = TipsApiErrors.missingUserQuery();
-      
+
       expect(response.status).toBe(400);
       expect(response.json()).resolves.toEqual({
         error: "Please provide a question about Japanese kana learning",
@@ -290,7 +299,7 @@ describe("TipsApiErrors", () => {
     it("should return a query too long error response", () => {
       const maxLength = 100;
       const response = TipsApiErrors.queryTooLong(maxLength);
-      
+
       expect(response.status).toBe(400);
       expect(response.json()).resolves.toEqual({
         error: "Question too long. Please keep it under 100 characters.",
@@ -302,10 +311,11 @@ describe("TipsApiErrors", () => {
   describe("generationFailed", () => {
     it("should return a generation failed error response", () => {
       const response = TipsApiErrors.generationFailed();
-      
+
       expect(response.status).toBe(500);
       expect(response.json()).resolves.toEqual({
-        error: "Unable to generate learning tips at this time. Please try again.",
+        error:
+          "Unable to generate learning tips at this time. Please try again.",
         code: "GENERATION_FAILED",
       });
     });
@@ -314,7 +324,7 @@ describe("TipsApiErrors", () => {
   describe("aiServiceNotConfigured", () => {
     it("should return an AI service not configured error response", () => {
       const response = TipsApiErrors.aiServiceNotConfigured();
-      
+
       expect(response.status).toBe(503);
       expect(response.json()).resolves.toEqual({
         error: "AI service not configured. Please contact support.",
@@ -326,7 +336,7 @@ describe("TipsApiErrors", () => {
   describe("generationError", () => {
     it("should return a generation error response", () => {
       const response = TipsApiErrors.generationError();
-      
+
       expect(response.status).toBe(500);
       expect(response.json()).resolves.toEqual({
         error: "Unable to generate learning tips. Please try again later.",
@@ -337,7 +347,9 @@ describe("TipsApiErrors", () => {
   // Tests from api-errors-uncovered.test.ts
   describe("GEMINI_API_KEY error handling", () => {
     it("handles generic Error instances with 'GEMINI_API_KEY' message", async () => {
-      const genericError = new Error("Missing GEMINI_API_KEY environment variable");
+      const genericError = new Error(
+        "Missing GEMINI_API_KEY environment variable",
+      );
       const handler = vi.fn().mockRejectedValue(genericError);
 
       const wrappedHandler = withErrorHandler(handler);
@@ -345,12 +357,16 @@ describe("TipsApiErrors", () => {
 
       expect(result.status).toBe(503);
       const responseData = await result.json();
-      expect(responseData.error).toBe("AI service not configured. Please contact support.");
+      expect(responseData.error).toBe(
+        "AI service not configured. Please contact support.",
+      );
       expect(responseData.code).toBe("AI_SERVICE_UNAVAILABLE");
     });
 
     it("handles generic Error instances with 'GEMINI_API_KEY' in the middle of message", async () => {
-      const genericError = new Error("Error: GEMINI_API_KEY is not set in environment");
+      const genericError = new Error(
+        "Error: GEMINI_API_KEY is not set in environment",
+      );
       const handler = vi.fn().mockRejectedValue(genericError);
 
       const wrappedHandler = withErrorHandler(handler);
@@ -358,12 +374,16 @@ describe("TipsApiErrors", () => {
 
       expect(result.status).toBe(503);
       const responseData = await result.json();
-      expect(responseData.error).toBe("AI service not configured. Please contact support.");
+      expect(responseData.error).toBe(
+        "AI service not configured. Please contact support.",
+      );
       expect(responseData.code).toBe("AI_SERVICE_UNAVAILABLE");
     });
 
     it("does not handle other error messages with 'gemini_api_key' (case sensitive)", async () => {
-      const genericError = new Error("Missing gemini_api_key environment variable");
+      const genericError = new Error(
+        "Missing gemini_api_key environment variable",
+      );
       const handler = vi.fn().mockRejectedValue(genericError);
 
       const wrappedHandler = withErrorHandler(handler);

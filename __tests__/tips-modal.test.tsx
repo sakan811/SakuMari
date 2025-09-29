@@ -351,7 +351,9 @@ describe("TipsModal", () => {
     const submitButton = screen.getByRole("button", { name: "Ask" });
     expect(submitButton).toBeDisabled();
 
-    const form = screen.getByPlaceholderText("Ask about kana learning techniques...").closest("form");
+    const form = screen
+      .getByPlaceholderText("Ask about kana learning techniques...")
+      .closest("form");
     fireEvent.submit(form);
 
     // fetch should not have been called
@@ -369,7 +371,9 @@ describe("TipsModal", () => {
     const submitButton = screen.getByRole("button", { name: "Ask" });
     expect(submitButton).toBeDisabled();
 
-    const form = screen.getByPlaceholderText("Ask about kana learning techniques...").closest("form");
+    const form = screen
+      .getByPlaceholderText("Ask about kana learning techniques...")
+      .closest("form");
     fireEvent.submit(form);
 
     // fetch should not have been called
@@ -382,9 +386,14 @@ describe("TipsModal", () => {
       () =>
         new Promise((resolve) => {
           setTimeout(() => {
-            resolve(mockApiResponse({ tip: "Test response", timestamp: "2025-01-01T00:00:00Z" }));
+            resolve(
+              mockApiResponse({
+                tip: "Test response",
+                timestamp: "2025-01-01T00:00:00Z",
+              }),
+            );
           }, 100);
-        })
+        }),
     );
 
     render(<TipsModal isOpen={true} onClose={mockOnClose} />);
@@ -462,12 +471,16 @@ describe("TipsModal", () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText("Failed to get learning tips")).toBeInTheDocument();
+      expect(
+        screen.getByText("Failed to get learning tips"),
+      ).toBeInTheDocument();
     });
   });
 
   test("handles unmounted component during error processing", async () => {
-    const { unmount } = render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+    const { unmount } = render(
+      <TipsModal isOpen={true} onClose={mockOnClose} />,
+    );
 
     const input = screen.getByPlaceholderText(
       "Ask about kana learning techniques...",
@@ -489,7 +502,7 @@ describe("TipsModal", () => {
 
     // Wait for async operations to complete
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     // Component should be unmounted without throwing errors

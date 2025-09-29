@@ -149,10 +149,7 @@ describe("ModeSelector Component Tests", () => {
   // Tests from mode-selector-uncovered.test.tsx
   test("uses default disabled value when not provided", () => {
     render(
-      <ModeSelector
-        currentMode="typing"
-        onModeChange={mockOnModeChange}
-      />,
+      <ModeSelector currentMode="typing" onModeChange={mockOnModeChange} />,
     );
 
     const typingButton = screen.getByTestId("typing-button");
@@ -161,7 +158,7 @@ describe("ModeSelector Component Tests", () => {
     // Buttons should not be disabled by default
     expect(typingButton).not.toBeDisabled();
     expect(multipleChoiceButton).not.toBeDisabled();
-    
+
     // Buttons should not have disabled styling
     expect(typingButton).not.toHaveClass("opacity-50");
     expect(typingButton).not.toHaveClass("cursor-not-allowed");
@@ -184,7 +181,7 @@ describe("ModeSelector Component Tests", () => {
     // Buttons should not be disabled
     expect(typingButton).not.toBeDisabled();
     expect(multipleChoiceButton).not.toBeDisabled();
-    
+
     // Buttons should not have disabled styling
     expect(typingButton).not.toHaveClass("opacity-50");
     expect(typingButton).not.toHaveClass("cursor-not-allowed");

@@ -311,7 +311,7 @@ describe("useDashboardData Hook", () => {
                 json: async () => mockStats,
               } as Response);
             }, 100);
-          })
+          }),
       );
 
       // Call refetch and check loading state

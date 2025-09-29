@@ -21,10 +21,18 @@ describe("shouldFetchKanaData", () => {
   it("should handle all combinations", () => {
     // Test all possible combinations
     const testCases = [
-      { hasFetched: false, kanaType: undefined as "hiragana" | "katakana" | undefined, expected: true },
+      {
+        hasFetched: false,
+        kanaType: undefined as "hiragana" | "katakana" | undefined,
+        expected: true,
+      },
       { hasFetched: false, kanaType: "hiragana" as const, expected: true },
       { hasFetched: false, kanaType: "katakana" as const, expected: true },
-      { hasFetched: true, kanaType: undefined as "hiragana" | "katakana" | undefined, expected: false },
+      {
+        hasFetched: true,
+        kanaType: undefined as "hiragana" | "katakana" | undefined,
+        expected: false,
+      },
       { hasFetched: true, kanaType: "hiragana" as const, expected: true },
       { hasFetched: true, kanaType: "katakana" as const, expected: true },
     ];

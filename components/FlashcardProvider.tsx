@@ -47,7 +47,10 @@ export type FlashcardContextType = {
   setInteractionMode: (_: InteractionMode) => void;
   choices: string[];
   isSubmitting: boolean;
-  generateChoicesArray: (_: KanaWithAccuracy, __: KanaWithAccuracy[]) => string[];
+  generateChoicesArray: (
+    _: KanaWithAccuracy,
+    __: KanaWithAccuracy[],
+  ) => string[];
   kanaType?: "hiragana" | "katakana";
 };
 
@@ -158,44 +161,46 @@ export function FlashcardProvider({
     handleDataFetch();
   }, [handleDataFetch]);
 
-  
   // Submit answer and update accuracy
-  const submitAnswer = useCallback(async (answer: string) => {
-    if (shouldPreventSubmission(currentKana, isSubmitting)) return;
+  const submitAnswer = useCallback(
+    async (answer: string) => {
+      if (shouldPreventSubmission(currentKana, isSubmitting)) return;
 
-    setIsSubmitting(true);
+      setIsSubmitting(true);
 
-    try {
-      const isCorrect =
-        answer.trim().toLowerCase() === currentKana.romaji.toLowerCase();
+      try {
+        const isCorrect =
+          answer.trim().toLowerCase() === currentKana.romaji.toLowerCase();
 
-      // Submit to API first
-      const response = await fetch("/api/flashcards/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          kanaId: currentKana.id,
-          isCorrect,
-          interactionMode, // Track which mode was used
-        }),
-      });
+        // Submit to API first
+        const response = await fetch("/api/flashcards/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            kanaId: currentKana.id,
+            isCorrect,
+            interactionMode, // Track which mode was used
+          }),
+        });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Only set result after successful API submission
+        setResult(isCorrect ? "correct" : "incorrect");
+      } catch (error) {
+        console.error("Error submitting answer:", error);
+        // Show error state but still allow user to continue
+        setResult("incorrect");
+      } finally {
+        setIsSubmitting(false);
       }
-
-      // Only set result after successful API submission
-      setResult(isCorrect ? "correct" : "incorrect");
-    } catch (error) {
-      console.error("Error submitting answer:", error);
-      // Show error state but still allow user to continue
-      setResult("incorrect");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [currentKana, isSubmitting, interactionMode]);
+    },
+    [currentKana, isSubmitting, interactionMode],
+  );
 
   // Proceed to next kana
   const nextCard = useCallback(() => {
@@ -203,7 +208,6 @@ export function FlashcardProvider({
     selectRandomKana(kanaList);
   }, [kanaList, selectRandomKana]);
 
-  
   const handleSetInteractionMode = (mode: InteractionMode) => {
     // Simple implementation for now - we'll add choice generation logic back if needed
     setInteractionMode(mode);

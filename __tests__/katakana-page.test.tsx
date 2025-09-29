@@ -34,11 +34,7 @@ describe("Katakana Page", () => {
 });
 
 // Create additional test suite using shared utilities
-createKanaPageTests(
-  "Katakana",
-  "katakana",
-  () => {
-    // Additional shared test logic can go here
-    expect("katakana").toBe("katakana");
-  }
-);
+createKanaPageTests("Katakana", "katakana", () => {
+  // Additional shared test logic can go here
+  expect("katakana").toBe("katakana");
+});

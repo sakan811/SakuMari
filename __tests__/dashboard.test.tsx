@@ -163,7 +163,10 @@ describe("Dashboard Component", () => {
       ];
 
       // Test the filtering logic with non-kana characters
-      const filterStats = (stats: typeof mockStatsWithNonKana, filter: "all" | "hiragana" | "katakana") => {
+      const filterStats = (
+        stats: typeof mockStatsWithNonKana,
+        filter: "all" | "hiragana" | "katakana",
+      ) => {
         return stats.filter((kana) => {
           if (filter === "all") return true;
 
@@ -327,7 +330,6 @@ describe("Dashboard Component", () => {
     });
   });
 
-
   describe("Sorting Functionality", () => {
     test("sorts data by columns", async () => {
       render(<Dashboard />);
@@ -455,5 +457,4 @@ describe("Dashboard Component", () => {
       });
     });
   });
-
 });

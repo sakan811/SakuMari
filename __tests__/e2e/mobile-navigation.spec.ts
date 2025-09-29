@@ -6,12 +6,17 @@ test.describe("Mobile Navigation", () => {
   });
 
   test.describe("Unauthenticated User", () => {
-    test("should show mobile menu button on small screens", async ({ page }) => {
+    test("should show mobile menu button on small screens", async ({
+      page,
+    }) => {
       await page.goto("/");
 
       const mobileMenuButton = page.getByLabel("Toggle mobile menu");
       await expect(mobileMenuButton).toBeVisible();
-      await expect(mobileMenuButton).toHaveAttribute("aria-label", "Toggle mobile menu");
+      await expect(mobileMenuButton).toHaveAttribute(
+        "aria-label",
+        "Toggle mobile menu",
+      );
     });
 
     test("should open mobile menu with hamburger icon", async ({ page }) => {
@@ -20,13 +25,17 @@ test.describe("Mobile Navigation", () => {
       const mobileMenuButton = page.getByLabel("Toggle mobile menu");
 
       // Should show hamburger icon when closed
-      await expect(mobileMenuButton.locator('path[d*="M4 6h16M4 12h16M4 18h16"]')).toBeVisible();
+      await expect(
+        mobileMenuButton.locator('path[d*="M4 6h16M4 12h16M4 18h16"]'),
+      ).toBeVisible();
 
       // Click to open menu
       await mobileMenuButton.click();
 
       // Should show X icon when open
-      await expect(mobileMenuButton.locator('path[d*="M6 18L18 6M6 6l12 12"]')).toBeVisible();
+      await expect(
+        mobileMenuButton.locator('path[d*="M6 18L18 6M6 6l12 12"]'),
+      ).toBeVisible();
     });
 
     test("should show sign in options in mobile menu", async ({ page }) => {
@@ -55,7 +64,11 @@ test.describe("Mobile Navigation", () => {
 
       // Menu should be closed
       await expect(page.getByText("Sign In with Google")).not.toBeVisible();
-      await expect(page.getByLabel("Toggle mobile menu").locator('path[d*="M4 6h16M4 12h16M4 18h16"]')).toBeVisible();
+      await expect(
+        page
+          .getByLabel("Toggle mobile menu")
+          .locator('path[d*="M4 6h16M4 12h16M4 18h16"]'),
+      ).toBeVisible();
     });
   });
 
@@ -89,7 +102,9 @@ test.describe("Mobile Navigation", () => {
       await expect(page.getByText("Sign Out")).toBeVisible();
     });
 
-    test("should navigate to hiragana practice from mobile menu", async ({ page }) => {
+    test("should navigate to hiragana practice from mobile menu", async ({
+      page,
+    }) => {
       // Open mobile menu
       await page.getByLabel("Toggle mobile menu").click();
 
@@ -98,13 +113,19 @@ test.describe("Mobile Navigation", () => {
 
       // Should navigate to hiragana page
       await page.waitForURL("/hiragana");
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeVisible();
 
       // Mobile menu should be closed
-      await expect(page.getByText("ひらがな Hiragana", { exact: false })).not.toBeVisible();
+      await expect(
+        page.getByText("ひらがな Hiragana", { exact: false }),
+      ).not.toBeVisible();
     });
 
-    test("should navigate to katakana practice from mobile menu", async ({ page }) => {
+    test("should navigate to katakana practice from mobile menu", async ({
+      page,
+    }) => {
       // Open mobile menu
       await page.getByLabel("Toggle mobile menu").click();
 
@@ -113,7 +134,9 @@ test.describe("Mobile Navigation", () => {
 
       // Should navigate to katakana page
       await page.waitForURL("/katakana");
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeVisible();
     });
 
     test("should navigate to dashboard from mobile menu", async ({ page }) => {
@@ -140,7 +163,9 @@ test.describe("Mobile Navigation", () => {
       await expect(page.getByRole("button", { name: "Sign In" })).toBeVisible();
 
       // Should not show authenticated content
-      await expect(page.getByText("ひらがな Hiragana Practice")).not.toBeVisible();
+      await expect(
+        page.getByText("ひらがな Hiragana Practice"),
+      ).not.toBeVisible();
     });
 
     test("should close mobile menu after navigation", async ({ page }) => {
@@ -156,10 +181,16 @@ test.describe("Mobile Navigation", () => {
       await expect(page.getByText("ひらがな Hiragana")).not.toBeVisible();
 
       // Should show hamburger icon again
-      await expect(page.getByLabel("Toggle mobile menu").locator('path[d*="M4 6h16M4 12h16M4 18h16"]')).toBeVisible();
+      await expect(
+        page
+          .getByLabel("Toggle mobile menu")
+          .locator('path[d*="M4 6h16M4 12h16M4 18h16"]'),
+      ).toBeVisible();
     });
 
-    test("should maintain mobile menu state across page loads", async ({ page }) => {
+    test("should maintain mobile menu state across page loads", async ({
+      page,
+    }) => {
       // Open mobile menu
       await page.getByLabel("Toggle mobile menu").click();
       await expect(page.getByText("ひらがな Hiragana")).toBeVisible();

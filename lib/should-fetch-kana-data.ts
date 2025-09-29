@@ -23,7 +23,7 @@
  */
 export function shouldFetchKanaData(
   hasFetched: boolean,
-  kanaType?: "hiragana" | "katakana"
+  kanaType?: "hiragana" | "katakana",
 ): boolean {
   return !hasFetched || !!kanaType;
 }

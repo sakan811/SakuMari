@@ -58,9 +58,7 @@ describe("Tips Integration", () => {
     fireEvent.click(tipsButton);
 
     expect(screen.getByText("Kana Learning Tips")).toBeTruthy();
-    expect(
-      screen.getByText("Ask questions about Japanese kana"),
-    ).toBeTruthy();
+    expect(screen.getByText("Ask questions about Japanese kana")).toBeTruthy();
   });
 
   test("closes tips modal when close button is clicked", async () => {
@@ -117,8 +115,6 @@ describe("Tips Integration", () => {
 
     // Tips modal content should not be present initially
     expect(screen.queryByText("Kana Learning Tips")).toBeNull();
-    expect(
-      screen.queryByText("Ask questions about Japanese kana"),
-    ).toBeNull();
+    expect(screen.queryByText("Ask questions about Japanese kana")).toBeNull();
   });
 });

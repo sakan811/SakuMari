@@ -17,7 +17,10 @@
 
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
-import { GET as authGet, POST as authPost } from "@/app/api/auth/[...nextauth]/route";
+import {
+  GET as authGet,
+  POST as authPost,
+} from "@/app/api/auth/[...nextauth]/route";
 import { GET as providersGet } from "@/app/api/auth/providers/route";
 
 // Store original environment variables
@@ -50,20 +53,20 @@ describe("Authentication API Routes", () => {
   describe("GET /api/auth/[...nextauth]", () => {
     test("exports GET handler from auth handlers", async () => {
       const request = new NextRequest("http://localhost/api/auth/signin");
-      
+
       // Call the GET handler
       await authGet(request);
-      
+
       // Verify that the GET handler from auth was called
       expect(mockHandlers.GET).toHaveBeenCalledWith(request);
     });
 
     test("handles different auth endpoints", async () => {
       const request = new NextRequest("http://localhost/api/auth/signout");
-      
+
       // Call the GET handler
       await authGet(request);
-      
+
       // Verify that the GET handler from auth was called with signout request
       expect(mockHandlers.GET).toHaveBeenCalledWith(request);
     });
@@ -71,30 +74,36 @@ describe("Authentication API Routes", () => {
 
   describe("POST /api/auth/[...nextauth]", () => {
     test("exports POST handler from auth handlers", async () => {
-      const request = new NextRequest("http://localhost/api/auth/callback/google", {
-        method: "POST",
-        body: JSON.stringify({ code: "test-code" }),
-      });
-      
+      const request = new NextRequest(
+        "http://localhost/api/auth/callback/google",
+        {
+          method: "POST",
+          body: JSON.stringify({ code: "test-code" }),
+        },
+      );
+
       // Call the POST handler
       await authPost(request);
-      
+
       // Verify that the POST handler from auth was called
       expect(mockHandlers.POST).toHaveBeenCalledWith(request);
     });
 
     test("handles callback requests", async () => {
-      const request = new NextRequest("http://localhost/api/auth/signin/credentials", {
-        method: "POST",
-        body: JSON.stringify({ 
-          email: "test@example.com", 
-          password: "password123" 
-        }),
-      });
-      
+      const request = new NextRequest(
+        "http://localhost/api/auth/signin/credentials",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: "test@example.com",
+            password: "password123",
+          }),
+        },
+      );
+
       // Call the POST handler
       await authPost(request);
-      
+
       // Verify that the POST handler from auth was called
       expect(mockHandlers.POST).toHaveBeenCalledWith(request);
     });
@@ -103,9 +112,9 @@ describe("Authentication API Routes", () => {
   describe("GET /api/auth/providers", () => {
     test("returns credentialsEnabled: true when CREDS_PROVIDER is 'true'", async () => {
       process.env.CREDS_PROVIDER = "true";
-      
+
       const response = await providersGet();
-      
+
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data).toEqual({ credentialsEnabled: true });
@@ -113,9 +122,9 @@ describe("Authentication API Routes", () => {
 
     test("returns credentialsEnabled: false when CREDS_PROVIDER is not 'true'", async () => {
       process.env.CREDS_PROVIDER = "false";
-      
+
       const response = await providersGet();
-      
+
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data).toEqual({ credentialsEnabled: false });
@@ -123,9 +132,9 @@ describe("Authentication API Routes", () => {
 
     test("returns credentialsEnabled: false when CREDS_PROVIDER is undefined", async () => {
       delete process.env.CREDS_PROVIDER;
-      
+
       const response = await providersGet();
-      
+
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data).toEqual({ credentialsEnabled: false });
@@ -133,9 +142,9 @@ describe("Authentication API Routes", () => {
 
     test("returns credentialsEnabled: false when CREDS_PROVIDER is empty string", async () => {
       process.env.CREDS_PROVIDER = "";
-      
+
       const response = await providersGet();
-      
+
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data).toEqual({ credentialsEnabled: false });

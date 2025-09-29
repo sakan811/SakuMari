@@ -28,7 +28,7 @@ export default defineConfig({
         "**.config.{js,ts,mts,mjs}",
         ".next/",
         "generated/",
-        "coverage-db/lcov-report"
+        "coverage-db/lcov-report",
       ],
     },
   },

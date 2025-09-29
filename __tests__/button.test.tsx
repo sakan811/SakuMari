@@ -47,7 +47,7 @@ describe("Button Component", () => {
     render(
       <Button onClick={mockOnClick} disabled={true}>
         Disabled Button
-      </Button>
+      </Button>,
     );
 
     const button = screen.getByText("Disabled Button");

@@ -24,7 +24,7 @@ import { describe, test, expect } from "vitest";
 export function createKanaPageTests(
   pageName: string,
   kanaType: string,
-  testFunction: () => void
+  testFunction: () => void,
 ) {
   describe(`${pageName} Page`, () => {
     test(`should be configured for ${kanaType} kana type`, () => {
@@ -48,7 +48,7 @@ export function createKanaPageTests(
 export function createDashboardPageTests(
   pageName: string,
   expectedTestId: string,
-  testFunction: () => void
+  testFunction: () => void,
 ) {
   describe(`${pageName} Page`, () => {
     test(`should render ${expectedTestId} component`, () => {
@@ -90,7 +90,7 @@ export const pageTestUtils = {
    */
   createPageTestSuite: (
     pageName: string,
-    tests: Array<{ name: string; testFn: () => void }>
+    tests: Array<{ name: string; testFn: () => void }>,
   ) => {
     describe(`${pageName} Page`, () => {
       tests.forEach(({ name, testFn }) => {

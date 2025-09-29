@@ -77,9 +77,12 @@ describe("Flashcard Submit API", () => {
       expectCalledTimes(mockPrisma.$executeRaw, 1);
 
       // Verify the SQL parameters for INSERT case
-      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [string[], ...unknown[]];
+      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [
+        string[],
+        ...unknown[],
+      ];
       expectSqlContains(mockCall, 'INSERT INTO "KanaProgress"');
-      expectSqlContains(mockCall, 'ON CONFLICT (kana_id, user_id)');
+      expectSqlContains(mockCall, "ON CONFLICT (kana_id, user_id)");
       expectSqlParameters(mockCall, [
         "test-1", // kanaId
         "user123", // userId
@@ -105,9 +108,12 @@ describe("Flashcard Submit API", () => {
       expectCalledTimes(mockPrisma.$executeRaw, 1);
 
       // Verify the SQL parameters for INSERT case with incorrect answer
-      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [string[], ...unknown[]];
+      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [
+        string[],
+        ...unknown[],
+      ];
       expectSqlContains(mockCall, 'INSERT INTO "KanaProgress"');
-      expectSqlContains(mockCall, 'ON CONFLICT (kana_id, user_id)');
+      expectSqlContains(mockCall, "ON CONFLICT (kana_id, user_id)");
       expectSqlParameters(mockCall, [
         "test-2", // kanaId
         "user123", // userId
@@ -133,11 +139,17 @@ describe("Flashcard Submit API", () => {
       expectCalledTimes(mockPrisma.$executeRaw, 1);
 
       // Verify the SQL parameters for UPDATE case with correct answer
-      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [string[], ...unknown[]];
-      expectSqlContains(mockCall, 'ON CONFLICT (kana_id, user_id)');
-      expectSqlContains(mockCall, 'DO UPDATE SET');
+      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [
+        string[],
+        ...unknown[],
+      ];
+      expectSqlContains(mockCall, "ON CONFLICT (kana_id, user_id)");
+      expectSqlContains(mockCall, "DO UPDATE SET");
       expectSqlContains(mockCall, 'attempts = "KanaProgress".attempts + 1');
-      expectSqlContains(mockCall, 'correct_attempts = "KanaProgress".correct_attempts +');
+      expectSqlContains(
+        mockCall,
+        'correct_attempts = "KanaProgress".correct_attempts +',
+      );
       expectSqlParameters(mockCall, [
         "test-3", // kanaId
         "user123", // userId
@@ -163,11 +175,17 @@ describe("Flashcard Submit API", () => {
       expectCalledTimes(mockPrisma.$executeRaw, 1);
 
       // Verify the SQL parameters for UPDATE case with incorrect answer
-      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [string[], ...unknown[]];
-      expectSqlContains(mockCall, 'ON CONFLICT (kana_id, user_id)');
-      expectSqlContains(mockCall, 'DO UPDATE SET');
+      const mockCall = mockPrisma.$executeRaw.mock.calls[0] as [
+        string[],
+        ...unknown[],
+      ];
+      expectSqlContains(mockCall, "ON CONFLICT (kana_id, user_id)");
+      expectSqlContains(mockCall, "DO UPDATE SET");
       expectSqlContains(mockCall, 'attempts = "KanaProgress".attempts + 1');
-      expectSqlContains(mockCall, 'correct_attempts = "KanaProgress".correct_attempts +');
+      expectSqlContains(
+        mockCall,
+        'correct_attempts = "KanaProgress".correct_attempts +',
+      );
       expectSqlParameters(mockCall, [
         "test-4", // kanaId
         "user123", // userId
@@ -263,11 +281,14 @@ describe("Flashcard Submit API", () => {
       // Setup
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
 
-      const request = new NextRequest("http://localhost/api/flashcards/submit", {
-        method: "POST",
-        body: JSON.stringify({ isCorrect: true }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const request = new NextRequest(
+        "http://localhost/api/flashcards/submit",
+        {
+          method: "POST",
+          body: JSON.stringify({ isCorrect: true }),
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       // Execute
       const response = await POST(request);
@@ -281,11 +302,14 @@ describe("Flashcard Submit API", () => {
       // Setup
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
 
-      const request = new NextRequest("http://localhost/api/flashcards/submit", {
-        method: "POST",
-        body: JSON.stringify({ kanaId: "test-1" }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const request = new NextRequest(
+        "http://localhost/api/flashcards/submit",
+        {
+          method: "POST",
+          body: JSON.stringify({ kanaId: "test-1" }),
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       // Execute
       const response = await POST(request);
@@ -299,11 +323,14 @@ describe("Flashcard Submit API", () => {
       // Setup
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
 
-      const request = new NextRequest("http://localhost/api/flashcards/submit", {
-        method: "POST",
-        body: JSON.stringify({ kanaId: 123, isCorrect: "true" }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const request = new NextRequest(
+        "http://localhost/api/flashcards/submit",
+        {
+          method: "POST",
+          body: JSON.stringify({ kanaId: 123, isCorrect: "true" }),
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       // Execute
       const response = await POST(request);
@@ -317,11 +344,14 @@ describe("Flashcard Submit API", () => {
       // Setup
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
 
-      const request = new NextRequest("http://localhost/api/flashcards/submit", {
-        method: "POST",
-        body: "{ invalid json }",
-        headers: { "Content-Type": "application/json" },
-      });
+      const request = new NextRequest(
+        "http://localhost/api/flashcards/submit",
+        {
+          method: "POST",
+          body: "{ invalid json }",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       // Execute
       const response = await POST(request);
@@ -335,11 +365,14 @@ describe("Flashcard Submit API", () => {
       // Setup
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
 
-      const request = new NextRequest("http://localhost/api/flashcards/submit", {
-        method: "POST",
-        body: "",
-        headers: { "Content-Type": "application/json" },
-      });
+      const request = new NextRequest(
+        "http://localhost/api/flashcards/submit",
+        {
+          method: "POST",
+          body: "",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       // Execute
       const response = await POST(request);
@@ -353,11 +386,14 @@ describe("Flashcard Submit API", () => {
       // Setup
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
 
-      const request = new NextRequest("http://localhost/api/flashcards/submit", {
-        method: "POST",
-        body: "kanaId=test-1&isCorrect=true",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      });
+      const request = new NextRequest(
+        "http://localhost/api/flashcards/submit",
+        {
+          method: "POST",
+          body: "kanaId=test-1&isCorrect=true",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        },
+      );
 
       // Execute
       const response = await POST(request);
@@ -390,11 +426,14 @@ describe("Flashcard Submit API", () => {
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
       mockPrisma.$executeRaw.mockResolvedValue(undefined);
 
-      const request = new NextRequest("http://localhost/api/flashcards/submit", {
-        method: "POST",
-        body: JSON.stringify({ kanaId: "test-1", isCorrect: "true" }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const request = new NextRequest(
+        "http://localhost/api/flashcards/submit",
+        {
+          method: "POST",
+          body: JSON.stringify({ kanaId: "test-1", isCorrect: "true" }),
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       // Execute
       const response = await POST(request);
@@ -409,11 +448,14 @@ describe("Flashcard Submit API", () => {
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
       mockPrisma.$executeRaw.mockResolvedValue(undefined);
 
-      const request = new NextRequest("http://localhost/api/flashcards/submit", {
-        method: "POST",
-        body: JSON.stringify({ kanaId: "123", isCorrect: true }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const request = new NextRequest(
+        "http://localhost/api/flashcards/submit",
+        {
+          method: "POST",
+          body: JSON.stringify({ kanaId: "123", isCorrect: true }),
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       // Execute
       const response = await POST(request);
@@ -427,11 +469,14 @@ describe("Flashcard Submit API", () => {
       // Setup
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
 
-      const request = new NextRequest("http://localhost/api/flashcards/submit", {
-        method: "POST",
-        body: JSON.stringify({ kanaId: null, isCorrect: null }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const request = new NextRequest(
+        "http://localhost/api/flashcards/submit",
+        {
+          method: "POST",
+          body: JSON.stringify({ kanaId: null, isCorrect: null }),
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       // Execute
       const response = await POST(request);
@@ -445,11 +490,14 @@ describe("Flashcard Submit API", () => {
       // Setup
       mockAuth.mockResolvedValue({ user: { id: "user123" } });
 
-      const request = new NextRequest("http://localhost/api/flashcards/submit", {
-        method: "POST",
-        body: JSON.stringify({ kanaId: undefined, isCorrect: undefined }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const request = new NextRequest(
+        "http://localhost/api/flashcards/submit",
+        {
+          method: "POST",
+          body: JSON.stringify({ kanaId: undefined, isCorrect: undefined }),
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       // Execute
       const response = await POST(request);

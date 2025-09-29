@@ -37,7 +37,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -55,7 +55,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -73,7 +73,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -91,7 +91,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -109,7 +109,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -127,7 +127,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -137,9 +137,15 @@ describe("useFlashcardHandlers Hook", () => {
       });
 
       expect(mockSetInteractionMode).toHaveBeenCalledTimes(3);
-      expect(mockSetInteractionMode).toHaveBeenNthCalledWith(1, "multiple-choice");
+      expect(mockSetInteractionMode).toHaveBeenNthCalledWith(
+        1,
+        "multiple-choice",
+      );
       expect(mockSetInteractionMode).toHaveBeenNthCalledWith(2, "typing");
-      expect(mockSetInteractionMode).toHaveBeenNthCalledWith(3, "multiple-choice");
+      expect(mockSetInteractionMode).toHaveBeenNthCalledWith(
+        3,
+        "multiple-choice",
+      );
     });
   });
 
@@ -152,7 +158,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -171,7 +177,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -190,7 +196,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -209,7 +215,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -228,7 +234,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -253,7 +259,7 @@ describe("useFlashcardHandlers Hook", () => {
           setInteractionMode: mockSetInteractionMode,
           setSelectedChoice: mockSetSelectedChoice,
           setError: mockSetError,
-        })
+        }),
       );
 
       act(() => {
@@ -276,7 +282,7 @@ describe("useFlashcardHandlers Hook", () => {
         }),
       {
         initialProps: { isSubmitting: false, result: null },
-      }
+      },
     );
 
     const initialHandlers = result.current;
@@ -285,14 +291,22 @@ describe("useFlashcardHandlers Hook", () => {
     rerender({ isSubmitting: false, result: null });
     const samePropsHandlers = result.current;
 
-    expect(initialHandlers.handleModeChange).toBe(samePropsHandlers.handleModeChange);
-    expect(initialHandlers.handleChoiceSelect).toBe(samePropsHandlers.handleChoiceSelect);
+    expect(initialHandlers.handleModeChange).toBe(
+      samePropsHandlers.handleModeChange,
+    );
+    expect(initialHandlers.handleChoiceSelect).toBe(
+      samePropsHandlers.handleChoiceSelect,
+    );
 
     // Rerender with different props
     rerender({ isSubmitting: true, result: null });
     const differentPropsHandlers = result.current;
 
-    expect(initialHandlers.handleModeChange).not.toBe(differentPropsHandlers.handleModeChange);
-    expect(initialHandlers.handleChoiceSelect).not.toBe(differentPropsHandlers.handleChoiceSelect);
+    expect(initialHandlers.handleModeChange).not.toBe(
+      differentPropsHandlers.handleModeChange,
+    );
+    expect(initialHandlers.handleChoiceSelect).not.toBe(
+      differentPropsHandlers.handleChoiceSelect,
+    );
   });
 });

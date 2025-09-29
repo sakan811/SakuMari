@@ -27,7 +27,9 @@ test.describe("Mobile Home Page", () => {
       await page.goto("/");
 
       // Feature cards should be visible
-      await expect(page.getByText("📚 Learn Japanese Characters")).toBeVisible();
+      await expect(
+        page.getByText("📚 Learn Japanese Characters"),
+      ).toBeVisible();
       await expect(page.getByText("🎯 Adaptive Learning")).toBeVisible();
       await expect(page.getByText("📊 Progress Tracking")).toBeVisible();
       await expect(page.getByText("🧠 AI-Powered Tips")).toBeVisible();
@@ -100,16 +102,22 @@ test.describe("Mobile Home Page", () => {
       await expect(page.getByText("📊 View Your Progress")).toBeVisible();
 
       // Should not show sign in button
-      await expect(page.getByRole("button", { name: "Sign In" })).not.toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "Sign In" }),
+      ).not.toBeVisible();
     });
 
-    test("should navigate to practice pages from mobile home", async ({ page }) => {
+    test("should navigate to practice pages from mobile home", async ({
+      page,
+    }) => {
       await page.goto("/");
 
       // Navigate to hiragana
       await page.getByText("ひらがな Hiragana Practice").click();
       await page.waitForURL("/hiragana");
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeVisible();
 
       // Go back to home
       await page.goto("/");
@@ -117,7 +125,9 @@ test.describe("Mobile Home Page", () => {
       // Navigate to katakana
       await page.getByText("カタカナ Katakana Practice").click();
       await page.waitForURL("/katakana");
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeVisible();
 
       // Go back to home
       await page.goto("/");
@@ -128,7 +138,9 @@ test.describe("Mobile Home Page", () => {
       await expect(page.getByText("Dashboard")).toBeVisible();
     });
 
-    test("should show mobile navigation menu for authenticated users", async ({ page }) => {
+    test("should show mobile navigation menu for authenticated users", async ({
+      page,
+    }) => {
       await page.goto("/");
 
       // Menu button should be visible
@@ -146,17 +158,23 @@ test.describe("Mobile Home Page", () => {
       await expect(page.getByText("Sign Out")).toBeVisible();
     });
 
-    test("should handle touch interactions on practice cards", async ({ page }) => {
+    test("should handle touch interactions on practice cards", async ({
+      page,
+    }) => {
       await page.goto("/");
 
       // Practice cards should be tappable
       const hiraganaCard = page.getByText("ひらがな Hiragana Practice");
       await hiraganaCard.tap();
       await page.waitForURL("/hiragana");
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeVisible();
     });
 
-    test("should maintain proper layout when mobile menu is open", async ({ page }) => {
+    test("should maintain proper layout when mobile menu is open", async ({
+      page,
+    }) => {
       await page.goto("/");
 
       // Open mobile menu
@@ -275,7 +293,9 @@ test.describe("Mobile Home Page", () => {
       await page.goto("/");
 
       // Simulate zoom by evaluating viewport scale
-      const initialScale = await page.evaluate(() => window.visualViewport?.scale || 1);
+      const initialScale = await page.evaluate(
+        () => window.visualViewport?.scale || 1,
+      );
       expect(initialScale).toBe(1);
 
       // Content should still be visible

@@ -77,7 +77,10 @@ export function expectNotFound(response: Response) {
 /**
  * Asserts that a response JSON body matches expected structure
  */
-export async function expectResponseJson(response: Response, expectedData: unknown) {
+export async function expectResponseJson(
+  response: Response,
+  expectedData: unknown,
+) {
   const data = await response.json();
   expect(data).toEqual(expectedData);
   return data;
@@ -88,10 +91,10 @@ export async function expectResponseJson(response: Response, expectedData: unkno
  */
 export async function expectResponseHasProperties(
   response: Response,
-  properties: string[]
+  properties: string[],
 ) {
   const data = await response.json();
-  properties.forEach(prop => {
+  properties.forEach((prop) => {
     expect(data).toHaveProperty(prop);
   });
   return data;
@@ -102,7 +105,7 @@ export async function expectResponseHasProperties(
  */
 export async function expectResponseMatchesPartial(
   response: Response,
-  partialData: Record<string, unknown>
+  partialData: Record<string, unknown>,
 ) {
   const data = await response.json();
   expect(data).toMatchObject(partialData);
@@ -132,7 +135,7 @@ export function expectTestIdHasText(testId: string, expectedText: string) {
 export function expectTestIdHasAttribute(
   testId: string,
   attributeName: string,
-  expectedValue: string
+  expectedValue: string,
 ) {
   const element = document.querySelector(`[data-testid="${testId}"]`);
   expect(element).toBeInTheDocument();
@@ -202,16 +205,22 @@ export function expectArrayLength(array: unknown[], expectedLength: number) {
 /**
  * Asserts that SQL query contains specific text
  */
-export function expectSqlContains(sqlCall: [string[], ...unknown[]], expectedText: string) {
+export function expectSqlContains(
+  sqlCall: [string[], ...unknown[]],
+  expectedText: string,
+) {
   const [strings] = sqlCall;
-  const fullSql = strings.join('');
+  const fullSql = strings.join("");
   expect(fullSql).toContain(expectedText);
 }
 
 /**
  * Asserts that SQL query has expected parameters
  */
-export function expectSqlParameters(sqlCall: [string[], ...unknown[]], expectedParams: unknown[]) {
+export function expectSqlParameters(
+  sqlCall: [string[], ...unknown[]],
+  expectedParams: unknown[],
+) {
   const values = sqlCall.slice(1);
   expect(values).toEqual(expectedParams);
 }

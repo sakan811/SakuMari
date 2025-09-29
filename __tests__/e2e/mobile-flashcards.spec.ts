@@ -14,13 +14,17 @@ test.describe("Mobile Flashcard Practice", () => {
 
       // Main elements should be visible
       await expect(page.getByTestId("current-kana")).toBeVisible();
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeVisible();
       await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
       await expect(page.getByTestId("typing-button")).toBeVisible();
       await expect(page.getByTestId("multiple-choice-button")).toBeVisible();
     });
 
-    test("should handle touch interactions for typing mode", async ({ page }) => {
+    test("should handle touch interactions for typing mode", async ({
+      page,
+    }) => {
       await page.goto("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
 
@@ -36,7 +40,9 @@ test.describe("Mobile Flashcard Practice", () => {
       ).toBeVisible();
     });
 
-    test("should switch to multiple choice mode on mobile", async ({ page }) => {
+    test("should switch to multiple choice mode on mobile", async ({
+      page,
+    }) => {
       await page.goto("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
 
@@ -56,7 +62,9 @@ test.describe("Mobile Flashcard Practice", () => {
       expect(box?.height).toBeGreaterThanOrEqual(44);
     });
 
-    test("should handle multiple choice selection with touch", async ({ page }) => {
+    test("should handle multiple choice selection with touch", async ({
+      page,
+    }) => {
       await page.goto("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
 
@@ -141,7 +149,9 @@ test.describe("Mobile Flashcard Practice", () => {
 
       // Should still work properly in landscape
       await expect(page.getByTestId("current-kana")).toBeVisible();
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeVisible();
       await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
 
       // Test interaction
@@ -160,7 +170,9 @@ test.describe("Mobile Flashcard Practice", () => {
 
       // Should display properly
       await expect(page.getByTestId("current-kana")).toBeVisible();
-      await expect(page.getByPlaceholder("Type romaji equivalent...")).toBeVisible();
+      await expect(
+        page.getByPlaceholder("Type romaji equivalent..."),
+      ).toBeVisible();
       await expect(page.getByRole("button", { name: "Submit" })).toBeVisible();
 
       // Test interaction

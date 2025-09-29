@@ -42,8 +42,15 @@ export function calculateKanaWeights(kanaList: KanaWithAccuracy[]): number[] {
 /**
  * Select a kana using weighted random selection based on confidence weights
  */
-export function selectKanaByWeight(kanaList: KanaWithAccuracy[], weights: number[]): KanaWithAccuracy | null {
-  if (!kanaList.length || !weights.length || kanaList.length !== weights.length) {
+export function selectKanaByWeight(
+  kanaList: KanaWithAccuracy[],
+  weights: number[],
+): KanaWithAccuracy | null {
+  if (
+    !kanaList.length ||
+    !weights.length ||
+    kanaList.length !== weights.length
+  ) {
     return null;
   }
 
@@ -103,7 +110,10 @@ export function generateChoicesArray(
 /**
  * Filter kana data by type (hiragana/katakana)
  */
-export function filterKanaByType(kanaData: KanaWithAccuracy[], kanaType?: "hiragana" | "katakana"): KanaWithAccuracy[] {
+export function filterKanaByType(
+  kanaData: KanaWithAccuracy[],
+  kanaType?: "hiragana" | "katakana",
+): KanaWithAccuracy[] {
   if (!kanaType) {
     return kanaData;
   }
@@ -119,6 +129,9 @@ export function filterKanaByType(kanaData: KanaWithAccuracy[], kanaType?: "hirag
 /**
  * Check if answer submission should be prevented
  */
-export function shouldPreventSubmission(currentKana: KanaWithAccuracy | null, isSubmitting: boolean): boolean {
+export function shouldPreventSubmission(
+  currentKana: KanaWithAccuracy | null,
+  isSubmitting: boolean,
+): boolean {
   return !currentKana || isSubmitting;
 }

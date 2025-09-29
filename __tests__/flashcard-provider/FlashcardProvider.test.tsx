@@ -27,7 +27,10 @@ vi.mock("@/lib/should-fetch-kana-data", () => ({
   shouldFetchKanaData: vi.fn(),
 }));
 
-import { FlashcardProvider, useFlashcard } from "@/components/FlashcardProvider";
+import {
+  FlashcardProvider,
+  useFlashcard,
+} from "@/components/FlashcardProvider";
 import type { KanaWithAccuracy } from "@/types/common";
 import { shouldFetchKanaData } from "@/lib/should-fetch-kana-data";
 
@@ -36,25 +39,50 @@ const TestComponent = () => {
   const context = useFlashcard();
   return (
     <div>
-      <div data-testid="current-kana">{context.currentKana?.romaji || "null"}</div>
-      <div data-testid="loading">{context.loadingKana ? "loading" : "loaded"}</div>
+      <div data-testid="current-kana">
+        {context.currentKana?.romaji || "null"}
+      </div>
+      <div data-testid="loading">
+        {context.loadingKana ? "loading" : "loaded"}
+      </div>
       <div data-testid="result">{context.result || "no-result"}</div>
       <div data-testid="choices">{context.choices.join(",")}</div>
-      <div data-testid="is-submitting">{context.isSubmitting ? "submitting" : "idle"}</div>
+      <div data-testid="is-submitting">
+        {context.isSubmitting ? "submitting" : "idle"}
+      </div>
       <button onClick={() => context.nextCard()}>Next Card</button>
-      <button onClick={() => context.setInteractionMode("typing")}>Typing Mode</button>
-      <button onClick={() => context.setInteractionMode("multiple-choice")}>Choice Mode</button>
-      <button onClick={() => context.submitAnswer("test")}>Submit Answer</button>
+      <button onClick={() => context.setInteractionMode("typing")}>
+        Typing Mode
+      </button>
+      <button onClick={() => context.setInteractionMode("multiple-choice")}>
+        Choice Mode
+      </button>
+      <button onClick={() => context.submitAnswer("test")}>
+        Submit Answer
+      </button>
     </div>
   );
 };
 
 describe("FlashcardProvider", () => {
   const mockKanaData: KanaWithAccuracy[] = [
-    { id: "1", character: "あ", romaji: "a", accuracy: 0.8, attempts: 5, correct_attempts: 4 },
-    { id: "2", character: "か", romaji: "ka", accuracy: 0.6, attempts: 5, correct_attempts: 3 },
+    {
+      id: "1",
+      character: "あ",
+      romaji: "a",
+      accuracy: 0.8,
+      attempts: 5,
+      correct_attempts: 4,
+    },
+    {
+      id: "2",
+      character: "か",
+      romaji: "ka",
+      accuracy: 0.6,
+      attempts: 5,
+      correct_attempts: 3,
+    },
   ];
-
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -88,7 +116,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -105,7 +133,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -114,12 +142,14 @@ describe("FlashcardProvider", () => {
     });
 
     it("should handle API fetch error (line 121-126)", async () => {
-      (fetch as ReturnType<typeof vi.fn>).mockRejectedValue(new Error("Network error"));
+      (fetch as ReturnType<typeof vi.fn>).mockRejectedValue(
+        new Error("Network error"),
+      );
 
       render(
         <FlashcardProvider>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -137,7 +167,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -158,7 +188,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider _resetHasFetched={true}>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -170,11 +200,46 @@ describe("FlashcardProvider", () => {
     it("should select kana and generate choices for non-empty array (line 148-153)", async () => {
       // Create test data with enough items for 4 choices
       const extendedKanaData: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.8, attempts: 5, correct_attempts: 4 },
-        { id: "2", character: "か", romaji: "ka", accuracy: 0.6, attempts: 5, correct_attempts: 3 },
-        { id: "3", character: "さ", romaji: "sa", accuracy: 0.7, attempts: 5, correct_attempts: 4 },
-        { id: "4", character: "た", romaji: "ta", accuracy: 0.5, attempts: 5, correct_attempts: 3 },
-        { id: "5", character: "な", romaji: "na", accuracy: 0.9, attempts: 5, correct_attempts: 5 },
+        {
+          id: "1",
+          character: "あ",
+          romaji: "a",
+          accuracy: 0.8,
+          attempts: 5,
+          correct_attempts: 4,
+        },
+        {
+          id: "2",
+          character: "か",
+          romaji: "ka",
+          accuracy: 0.6,
+          attempts: 5,
+          correct_attempts: 3,
+        },
+        {
+          id: "3",
+          character: "さ",
+          romaji: "sa",
+          accuracy: 0.7,
+          attempts: 5,
+          correct_attempts: 4,
+        },
+        {
+          id: "4",
+          character: "た",
+          romaji: "ta",
+          accuracy: 0.5,
+          attempts: 5,
+          correct_attempts: 3,
+        },
+        {
+          id: "5",
+          character: "な",
+          romaji: "na",
+          accuracy: 0.9,
+          attempts: 5,
+          correct_attempts: 5,
+        },
       ];
 
       // Mock fetch to return test data
@@ -186,7 +251,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -219,7 +284,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider _resetHasFetched={true}>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -229,7 +294,9 @@ describe("FlashcardProvider", () => {
 
         // Current kana should be one of our mock data items
         const currentKanaText = currentKanaElement.textContent;
-        expect(mockKanaData.some(kana => kana.romaji === currentKanaText)).toBe(true);
+        expect(
+          mockKanaData.some((kana) => kana.romaji === currentKanaText),
+        ).toBe(true);
 
         // Choices should be generated and include the current kana
         const choicesText = choicesElement.textContent;
@@ -245,8 +312,22 @@ describe("FlashcardProvider", () => {
     it("should test lines 148-153 with deterministic behavior", async () => {
       // Create test data with predictable weights
       const predictableKanaData: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.1, attempts: 10, correct_attempts: 1 }, // Low accuracy = high weight
-        { id: "2", character: "い", romaji: "i", accuracy: 0.9, attempts: 10, correct_attempts: 9 }, // High accuracy = low weight
+        {
+          id: "1",
+          character: "あ",
+          romaji: "a",
+          accuracy: 0.1,
+          attempts: 10,
+          correct_attempts: 1,
+        }, // Low accuracy = high weight
+        {
+          id: "2",
+          character: "い",
+          romaji: "i",
+          accuracy: 0.9,
+          attempts: 10,
+          correct_attempts: 9,
+        }, // High accuracy = low weight
       ];
 
       // Mock Math.random to ensure predictable selection
@@ -261,7 +342,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider _resetHasFetched={true}>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -292,7 +373,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider _resetHasFetched={true}>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -314,7 +395,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider _resetHasFetched={true}>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       // Wait for initial load with empty data
@@ -350,7 +431,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       // Wait for initial load
@@ -363,23 +444,28 @@ describe("FlashcardProvider", () => {
 
       // Use act to ensure state updates are processed
       await act(async () => {
-        await waitFor(() => {
-          expect(screen.getByTestId("result")).toHaveTextContent("incorrect");
-        }, { timeout: 3000 });
+        await waitFor(
+          () => {
+            expect(screen.getByTestId("result")).toHaveTextContent("incorrect");
+          },
+          { timeout: 3000 },
+        );
       });
     });
 
     it("should handle network error during submission (line 191-194)", async () => {
-      (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockKanaData),
-      }).mockRejectedValueOnce(new Error("Network error"));
+      (fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockKanaData),
+        })
+        .mockRejectedValueOnce(new Error("Network error"));
 
       const user = userEvent.setup();
       render(
         <FlashcardProvider>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -412,7 +498,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -447,7 +533,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       // Wait for loading to complete
@@ -469,9 +555,30 @@ describe("FlashcardProvider", () => {
     it("should filter kana by type correctly when kanaType is specified", async () => {
       // Create test data with both hiragana and katakana
       const mixedKanaData: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.8, attempts: 5, correct_attempts: 4 }, // Hiragana
-        { id: "2", character: "ア", romaji: "ka", accuracy: 0.6, attempts: 5, correct_attempts: 3 }, // Katakana
-        { id: "3", character: "い", romaji: "i", accuracy: 0.7, attempts: 5, correct_attempts: 4 }, // Hiragana
+        {
+          id: "1",
+          character: "あ",
+          romaji: "a",
+          accuracy: 0.8,
+          attempts: 5,
+          correct_attempts: 4,
+        }, // Hiragana
+        {
+          id: "2",
+          character: "ア",
+          romaji: "ka",
+          accuracy: 0.6,
+          attempts: 5,
+          correct_attempts: 3,
+        }, // Katakana
+        {
+          id: "3",
+          character: "い",
+          romaji: "i",
+          accuracy: 0.7,
+          attempts: 5,
+          correct_attempts: 4,
+        }, // Hiragana
       ];
 
       (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
@@ -482,7 +589,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider kanaType="hiragana">
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -499,8 +606,22 @@ describe("FlashcardProvider", () => {
     it("should include all kana types when kanaType is undefined", async () => {
       // Create test data with both hiragana and katakana
       const mixedKanaData: KanaWithAccuracy[] = [
-        { id: "1", character: "あ", romaji: "a", accuracy: 0.8, attempts: 5, correct_attempts: 4 }, // Hiragana
-        { id: "2", character: "ア", romaji: "ka", accuracy: 0.6, attempts: 5, correct_attempts: 3 }, // Katakana
+        {
+          id: "1",
+          character: "あ",
+          romaji: "a",
+          accuracy: 0.8,
+          attempts: 5,
+          correct_attempts: 4,
+        }, // Hiragana
+        {
+          id: "2",
+          character: "ア",
+          romaji: "ka",
+          accuracy: 0.6,
+          attempts: 5,
+          correct_attempts: 3,
+        }, // Katakana
       ];
 
       (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
@@ -511,7 +632,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {
@@ -538,7 +659,7 @@ describe("FlashcardProvider", () => {
       render(
         <FlashcardProvider>
           <TestComponent />
-        </FlashcardProvider>
+        </FlashcardProvider>,
       );
 
       await waitFor(() => {

@@ -41,27 +41,29 @@ describe("Prisma Client Configuration", () => {
     // Reset modules and mocks before each test
     vi.resetModules();
     vi.clearAllMocks();
-    
+
     // Reset process.env
     process.env = { ...originalEnv };
-    
+
     // Reset global object
     delete (global as typeof globalThis & { prisma?: unknown }).prisma;
-    
+
     // Default mock implementation for getDatabaseUrls
     mockGetDatabaseUrls.mockReturnValue({
-      POSTGRES_PRISMA_URL: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
-      POSTGRES_URL_NON_POOLING: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+      POSTGRES_PRISMA_URL:
+        "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+      POSTGRES_URL_NON_POOLING:
+        "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
     });
   });
 
   afterEach(() => {
     // Restore original environment
     process.env = originalEnv;
-    
+
     // Clean up global prisma
     delete (global as typeof globalThis & { prisma?: unknown }).prisma;
-    
+
     // Reset all environment stubs
     vi.unstubAllEnvs();
   });
@@ -90,9 +92,10 @@ describe("Prisma Client Configuration", () => {
   it("should use existing global prisma client when available", async () => {
     // Create a mock prisma client
     const mockPrismaClient = { $connect: vi.fn(), $disconnect: vi.fn() };
-    
+
     // Set the global prisma client
-    (global as unknown as { prisma: typeof mockPrismaClient }).prisma = mockPrismaClient;
+    (global as unknown as { prisma: typeof mockPrismaClient }).prisma =
+      mockPrismaClient;
 
     // Import the module after setting up mocks
     const { prisma } = await import("@/lib/prisma");
@@ -172,7 +175,9 @@ describe("Prisma Client Configuration", () => {
     const { prisma } = await import("@/lib/prisma");
 
     // Verify global prisma was set
-    expect((global as unknown as { prisma: typeof prisma }).prisma).toBe(prisma);
+    expect((global as unknown as { prisma: typeof prisma }).prisma).toBe(
+      prisma,
+    );
   });
 
   it("should not set global prisma client in production environment", async () => {
@@ -186,7 +191,9 @@ describe("Prisma Client Configuration", () => {
     await import("@/lib/prisma");
 
     // Verify global prisma was not set
-    expect((global as typeof globalThis & { prisma?: unknown }).prisma).toBeUndefined();
+    expect(
+      (global as typeof globalThis & { prisma?: unknown }).prisma,
+    ).toBeUndefined();
   });
 
   it("should use the correct database URL from getDatabaseUrls", async () => {
@@ -194,7 +201,8 @@ describe("Prisma Client Configuration", () => {
     const customUrl = "postgresql://custom:custom@customhost:5433/customdb";
     mockGetDatabaseUrls.mockReturnValue({
       POSTGRES_PRISMA_URL: customUrl,
-      POSTGRES_URL_NON_POOLING: "postgresql://custom:custom@customhost:5433/customdb",
+      POSTGRES_URL_NON_POOLING:
+        "postgresql://custom:custom@customhost:5433/customdb",
     });
 
     // Import the module after setting up mocks
@@ -214,16 +222,17 @@ describe("Prisma Client Configuration", () => {
   it("should handle global prisma object with prisma property", async () => {
     // Create a mock prisma client
     const mockPrismaClient = { $connect: vi.fn(), $disconnect: vi.fn() };
-    
+
     // Set the global prisma client with the expected structure
-    (global as unknown as { prisma: typeof mockPrismaClient }).prisma = mockPrismaClient;
+    (global as unknown as { prisma: typeof mockPrismaClient }).prisma =
+      mockPrismaClient;
 
     // Import the module after setting up mocks
     const { prisma } = await import("@/lib/prisma");
 
     // Verify the returned prisma instance is the global one
     expect(prisma).toBe(mockPrismaClient);
-    
+
     // Verify PrismaClient was NOT instantiated again
     expect(PrismaClient).not.toHaveBeenCalled();
   });
