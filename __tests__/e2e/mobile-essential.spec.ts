@@ -6,38 +6,57 @@ test.describe("Mobile Essential Features", () => {
       await page.setViewportSize(devices["iPhone 12"].viewport);
     });
 
-    test("should show mobile menu button on small screens", async ({ page }) => {
+    test("should show mobile menu button on small screens", async ({
+      page,
+    }) => {
       await page.goto("/");
       const mobileMenuButton = page.getByLabel("Toggle mobile menu");
       await expect(mobileMenuButton).toBeVisible();
-      await expect(mobileMenuButton).toHaveAttribute("aria-label", "Toggle mobile menu");
+      await expect(mobileMenuButton).toHaveAttribute(
+        "aria-label",
+        "Toggle mobile menu",
+      );
     });
 
-    test("should open and close mobile menu with proper icons", async ({ page }) => {
+    test("should open and close mobile menu with proper icons", async ({
+      page,
+    }) => {
       await page.goto("/");
       const mobileMenuButton = page.getByLabel("Toggle mobile menu");
 
       // Should show hamburger icon when closed
-      await expect(mobileMenuButton.locator('path[d*="M4 6h16M4 12h16M4 18h16"]')).toBeVisible();
+      await expect(
+        mobileMenuButton.locator('path[d*="M4 6h16M4 12h16M4 18h16"]'),
+      ).toBeVisible();
 
       // Click to open menu
       await mobileMenuButton.click();
 
       // Should show X icon when open
-      await expect(mobileMenuButton.locator('path[d*="M6 18L18 6M6 6l12 12"]')).toBeVisible();
+      await expect(
+        mobileMenuButton.locator('path[d*="M6 18L18 6M6 6l12 12"]'),
+      ).toBeVisible();
 
       // Click to close menu
       await mobileMenuButton.click();
 
       // Should show hamburger icon again
-      await expect(mobileMenuButton.locator('path[d*="M4 6h16M4 12h16M4 18h16"]')).toBeVisible();
+      await expect(
+        mobileMenuButton.locator('path[d*="M4 6h16M4 12h16M4 18h16"]'),
+      ).toBeVisible();
     });
 
-    test("should show sign in options in mobile menu for unauthenticated users", async ({ page }) => {
+    test("should show sign in options in mobile menu for unauthenticated users", async ({
+      page,
+    }) => {
       await page.goto("/");
       await page.getByLabel("Toggle mobile menu").click();
-      await expect(page.locator('button:has-text("Sign In with Google")')).toBeVisible();
-      await expect(page.locator('button:has-text("Sign In with Credentials")')).toBeVisible();
+      await expect(
+        page.locator('button:has-text("Sign In with Google")'),
+      ).toBeVisible();
+      await expect(
+        page.locator('button:has-text("Sign In with Credentials")'),
+      ).toBeVisible();
     });
 
     test("should close mobile menu when clicking outside", async ({ page }) => {
@@ -46,7 +65,7 @@ test.describe("Mobile Essential Features", () => {
       await expect(page.getByText("Sign In with Google")).toBeVisible();
 
       // Click outside the menu
-      await page.click('body', { position: { x: 10, y: 10 } });
+      await page.click("body", { position: { x: 10, y: 10 } });
       await expect(page.getByText("Sign In with Google")).toBeHidden();
     });
   });
@@ -84,7 +103,9 @@ test.describe("Mobile Essential Features", () => {
       await page.getByPlaceholder("Type romaji equivalent...").click();
       await page.getByPlaceholder("Type romaji equivalent...").fill("a");
       await page.getByRole("button", { name: "Submit" }).click();
-      await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
+      await expect(
+        page.getByText("Correct!").or(page.getByText("Incorrect!")),
+      ).toBeVisible();
     });
 
     test("should handle mobile multiple choice practice", async ({ page }) => {
@@ -95,11 +116,15 @@ test.describe("Mobile Essential Features", () => {
       await expect(page.getByText("Tap to select your answer")).toBeVisible();
 
       await page.waitForSelector('[data-testid^="choice-button-"]');
-      const choices = await page.locator('[data-testid^="choice-button-"]').all();
+      const choices = await page
+        .locator('[data-testid^="choice-button-"]')
+        .all();
       if (choices.length > 0) {
         // Test touch interaction
         await choices[0].tap();
-        await expect(page.getByText("Correct!").or(page.getByText("Incorrect!"))).toBeVisible();
+        await expect(
+          page.getByText("Correct!").or(page.getByText("Incorrect!")),
+        ).toBeVisible();
       }
     });
 
