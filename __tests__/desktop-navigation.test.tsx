@@ -118,14 +118,14 @@ describe("DesktopNavigation", () => {
 
       // Check for Hiragana link
       const hiraganaLink = screen.getByRole("link", {
-        name: /ひらがなHiragana/,
+        name: /ひらがな Hiragana/,
       });
       expect(hiraganaLink).toBeInTheDocument();
       expect(hiraganaLink.getAttribute("href")).toBe("/hiragana");
 
       // Check for Katakana link
       const katakanaLink = screen.getByRole("link", {
-        name: /カタカナKatakana/,
+        name: /カタカナ Katakana/,
       });
       expect(katakanaLink).toBeInTheDocument();
       expect(katakanaLink.getAttribute("href")).toBe("/katakana");
@@ -249,7 +249,7 @@ describe("DesktopNavigation", () => {
     test("disables button during loading state", () => {
       render(<DesktopNavigation {...defaultProps} status="loading" />);
 
-      const button = screen.getByRole("button", { name: /⌛Sign In/ });
+      const button = screen.getByRole("button", { name: /⌛ Sign In/ });
       expect(button).toBeDisabled();
       expect(button).toHaveClass("disabled:opacity-50");
     });
@@ -282,7 +282,7 @@ describe("DesktopNavigation", () => {
         />,
       );
 
-      const button = screen.getByRole("button", { name: /⌛Sign In/ });
+      const button = screen.getByRole("button", { name: /⌛ Sign In/ });
       expect(button).toBeDisabled();
       expect(button).toHaveClass("disabled:opacity-50");
     });
@@ -296,7 +296,7 @@ describe("DesktopNavigation", () => {
         />,
       );
 
-      const button = screen.getByRole("button", { name: /⌛Sign In/ });
+      const button = screen.getByRole("button", { name: /⌛ Sign In/ });
       // Verify the loading spinner is present
       expect(button.querySelector(".animate-spin")).toBeInTheDocument();
     });
@@ -328,7 +328,7 @@ describe("DesktopNavigation", () => {
       expect(screen.getByRole("navigation")).toBeInTheDocument();
       // When session exists but user is undefined, it still renders authenticated state
       expect(
-        screen.getByRole("link", { name: /ひらがなHiragana/ }),
+        screen.getByRole("link", { name: /ひらがな Hiragana/ }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole("button", { name: "Sign Out" }),
