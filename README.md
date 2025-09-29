@@ -1,5 +1,10 @@
 # SakuMari - Japanese Kana Flashcard App
 
+<div align="center">
+  <img src="docs/SakuMari.png" alt="SakuMari App Screenshot" width="250" />
+  <br></br>
+</div>
+
 [![Web-App Test](https://github.com/sakan811/SakuMari/actions/workflows/test-app.yml/badge.svg)](https://github.com/sakan811/SakuMari/actions/workflows/test-app.yml)
 [![E2E Test](https://github.com/sakan811/SakuMari/actions/workflows/playwright.yml/badge.svg)](https://github.com/sakan811/SakuMari/actions/workflows/playwright.yml)
 [![Docker CI](https://github.com/sakan811/SakuMari/actions/workflows/docker-ci.yml/badge.svg)](https://github.com/sakan811/SakuMari/actions/workflows/docker-ci.yml)
