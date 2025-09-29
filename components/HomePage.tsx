@@ -48,7 +48,10 @@ export default function HomePage() {
             Japanese Kana Flashcard App
           </h2>
           <p className="text-sm sm:text-lg lg:text-xl text-[#705a39] font-medium">
-            Master Hiragana and Katakana with interactive practice
+            Master Japanese Characters
+          </p>
+          <p className="text-xs sm:text-base text-[#705a39] font-medium mt-2">
+            Interactive Flashcards
           </p>
         </div>
 
@@ -111,7 +114,7 @@ export default function HomePage() {
           </>
         ) : (
           <div className="text-center">
-            <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 sm:p-8 border-2 border-[#705a39] max-w-2xl mx-auto">
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 sm:p-8 border-2 border-[#705a39] max-w-2xl mx-auto mb-8 sm:mb-12">
               <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-[#403933]">
                 Welcome to SakuMari!
               </h2>
@@ -124,6 +127,46 @@ export default function HomePage() {
                 <p className="text-xs sm:text-sm text-[#705a39] mb-3 sm:mb-4">
                   Click &quot;Sign In with Google&quot; in the top navigation to
                   get started.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-4xl mx-auto">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 sm:p-8 border-2 border-[#705a39] text-center">
+                <div className="text-4xl sm:text-5xl mb-4">📚</div>
+                <h3 className="text-lg sm:text-xl font-bold mb-2 text-[#403933]">
+                  Learn Japanese Characters
+                </h3>
+                <p className="text-sm sm:text-base text-[#705a39]">
+                  Master both Hiragana and Katakana with our interactive flashcards
+                </p>
+              </div>
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 sm:p-8 border-2 border-[#705a39] text-center">
+                <div className="text-4xl sm:text-5xl mb-4">🎯</div>
+                <h3 className="text-lg sm:text-xl font-bold mb-2 text-[#403933]">
+                  Adaptive Learning
+                </h3>
+                <p className="text-sm sm:text-base text-[#705a39]">
+                  Smart algorithm focuses on characters you need the most practice with
+                </p>
+              </div>
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 sm:p-8 border-2 border-[#705a39] text-center">
+                <div className="text-4xl sm:text-5xl mb-4">📊</div>
+                <h3 className="text-lg sm:text-xl font-bold mb-2 text-[#403933]">
+                  Progress Tracking
+                </h3>
+                <p className="text-sm sm:text-base text-[#705a39]">
+                  Track your learning journey with detailed statistics and achievements
+                </p>
+              </div>
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 sm:p-8 border-2 border-[#705a39] text-center">
+                <div className="text-4xl sm:text-5xl mb-4">🧠</div>
+                <h3 className="text-lg sm:text-xl font-bold mb-2 text-[#403933]">
+                  AI-Powered Tips
+                </h3>
+                <p className="text-sm sm:text-base text-[#705a39]">
+                  Get personalized learning recommendations powered by Google Gemini AI
                 </p>
               </div>
             </div>
