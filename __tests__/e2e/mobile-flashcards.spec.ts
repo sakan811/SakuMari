@@ -3,6 +3,14 @@ import { test, expect } from "@playwright/test";
 test.describe("Mobile Flashcard Practice", () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
+    await page.context().addInitScript(() => {
+      Object.defineProperty(navigator, 'platform', {
+        get: () => 'iPhone',
+      });
+      Object.defineProperty(navigator, 'userAgent', {
+        get: () => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+      });
+    });
   });
 
   test.describe("Hiragana Practice", () => {

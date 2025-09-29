@@ -23,12 +23,22 @@ fi
 echo "📝 Creating temporary .env.local with test credentials..."
 cp "$PROJECT_ROOT/.env" "$PROJECT_ROOT/.env.local"
 
-# Replace CREDS_PROVIDER with true for testing
-sed -i.bak 's/CREDS_PROVIDER=.*/CREDS_PROVIDER=true/' "$PROJECT_ROOT/.env.local"
-rm -f "$PROJECT_ROOT/.env.local.bak"
+# Replace CREDS_PROVIDER with true for testing (cross-platform compatible)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' 's/CREDS_PROVIDER=.*/CREDS_PROVIDER=true/' "$PROJECT_ROOT/.env.local"
+else
+    sed -i 's/CREDS_PROVIDER=.*/CREDS_PROVIDER=true/' "$PROJECT_ROOT/.env.local"
+fi
 
 # Export environment variables from .env.local
-export $(grep -v '^#' "$PROJECT_ROOT/.env.local" | xargs)
+set -a
+if [ -f "$PROJECT_ROOT/.env.local" ]; then
+    source "$PROJECT_ROOT/.env.local"
+else
+    echo "❌ Error: .env.local file not found after copying"
+    exit 1
+fi
+set +a
 
 
 echo "🔗 Database connection: $POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB"

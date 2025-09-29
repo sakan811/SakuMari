@@ -27,7 +27,7 @@
     "test:db:clean": "cross-env NODE_ENV=test && (rm -f __tests__/db/test.db || del __tests__\\db\\test.db 2>nul || true)",
     "test:db:full": "pnpm test:db:setup && pnpm test:db",
     "test:e2e": "pnpm exec playwright test",
-    "test:e2e:setup": "docker compose -f docker/docker-compose.yml up -d db && cross-env CREDS_PROVIDER=true ./scripts/setup-database.sh",
+    "test:e2e:setup": "docker compose -f docker/docker-compose.yml up -d db && chmod +x scripts/setup-database.sh && cross-env CREDS_PROVIDER=true ./scripts/setup-database.sh",
     "test:e2e:build": "cross-env CREDS_PROVIDER=true pnpm build",
     "test:e2e:full": "pnpm test:e2e:setup && pnpm test:e2e:build && pnpm test:e2e",
     "test:e2e:clean": "docker compose -f docker/docker-compose.yml down --volumes",
