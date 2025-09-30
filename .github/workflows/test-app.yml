@@ -35,6 +35,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Install Prisma Client
+        env:
+          PRISMA_ENGINES_MIRROR: https://registry.npmmirror.com/-/binary/prisma
+          PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
+        run: pnpm prisma generate
+
       - name: Run tests
         run: pnpm test
 
