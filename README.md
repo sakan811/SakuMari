@@ -185,3 +185,7 @@ pnpm run test:e2e
 # Clean up test environment
 pnpm run test:e2e:clean
 ```
+
+## Test Document
+
+For comprehensive test coverage and test case documentation, see [docs/test-cases.md](docs/test-cases.md).
