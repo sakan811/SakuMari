@@ -107,7 +107,9 @@ test.describe("Essential Core Functionality", () => {
     test("should navigate to dashboard", async ({ page }) => {
       await page.getByRole("link", { name: "📊 View Your Progress" }).click();
       await page.waitForURL("/dashboard");
-      await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Dashboard" }),
+      ).toBeVisible();
     });
   });
 
