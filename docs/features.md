@@ -272,14 +272,16 @@ The AI assistant analyzes your learning data to provide personalized guidance th
 
 ### Interactive Chat Experience
 
-Have natural conversations with your AI learning coach through an easy-to-use chat interface.
+Have natural conversations with your AI learning coach through an easy-to-use chat interface with rich markdown support.
 
 **Chat Features**:
 
 - **Context Awareness**: The AI remembers your conversation and learning situation
-- **Rich Responses**: Get detailed explanations with formatted text and examples
+- **Rich Responses**: Get detailed explanations with formatted text, examples, and markdown support via React Markdown
 - **Quick Access**: Open the chat anytime from your dashboard with one click
 - **Conversation History**: Previous messages are saved during your session
+- **Real-time Interface**: Smooth chat experience with loading states and error handling
+- **Dynamic AI Import**: Google Gemini AI is dynamically imported for optimal code splitting and performance
 
 **What You Can Ask About**:
 

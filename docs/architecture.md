@@ -12,7 +12,7 @@
 - **Pages:** HomePage, Practice (Hiragana/Katakana), Dashboard
 - **State Management:** FlashcardProvider context with confidence-weighted adaptive learning algorithm
 - **Data Layer:** Prisma ORM with type-safe PostgreSQL queries + custom Prisma client generation
-- **AI Integration:** Google Gemini for personalized learning recommendations
+- **AI Integration:** Google Gemini AI v0.24.1 + React Markdown v10.1.0 for personalized learning recommendations with chat interface
 - **Utilities:** Kana filtering system, API middleware, error handling, background management
 - **License Management:** Automated license header management with validation scripts
 - **Code Quality:** SonarQube integration for comprehensive analysis and coverage reporting
@@ -175,7 +175,14 @@ __tests__/
 └── utils/                    # Test helpers and utilities
 ```
 
-**Note**: Some hook tests are still being organized into the `__tests__/hooks/` directory structure. The `use-flashcard-handlers.test.ts` file exists at the root level and will be moved to `__tests__/hooks/` for consistency.
+**Test Coverage:**
+- **76 total test files** covering unit, integration, database, and E2E scenarios
+- **Comprehensive API testing** with isolation and error handling
+- **Cross-browser E2E testing** with Playwright
+- **Database testing** with isolated SQLite environment
+- **Hook testing** with dedicated `__tests__/hooks/` directory structure
+- **UI component testing** with React Testing Library
+- **Accessibility testing** integrated throughout test suite
 
 **Development Infrastructure:**
 
