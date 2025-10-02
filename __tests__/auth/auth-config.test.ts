@@ -368,6 +368,36 @@ describe("Auth Configuration Tests", () => {
         },
       });
     });
+
+    test("signIn callback allows users with valid email (line 95)", async () => {
+      await import("@/lib/auth");
+
+      const nextAuthCall = mockNextAuth.mock.calls[0][0];
+      const signInCallback = nextAuthCall.callbacks.signIn;
+
+      // Test with user having valid email
+      const userWithEmail = { email: "test@example.com", name: "Test User" };
+      const resultWithEmail = await signInCallback({ user: userWithEmail });
+      expect(resultWithEmail).toBe(true);
+
+      // Test with user having no email
+      const userWithoutEmail = { name: "Test User" };
+      const resultWithoutEmail = await signInCallback({ user: userWithoutEmail });
+      expect(resultWithoutEmail).toBe(false);
+
+      // Test with null user
+      const resultWithNullUser = await signInCallback({ user: null });
+      expect(resultWithNullUser).toBe(false);
+
+      // Test with undefined user
+      const resultWithUndefinedUser = await signInCallback({ user: undefined });
+      expect(resultWithUndefinedUser).toBe(false);
+
+      // Test with user having empty string email
+      const userWithEmptyEmail = { email: "", name: "Test User" };
+      const resultWithEmptyEmail = await signInCallback({ user: userWithEmptyEmail });
+      expect(resultWithEmptyEmail).toBe(false);
+    });
   });
 
   describe("Error Handling and Edge Cases", () => {
