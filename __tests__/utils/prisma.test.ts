@@ -21,12 +21,22 @@ import { PrismaClient } from "@/generated/prisma_client";
 // Store original environment variables
 const originalEnv = { ...process.env };
 
-// Mock the PrismaClient
+// Mock the PrismaClient and adapter
 vi.mock("@/generated/prisma_client", () => ({
   PrismaClient: vi.fn().mockImplementation((config) => ({
     $connect: vi.fn(),
     $disconnect: vi.fn(),
     config,
+  })),
+}));
+
+vi.mock("@prisma/adapter-pg", () => ({
+  PrismaPg: vi.fn().mockImplementation((config) => ({
+    adapterName: "@prisma/adapter-pg",
+    config,
+    externalPool: null,
+    options: undefined,
+    provider: "postgres",
   })),
 }));
 
@@ -75,13 +85,17 @@ describe("Prisma Client Configuration", () => {
     // Verify getDatabaseUrls was called
     expect(mockGetDatabaseUrls).toHaveBeenCalled();
 
-    // Verify PrismaClient was instantiated
+    // Verify PrismaClient was instantiated with adapter
     expect(PrismaClient).toHaveBeenCalledWith({
-      datasources: {
-        db: {
-          url: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+      adapter: expect.objectContaining({
+        adapterName: "@prisma/adapter-pg",
+        config: {
+          connectionString: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
         },
-      },
+        externalPool: null,
+        options: undefined,
+        provider: "postgres",
+      }),
       log: ["error"], // Default log level (non-development)
     });
 
@@ -119,11 +133,15 @@ describe("Prisma Client Configuration", () => {
 
     // Verify PrismaClient was instantiated with development log levels
     expect(PrismaClient).toHaveBeenCalledWith({
-      datasources: {
-        db: {
-          url: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+      adapter: expect.objectContaining({
+        adapterName: "@prisma/adapter-pg",
+        config: {
+          connectionString: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
         },
-      },
+        externalPool: null,
+        options: undefined,
+        provider: "postgres",
+      }),
       log: ["query", "error", "warn"],
     });
   });
@@ -137,11 +155,15 @@ describe("Prisma Client Configuration", () => {
 
     // Verify PrismaClient was instantiated with production log levels
     expect(PrismaClient).toHaveBeenCalledWith({
-      datasources: {
-        db: {
-          url: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+      adapter: expect.objectContaining({
+        adapterName: "@prisma/adapter-pg",
+        config: {
+          connectionString: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
         },
-      },
+        externalPool: null,
+        options: undefined,
+        provider: "postgres",
+      }),
       log: ["error"],
     });
   });
@@ -155,11 +177,15 @@ describe("Prisma Client Configuration", () => {
 
     // Verify PrismaClient was instantiated with production log levels
     expect(PrismaClient).toHaveBeenCalledWith({
-      datasources: {
-        db: {
-          url: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+      adapter: expect.objectContaining({
+        adapterName: "@prisma/adapter-pg",
+        config: {
+          connectionString: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
         },
-      },
+        externalPool: null,
+        options: undefined,
+        provider: "postgres",
+      }),
       log: ["error"],
     });
   });
@@ -210,11 +236,15 @@ describe("Prisma Client Configuration", () => {
 
     // Verify PrismaClient was instantiated with the custom URL
     expect(PrismaClient).toHaveBeenCalledWith({
-      datasources: {
-        db: {
-          url: customUrl,
+      adapter: expect.objectContaining({
+        adapterName: "@prisma/adapter-pg",
+        config: {
+          connectionString: customUrl,
         },
-      },
+        externalPool: null,
+        options: undefined,
+        provider: "postgres",
+      }),
       log: ["error"],
     });
   });

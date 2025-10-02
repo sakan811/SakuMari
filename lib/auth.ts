@@ -87,18 +87,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   trustHost: true,
   callbacks: {
+    /**
+     * Allow all users to sign in regardless of database existence
+     * User existence will be handled on the UI layer with appropriate error messages
+     */
+    signIn: async ({ user }) => {
+      return !!user?.email; // Allow sign in if user has a valid email
+    },
     jwt: ({ token, user }) => {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    session: ({ session, token }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: token.id as string,
-      },
-    }),
+    session: ({ session, token }) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id as string,
+        },
+      };
+    },
   },
 });

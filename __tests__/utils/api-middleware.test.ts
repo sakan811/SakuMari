@@ -50,10 +50,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { withAuth, withAuthSimple } from "@/lib/api-middleware";
 import { auth } from "@/lib/auth";
 
-// Get the mocked auth function
+// Get the mocked functions
 const mockAuth = auth as ReturnType<typeof vi.fn>;
 
 describe("API Middleware", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   // Tests from api-middleware-uncovered.test.ts
   describe("withAuth", () => {
     it("handles authentication errors", async () => {
