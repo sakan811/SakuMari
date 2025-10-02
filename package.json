@@ -46,7 +46,7 @@
     "license:check": "pnpm run license check"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "Sakan Nirattisaykul",
@@ -88,6 +88,7 @@
     "prisma": "^6.16.2",
     "tailwindcss": "^4.1.13",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.2",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
