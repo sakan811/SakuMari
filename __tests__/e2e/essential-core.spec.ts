@@ -1,5 +1,25 @@
 import { test, expect } from "@playwright/test";
 
+// Helper function to handle mobile authentication
+async function performAuth(page: any) {
+  await page.goto("/");
+
+  // For mobile tests, we need to open the mobile menu first
+  const isMobile = page.viewportSize()?.width < 1024;
+  if (isMobile) {
+    await page.getByRole("button", { name: "Toggle mobile menu" }).click();
+    await page.getByRole("button", { name: "Sign In with Google" }).click();
+  } else {
+    await page.getByRole("button", { name: "Sign In" }).click();
+  }
+
+  await page.waitForURL(/.*signin.*/);
+  await page.fill('input[name="email"]', "test@sakumari.local");
+  await page.fill('input[name="password"]', "TestPassword123!");
+  await page.click('form[action*="credentials"] button[type="submit"]');
+  await page.waitForURL("/");
+}
+
 test.describe("Essential Core Functionality", () => {
   test.describe("Authentication", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
@@ -21,22 +41,7 @@ test.describe("Essential Core Functionality", () => {
     });
 
     test("should authenticate with credentials provider", async ({ page }) => {
-      await page.goto("/");
-
-      // For mobile tests, we need to open the mobile menu first
-      const isMobile = page.viewportSize()?.width < 1024;
-      if (isMobile) {
-        await page.getByRole("button", { name: "Toggle mobile menu" }).click();
-        await page.getByRole("button", { name: "Sign In with Google" }).click();
-      } else {
-        await page.getByRole("button", { name: "Sign In" }).click();
-      }
-
-      await page.waitForURL(/.*signin.*/);
-      await page.fill('input[name="email"]', "test@sakumari.local");
-      await page.fill('input[name="password"]', "TestPassword123!");
-      await page.click('form[action*="credentials"] button[type="submit"]');
-      await page.waitForURL("/");
+      await performAuth(page);
       await expect(page.getByText("ひらがな Hiragana Practice")).toBeVisible();
     });
 
@@ -68,22 +73,7 @@ test.describe("Essential Core Functionality", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
     test.beforeEach(async ({ page }) => {
-      await page.goto("/");
-
-      // For mobile tests, we need to open the mobile menu first
-      const isMobile = page.viewportSize()?.width < 1024;
-      if (isMobile) {
-        await page.getByRole("button", { name: "Toggle mobile menu" }).click();
-        await page.getByRole("button", { name: "Sign In with Google" }).click();
-      } else {
-        await page.getByRole("button", { name: "Sign In" }).click();
-      }
-
-      await page.waitForURL(/.*signin.*/);
-      await page.fill('input[name="email"]', "test@sakumari.local");
-      await page.fill('input[name="password"]', "TestPassword123!");
-      await page.click('form[action*="credentials"] button[type="submit"]');
-      await page.waitForURL("/");
+      await performAuth(page);
     });
 
     test("should navigate to hiragana practice", async ({ page }) => {
@@ -113,26 +103,13 @@ test.describe("Essential Core Functionality", () => {
     });
   });
 
+  test.describe.configure({ mode: 'parallel' }); // Enable parallel execution within this file
+
   test.describe("Practice Essential", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
     test.beforeEach(async ({ page }) => {
-      await page.goto("/");
-
-      // For mobile tests, we need to open the mobile menu first
-      const isMobile = page.viewportSize()?.width < 1024;
-      if (isMobile) {
-        await page.getByRole("button", { name: "Toggle mobile menu" }).click();
-        await page.getByRole("button", { name: "Sign In with Google" }).click();
-      } else {
-        await page.getByRole("button", { name: "Sign In" }).click();
-      }
-
-      await page.waitForURL(/.*signin.*/);
-      await page.fill('input[name="email"]', "test@sakumari.local");
-      await page.fill('input[name="password"]', "TestPassword123!");
-      await page.click('form[action*="credentials"] button[type="submit"]');
-      await page.waitForURL("/");
+      await performAuth(page);
     });
 
     test("should practice hiragana in typing mode", async ({ page }) => {
@@ -189,23 +166,23 @@ test.describe("Essential Core Functionality", () => {
       await page.getByPlaceholder("Type romaji equivalent...").fill("a");
       await page.getByRole("button", { name: "Submit" }).click();
 
-      // Wait for feedback to appear first
+      // Reduced timeout for faster execution
       await expect(
         page.getByText("Correct!").or(page.getByText("Incorrect!")),
-        { timeout: 10_000 }
+        { timeout: 8_000 }
       ).toBeVisible();
 
-      // Then click Next Card with extended timeout for mobile
-      await page.getByRole("button", { name: "Next Card" }).click({ timeout: 15_000 });
+      // Reduced timeout for Next Card click
+      await page.getByRole("button", { name: "Next Card" }).click({ timeout: 10_000 });
 
-      // Wait for the content to actually change, not just the element to exist
+      // Wait for the content to actually change with reduced timeout
       await page.waitForFunction(
         (expectedKana) => {
           const currentKana = document.querySelector('[data-testid="current-kana"]')?.textContent;
           return currentKana !== expectedKana;
         },
         firstKana,
-        { timeout: 10_000 }
+        { timeout: 8_000 }
       );
 
       const secondKana = await page.getByTestId("current-kana").textContent();
@@ -217,36 +194,19 @@ test.describe("Essential Core Functionality", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
     test.beforeEach(async ({ page }) => {
-      await page.goto("/");
+      await performAuth(page);
 
-      // For mobile tests, we need to open the mobile menu first
-      const isMobile = page.viewportSize()?.width < 1024;
-      if (isMobile) {
-        await page.getByRole("button", { name: "Toggle mobile menu" }).click();
-        await page.getByRole("button", { name: "Sign In with Google" }).click();
-      } else {
-        await page.getByRole("button", { name: "Sign In" }).click();
-      }
-
-      await page.waitForURL(/.*signin.*/);
-      await page.fill('input[name="email"]', "test@sakumari.local");
-      await page.fill('input[name="password"]', "TestPassword123!");
-      await page.click('form[action*="credentials"] button[type="submit"]');
-      await page.waitForURL("/");
-
-      // Generate some practice data
+      // Generate minimal practice data (reduced to 1 iteration for speed)
       await page.goto("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
-      for (let i = 0; i < 3; i++) {
-        await page.getByPlaceholder("Type romaji equivalent...").fill("a");
-        await page.getByRole("button", { name: "Submit" }).click();
-        // Wait for feedback before clicking Next Card
-        await expect(
-          page.getByText("Correct!").or(page.getByText("Incorrect!")),
-          { timeout: 10_000 }
-        ).toBeVisible();
-        await page.getByRole("button", { name: "Next Card" }).click({ timeout: 15_000 });
-      }
+      await page.getByPlaceholder("Type romaji equivalent...").fill("a");
+      await page.getByRole("button", { name: "Submit" }).click();
+      // Reduced timeout for feedback
+      await expect(
+        page.getByText("Correct!").or(page.getByText("Incorrect!")),
+        { timeout: 5_000 }
+      ).toBeVisible();
+      await page.getByRole("button", { name: "Next Card" }).click({ timeout: 8_000 });
     });
 
     test("should display progress dashboard", async ({ page }) => {

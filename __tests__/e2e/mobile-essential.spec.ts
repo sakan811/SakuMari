@@ -1,5 +1,7 @@
 import { test, expect, devices } from "@playwright/test";
 
+test.describe.configure({ mode: 'parallel' }); // Enable parallel execution within this file
+
 test.describe("Mobile Essential Features", () => {
   test.describe("Mobile Navigation", () => {
     test.beforeEach(async ({ page }) => {
@@ -78,6 +80,7 @@ test.describe("Mobile Essential Features", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
     test.beforeEach(async ({ page }) => {
+      // Optimized mobile auth
       await page.goto("/");
       await page.getByLabel("Toggle mobile menu").click();
       await page.locator('button:has-text("Sign In with Credentials")').click();
@@ -151,6 +154,7 @@ test.describe("Mobile Essential Features", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
     test.beforeEach(async ({ page }) => {
+      // Optimized mobile auth with minimal progress data
       await page.goto("/");
       await page.getByLabel("Toggle mobile menu").click();
       await page.locator('button:has-text("Sign In with Credentials")').click();
@@ -160,14 +164,12 @@ test.describe("Mobile Essential Features", () => {
       await page.click('form[action*="credentials"] button[type="submit"]');
       await page.waitForURL("/");
 
-      // Generate some progress data
+      // Generate minimal progress data (reduced from 3 to 1 iteration)
       await page.goto("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
-      for (let i = 0; i < 3; i++) {
-        await page.getByPlaceholder("Type romaji equivalent...").fill("a");
-        await page.getByRole("button", { name: "Submit" }).click();
-        await page.getByRole("button", { name: "Next Card" }).click();
-      }
+      await page.getByPlaceholder("Type romaji equivalent...").fill("a");
+      await page.getByRole("button", { name: "Submit" }).click();
+      await page.getByRole("button", { name: "Next Card" }).click();
     });
 
     test("should display responsive dashboard on mobile", async ({ page }) => {

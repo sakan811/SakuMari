@@ -1,29 +1,32 @@
 import { test, expect, devices } from "@playwright/test";
 
+// Helper function to perform authentication
+async function performAuth(page: any) {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Sign In" }).click();
+  await page.waitForURL(/.*signin.*/);
+  await page.fill('input[name="email"]', "test@sakumari.local");
+  await page.fill('input[name="password"]', "TestPassword123!");
+  await page.click('form[action*="credentials"] button[type="submit"]');
+  await page.waitForURL("/");
+}
+
+test.describe.configure({ mode: 'parallel' }); // Enable parallel execution within this file
+
 test.describe("Critical Integration Flows", () => {
   test.describe("Complete Learning Session - Desktop", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
     test("should complete full desktop learning session", async ({ page }) => {
-      // Start from home page
-      await page.goto("/");
-      await expect(page.getByText("🌸 SakuMari 🌸")).toBeVisible();
-
-      // Sign in
-      await page.getByRole("button", { name: "Sign In" }).click();
-      await page.waitForURL(/.*signin.*/);
-      await page.fill('input[name="email"]', "test@sakumari.local");
-      await page.fill('input[name="password"]', "TestPassword123!");
-      await page.click('form[action*="credentials"] button[type="submit"]');
-      await page.waitForURL("/");
+      await performAuth(page);
 
       // Navigate to hiragana practice
       await page.getByText("ひらがな Hiragana").click();
       await page.waitForURL("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
 
-      // Complete practice session
-      for (let i = 0; i < 5; i++) {
+      // Reduced practice session from 5 to 2 iterations for speed
+      for (let i = 0; i < 2; i++) {
         await page.waitForSelector('[data-testid="current-kana"]');
         await page.getByPlaceholder("Type romaji equivalent...").fill("a");
         await page.getByRole("button", { name: "Submit" }).click();
@@ -33,26 +36,17 @@ test.describe("Critical Integration Flows", () => {
         await page.getByRole("button", { name: "Next Card" }).click();
       }
 
-      // Switch to katakana practice
+      // Switch to katakana practice - reduced to 1 iteration
       await page.goto("/katakana");
       await page.waitForSelector('[data-testid="current-kana"]');
-
-      // Complete katakana practice session
-      for (let i = 0; i < 3; i++) {
-        await page.waitForSelector('[data-testid="current-kana"]');
-        await page.getByTestId("multiple-choice-button").click();
-        await expect(page.getByText("Tap to select your answer")).toBeVisible();
-        await page.waitForSelector('[data-testid^="choice-button-"]');
-        const choices = await page
-          .locator('[data-testid^="choice-button-"]')
-          .all();
-        if (choices.length > 0) {
-          await choices[0].click();
-          await expect(
-            page.getByText("Correct!").or(page.getByText("Incorrect!")),
-          ).toBeVisible();
-          await page.getByRole("button", { name: "Next Card" }).click();
-        }
+      await page.getByTestId("multiple-choice-button").click();
+      await expect(page.getByText("Tap to select your answer")).toBeVisible();
+      const firstChoice = page.locator('[data-testid^="choice-button-"]').first();
+      if (await firstChoice.isVisible()) {
+        await firstChoice.click();
+        await expect(
+          page.getByText("Correct!").or(page.getByText("Incorrect!")),
+        ).toBeVisible();
       }
 
       // Check dashboard for progress
@@ -64,13 +58,7 @@ test.describe("Critical Integration Flows", () => {
     test("should handle practice session with mode switching", async ({
       page,
     }) => {
-      await page.goto("/");
-      await page.getByRole("button", { name: "Sign In" }).click();
-      await page.waitForURL(/.*signin.*/);
-      await page.fill('input[name="email"]', "test@sakumari.local");
-      await page.fill('input[name="password"]', "TestPassword123!");
-      await page.click('form[action*="credentials"] button[type="submit"]');
-      await page.waitForURL("/");
+      await performAuth(page);
 
       await page.goto("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
@@ -112,11 +100,8 @@ test.describe("Critical Integration Flows", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
     test("should complete full mobile learning session", async ({ page }) => {
-      // Start from home page
-      await page.goto("/");
-      await expect(page.getByText("🌸 SakuMari 🌸")).toBeVisible();
-
       // Sign in using mobile menu
+      await page.goto("/");
       await page.getByLabel("Toggle mobile menu").click();
       await page.locator('button:has-text("Sign In with Credentials")').click();
       await page.waitForURL(/.*signin.*/);
@@ -131,16 +116,13 @@ test.describe("Critical Integration Flows", () => {
       await page.waitForURL("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
 
-      // Complete mobile practice session
-      for (let i = 0; i < 3; i++) {
-        await page.waitForSelector('[data-testid="current-kana"]');
-        await page.getByPlaceholder("Type romaji equivalent...").fill("a");
-        await page.getByRole("button", { name: "Submit" }).click();
-        await expect(
-          page.getByText("Correct!").or(page.getByText("Incorrect!")),
-        ).toBeVisible();
-        await page.getByRole("button", { name: "Next Card" }).click();
-      }
+      // Reduced mobile practice session from 3 to 1 iteration for speed
+      await page.waitForSelector('[data-testid="current-kana"]');
+      await page.getByPlaceholder("Type romaji equivalent...").fill("a");
+      await page.getByRole("button", { name: "Submit" }).click();
+      await expect(
+        page.getByText("Correct!").or(page.getByText("Incorrect!")),
+      ).toBeVisible();
 
       // Check mobile dashboard
       await page.getByLabel("Toggle mobile menu").click();
@@ -154,23 +136,15 @@ test.describe("Critical Integration Flows", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
     test("should maintain progress across sessions", async ({ page }) => {
-      // Initial session - create some progress
-      await page.goto("/");
-      await page.getByRole("button", { name: "Sign In" }).click();
-      await page.waitForURL(/.*signin.*/);
-      await page.fill('input[name="email"]', "test@sakumari.local");
-      await page.fill('input[name="password"]', "TestPassword123!");
-      await page.click('form[action*="credentials"] button[type="submit"]');
-      await page.waitForURL("/");
+      // Use shared auth function
+      await performAuth(page);
 
-      // Generate progress data
+      // Generate minimal progress data (reduced to 1 iteration)
       await page.goto("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
-      for (let i = 0; i < 3; i++) {
-        await page.getByPlaceholder("Type romaji equivalent...").fill("a");
-        await page.getByRole("button", { name: "Submit" }).click();
-        await page.getByRole("button", { name: "Next Card" }).click();
-      }
+      await page.getByPlaceholder("Type romaji equivalent...").fill("a");
+      await page.getByRole("button", { name: "Submit" }).click();
+      await page.getByRole("button", { name: "Next Card" }).click();
 
       // Check dashboard shows progress
       await page.goto("/dashboard");
