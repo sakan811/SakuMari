@@ -194,7 +194,7 @@ export function FlashcardProvider({
               const errorData = await response.json();
               setError(errorData.message || "Authentication required");
               return;
-            } catch (parseError) {
+            } catch {
               setError("Authentication required");
               return;
             }
