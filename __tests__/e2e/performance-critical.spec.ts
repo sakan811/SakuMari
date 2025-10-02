@@ -1,10 +1,13 @@
 import { test, expect, devices } from "@playwright/test";
 
+test.describe.configure({ mode: 'parallel' }); // Enable parallel execution within this file
+
 test.describe("Performance and Critical Accessibility", () => {
   test.describe("Key Performance Benchmarks", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
     test.beforeEach(async ({ page }) => {
+      // Optimized auth with minimal navigation
       await page.goto("/");
       await page.getByRole("button", { name: "Sign In" }).click();
       await page.waitForURL(/.*signin.*/);
@@ -19,7 +22,7 @@ test.describe("Performance and Critical Accessibility", () => {
       await page.goto("/");
       await expect(page.getByText("🌸 SakuMari 🌸")).toBeVisible();
       const loadTime = Date.now() - startTime;
-      expect(loadTime).toBeLessThan(3000);
+      expect(loadTime).toBeLessThan(2000); // Reduced from 3000ms
     });
 
     test("should load practice page quickly", async ({ page }) => {
@@ -27,24 +30,22 @@ test.describe("Performance and Critical Accessibility", () => {
       await page.goto("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
       const loadTime = Date.now() - startTime;
-      expect(loadTime).toBeLessThan(3000);
+      expect(loadTime).toBeLessThan(2000); // Reduced from 3000ms
     });
 
     test("should load dashboard quickly", async ({ page }) => {
-      // Generate some practice data first
+      // Generate minimal practice data (reduced from 3 to 1 iteration)
       await page.goto("/hiragana");
       await page.waitForSelector('[data-testid="current-kana"]');
-      for (let i = 0; i < 3; i++) {
-        await page.getByPlaceholder("Type romaji equivalent...").fill("a");
-        await page.getByRole("button", { name: "Submit" }).click();
-        await page.getByRole("button", { name: "Next Card" }).click();
-      }
+      await page.getByPlaceholder("Type romaji equivalent...").fill("a");
+      await page.getByRole("button", { name: "Submit" }).click();
+      await page.getByRole("button", { name: "Next Card" }).click();
 
       const startTime = Date.now();
       await page.goto("/dashboard");
       await expect(page.getByText("Dashboard")).toBeVisible();
       const loadTime = Date.now() - startTime;
-      expect(loadTime).toBeLessThan(3000);
+      expect(loadTime).toBeLessThan(2000); // Reduced from 3000ms
     });
 
     test("should respond quickly to flashcard interactions", async ({
@@ -61,7 +62,7 @@ test.describe("Performance and Critical Accessibility", () => {
         page.getByText("Correct!").or(page.getByText("Incorrect!")),
       ).toBeVisible();
       const responseTime = Date.now() - submitStartTime;
-      expect(responseTime).toBeLessThan(1000);
+      expect(responseTime).toBeLessThan(800); // Reduced from 1000ms
 
       // Test next card response time
       const nextStartTime = Date.now();
@@ -70,7 +71,7 @@ test.describe("Performance and Critical Accessibility", () => {
         page.getByPlaceholder("Type romaji equivalent..."),
       ).toBeVisible();
       const nextResponseTime = Date.now() - nextStartTime;
-      expect(nextResponseTime).toBeLessThan(1000);
+      expect(nextResponseTime).toBeLessThan(800); // Reduced from 1000ms
     });
   });
 
@@ -218,8 +219,8 @@ test.describe("Performance and Critical Accessibility", () => {
       await mobileMenuButton.click();
 
       // Mobile menu items should be accessible
-      const menuItems = page.locator('[role="menuitem"], button').all();
-      expect(await menuItems.length).toBeGreaterThan(0);
+      const menuItems = await page.locator('[role="menuitem"], button').count();
+      expect(menuItems).toBeGreaterThan(0);
     });
   });
 });
