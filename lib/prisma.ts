@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma_client";
 import { getDatabaseUrls } from "./env";
 
@@ -25,11 +26,9 @@ const { POSTGRES_PRISMA_URL } = getDatabaseUrls();
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
-    datasources: {
-      db: {
-        url: POSTGRES_PRISMA_URL,
-      },
-    },
+    adapter: new PrismaPg({
+      connectionString: POSTGRES_PRISMA_URL,
+    }),
     log:
       process.env.NODE_ENV === "development"
         ? ["query", "error", "warn"]

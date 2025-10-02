@@ -47,6 +47,8 @@ export type FlashcardContextType = {
   setInteractionMode: (_: InteractionMode) => void;
   choices: string[];
   isSubmitting: boolean;
+  error: string | null;
+  clearError: () => void;
   generateChoicesArray: (
     _: KanaWithAccuracy,
     __: KanaWithAccuracy[],
@@ -83,6 +85,7 @@ export function FlashcardProvider({
     useState<InteractionMode>("typing");
   const [choices, setChoices] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const hasFetched = useRef(_resetHasFetched ? false : true);
 
   const fetchKanaData = useCallback(async () => {
@@ -186,30 +189,25 @@ export function FlashcardProvider({
         });
 
         if (!response.ok) {
-          // Handle authentication errors specifically
           if (response.status === 401) {
             try {
               const errorData = await response.json();
-              if (errorData.requiresReauth && errorData.redirectTo) {
-                // Redirect to homepage for re-authentication
-                window.location.href = errorData.redirectTo;
-                return;
-              }
+              setError(errorData.message || "Authentication required");
+              return;
             } catch (parseError) {
-              // If we can't parse the error, still redirect to homepage as fallback
-              window.location.href = "/";
+              setError("Authentication required");
               return;
             }
           }
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Only set result after successful API submission
+        // Clear any previous error on successful submission
+        setError(null);
         setResult(isCorrect ? "correct" : "incorrect");
       } catch (error) {
         console.error("Error submitting answer:", error);
-        // Show error state but still allow user to continue
-        setResult("incorrect");
+        setError(error instanceof Error ? error.message : "Failed to submit answer");
       } finally {
         setIsSubmitting(false);
       }
@@ -217,9 +215,15 @@ export function FlashcardProvider({
     [currentKana, isSubmitting, interactionMode],
   );
 
+  // Clear error
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
   // Proceed to next kana
   const nextCard = useCallback(() => {
     setResult(null);
+    setError(null);
     selectRandomKana(kanaList);
   }, [kanaList, selectRandomKana]);
 
@@ -239,6 +243,8 @@ export function FlashcardProvider({
     setInteractionMode: handleSetInteractionMode,
     choices,
     isSubmitting,
+    error,
+    clearError,
     generateChoicesArray,
     kanaType,
   };

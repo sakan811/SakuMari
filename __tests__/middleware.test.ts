@@ -5,18 +5,20 @@ import { NextRequest, NextResponse } from "next/server";
 vi.mock("next/server", async () => {
   const actual = await vi.importActual("next/server");
   const actualResponse = actual as { NextResponse: typeof NextResponse };
+  const mockRedirect = vi.fn((url: string) => {
+    const response = actualResponse.NextResponse.redirect(url);
+    return response;
+  });
+
+  const mockNext = vi.fn(() => actualResponse.NextResponse.next());
+
   return {
     NextResponse: {
       ...actualResponse.NextResponse,
-      redirect: vi
-        .fn()
-        .mockImplementation((url: string) =>
-          actualResponse.NextResponse.redirect(url),
-        ),
-      next: vi
-        .fn()
-        .mockImplementation(() => actualResponse.NextResponse.next()),
+      redirect: mockRedirect,
+      next: mockNext,
     },
+    URL: actual.URL,
   };
 });
 

@@ -46,6 +46,7 @@ const TestComponent = () => {
         {context.loadingKana ? "loading" : "loaded"}
       </div>
       <div data-testid="result">{context.result || "no-result"}</div>
+      <div data-testid="error">{context.error || "no-error"}</div>
       <div data-testid="choices">{context.choices.join(",")}</div>
       <div data-testid="is-submitting">
         {context.isSubmitting ? "submitting" : "idle"}
@@ -446,7 +447,7 @@ describe("FlashcardProvider", () => {
       await act(async () => {
         await waitFor(
           () => {
-            expect(screen.getByTestId("result")).toHaveTextContent("incorrect");
+            expect(screen.getByTestId("error")).toHaveTextContent("HTTP error! status: 500");
           },
           { timeout: 3000 },
         );
@@ -475,7 +476,7 @@ describe("FlashcardProvider", () => {
       await user.click(screen.getByText("Submit Answer"));
 
       await waitFor(() => {
-        expect(screen.getByTestId("result")).toHaveTextContent("incorrect");
+        expect(screen.getByTestId("error")).toHaveTextContent("Network error");
       });
     });
   });

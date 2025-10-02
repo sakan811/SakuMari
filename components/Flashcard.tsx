@@ -36,6 +36,8 @@ export default function Flashcard() {
     setInteractionMode,
     choices,
     isSubmitting,
+    error,
+    clearError,
   } = useFlashcard();
 
   // Typing mode state
@@ -44,7 +46,7 @@ export default function Flashcard() {
   // Multiple choice mode state
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
 
-  const [error, setError] = useState("");
+  const [localError, setLocalError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Focus input when component mounts, when card changes, or after result is cleared
@@ -68,7 +70,7 @@ export default function Flashcard() {
         nextCard();
         setAnswer("");
         setSelectedChoice(null);
-        setError("");
+        setLocalError("");
       }
     };
 
@@ -81,14 +83,14 @@ export default function Flashcard() {
     result,
     setInteractionMode,
     setSelectedChoice,
-    setError,
+    setError: setLocalError,
   });
 
   // Clear state when switching modes
   useEffect(() => {
     setAnswer("");
     setSelectedChoice(null);
-    setError("");
+    setLocalError("");
   }, [interactionMode]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -100,20 +102,20 @@ export default function Flashcard() {
     if (interactionMode === "typing") {
       // Validate the answer isn't empty
       if (!answer.trim()) {
-        setError("Please enter an answer");
+        setLocalError("Please enter an answer");
         return;
       }
       userAnswer = answer.trim();
     } else {
       // Multiple choice validation
       if (selectedChoice === null) {
-        setError("Please select an answer");
+        setLocalError("Please select an answer");
         return;
       }
       userAnswer = choices[selectedChoice];
     }
 
-    setError(""); // Clear any previous errors
+    setLocalError(""); // Clear any previous errors
     await submitAnswer(userAnswer);
   };
 
@@ -121,7 +123,7 @@ export default function Flashcard() {
     nextCard();
     setAnswer("");
     setSelectedChoice(null);
-    setError("");
+    setLocalError("");
   };
 
   if (loadingKana) {
@@ -167,6 +169,30 @@ export default function Flashcard() {
           </h2>
         </div>
 
+        {error && (
+          <div className="mb-3 sm:mb-4 rounded-md p-2 sm:p-3 text-center border-2 bg-red-50 text-red-800 border-red-300">
+            <p className="text-sm sm:text-base font-medium">{error}</p>
+            <button
+              onClick={clearError}
+              className="mt-1 text-xs sm:text-sm text-red-600 hover:text-red-800 underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
+        {localError && (
+          <div className="mb-3 sm:mb-4 rounded-md p-2 sm:p-3 text-center border-2 bg-red-50 text-red-800 border-red-300">
+            <p className="text-sm sm:text-base font-medium">{localError}</p>
+            <button
+              onClick={() => setLocalError("")}
+              className="mt-1 text-xs sm:text-sm text-red-600 hover:text-red-800 underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {result && (
           <div
             className={`mb-3 sm:mb-4 rounded-md p-2 sm:p-3 text-center border-2 ${
@@ -195,8 +221,8 @@ export default function Flashcard() {
                   value={answer}
                   onChange={(e) => {
                     setAnswer(e.target.value);
-                    if (error && e.target.value.trim()) {
-                      setError("");
+                    if (localError && e.target.value.trim()) {
+                      setLocalError("");
                     }
                   }}
                   onKeyDown={(e) => {
@@ -206,14 +232,14 @@ export default function Flashcard() {
                   }}
                   placeholder="Type romaji equivalent..."
                   className={`mb-1 sm:mb-2 rounded-md border-2 ${
-                    error ? "border-[#ae0d13]" : "border-[#705a39]"
+                    localError ? "border-[#ae0d13]" : "border-[#705a39]"
                   } px-3 sm:px-4 py-3 text-sm sm:text-base focus:border-[#d1622b] focus:outline-none bg-white text-[#403933] placeholder-[#705a39]`}
                   disabled={isSubmitting}
                   autoFocus
                 />
-                {error && (
+                {localError && (
                   <div className="mb-1 sm:mb-2 text-[#ae0d13] text-xs sm:text-sm font-medium">
-                    {error}
+                    {localError}
                   </div>
                 )}
               </>
@@ -225,7 +251,7 @@ export default function Flashcard() {
                   selectedChoice={selectedChoice}
                   onChoiceSelect={handleChoiceSelect}
                   disabled={isSubmitting}
-                  error={error}
+                  error={localError}
                 />
               </div>
             )}
