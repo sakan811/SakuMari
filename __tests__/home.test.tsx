@@ -36,7 +36,7 @@ describe("Home Page", () => {
   test("renders all navigation cards", () => {
     render(<Home />);
 
-    expect(screen.getByText("🌸 SakuMari")).toBeDefined();
+    expect(screen.getByText(/🌸 SakuMari/)).toBeDefined();
     expect(screen.getByText("ひらがな Hiragana Practice")).toBeDefined();
     expect(screen.getByText("カタカナ Katakana Practice")).toBeDefined();
     expect(screen.getByText("📊 View Your Progress")).toBeDefined();
