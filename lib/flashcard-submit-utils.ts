@@ -27,7 +27,10 @@ export function handleSubmissionError(error: unknown): NextResponse {
 
   // Handle Prisma foreign key constraint violations
   if (error && typeof error === 'object' && 'name' in error && error.name === 'PrismaClientKnownRequestError') {
-    const prismaError = error as any;
+    const prismaError = error as {
+      code: string;
+      message: string;
+    };
 
     // P2010: Raw query failed (foreign key constraint violation)
     // P2003: Foreign key constraint violation
