@@ -190,7 +190,15 @@ test.describe("Essential Core Functionality", () => {
       await page.getByRole("button", { name: "Submit" }).click();
       await page.getByRole("button", { name: "Next Card" }).click();
 
-      await page.waitForSelector('[data-testid="current-kana"]');
+      // Wait for the content to actually change, not just the element to exist
+      await page.waitForFunction(
+        (expectedKana) => {
+          const currentKana = document.querySelector('[data-testid="current-kana"]')?.textContent;
+          return currentKana !== expectedKana;
+        },
+        firstKana
+      );
+
       const secondKana = await page.getByTestId("current-kana").textContent();
       expect(firstKana).not.toBe(secondKana);
     });
