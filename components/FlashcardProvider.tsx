@@ -186,6 +186,21 @@ export function FlashcardProvider({
         });
 
         if (!response.ok) {
+          // Handle authentication errors specifically
+          if (response.status === 401) {
+            try {
+              const errorData = await response.json();
+              if (errorData.requiresReauth && errorData.redirectTo) {
+                // Redirect to homepage for re-authentication
+                window.location.href = errorData.redirectTo;
+                return;
+              }
+            } catch (parseError) {
+              // If we can't parse the error, still redirect to homepage as fallback
+              window.location.href = "/";
+              return;
+            }
+          }
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
