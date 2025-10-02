@@ -28,6 +28,7 @@ const { mockAuth, mockPrisma } = vi.hoisted(() => ({
       upsert: vi.fn(),
       update: vi.fn(),
     },
+    user: { findUnique: vi.fn() },
     $executeRaw: vi.fn(),
   },
 }));
@@ -47,6 +48,7 @@ describe("Additional API Edge Cases", () => {
   describe("POST /api/flashcards/submit - Additional Edge Cases", () => {
     test("handles extremely large kanaId", async () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
+      mockPrisma.user.findUnique.mockResolvedValue({ id: "user123" });
       mockPrisma.$executeRaw.mockResolvedValue(undefined);
 
       const request = new NextRequest(
@@ -145,6 +147,7 @@ describe("Additional API Edge Cases", () => {
 
     test("handles extra fields in request body", async () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
+      mockPrisma.user.findUnique.mockResolvedValue({ id: "user123" });
       mockPrisma.$executeRaw.mockResolvedValue(undefined);
 
       const request = new NextRequest(
@@ -168,6 +171,7 @@ describe("Additional API Edge Cases", () => {
 
     test("handles special characters in kanaId", async () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
+      mockPrisma.user.findUnique.mockResolvedValue({ id: "user123" });
       mockPrisma.$executeRaw.mockResolvedValue(undefined);
 
       const request = new NextRequest(

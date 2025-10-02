@@ -12,6 +12,7 @@ const { mockAuth, mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     kana: { findMany: vi.fn() },
     kanaProgress: { upsert: vi.fn(), update: vi.fn() },
+    user: { findUnique: vi.fn() },
     $executeRaw: vi.fn(),
   },
 }));
@@ -73,6 +74,7 @@ describe("API Authentication", () => {
 
     test("processes submissions for authenticated users", async () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
+      mockPrisma.user.findUnique.mockResolvedValue({ id: "user123" });
       mockPrisma.$executeRaw.mockResolvedValue(undefined);
 
       const request = new NextRequest(

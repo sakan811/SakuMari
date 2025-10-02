@@ -17,6 +17,23 @@
 
 import { NextResponse } from "next/server";
 import { ApiErrors } from "@/lib/api-errors";
+import { prisma } from "@/lib/prisma";
+
+/**
+ * Validates that a user exists in the database before attempting operations
+ */
+export async function validateUserExists(userId: string): Promise<boolean> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true }
+    });
+    return user !== null;
+  } catch (error) {
+    console.error("Error validating user existence:", error);
+    return false;
+  }
+}
 
 export function handleSubmissionError(error: unknown): NextResponse {
   if (error instanceof Error) {
@@ -26,11 +43,22 @@ export function handleSubmissionError(error: unknown): NextResponse {
   }
 
   // Handle Prisma foreign key constraint violations
-  if (error instanceof Error && error.name === 'PrismaClientKnownRequestError') {
-    const prismaError = error as { code?: string };
+  if (error && typeof error === 'object' && 'name' in error && error.name === 'PrismaClientKnownRequestError') {
+    const prismaError = error as any;
+
+    // P2010: Raw query failed (foreign key constraint violation)
+    // P2003: Foreign key constraint violation
     if (prismaError.code === 'P2010' || prismaError.code === 'P2003') {
+      console.error("Foreign key constraint violation - user may not exist in database:", prismaError.message);
+
+      // Return a more specific error that includes redirect information
       return NextResponse.json(
-        { error: "Please sign in" },
+        {
+          error: "Authentication required",
+          message: "Please sign in to continue",
+          requiresReauth: true,
+          redirectTo: "/"
+        },
         { status: 401 }
       );
     }

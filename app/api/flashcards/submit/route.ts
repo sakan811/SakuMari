@@ -19,7 +19,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
 import { validateRequired, validateTypes } from "@/lib/api-errors";
-import { handleSubmissionError } from "@/lib/flashcard-submit-utils";
+import { handleSubmissionError, validateUserExists } from "@/lib/flashcard-submit-utils";
 
 async function submitAnswer(
   request: NextRequest,
@@ -44,6 +44,21 @@ async function submitAnswer(
       isCorrect: (value) => typeof value === "boolean",
     });
     if (typeValidation) return typeValidation;
+
+    // Validate that the user exists in the database before proceeding
+    const userExists = await validateUserExists(context.userId);
+    if (!userExists) {
+      console.error("User not found in database:", context.userId);
+      return NextResponse.json(
+        {
+          error: "Authentication required",
+          message: "Please sign in to continue",
+          requiresReauth: true,
+          redirectTo: "/"
+        },
+        { status: 401 }
+      );
+    }
 
     // Optimized progress tracking using raw SQL to calculate accuracy in single operation
     await prisma.$executeRaw`

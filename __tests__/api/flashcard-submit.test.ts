@@ -49,6 +49,9 @@ const { mockAuth, mockPrisma } = vi.hoisted(() => ({
       findFirst: vi.fn(),
       upsert: vi.fn(),
     },
+    user: {
+      findUnique: vi.fn(),
+    },
   },
 }));
 
@@ -59,6 +62,8 @@ vi.mock("@/lib/prisma", () => ({ prisma: mockPrisma }));
 describe("Flashcard Submit API", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default: set up user to exist in database
+    mockPrisma.user.findUnique.mockResolvedValue({ id: "user123" });
   });
 
   describe("Database Operations", () => {
