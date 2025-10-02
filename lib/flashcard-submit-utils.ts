@@ -25,5 +25,16 @@ export function handleSubmissionError(error: unknown): NextResponse {
     }
   }
 
+  // Handle Prisma foreign key constraint violations
+  if (error instanceof Error && error.name === 'PrismaClientKnownRequestError') {
+    const prismaError = error as { code?: string };
+    if (prismaError.code === 'P2010' || prismaError.code === 'P2003') {
+      return NextResponse.json(
+        { error: "Please sign in" },
+        { status: 401 }
+      );
+    }
+  }
+
   return ApiErrors.internalError("Failed to submit flashcard answer");
 }
