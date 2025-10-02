@@ -26,21 +26,30 @@ export function handleSubmissionError(error: unknown): NextResponse {
   }
 
   // Handle Prisma foreign key constraint violations
-  if (error && typeof error === 'object' && 'name' in error && error.name === 'PrismaClientKnownRequestError') {
+  if (
+    error &&
+    typeof error === "object" &&
+    "name" in error &&
+    error.name === "PrismaClientKnownRequestError"
+  ) {
     const prismaError = error as unknown as { code: string; message: string };
 
     // P2010: Raw query failed (foreign key constraint violation)
     // P2003: Foreign key constraint violation
-    if (prismaError.code === 'P2010' || prismaError.code === 'P2003') {
-      console.error("Foreign key constraint violation - user may not exist in database:", prismaError.message);
+    if (prismaError.code === "P2010" || prismaError.code === "P2003") {
+      console.error(
+        "Foreign key constraint violation - user may not exist in database:",
+        prismaError.message,
+      );
 
       // Return a simple error message
       return NextResponse.json(
         {
           error: "User not found",
-          message: "Your user account could not be found in the database. Please sign in again.",
+          message:
+            "Your user account could not be found in the database. Please sign in again.",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
   }

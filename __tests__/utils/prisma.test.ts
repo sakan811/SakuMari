@@ -90,7 +90,8 @@ describe("Prisma Client Configuration", () => {
       adapter: expect.objectContaining({
         adapterName: "@prisma/adapter-pg",
         config: {
-          connectionString: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+          connectionString:
+            "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
         },
         externalPool: null,
         options: undefined,
@@ -136,7 +137,8 @@ describe("Prisma Client Configuration", () => {
       adapter: expect.objectContaining({
         adapterName: "@prisma/adapter-pg",
         config: {
-          connectionString: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+          connectionString:
+            "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
         },
         externalPool: null,
         options: undefined,
@@ -158,7 +160,8 @@ describe("Prisma Client Configuration", () => {
       adapter: expect.objectContaining({
         adapterName: "@prisma/adapter-pg",
         config: {
-          connectionString: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+          connectionString:
+            "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
         },
         externalPool: null,
         options: undefined,
@@ -180,7 +183,8 @@ describe("Prisma Client Configuration", () => {
       adapter: expect.objectContaining({
         adapterName: "@prisma/adapter-pg",
         config: {
-          connectionString: "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
+          connectionString:
+            "postgresql://postgres:postgres@localhost:5432/kana_flashcard",
         },
         externalPool: null,
         options: undefined,
