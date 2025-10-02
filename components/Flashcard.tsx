@@ -181,7 +181,6 @@ export default function Flashcard() {
           </div>
         )}
 
-  
         {result && (
           <div
             className={`mb-3 sm:mb-4 rounded-md p-2 sm:p-3 text-center border-2 ${

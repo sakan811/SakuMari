@@ -207,7 +207,9 @@ export function FlashcardProvider({
         setResult(isCorrect ? "correct" : "incorrect");
       } catch (error) {
         console.error("Error submitting answer:", error);
-        setError(error instanceof Error ? error.message : "Failed to submit answer");
+        setError(
+          error instanceof Error ? error.message : "Failed to submit answer",
+        );
       } finally {
         setIsSubmitting(false);
       }

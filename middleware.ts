@@ -32,7 +32,7 @@ export default auth((req) => {
 });
 
 export const config = {
-  runtime: 'nodejs',
+  runtime: "nodejs",
   matcher: [
     "/hiragana",
     "/katakana",

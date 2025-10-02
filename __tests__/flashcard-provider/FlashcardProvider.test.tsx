@@ -447,7 +447,9 @@ describe("FlashcardProvider", () => {
       await act(async () => {
         await waitFor(
           () => {
-            expect(screen.getByTestId("error")).toHaveTextContent("HTTP error! status: 500");
+            expect(screen.getByTestId("error")).toHaveTextContent(
+              "HTTP error! status: 500",
+            );
           },
           { timeout: 3000 },
         );

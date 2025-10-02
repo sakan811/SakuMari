@@ -78,6 +78,7 @@
 **Responsive Strategy:** Mobile-first design with progressive enhancement
 
 **Key API Endpoints:**
+
 - `GET /api/stats` - Progress data API (protected - requires authentication)
 - `POST /api/flashcards/submit` - Answer processing API (protected)
 - `POST /api/tips` - AI learning tips API (protected)
@@ -86,6 +87,7 @@
 - `GET /api/health` - System health monitoring (public)
 
 **Route Protection:**
+
 - Protected routes: `/hiragana`, `/katakana`, `/dashboard`, `/api/stats`, `/api/flashcards/*`, `/api/tips`
 - Public routes: `/`, `/api/auth/*`, `/api/health`
 - Middleware enforces authentication for all practice and progress APIs
@@ -176,6 +178,7 @@ __tests__/
 ```
 
 **Test Coverage:**
+
 - **76 total test files** covering unit, integration, database, and E2E scenarios
 - **Comprehensive API testing** with isolation and error handling
 - **Cross-browser E2E testing** with Playwright
