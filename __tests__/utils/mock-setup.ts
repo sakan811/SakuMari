@@ -100,6 +100,8 @@ export function mockFlashcardProvider(overrides = {}) {
     setInteractionMode: vi.fn(),
     choices: [],
     isSubmitting: false,
+    error: null,
+    clearError: vi.fn(),
     ...overrides,
   };
 }

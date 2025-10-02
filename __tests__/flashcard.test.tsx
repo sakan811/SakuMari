@@ -940,6 +940,120 @@ describe("Flashcard Component", () => {
     });
   });
 
+  describe("Error Display and Dismissal (Line 172)", () => {
+    test("displays error message with dismiss button when error is present", () => {
+      const clearError = vi.fn();
+      setupProvider(
+        createMockProvider({
+          currentKana: MOCK_KANA,
+          error: "Network error occurred",
+          clearError,
+        }),
+      );
+
+      render(<Flashcard />);
+
+      // Check that error message is displayed
+      expect(screen.getByText("Network error occurred")).toBeInTheDocument();
+
+      // Check that dismiss button is present
+      const dismissButton = screen.getByText("Dismiss");
+      expect(dismissButton).toBeInTheDocument();
+      expect(dismissButton).toHaveClass(
+        "text-red-600",
+        "hover:text-red-800",
+        "underline"
+      );
+    });
+
+    test("calls clearError when dismiss button is clicked", () => {
+      const clearError = vi.fn();
+      setupProvider(
+        createMockProvider({
+          currentKana: MOCK_KANA,
+          error: "Connection failed",
+          clearError,
+        }),
+      );
+
+      render(<Flashcard />);
+
+      const dismissButton = screen.getByText("Dismiss");
+      fireEvent.click(dismissButton);
+
+      expect(clearError).toHaveBeenCalledTimes(1);
+    });
+
+    test("does not display error section when no error is present", () => {
+      setupProvider(createMockProvider({ currentKana: MOCK_KANA }));
+
+      render(<Flashcard />);
+
+      // Error section should not be rendered
+      expect(screen.queryByText("Network error occurred")).toBeNull();
+      expect(screen.queryByText("Dismiss")).toBeNull();
+    });
+
+    test("error section has correct styling and structure", () => {
+      setupProvider(
+        createMockProvider({
+          currentKana: MOCK_KANA,
+          error: "Validation error",
+        }),
+      );
+
+      render(<Flashcard />);
+
+      const errorContainer = screen.getByText("Validation error").closest("div");
+      expect(errorContainer).toHaveClass(
+        "mb-3",
+        "sm:mb-4",
+        "rounded-md",
+        "p-2",
+        "sm:p-3",
+        "text-center",
+        "border-2",
+        "bg-red-50",
+        "text-red-800",
+        "border-red-300"
+      );
+
+      const errorMessage = screen.getByText("Validation error");
+      expect(errorMessage).toHaveClass(
+        "text-sm",
+        "sm:text-base",
+        "font-medium"
+      );
+    });
+
+    test("displays different error messages correctly", () => {
+      const errorMessages = [
+        "Network timeout",
+        "Invalid credentials",
+        "Server error occurred",
+        "Please try again later"
+      ];
+
+      errorMessages.forEach((errorMessage) => {
+        const clearError = vi.fn();
+        setupProvider(
+          createMockProvider({
+            currentKana: MOCK_KANA,
+            error: errorMessage,
+            clearError,
+          }),
+        );
+
+        const { unmount } = render(<Flashcard />);
+
+        expect(screen.getByText(errorMessage)).toBeInTheDocument();
+        expect(screen.getByText("Dismiss")).toBeInTheDocument();
+
+        unmount();
+      });
+    });
+  });
+
   describe("Lines 120-126 coverage through component interaction", () => {
     test("handleModeChange early return logic is tested through component interaction", () => {
       // The handleModeChange function (lines 120-123) is tested through the existing
