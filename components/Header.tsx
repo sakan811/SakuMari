@@ -17,6 +17,7 @@
 
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
@@ -42,9 +43,16 @@ export default function Header({
           {/* Logo */}
           <Link
             href="/"
-            className="text-lg sm:text-2xl font-bold text-[#fad182] hover:text-white transition-colors duration-200 drop-shadow-sm min-h-[44px] relative z-10 inline-flex items-center"
+            className="text-lg sm:text-2xl font-bold text-[#fad182] hover:text-white transition-colors duration-200 drop-shadow-sm min-h-[44px] relative z-10 inline-flex items-center gap-2"
           >
-            🌸 SakuMari
+            <Image
+              src="/favicon.ico"
+              alt="SakuMari Icon"
+              width={24}
+              height={24}
+              className="w-6 h-6 sm:w-8 sm:h-8"
+            />
+            SakuMari
           </Link>
 
           {/* Desktop Navigation */}
