@@ -4,7 +4,7 @@
 
 ![System Architecture](mermaid/system.svg)
 
-**Core Stack:** Next.js 15 App Router + NextAuth.js v5 + PostgreSQL 17 + Google Gemini AI
+**Core Stack:** Next.js 15.5.4 App Router + NextAuth.js v5.0.0-beta.29 + PostgreSQL 17 + Google Gemini AI v0.24.1
 
 **Key Components:**
 
@@ -77,6 +77,19 @@
 
 **Responsive Strategy:** Mobile-first design with progressive enhancement
 
+**Key API Endpoints:**
+- `GET /api/stats` - Progress data API (protected - requires authentication)
+- `POST /api/flashcards/submit` - Answer processing API (protected)
+- `POST /api/tips` - AI learning tips API (protected)
+- `GET /api/auth/providers` - Available login options
+- `POST /api/auth/[...nextauth]` - Authentication session management
+- `GET /api/health` - System health monitoring (public)
+
+**Route Protection:**
+- Protected routes: `/hiragana`, `/katakana`, `/dashboard`, `/api/stats`, `/api/flashcards/*`, `/api/tips`
+- Public routes: `/`, `/api/auth/*`, `/api/health`
+- Middleware enforces authentication for all practice and progress APIs
+
 ## App Architecture
 
 ![App Architecture](mermaid/app.svg)
@@ -91,7 +104,7 @@
 - **SEO Optimized:** Dynamic `sitemap.ts`, `robots.ts`, and page-level metadata
 - **Performance:** Automatic code splitting, SSR, and static generation
 - **Health Monitoring:** Database connectivity endpoint (`/api/health`)
-- **Enhanced Protection:** Middleware enforcement for all practice and progress APIs
+- **Enhanced Protection:** Middleware enforcement for all practice and progress APIs (`/hiragana`, `/katakana`, `/dashboard`, `/api/flashcards/*`, `/api/stats`)
 
 ## Project Structure Overview
 
@@ -161,6 +174,8 @@ __tests__/
 ├── seo/                      # SEO and metadata tests
 └── utils/                    # Test helpers and utilities
 ```
+
+**Note**: Some hook tests are still being organized into the `__tests__/hooks/` directory structure. The `use-flashcard-handlers.test.ts` file exists at the root level and will be moved to `__tests__/hooks/` for consistency.
 
 **Development Infrastructure:**
 

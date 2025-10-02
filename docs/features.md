@@ -2,7 +2,7 @@
 
 Learn Japanese Hiragana and Katakana with SakuMari's comprehensive feature set designed to make your learning journey effective and enjoyable.
 
-**Last Updated**: September 2025
+**Last Updated**: October 2025
 
 ## Table of Contents
 
