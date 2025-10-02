@@ -61,6 +61,7 @@ const TestComponent = () => {
       <button onClick={() => context.submitAnswer("test")}>
         Submit Answer
       </button>
+      <button onClick={() => context.clearError()}>Clear Error</button>
     </div>
   );
 };
@@ -674,6 +675,208 @@ describe("FlashcardProvider", () => {
 
       // Verify fetch was only called once (initial load) since submission should be prevented
       expect(fetch).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("401 Authentication Error Handling (Lines 193-199)", () => {
+    it("should handle 401 authentication error with custom message", async () => {
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      (fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockKanaData),
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          json: () => Promise.resolve({ message: "Session expired. Please sign in again." }),
+        });
+
+      const user = userEvent.setup();
+      render(
+        <FlashcardProvider>
+          <TestComponent />
+        </FlashcardProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("loading")).toHaveTextContent("loaded");
+      });
+
+      await user.click(screen.getByText("Submit Answer"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error")).toHaveTextContent("Session expired. Please sign in again.");
+      });
+
+      // Should not log console errors for 401 (expected auth error)
+      expect(consoleSpy).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it("should handle 401 authentication error with fallback message", async () => {
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      (fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockKanaData),
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          json: () => Promise.reject(new Error("Invalid JSON")),
+        });
+
+      const user = userEvent.setup();
+      render(
+        <FlashcardProvider>
+          <TestComponent />
+        </FlashcardProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("loading")).toHaveTextContent("loaded");
+      });
+
+      await user.click(screen.getByText("Submit Answer"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error")).toHaveTextContent("Authentication required");
+      });
+
+      // Should not log console errors for 401 (expected auth error)
+      expect(consoleSpy).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it("should handle 401 authentication error and return early without setting result", async () => {
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      (fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockKanaData),
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          json: () => Promise.resolve({ message: "Authentication failed" }),
+        });
+
+      const user = userEvent.setup();
+      render(
+        <FlashcardProvider>
+          <TestComponent />
+        </FlashcardProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("loading")).toHaveTextContent("loaded");
+      });
+
+      await user.click(screen.getByText("Submit Answer"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error")).toHaveTextContent("Authentication failed");
+      });
+
+      // Result should not be set when 401 error occurs
+      expect(screen.getByTestId("result")).toHaveTextContent("no-result");
+
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe("clearError function (Line 222)", () => {
+    it("should provide clearError function in context", async () => {
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockKanaData),
+      });
+
+      render(
+        <FlashcardProvider>
+          <TestComponent />
+        </FlashcardProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("loading")).toHaveTextContent("loaded");
+      });
+
+      // The clearError function should be available in the context
+      const clearErrorButton = screen.getByText("Clear Error");
+      expect(clearErrorButton).toBeInTheDocument();
+    });
+
+    it("should clear error when clearError is called", async () => {
+      (fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockKanaData),
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          json: () => Promise.resolve({ message: "Authentication error" }),
+        });
+
+      const user = userEvent.setup();
+      render(
+        <FlashcardProvider>
+          <TestComponent />
+        </FlashcardProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("loading")).toHaveTextContent("loaded");
+      });
+
+      // Submit answer to trigger error
+      await user.click(screen.getByText("Submit Answer"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error")).toHaveTextContent("Authentication error");
+      });
+
+      // Clear error
+      await user.click(screen.getByText("Clear Error"));
+
+      // Error should be cleared
+      await waitFor(() => {
+        expect(screen.getByTestId("error")).toHaveTextContent("no-error");
+      });
+    });
+
+    it("should handle clearError when no error exists", async () => {
+      (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockKanaData),
+      });
+
+      const user = userEvent.setup();
+      render(
+        <FlashcardProvider>
+          <TestComponent />
+        </FlashcardProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("loading")).toHaveTextContent("loaded");
+      });
+
+      // Error should initially be null
+      expect(screen.getByTestId("error")).toHaveTextContent("no-error");
+
+      // Clear error when no error exists
+      await user.click(screen.getByText("Clear Error"));
+
+      // Error should still be null (no error should be thrown)
+      expect(screen.getByTestId("error")).toHaveTextContent("no-error");
     });
   });
 });
