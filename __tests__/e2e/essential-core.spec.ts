@@ -188,7 +188,15 @@ test.describe("Essential Core Functionality", () => {
       const firstKana = await page.getByTestId("current-kana").textContent();
       await page.getByPlaceholder("Type romaji equivalent...").fill("a");
       await page.getByRole("button", { name: "Submit" }).click();
-      await page.getByRole("button", { name: "Next Card" }).click();
+
+      // Wait for feedback to appear first
+      await expect(
+        page.getByText("Correct!").or(page.getByText("Incorrect!")),
+        { timeout: 10_000 }
+      ).toBeVisible();
+
+      // Then click Next Card with extended timeout for mobile
+      await page.getByRole("button", { name: "Next Card" }).click({ timeout: 15_000 });
 
       // Wait for the content to actually change, not just the element to exist
       await page.waitForFunction(
@@ -196,7 +204,8 @@ test.describe("Essential Core Functionality", () => {
           const currentKana = document.querySelector('[data-testid="current-kana"]')?.textContent;
           return currentKana !== expectedKana;
         },
-        firstKana
+        firstKana,
+        { timeout: 10_000 }
       );
 
       const secondKana = await page.getByTestId("current-kana").textContent();
@@ -231,7 +240,12 @@ test.describe("Essential Core Functionality", () => {
       for (let i = 0; i < 3; i++) {
         await page.getByPlaceholder("Type romaji equivalent...").fill("a");
         await page.getByRole("button", { name: "Submit" }).click();
-        await page.getByRole("button", { name: "Next Card" }).click();
+        // Wait for feedback before clicking Next Card
+        await expect(
+          page.getByText("Correct!").or(page.getByText("Incorrect!")),
+          { timeout: 10_000 }
+        ).toBeVisible();
+        await page.getByRole("button", { name: "Next Card" }).click({ timeout: 15_000 });
       }
     });
 

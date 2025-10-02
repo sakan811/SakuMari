@@ -14,6 +14,11 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : 2,
   reporter: "html",
+  timeout: 60 * 1000, // 60 seconds per test
+  globalTimeout: 10 * 60 * 1000, // 10 minutes for entire test run
+  expect: {
+    timeout: 15 * 1000, // 15 seconds for assertions
+  },
 
   // Playwright will manage the Next.js server
   webServer: {
@@ -31,6 +36,8 @@ export default defineConfig({
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
+    actionTimeout: 15 * 1000, // 15 seconds for actions
+    navigationTimeout: 30 * 1000, // 30 seconds for navigation
   },
 
   projects: [
@@ -80,6 +87,8 @@ export default defineConfig({
         ...devices["iPhone 12"],
         storageState: "playwright/.auth/user.json",
         hasTouch: true,
+        actionTimeout: 20 * 1000, // 20 seconds for mobile actions
+        navigationTimeout: 40 * 1000, // 40 seconds for mobile navigation
       },
       dependencies: ["setup"],
       testMatch: /.*essential-.*\.spec\.ts$/,
