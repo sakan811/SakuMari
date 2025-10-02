@@ -181,18 +181,7 @@ export default function Flashcard() {
           </div>
         )}
 
-        {localError && (
-          <div className="mb-3 sm:mb-4 rounded-md p-2 sm:p-3 text-center border-2 bg-red-50 text-red-800 border-red-300">
-            <p className="text-sm sm:text-base font-medium">{localError}</p>
-            <button
-              onClick={() => setLocalError("")}
-              className="mt-1 text-xs sm:text-sm text-red-600 hover:text-red-800 underline"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
-
+  
         {result && (
           <div
             className={`mb-3 sm:mb-4 rounded-md p-2 sm:p-3 text-center border-2 ${
