@@ -14,6 +14,8 @@
 - **Data Layer:** Prisma ORM with type-safe PostgreSQL queries + custom Prisma client generation
 - **AI Integration:** Google Gemini for personalized learning recommendations
 - **Utilities:** Kana filtering system, API middleware, error handling, background management
+- **License Management:** Automated license header management with validation scripts
+- **Code Quality:** SonarQube integration for comprehensive analysis and coverage reporting
 
 ## Component Architecture
 
@@ -30,6 +32,8 @@
 - **FlashcardProvider:** Confidence-weighted adaptive learning algorithm + flashcard state
 - **SessionProviders:** NextAuth.js authentication context
 - **Custom Hooks:** `useDashboardData`, `useSorting`, `useAuthStatus`, `useFlashcardInteraction`, `useFlashcardHandlers`
+- **UI Component System:** Modular `/components/ui/` directory with Button, ButtonLink, FilterButton components
+- **Error Handling:** Enhanced API utilities for foreign key constraint violations
 
 **Component Groups:**
 
@@ -37,6 +41,7 @@
 
 - **HomePage** - Landing page with auth-aware content
 - **FlashcardApp** - Main practice session container
+- **FlashcardProvider** - Confidence-weighted adaptive learning context
 - **Header** - Global navigation + auth controls
 - **SessionProviders** - Authentication wrapper
 
@@ -53,12 +58,22 @@
 - **CharacterProgressTable** - Sortable/filterable progress data
 - **TipsModal** - AI chat interface
 
+### Table Components
+
+- **CharacterProgressTable** - Sortable progress data table
+- **CharacterTableRow** - Individual progress row component
+- **SortableTableHeader** - Sortable column headers
+
+### Navigation Components
+
+- **DesktopNavigation** - Desktop navigation menu
+- **MobileNavigation** - Mobile navigation menu
+
 ### UI Components
 
-- **Navigation** - Desktop/Mobile responsive menus
-- **Table** - Sortable headers, data rows
-- **Buttons** - Consistent interface elements (`/components/ui/` directory)
-- **Filtering** - Filter buttons for character type selection (all/hiragana/katakana)
+- **Button** - Consistent button interface (`/components/ui/` directory)
+- **ButtonLink** - Link-style button component (`/components/ui/` directory)
+- **FilterButton** - Filter buttons for character type selection (`/components/ui/` directory)
 
 **Responsive Strategy:** Mobile-first design with progressive enhancement
 
@@ -75,6 +90,8 @@
 - **Co-located APIs:** Route handlers alongside pages for better organization
 - **SEO Optimized:** Dynamic `sitemap.ts`, `robots.ts`, and page-level metadata
 - **Performance:** Automatic code splitting, SSR, and static generation
+- **Health Monitoring:** Database connectivity endpoint (`/api/health`)
+- **Enhanced Protection:** Middleware enforcement for all practice and progress APIs
 
 ## Project Structure Overview
 
@@ -115,7 +132,7 @@ lib/
 ├── backgrounds.ts              # Background management
 ├── metadata.ts                 # SEO & metadata configuration
 ├── kana-filter.ts              # Character filtering utilities
-├── flashcard-submit-utils.ts   # Flashcard submission utilities
+├── flashcard-submit-utils.ts   # Flashcard submission utilities and validation
 ├── flashcard-utils.ts          # Flashcard helper functions
 └── should-fetch-kana-data.ts   # Data fetching utilities
 ```
@@ -126,8 +143,8 @@ lib/
 hooks/
 ├── useAuthStatus.ts          # Authentication state management
 ├── useDashboardData.ts       # Dashboard data fetching
-├── useFlashcardInteraction.ts # Flashcard interaction logic
 ├── useFlashcardHandlers.ts   # Flashcard mode and choice selection handlers
+├── useFlashcardInteraction.ts # Flashcard interaction logic
 └── useSorting.ts             # Table sorting functionality
 ```
 
@@ -143,4 +160,17 @@ __tests__/
 ├── hooks/                    # Custom hooks tests
 ├── seo/                      # SEO and metadata tests
 └── utils/                    # Test helpers and utilities
+```
+
+**Development Infrastructure:**
+
+```
+docker/                         # Docker configuration for local testing
+├── Dockerfile                  # Application container definition
+└── docker-compose.yml          # PostgreSQL development environment
+scripts/                        # Development automation scripts
+└── manage-license-headers.js   # License header management
+sonar-project.properties        # SonarQube code quality configuration
+generated/                      # Generated code and clients
+└── prisma_client/              # Custom Prisma client output
 ```
