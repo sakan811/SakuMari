@@ -6,59 +6,61 @@ config:
 ---
 flowchart LR
     %% Authentication Layer
-    SessionProviders["🔐 SessionProviders<br/>Authentication Context Provider<br/>NextAuth.js Session Management"]
+    SessionProviders["🔐 SessionProviders<br/>Authentication Context<br/>NextAuth.js"]
 
     %% Root Application Structure
-    SessionProviders --> HomePage["🏠 HomePage<br/>Landing Page Component<br/>Authentication-aware Content"]
-    SessionProviders --> FlashcardApp["⚡ FlashcardApp<br/>Main Practice Application<br/>Container for All Practice Features"]
+    SessionProviders --> HomePage["🏠 HomePage<br/>Landing Page<br/>Authentication-aware"]
+    SessionProviders --> FlashcardApp["⚡ FlashcardApp<br/>Main Practice App<br/>Container"]
 
     %% Core Application Components
-    FlashcardApp --> Header["📋 Header<br/>Global Navigation Component<br/>Authentication Controls"]
-    FlashcardApp --> FlashcardProvider["🎯 FlashcardProvider<br/>React Context Provider<br/>Adaptive Learning Algorithm & State"]
+    FlashcardApp --> Header["📋 Header<br/>Global Navigation<br/>Authentication Controls"]
+    FlashcardApp --> FlashcardProvider["🎯 FlashcardProvider<br/>React Context<br/>Adaptive Learning"]
 
-    %% Navigation Components (Header Children)
-    Header --> DesktopNavigation["🖥️ DesktopNavigation<br/>Desktop Menu Interface<br/>Large Screen Navigation"]
-    Header --> MobileNavigation["📱 MobileNavigation<br/>Mobile Menu Interface<br/>Responsive Navigation"]
+    %% Navigation Components
+    Header --> DesktopNavigation["🖥️ DesktopNavigation<br/>Desktop Menu<br/>Large Screen"]
+    Header --> MobileNavigation["📱 MobileNavigation<br/>Mobile Menu<br/>Responsive"]
 
     %% Practice Flow Components
-    FlashcardProvider --> Flashcard["🃏 Flashcard<br/>Main Practice Interface<br/>Dual Input Mode Support"]
+    FlashcardProvider --> Flashcard["🃏 Flashcard<br/>Practice Interface<br/>Dual Input Modes"]
 
     Flashcard --> ModeSelector["⌨️ ModeSelector<br/>Input Mode Toggle<br/>Typing vs Multiple Choice"]
-    Flashcard --> MultipleChoice["📝 MultipleChoice<br/>Multiple Choice Interface<br/>Answer Selection UI"]
+    Flashcard --> MultipleChoice["📝 MultipleChoice<br/>Multiple Choice Interface<br/>Answer Selection"]
+    Flashcard --> FilterButton["🔍 FilterButton<br/>Character Type Filter<br/>Hiragana/Katakana/All"]
 
-    %% Dashboard and Progress Components
-    FlashcardApp --> Dashboard["📊 Dashboard<br/>Progress Tracking Main View<br/>Statistics and Analytics"]
+    %% Dashboard Components
+    FlashcardApp --> Dashboard["📊 Dashboard<br/>Progress Tracking<br/>Statistics & Analytics"]
 
-    Dashboard --> StatsSummary["📈 StatsSummary<br/>Progress Overview Cards<br/>Key Metrics Display"]
-    Dashboard --> CharacterProgressTable["📋 CharacterProgressTable<br/>Detailed Progress Table<br/>Character-level Statistics"]
-    Dashboard --> TipsModal["🤖 TipsModal<br/>AI Chat Interface<br/>Personalized Learning Tips"]
+    Dashboard --> StatsSummary["📈 StatsSummary<br/>Progress Overview<br/>Key Metrics"]
+    Dashboard --> CharacterProgressTable["📋 CharacterProgressTable<br/>Progress Table<br/>Character Statistics"]
+    Dashboard --> TipsModal["🤖 TipsModal<br/>AI Chat Interface<br/>Learning Tips"]
 
     %% Table Sub-Components
-    CharacterProgressTable --> SortableTableHeader["🔄 SortableTableHeader<br/>Column Sorting Controls<br/>Dynamic Table Ordering"]
-    CharacterProgressTable --> CharacterTableRow["📝 CharacterTableRow<br/>Individual Character Stats<br/>Progress Data Display"]
+    CharacterProgressTable --> SortableTableHeader["🔄 SortableTableHeader<br/>Column Sorting<br/>Dynamic Ordering"]
+    CharacterProgressTable --> CharacterTableRow["📝 CharacterTableRow<br/>Individual Stats<br/>Progress Data"]
 
     %% Custom Hooks Integration
-    Dashboard --> useDashboardData["🔧 useDashboardData<br/>Data Fetching Hook<br/>Progress Statistics API"]
-    Dashboard --> useSorting["🔧 useSorting<br/>Table Sorting Hook<br/>Column Sort Logic"]
-    Header --> useAuthStatus["🔧 useAuthStatus<br/>Authentication Hook<br/>Session State Management"]
+    Dashboard --> useDashboardData["🔧 useDashboardData<br/>Data Fetching<br/>Progress API"]
+    Dashboard --> useSorting["🔧 useSorting<br/>Table Sorting<br/>Column Logic"]
+    Header --> useAuthStatus["🔧 useAuthStatus<br/>Authentication<br/>Session State"]
+    Flashcard --> useFlashcardHandlers["🔧 useFlashcardHandlers<br/>Mode & Choice<br/>Input Management"]
+    Flashcard --> useFlashcardInteraction["🔧 useFlashcardInteraction<br/>Interaction<br/>Card Logic"]
 
-    %% Reusable UI Components
-    Button["🔘 Button<br/>Reusable Button Component<br/>Consistent UI Element"]
-    ButtonLink["🔗 ButtonLink<br/>Link Button Component<br/>Navigation UI Element"]
+    %% UI Components System
+    Button["🔘 Button<br/>Reusable Component<br/>Consistent UI"]
+    ButtonLink["🔗 ButtonLink<br/>Link Component<br/>Navigation"]
+    FilterButton["🔍 FilterButton<br/>Filter Component<br/>Character Type"]
 
     %% Component Usage Relationships
     HomePage -.-> Header
     HomePage -.-> ButtonLink
     Dashboard -.-> Button
     Dashboard -.-> ButtonLink
-    ModeSelector -.-> Button
-    MultipleChoice -.-> Button
     Flashcard -.-> Button
+    Flashcard -.-> FilterButton
+    Dashboard -.-> FilterButton
 
     %% Context Provider Relationships
     FlashcardProvider -.-> Flashcard
-    FlashcardProvider -.-> ModeSelector
-    FlashcardProvider -.-> MultipleChoice
     SessionProviders -.-> Dashboard
 
     %% Styling Classes
@@ -72,6 +74,6 @@ flowchart LR
     class SessionProviders,HomePage,FlashcardApp,Header,DesktopNavigation,MobileNavigation coreComponent
     class Flashcard,ModeSelector,MultipleChoice,FlashcardProvider practiceComponent
     class Dashboard,StatsSummary,CharacterProgressTable,SortableTableHeader,CharacterTableRow,TipsModal dashboardComponent
-    class Button,ButtonLink uiComponent
+    class Button,ButtonLink,FilterButton uiComponent
     class FlashcardProvider,SessionProviders contextProvider
-    class useDashboardData,useSorting,useAuthStatus customHook
+    class useDashboardData,useSorting,useAuthStatus,useFlashcardHandlers,useFlashcardInteraction customHook

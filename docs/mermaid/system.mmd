@@ -2,44 +2,47 @@
 config:
   theme: 'forest'
   defaultRenderer: "elk"
+  layout: elk
 ---
 flowchart TD
     %% User Interface Layer
-    User([👤 User]) --> Browser{{"🌐 Next.js App Router"}}
+    User([👤 User]) --> Browser{{"🌐 Next.js 15.5.4 App Router<br/>Web framework for user interface"}}
 
     %% Authentication Flow
-    Browser --> Auth["🔐 NextAuth.js v5<br/>Google OAuth + Test Creds"]
-    Auth --> Session["📝 Session Management<br/>30-day JWT + Cookies"]
+    Browser --> Auth["🔐 NextAuth.js v5.0.0-beta.29<br/>Google OAuth + Test Creds<br/>Authentication service"]
+    Auth --> Session["📝 Session Management<br/>30-day JWT + Cookies<br/>User session persistence"]
+    Auth --> Middleware["🛡️ Middleware Protection<br/>Route Access Control<br/>Route security enforcement"]
 
     %% Page Routes
-    Browser --> Home["🏠 HomePage<br/>Landing & Navigation"]
-    Browser --> Practice["⚡ Practice Pages<br/>Hiragana/Katakana"]
-    Browser --> Dashboard["📊 Dashboard<br/>Progress Tracking"]
+    Browser --> Home["🏠 HomePage<br/>(Public)<br/>Landing and navigation page"]
+    Browser --> Practice["⚡ Practice Pages<br/>(Protected)<br/>Kana learning interface"]
+    Browser --> Dashboard["📊 Dashboard<br/>(Protected)<br/>Progress tracking display"]
 
     %% React Context & State
-    Practice --> Provider["🎯 FlashcardProvider<br/>Adaptive Algorithm"]
-    Provider --> Components["🃏 UI Components<br/>Flashcard, ModeSelector"]
+    Practice --> Provider["🎯 FlashcardProvider<br/>Adaptive Learning Algorithm<br/>State management for flashcards"]
+    Provider --> Components["🃏 UI Components<br/>Flashcard, ModeSelector, MultipleChoice<br/>Reusable interface elements"]
 
     %% API Layer
-    Components --> API["🔌 API Routes"]
+    Components --> API["🔌 API Routes<br/>Server-side request handlers"]
     Dashboard --> API
-    API --> Stats["/api/stats<br/>Progress Data"]
-    API --> Submit["/api/flashcards/submit<br/>Answer Processing"]
-    API --> Tips["/api/tips<br/>AI Recommendations"]
-    API --> Health["/api/health<br/>System Status"]
+    API --> Stats["/api/stats<br/>(Protected)<br/>Progress data endpoint"]
+    API --> Submit["/api/flashcards/submit<br/>(Protected)<br/>Answer processing endpoint"]
+    API --> Tips["/api/tips<br/>(Protected)<br/>AI learning recommendations"]
+    API --> Health["/api/health<br/>(Public)<br/>System status monitoring"]
+    API --> AuthProviders["/api/auth/providers<br/>(Public)<br/>Available authentication methods"]
 
     %% Data Layer
-    Stats --> Prisma["🗄️ Prisma ORM<br/>Type-safe Queries"]
+    Stats --> Prisma["🗄️ Prisma ORM 6.16.3<br/>Type-safe PostgreSQL<br/>Database query interface"]
     Submit --> Prisma
     Tips --> Prisma
-    Prisma --> DB[(🐘 PostgreSQL 17<br/>Kana + Progress + Auth)]
+    Auth --> Prisma
+    Prisma --> DB[(🐘 PostgreSQL 17<br/>Kana + Progress + Auth<br/>Primary data storage)]
 
     %% AI Integration
-    Tips --> Gemini["🤖 Google Gemini AI<br/>Personalized Learning"]
-
+    Tips --> Gemini["🤖 Google Gemini AI v0.24.1<br/>Personalized Learning<br/>AI-powered recommendations"]
 
     %% Custom Hooks
-    Components --> Hooks["⚡ React Hooks<br/>Auth, Data, Interaction"]
+    Components --> Hooks["⚡ React Hooks<br/>State Management & Logic<br/>Reusable state logic"]
     Dashboard --> Hooks
 
     %% Styling
@@ -47,8 +50,10 @@ flowchart TD
     classDef appLayer fill:#fef3c7,stroke:#d97706,stroke-width:2px
     classDef dataLayer fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
     classDef aiLayer fill:#fdf4ff,stroke:#a855f7,stroke-width:2px
+    classDef protectedRoute fill:#fee2e2,stroke:#dc2626,stroke-width:2px
 
     class User,Browser userLayer
     class Home,Practice,Dashboard,Provider,Components,API,Hooks appLayer
     class Prisma,DB dataLayer
-    class Auth,Session,Gemini aiLayer
+    class Auth,Session,Gemini,Middleware aiLayer
+    class Practice,Dashboard,Stats,Submit,Tips protectedRoute
