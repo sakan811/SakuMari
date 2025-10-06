@@ -10,6 +10,7 @@ datasource db {
   directUrl  = env("POSTGRES_URL_NON_POOLING")
 }
 
+
 // Auth.js tables
 model Account {
   id                String  @id @default(cuid())
@@ -17,14 +18,7 @@ model Account {
   type              String
   provider          String
   providerAccountId String  @map("provider_account_id")
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
+  
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -54,14 +48,6 @@ model User {
   @@map("users")
 }
 
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@unique([identifier, token])
-  @@map("verificationtokens")
-}
 
 // Application tables
 model Kana {
@@ -73,12 +59,12 @@ model Kana {
 
 model KanaProgress {
   id              String   @id @default(uuid())
-  kana_id         String   
-  user_id         String   
+  kana_id         String
+  user_id         String
   attempts        Int      @default(0)
   correct_attempts Int      @default(0)
   accuracy        Float    @default(0)
-  
+
   kana            Kana     @relation(fields: [kana_id], references: [id])
   user            User     @relation(fields: [user_id], references: [id])
 

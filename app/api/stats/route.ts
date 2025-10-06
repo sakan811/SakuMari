@@ -40,7 +40,7 @@ async function getStats(_request: NextRequest, context: AuthenticatedContext) {
 
     // Transform the data
     const result = kanaWithProgress.map((kana) => {
-      const progress = kana.progress[0]; // Should be 0 or 1 record for this user
+      const progress = kana.progress[0];
       return {
         id: kana.id,
         character: kana.character,
