@@ -24,7 +24,7 @@ export default defineConfig({
     // Disable file parallelism
     fileParallelism: false,
     coverage: {
-      provider: "istanbul",
+      provider: "v8",
       reporter: ["text", "lcov"],
       reportsDirectory: "./coverage-db",
       exclude: [
