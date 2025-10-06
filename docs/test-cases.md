@@ -1,224 +1,142 @@
 # Test Cases Overview
 
-This document provides a comprehensive overview of the test cases in the `__tests__` directory for the SakuMari Japanese learning application.
+Comprehensive test suite for the SakuMari Japanese kana learning application with 59 test files organized across unit, integration, and E2E testing.
 
-## Test Structure
+## Test Organization
 
-The test suite is organized into several main categories:
+### **Unit Tests** (`*.test.*`)
 
-### 1. **Unit Tests**
+**Components** (`*.test.tsx`)
+- Core UI: button, button-link, header, layout
+- Learning: flashcard, flashcard-app, flashcard-interaction, multiple-choice, mode-selector
+- Pages: home, hiragana-page, katakana-page, dashboard variants
+- Navigation: desktop-navigation, mobile-navigation
+- UI: stats-summary, tips-modal
 
-- **Components**: Individual React component testing
-- **Hooks**: Custom hook functionality testing
-- **Utilities**: Helper functions and utilities
-- **API**: API endpoint testing
-- **Authentication**: Auth-related functionality
+**Hooks** (`hooks/*.test.*`)
+- `useDashboardData.test.tsx` - Dashboard data fetching
+- `useFlashcardInteraction.test.tsx` - Flashcard interaction logic
+- `use-flashcard-handlers.test.ts` - Mode selection handlers
+- `useSorting.test.ts` - Table sorting functionality
 
-### 2. **Integration Tests**
+**API** (`api/*.test.ts`)
+- `flashcards.test.ts` - Flashcard data operations
+- `flashcard-submit.test.ts` - Answer submission
+- `stats.test.ts` - Progress statistics
+- `tips.test.ts` - AI learning recommendations
+- `health.test.ts` - System health checks
+- `additional-edge-cases.test.ts` - Edge case handling
 
-- **Database**: Database operations and Prisma client testing
-- **Critical Edge Cases**: Complex user flows and error handling
-- **SEO**: Search engine optimization metadata testing
+**Authentication** (`auth/*.test.*`)
+- `auth-config.test.ts` - NextAuth.js configuration
+- `auth-flows.test.tsx` - Login/logout flows
+- `auth-routes.test.ts` - Route protection
+- `session-management.test.tsx` - Session persistence
+- `api-authentication.test.ts` - API authentication
+- `protected-routes.test.tsx` - Route access control
 
-### 3. **End-to-End (E2E) Tests**
+**Utilities** (`utils/*.test.ts`)
+- `api-errors.test.ts` - Error handling utilities
+- `api-middleware.test.ts` - API middleware
+- `backgrounds.test.ts` - Background management
+- `env.test.ts` - Environment variables
+- `flashcard-utils.test.ts` - Flashcard algorithms
+- `flashcard-submit-utils.test.ts` - Submission helpers
+- `kana-filter.test.ts` - Character filtering
+- `prisma.test.ts` - Database client utilities
+- `should-fetch-kana-data.test.ts` - Data fetching logic
 
-- **Critical Flows**: Complete user journeys
-- **Essential Core**: Core functionality verification
-- **Mobile**: Mobile-specific interactions
-- **Performance**: Performance-critical scenarios
-- **SEO Health**: SEO validation
+### **Integration Tests**
 
-## Test Categories
+**Database** (`db/*.test.ts`)
+- `setup.ts` - Test environment setup
+- `kana-progress.test.ts` - Progress tracking
+- `concurrent-operations.test.ts` - Parallel operations
+- `kana-filtering.test.ts` - Character filtering
+- `user-data.test.ts` - User data management
+- `rls.test.ts` - Row Level Security verification
 
-### Component Tests (`*.test.tsx`)
+**Application** (`*.test.tsx`)
+- `integration.test.tsx` - Cross-component integration
+- `critical-edge-cases.test.tsx` - Critical error scenarios
+- `middleware.test.ts` - Route protection middleware
 
-#### Core Components
+**SEO** (`seo/*.test.ts`)
+- `metadata.test.ts` - SEO metadata validation
+- `seo-files.test.ts` - Generated SEO files
+- `integration.test.tsx` - SEO integration tests
 
-- **`button.test.tsx`** - Button component rendering and interactions
-- **`button-link.test.tsx`** - Button link navigation and accessibility
-- **`header.test.tsx`** - Header navigation and branding
-- **`layout.test.tsx`** - Root layout structure and providers
+### **E2E Tests** (`e2e/*.spec.ts`)
 
-#### Learning Components
-
-- **`flashcard.test.tsx`** - Flashcard display and interactions
-- **`flashcard-app.test.tsx`** - Main flashcard application
-- **`flashcard-interaction.test.tsx`** - User interaction handling
-- **`multiple-choice.test.tsx`** - Multiple choice question component
-- **`multiple-choice-component.test.tsx`** - Multiple choice implementation
-- **`mode-selector.test.tsx`** - Learning mode selection interface
-
-#### Page Components
-
-- **`home.test.tsx`** - Homepage functionality and SEO
-- **`hiragana-page.test.tsx`** - Hiragana practice page
-- **`katakana-page.test.tsx`** - Katakana practice page
-- **`dashboard.test.tsx`** - Dashboard progress display
-- **`dashboard-page.test.tsx`** - Dashboard page interactions
-- **`dashboard-interaction.test.tsx`** - Dashboard user interactions
-- **`dashboard-tips.test.tsx`** - Learning tips display
-
-#### Navigation Components
-
-- **`desktop-navigation.test.tsx`** - Desktop navigation menu
-- **`mobile-navigation.test.tsx`** - Mobile navigation and hamburger menu
-
-#### UI Components
-
-- **`stats-summary.test.tsx`** - Statistics summary display
-- **`tips-modal.test.tsx`** - Tips modal interactions
-
-### Hook Tests (`hooks/*.test.tsx`)
-
-- **`useDashboardData.test.tsx`** - Dashboard data fetching
-- **`useFlashcardInteraction.test.tsx`** - Flashcard interaction logic
-- **`use-flashcard-handlers.test.ts`** - Mode selection handlers
-- **`useSorting.test.ts`** - Data sorting functionality
-
-### API Tests (`api/*.test.ts`)
-
-- **`flashcards.test.ts`** - Flashcard data retrieval and submission
-- **`flashcard-submit.test.ts`** - Answer submission processing
-- **`stats.test.ts`** - User progress statistics
-- **`tips.test.ts`** - AI-powered learning tips
-- **`health.test.ts`** - API health checks
-- **`additional-edge-cases.test.ts`** - Edge case handling
-
-### Authentication Tests (`auth/*.test.tsx`)
-
-- **`auth-config.test.ts`** - Authentication configuration
-- **`auth-flows.test.tsx`** - Authentication user flows
-- **`auth-routes.test.ts`** - Protected route handling
-- **`session-management.test.tsx`** - Session persistence
-- **`session-provider.test.tsx`** - Session context provider
-- **`api-authentication.test.ts`** - API authentication middleware
-- **`protected-routes.test.tsx`** - Route protection logic
-
-### Database Tests (`db/*.test.ts`)
-
-- **`setup.ts`** - Database test setup utilities
-- **`kana-progress.test.ts`** - Kana progress tracking
-- **`concurrent-operations.test.ts`** - Concurrent database operations
-- **`kana-filtering.test.ts`** - Kana character filtering
-- **`user-data.test.ts`** - User data management
-
-### SEO Tests (`seo/*.test.ts`)
-
-- **`metadata.test.ts`** - SEO metadata validation
-- **`seo-files.test.ts`** - SEO file generation
-
-### Utility Tests (`utils/*.test.ts`)
-
-- **`api-errors.test.ts`** - API error handling
-- **`api-middleware.test.ts`** - API middleware functionality
-- **`backgrounds.test.ts`** - Background image utilities
-- **`env.test.ts`** - Environment variable handling
-- **`flashcard-utils.test.ts`** - Flashcard algorithm utilities
-- **`kana-filter.test.ts`** - Kana filtering logic
-- **`prisma.test.ts`** - Prisma client utilities
-- **`should-fetch-kana-data.test.ts`** - Data fetching logic
-
-### Integration Tests
-
-- **`integration.test.tsx`** - Cross-component integration
-- **`critical-edge-cases.test.tsx`** - Critical error scenarios
-
-### End-to-End Tests (`e2e/*.spec.ts`)
-
-- **`critical-flows.spec.ts`** - Complete user journeys across devices
-- **`essential-core.spec.ts`** - Core application functionality
-- **`mobile-essential.spec.ts`** - Mobile-specific features
-- **`performance-critical.spec.ts`** - Performance validation
-- **`seo-health.spec.ts`** - SEO and accessibility checks
-
-### E2E Setup and Teardown
-
-- **`auth.setup.ts`** - Authentication test setup
-- **`cleanup.teardown.ts`** - Test environment cleanup
-- **`db-reset.ts`** - Database reset between tests
+- `critical-flows.spec.ts` - Complete user journeys
+- `essential-core.spec.ts` - Core functionality
+- `mobile-essential.spec.ts` - Mobile interactions
+- `performance-critical.spec.ts` - Performance validation
+- `seo-health.spec.ts` - SEO and accessibility
 
 ## Key Test Scenarios
 
-### Authentication & Authorization
-
-- Google OAuth integration
-- Credential-based authentication
-- Session management and persistence
-- Protected route access control
-- Role-based authorization
+### Authentication & Security
+- Google OAuth and test credentials authentication
+- Session persistence and JWT token management
+- Protected route enforcement and middleware
+- API authentication middleware verification
+- Row Level Security (RLS) configuration
 
 ### Learning Functionality
-
-- Flashcard display and progression
-- Adaptive learning algorithm
-- Multiple choice and typing modes
-- Progress tracking and statistics
-- Accuracy calculation and improvement
+- Flashcard display and adaptive algorithm
+- Multiple choice and typing practice modes
+- Character filtering (hiragana/katakana)
+- Progress tracking and accuracy calculation
+- AI-powered learning tips generation
 
 ### Data Management
-
-- User progress persistence
-- Kana character filtering
-- Database operations and transactions
-- Concurrent operation handling
-- Data validation and error handling
+- User progress persistence with concurrent operations
+- Database transactions and error handling
+- Environment variable configuration
+- API endpoint validation and error handling
+- Prisma client utility functions
 
 ### User Experience
-
-- Mobile responsive design
-- Navigation flows
-- Loading states and error handling
-- Accessibility features
+- Responsive design across devices
+- Navigation flows and accessibility
+- SEO metadata validation
 - Performance optimization
-
-### API Integration
-
-- RESTful endpoint testing
-- Request validation
-- Error handling and response formatting
-- Authentication middleware
-- Rate limiting and security
-
-### SEO & Accessibility
-
-- Meta tags and structured data
-- Image optimization
-- Screen reader compatibility
-- Keyboard navigation
-- Performance metrics
+- Mobile-specific interactions
 
 ## Testing Framework
 
-The test suite uses:
-
-- **Vitest** for unit and integration testing
-- **Testing Library** for React component testing
-- **Playwright** for end-to-end testing
-- **MSW (Mock Service Worker)** for API mocking
-- **Prisma** with SQLite for isolated database testing
+**Unit & Integration:** Vitest + React Testing Library
+**Database:** Isolated SQLite environment with custom schema
+**E2E:** Playwright with cross-browser support
+**API Mocking:** MSW (Mock Service Worker)
+**Authentication:** Comprehensive NextAuth.js mocking
 
 ## Running Tests
 
 ```bash
-# Run all tests
-pnpm test
+# Unit tests
+pnpm test:run           # Run once
+pnpm test               # Watch mode
+pnpm test:coverage      # With coverage
 
-# Run tests with coverage
-pnpm test:coverage
+# Database tests
+pnpm test:db:run        # Run once
+pnpm test:db:watch      # Watch mode
+pnpm test:db:full       # Fresh setup + run
 
-# Run unit tests only
-pnpm test:run
+# E2E tests
+pnpm test:e2e:full      # Complete workflow
+pnpm test:e2e:setup     # Setup environment
+pnpm test:e2e:clean     # Cleanup environment
 
-# Run database tests
-pnpm test:db:full
-
-# Run E2E tests
-pnpm test:e2e:full
+# All tests
+pnpm test:all           # Run all tests + quality checks
 ```
 
-## Test Configuration
+## Test Environment
 
-- **Isolated Database**: Uses SQLite for testing to avoid interference with development data
-- **Mock Authentication**: Comprehensive mocking of NextAuth.js for reliable test execution
-- **Environment Mocking**: Proper environment variable handling for different test scenarios
-- **Cleanup Procedures**: Automatic cleanup between tests to ensure isolation
+- **Database**: Isolated SQLite (`__tests__/db/test.db`) with custom Prisma schema
+- **Authentication**: Mocked NextAuth.js with test credentials provider
+- **API**: MSW for comprehensive API mocking
+- **Cleanup**: Automatic isolation and cleanup between tests
