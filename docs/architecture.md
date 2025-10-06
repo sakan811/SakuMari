@@ -159,6 +159,66 @@ __tests__/
 └── utils/                      # Test utilities
 ```
 
+## Database Schema
+
+### Application Tables
+
+**Kana Table**
+- `id` (UUID) - Primary key
+- `character` (String, unique) - Hiragana/Katakana character
+- `romaji` (String) - Romanized pronunciation
+- `progress` (relation) - One-to-many relationship to KanaProgress
+
+**KanaProgress Table**
+- `id` (UUID) - Primary key
+- `kana_id` (String) - Foreign key to Kana table
+- `user_id` (String) - Foreign key to User table
+- `attempts` (Int, default: 0) - Total practice attempts
+- `correct_attempts` (Int, default: 0) - Correct answer count
+- `accuracy` (Float, default: 0) - Calculated accuracy percentage
+- Unique constraint on (kana_id, user_id) - One progress record per user per character
+
+### Authentication Tables (NextAuth.js)
+
+**User Table**
+- `id` (String, cuid) - Primary key
+- `name` (String, nullable) - Display name
+- `email` (String, unique, nullable) - Email address
+- `emailVerified` (DateTime, nullable) - Email verification timestamp
+- `image` (String, nullable) - Profile image URL
+- `accounts` (relation) - One-to-many to Account
+- `sessions` (relation) - One-to-many to Session
+- `kanaProgress` (relation) - One-to-many to KanaProgress
+
+**Account Table**
+- `id` (String, cuid) - Primary key
+- `userId` (String) - Foreign key to User
+- `type` (String) - OAuth provider type
+- `provider` (String) - OAuth provider name
+- `providerAccountId` (String) - Provider-specific user ID
+- OAuth tokens: `refresh_token`, `access_token`, `id_token` (Text, nullable)
+- Token metadata: `expires_at`, `token_type`, `scope`, `session_state`
+- Unique constraint on (provider, providerAccountId)
+
+**Session Table**
+- `id` (String, cuid) - Primary key
+- `sessionToken` (String, unique) - JWT session token
+- `userId` (String) - Foreign key to User
+- `expires` (DateTime) - Session expiration
+
+**VerificationToken Table**
+- `identifier` (String) - Email address or user identifier
+- `token` (String, unique) - Verification token
+- `expires` (DateTime) - Token expiration
+- Unique constraint on (identifier, token)
+
+### Key Relationships
+
+- **User-KanaProgress**: One-to-many relationship for user progress tracking
+- **Kana-KanaProgress**: One-to-many relationship for character progress
+- **User-Account/Session**: One-to-many relationships for authentication
+- **Cascading Deletes**: User deletions cascade to accounts, sessions, and progress
+
 ## Database Security
 
 ### Row Level Security (RLS)
@@ -182,7 +242,7 @@ __tests__/
 - Migration history with security fixes in 2025-10-06
 - Comprehensive RLS configuration tests in `__tests__/db/rls.test.ts`
 
-**Development:**
+## Development
 
 ```
 docker/
