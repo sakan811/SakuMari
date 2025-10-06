@@ -159,6 +159,29 @@ __tests__/
 └── utils/                      # Test utilities
 ```
 
+## Database Security
+
+### Row Level Security (RLS)
+
+**PostgreSQL RLS** protects all sensitive tables with application-level filtering policies:
+
+| Table | Purpose | Access Level |
+|-------|---------|--------------|
+| `users` | User profiles | Self-updates only |
+| `accounts` | OAuth connections | Application-filtered |
+| `sessions` | Session management | Application-filtered |
+| `verificationtokens` | Email verification | Application-filtered |
+| `kanaprogress` | Learning progress | Application-filtered |
+
+**Public Tables:**
+- `kana` - Reference data (Hiragana/Katakana characters) - no RLS needed
+
+**Security Implementation:**
+- Permissive policies with `USING (true)` for application-level control
+- Prisma ORM handles access control logic
+- Migration history with security fixes in 2025-10-06
+- Comprehensive RLS configuration tests in `__tests__/db/rls.test.ts`
+
 **Development:**
 
 ```
