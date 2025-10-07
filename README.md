@@ -55,6 +55,13 @@ Visit: <https://pnpm.io/installation>
 
 More details: <https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid>
 
+## Upstash Rate Limiting Setup
+
+1. Go to [Upstash Console](https://console.upstash.com/)
+2. Create/select a database > "Details" tab
+3. Copy REST URL and REST Token to `.env` file
+4. Single region setup recommended for optimal performance
+
 ## Environment Setup
 
 Copy `.env.example` to `.env` and configure:
@@ -81,6 +88,10 @@ AUTH_GOOGLE_SECRET=your_google_client_secret
 # AI Learning Tips
 GEMINI_API_KEY=your_gemini_api_key_here
 MODEL_NAME=gemini-2.5-flash-lite
+
+# Rate Limiting (Upstash Redis)
+UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token
 
 # E2E test credentials only
 CREDS_PROVIDER=true
