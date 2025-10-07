@@ -1,39 +1,37 @@
 # Test Cases Overview
 
-Comprehensive test suite for the SakuMari Japanese kana learning application with 59 test files organized across unit, integration, and E2E testing.
+Comprehensive test suite for the SakuMari Japanese kana learning application with 50 test files organized across unit, integration, and E2E testing.
 
 ## Test Organization
 
 ### **Unit Tests** (`*.test.*`)
 
 **Components** (`*.test.tsx`)
-- Core UI: button, button-link, header, layout
-- Learning: flashcard, flashcard-app, flashcard-interaction, multiple-choice, mode-selector
-- Pages: home, hiragana-page, katakana-page, dashboard variants
-- Navigation: desktop-navigation, mobile-navigation
-- UI: stats-summary, tips-modal
+- **Core UI**: button, button-link, header, layout
+- **Learning**: flashcard, flashcard-app, flashcard-interaction, multiple-choice, mode-selector
+- **Pages**: home, hiragana-page, katakana-page, dashboard
+- **Navigation**: desktop-navigation, mobile-navigation
+- **UI**: stats-summary, tips-modal
+- **Providers**: SessionProviders
 
 **Hooks** (`hooks/*.test.*`)
 - `useDashboardData.test.tsx` - Dashboard data fetching
 - `useFlashcardInteraction.test.tsx` - Flashcard interaction logic
-- `use-flashcard-handlers.test.ts` - Mode selection handlers
+- `useFlashcardHandlers.test.tsx` - Mode selection handlers
 - `useSorting.test.ts` - Table sorting functionality
 
 **API** (`api/*.test.ts`)
-- `flashcards.test.ts` - Flashcard data operations
-- `flashcard-submit.test.ts` - Answer submission
+- `health.test.ts` - System health checks
 - `stats.test.ts` - Progress statistics
 - `tips.test.ts` - AI learning recommendations
-- `health.test.ts` - System health checks
+- `flashcard-submit.test.ts` - Answer submission
 - `additional-edge-cases.test.ts` - Edge case handling
 
 **Authentication** (`auth/*.test.*`)
 - `auth-config.test.ts` - NextAuth.js configuration
-- `auth-flows.test.tsx` - Login/logout flows
+- `auth.test.tsx` - Login/logout flows
 - `auth-routes.test.ts` - Route protection
-- `session-management.test.tsx` - Session persistence
 - `api-authentication.test.ts` - API authentication
-- `protected-routes.test.tsx` - Route access control
 
 **Utilities** (`utils/*.test.ts`)
 - `api-errors.test.ts` - Error handling utilities
@@ -46,25 +44,26 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - `prisma.test.ts` - Database client utilities
 - `should-fetch-kana-data.test.ts` - Data fetching logic
 
+**Libraries** (`lib/*.test.ts`)
+- `rate-limit.test.ts` - Upstash Redis rate limiting
+
+**Flashcard Provider** (`flashcard-provider/*.test.tsx`)
+- `FlashcardProvider.test.tsx` - Flashcard context provider logic
+
 ### **Integration Tests**
 
 **Database** (`db/*.test.ts`)
-- `setup.ts` - Test environment setup
 - `kana-progress.test.ts` - Progress tracking
 - `concurrent-operations.test.ts` - Parallel operations
-- `kana-filtering.test.ts` - Character filtering
-- `user-data.test.ts` - User data management
 - `rls.test.ts` - Row Level Security verification
+- `user-data.test.ts` - User data management
 
 **Application** (`*.test.tsx`)
 - `integration.test.tsx` - Cross-component integration
-- `critical-edge-cases.test.tsx` - Critical error scenarios
 - `middleware.test.ts` - Route protection middleware
 
-**SEO** (`seo/*.test.ts`)
-- `metadata.test.ts` - SEO metadata validation
-- `seo-files.test.ts` - Generated SEO files
-- `integration.test.tsx` - SEO integration tests
+**SEO** (`seo/*.test.tsx`)
+- `seo.test.tsx` - SEO metadata validation
 
 ### **E2E Tests** (`e2e/*.spec.ts`)
 
@@ -96,6 +95,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - Environment variable configuration
 - API endpoint validation and error handling
 - Prisma client utility functions
+- Rate limiting with Upstash Redis
 
 ### User Experience
 - Responsive design across devices
@@ -139,4 +139,5 @@ pnpm test:all           # Run all tests + quality checks
 - **Database**: Isolated SQLite (`__tests__/db/test.db`) with custom Prisma schema
 - **Authentication**: Mocked NextAuth.js with test credentials provider
 - **API**: MSW for comprehensive API mocking
+- **Rate Limiting**: Mocked Upstash Redis for testing
 - **Cleanup**: Automatic isolation and cleanup between tests
