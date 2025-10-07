@@ -16,8 +16,16 @@
  */
 
 import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { applyRateLimit } from "@/lib/rate-limit";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Apply rate limiting (auth endpoints are public)
+  const rateLimitResult = await applyRateLimit(request, "auth");
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   return NextResponse.json({
     credentialsEnabled: process.env.CREDS_PROVIDER === "true",
   });

@@ -19,8 +19,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
 import { prisma } from "@/lib/prisma";
 import { ApiErrors } from "@/lib/api-errors";
+import { applyRateLimit } from "@/lib/rate-limit";
 
-async function getStats(_request: NextRequest, context: AuthenticatedContext) {
+async function getStats(request: NextRequest, context: AuthenticatedContext) {
+  // Apply rate limiting for authenticated users
+  const rateLimitResult = await applyRateLimit(request, "stats", context.userId);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     // Single query with joins to get all data at once for the authenticated user
     const kanaWithProgress = await prisma.kana.findMany({

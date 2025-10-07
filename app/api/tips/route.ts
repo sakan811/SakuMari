@@ -19,6 +19,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
 import { prisma } from "@/lib/prisma";
 import { TipsApiErrors } from "@/lib/api-errors";
+import { applyRateLimit } from "@/lib/rate-limit";
 
 
 interface ConversationMessage {
@@ -49,6 +50,12 @@ async function generateTips(
   request: NextRequest,
   context: AuthenticatedContext,
 ) {
+  // Apply rate limiting for authenticated users (AI endpoints are more restrictive)
+  const rateLimitResult = await applyRateLimit(request, "tips", context.userId);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     const { userQuery, conversationHistory = [] } = await request.json();
 
