@@ -26,6 +26,7 @@ import {
 } from "vitest";
 import { POST } from "../../app/api/tips/route";
 import { NextRequest } from "next/server";
+import { applyRateLimit } from "../../lib/rate-limit";
 
 // Import mock setup functions
 import { mockSession } from "../utils/mock-setup";
@@ -43,6 +44,10 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+vi.mock("@/lib/rate-limit", () => ({
+  applyRateLimit: vi.fn(),
+}));
+
 // Mock Google Generative AI
 const mockGenerateContent = vi.fn();
 const mockGetGenerativeModel = vi.fn();
@@ -57,11 +62,15 @@ describe("Tips API Route", async () => {
   const { auth } = await import("@/lib/auth");
   const { prisma } = await import("@/lib/prisma");
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     // Set default environment variables
     process.env.GEMINI_API_KEY = "test-api-key";
     process.env.MODEL_NAME = "gemini-2.5-flash-lite";
+
+    // Default: allow rate limiting
+    const { applyRateLimit } = await import("@/lib/rate-limit");
+    vi.mocked(applyRateLimit).mockResolvedValue({ success: true });
 
     // Setup default mock behavior
     mockGenerateContent.mockResolvedValue({
@@ -556,6 +565,61 @@ describe("Tips API Route", async () => {
       expect(mockGenerateContent).toHaveBeenCalledWith(
         expect.stringContaining("Mastering: さ (100%)"),
       );
+    });
+  });
+
+  describe("Rate Limiting", () => {
+    test("should return rate limit response when rate limit is exceeded", async () => {
+      // Setup
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
+      vi.mocked(applyRateLimit).mockResolvedValue({
+        success: false,
+        response: new Response("Too Many Requests", { status: 429 }) as any,
+      });
+
+      const request = new NextRequest("http://localhost/api/tips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userQuery: "Help me improve" }),
+      });
+
+      // Execute
+      const response = await POST(request);
+
+      // Verify
+      expect(response.status).toBe(429);
+      expect(applyRateLimit).toHaveBeenCalledWith(request, "tips", "user123");
+    });
+
+    test("should proceed when rate limit allows request", async () => {
+      // Setup
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
+      vi.mocked(applyRateLimit).mockResolvedValue({
+        success: true,
+      });
+      vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
+      mockGoogleGenerativeAI.mockReturnValue({
+        getGenerativeModel: mockGetGenerativeModel.mockReturnValue({
+          generateContent: mockGenerateContent.mockResolvedValue({
+            response: {
+              text: () => "Here are some learning tips!",
+            },
+          }),
+        }),
+      });
+
+      const request = new NextRequest("http://localhost/api/tips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userQuery: "Help me improve" }),
+      });
+
+      // Execute
+      const response = await POST(request);
+
+      // Verify
+      expect(response.status).toBe(200);
+      expect(applyRateLimit).toHaveBeenCalledWith(request, "tips", "user123");
     });
   });
 });

@@ -344,4 +344,57 @@ describe("TipsModal", () => {
       expect(screen.getByText("Test response")).toBeTruthy();
     });
   });
+
+  test("does not submit form when input is empty", async () => {
+    render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const submitButton = screen.getByRole("button", { name: /send/i });
+    fireEvent.click(submitButton);
+
+    // Should not call fetch since input is empty
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  test("does not submit form when already loading", async () => {
+    // Mock a slow response
+    mockFetch.mockImplementation(() => new Promise(() => {}));
+
+    render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const input = screen.getByPlaceholderText(
+      "Ask about kana learning techniques...",
+    );
+    const submitButton = screen.getByRole("button", { name: /send/i });
+
+    fireEvent.change(input, { target: { value: "First question" } });
+    fireEvent.click(submitButton);
+
+    // Try to submit again while loading
+    fireEvent.change(input, { target: { value: "Second question" } });
+    fireEvent.click(submitButton);
+
+    // Should only call fetch once
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  test("handles API error response correctly", async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: "API Error" }),
+    });
+
+    render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const input = screen.getByPlaceholderText(
+      "Ask about kana learning techniques...",
+    );
+    fireEvent.change(input, { target: { value: "Test question" } });
+    fireEvent.submit(input.closest("form")!);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Failed to get learning tip. Please try again."),
+      ).toBeInTheDocument();
+    });
+  });
 });
