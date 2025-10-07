@@ -21,9 +21,17 @@
  */
 
 import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { applyRateLimit } from "@/lib/rate-limit";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Apply rate limiting (health endpoint is public, so no user ID)
+  const rateLimitResult = await applyRateLimit(request, "health");
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     // Check database connectivity
     await prisma.$queryRaw`SELECT 1`;
@@ -55,7 +63,13 @@ export async function GET() {
 }
 
 // Support HEAD requests for basic connectivity checks
-export async function HEAD() {
+export async function HEAD(request: NextRequest) {
+  // Apply rate limiting (health endpoint is public, so no user ID)
+  const rateLimitResult = await applyRateLimit(request, "health");
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     await prisma.$queryRaw`SELECT 1`;
     return new NextResponse(null, { status: 200 });

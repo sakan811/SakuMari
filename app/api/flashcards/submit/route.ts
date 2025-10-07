@@ -20,11 +20,18 @@ import { prisma } from "@/lib/prisma";
 import { withAuth, AuthenticatedContext } from "@/lib/api-middleware";
 import { validateRequired, validateTypes } from "@/lib/api-errors";
 import { handleSubmissionError } from "@/lib/flashcard-submit-utils";
+import { applyRateLimit } from "@/lib/rate-limit";
 
 async function submitAnswer(
   request: NextRequest,
   context: AuthenticatedContext,
 ) {
+  // Apply rate limiting for authenticated users
+  const rateLimitResult = await applyRateLimit(request, "flashcards", context.userId);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     const requestBody = await request.json().catch(() => {
       throw new Error("Invalid JSON");
