@@ -33,6 +33,7 @@ import {
   expectSqlContains,
   expectSqlParameters,
 } from "../utils/test-assertions";
+import { applyRateLimit } from "../../lib/rate-limit";
 
 // Create mocks directly in the test file
 const { mockAuth, mockPrisma } = vi.hoisted(() => ({
@@ -58,12 +59,18 @@ const { mockAuth, mockPrisma } = vi.hoisted(() => ({
 // Mock the modules
 vi.mock("@/lib/auth", () => ({ auth: mockAuth }));
 vi.mock("@/lib/prisma", () => ({ prisma: mockPrisma }));
+vi.mock("@/lib/rate-limit", () => ({
+  applyRateLimit: vi.fn(),
+}));
 
 describe("Flashcard Submit API", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     // Default: set up user to exist in database
     mockPrisma.user.findUnique.mockResolvedValue({ id: "user123" });
+    // Default: allow rate limiting
+    const { applyRateLimit } = await import("@/lib/rate-limit");
+    vi.mocked(applyRateLimit).mockResolvedValue({ success: true });
   });
 
   describe("Database Operations", () => {
@@ -589,6 +596,46 @@ describe("Flashcard Submit API", () => {
 
       // Verify
       expectServerError(response);
+    });
+  });
+
+  describe("Rate Limiting", () => {
+    test("should return rate limit response when rate limit is exceeded", async () => {
+      // Setup
+      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      const { applyRateLimit } = await import("@/lib/rate-limit");
+      vi.mocked(applyRateLimit).mockResolvedValue({
+        success: false,
+        response: new Response("Too Many Requests", { status: 429 }) as any,
+      });
+
+      const request = createFlashcardSubmitRequest("test-1", true);
+
+      // Execute
+      const response = await POST(request);
+
+      // Verify
+      expect(response.status).toBe(429);
+      expect(applyRateLimit).toHaveBeenCalledWith(request, "flashcards", "user123");
+    });
+
+    test("should proceed when rate limit allows request", async () => {
+      // Setup
+      mockAuth.mockResolvedValue({ user: { id: "user123" } });
+      const { applyRateLimit } = await import("@/lib/rate-limit");
+      vi.mocked(applyRateLimit).mockResolvedValue({
+        success: true,
+      });
+      mockPrisma.$executeRaw.mockResolvedValue(undefined);
+
+      const request = createFlashcardSubmitRequest("test-1", true);
+
+      // Execute
+      const response = await POST(request);
+
+      // Verify
+      expectSuccess(response);
+      expect(applyRateLimit).toHaveBeenCalledWith(request, "flashcards", "user123");
     });
   });
 });

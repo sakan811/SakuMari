@@ -64,4 +64,18 @@ describe("Button Component", () => {
     expect(button).toHaveClass("disabled:opacity-50");
     expect(button).toHaveClass("disabled:cursor-not-allowed");
   });
+
+  test("applies fullWidth styling when fullWidth prop is true", () => {
+    render(<Button fullWidth={true}>Full Width Button</Button>);
+
+    const button = screen.getByText("Full Width Button");
+    expect(button).toHaveClass("w-full");
+  });
+
+  test("does not apply fullWidth styling when fullWidth prop is false", () => {
+    render(<Button fullWidth={false}>Normal Button</Button>);
+
+    const button = screen.getByText("Normal Button");
+    expect(button).not.toHaveClass("w-full");
+  });
 });

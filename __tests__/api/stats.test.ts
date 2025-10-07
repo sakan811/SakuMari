@@ -9,6 +9,7 @@ import {
 } from "vitest";
 import { GET } from "../../app/api/stats/route";
 import { NextRequest } from "next/server";
+import { applyRateLimit } from "../../lib/rate-limit";
 
 // Define type for stats response
 interface StatResponse {
@@ -33,6 +34,10 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+vi.mock("@/lib/rate-limit", () => ({
+  applyRateLimit: vi.fn(),
+}));
+
 describe("Stats API Route", async () => {
   // Import the mocked functions after mocking
   const { auth } = await import("@/lib/auth");
@@ -41,8 +46,11 @@ describe("Stats API Route", async () => {
   // Import mock setup functions
   const { mockSession } = await import("../utils/mock-setup");
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    // Default: allow rate limiting
+    const { applyRateLimit } = await import("@/lib/rate-limit");
+    vi.mocked(applyRateLimit).mockResolvedValue({ success: true });
   });
 
   afterEach(() => {
@@ -230,6 +238,58 @@ describe("Stats API Route", async () => {
         correct_attempts: 0,
         accuracy: 0.5, // Returns data as-is, doesn't try to "fix" it
       });
+    });
+  });
+
+  describe("Rate Limiting", () => {
+    test("should return rate limit response when rate limit is exceeded", async () => {
+      // Setup
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
+      vi.mocked(applyRateLimit).mockResolvedValue({
+        success: false,
+        response: new Response("Too Many Requests", { status: 429 }) as any,
+      });
+
+      const request = new NextRequest("http://localhost/api/stats");
+
+      // Execute
+      const response = await GET(request);
+
+      // Verify
+      expect(response.status).toBe(429);
+      expect(applyRateLimit).toHaveBeenCalledWith(request, "stats", "user123");
+    });
+
+    test("should proceed when rate limit allows request", async () => {
+      // Setup
+      const mockStatsData = [
+        {
+          id: "1",
+          character: "あ",
+          romaji: "a",
+          progress: [
+            {
+              attempts: 5,
+              correct_attempts: 4,
+              accuracy: 0.8,
+            },
+          ],
+        },
+      ];
+      (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
+      vi.mocked(applyRateLimit).mockResolvedValue({
+        success: true,
+      });
+      vi.mocked(prisma.kana.findMany).mockResolvedValue(mockStatsData);
+
+      const request = new NextRequest("http://localhost/api/stats");
+
+      // Execute
+      const response = await GET(request);
+
+      // Verify
+      expect(response.status).toBe(200);
+      expect(applyRateLimit).toHaveBeenCalledWith(request, "stats", "user123");
     });
   });
 });

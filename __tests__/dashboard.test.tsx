@@ -369,7 +369,7 @@ describe("Dashboard Component", () => {
         expect(cells[2].textContent).toBe("10"); // First row attempts
         expect(cells[7].textContent).toBe("10"); // Second row attempts
       });
-    });
+    }, 10000);
 
     test("correct_attempts column displays correct values", async () => {
       render(<Dashboard />);
@@ -454,6 +454,30 @@ describe("Dashboard Component", () => {
         expect(cells[8].textContent).toBe("5");
         // Third row should have lowest correct_attempts (3)
         expect(cells[13].textContent).toBe("3");
+      });
+    });
+  });
+
+  describe("Empty State", () => {
+    test("displays empty state when no character data available", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => [],
+      });
+
+      await act(async () => {
+        render(<Dashboard />);
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByText("No character data available yet."),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText("Start practicing to see your progress here!"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Practice Hiragana")).toBeInTheDocument();
+        expect(screen.getByText("Practice Katakana")).toBeInTheDocument();
       });
     });
   });

@@ -275,5 +275,47 @@ describe("Flashcard Component", () => {
         expect.any(Function),
       );
     });
+
+    test("displays correct answer with green styling", () => {
+      const submitAnswer = vi.fn();
+      setupProvider(createMockProvider({
+        currentKana: MOCK_KANA,
+        result: { correct: true, correctAnswer: "a" },
+        submitAnswer,
+        interactionMode: "typing"
+      }));
+
+      render(<Flashcard />);
+
+      expect(screen.getByText("Correct! The answer is: a")).toBeInTheDocument();
+
+      const resultContainer = screen.getByText(/Correct!/).closest('div');
+      expect(resultContainer).toHaveClass("bg-green-50", "text-green-800", "border-green-300");
+    });
+
+    test("clears local error when user types valid input", () => {
+      const submitAnswer = vi.fn();
+      setupProvider(createMockProvider({
+        currentKana: MOCK_KANA,
+        submitAnswer,
+        interactionMode: "typing",
+        error: "Previous error"
+      }));
+
+      render(<Flashcard />);
+
+      const input = getInputField();
+
+      // First, trigger an error
+      fireEvent.change(input, { target: { value: "" } });
+      fireEvent.click(getSubmitButton());
+      expect(screen.getByText("Please enter an answer")).toBeInTheDocument();
+
+      // Then type valid input
+      fireEvent.change(input, { target: { value: "a" } });
+
+      // Local error should be cleared
+      expect(screen.queryByText("Please enter an answer")).not.toBeInTheDocument();
+    });
   });
 });
