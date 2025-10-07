@@ -287,10 +287,12 @@ describe("Flashcard Component", () => {
 
       render(<Flashcard />);
 
-      expect(screen.getByText("Correct! The answer is: a")).toBeInTheDocument();
+      expect(screen.getByText("Incorrect!")).toBeInTheDocument();
+      expect(screen.getByText(/The correct answer is:/)).toBeInTheDocument();
+      expect(screen.getByText("a", { selector: "strong" })).toBeInTheDocument();
 
-      const resultContainer = screen.getByText(/Correct!/).closest('div');
-      expect(resultContainer).toHaveClass("bg-green-50", "text-green-800", "border-green-300");
+      const resultContainer = screen.getByText(/Incorrect!/).closest('div');
+      expect(resultContainer).toHaveClass("bg-[#ae0d13]", "text-white", "border-[#950a1e]");
     });
 
     test("clears local error when user types valid input", () => {
