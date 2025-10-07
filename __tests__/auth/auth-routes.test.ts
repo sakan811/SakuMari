@@ -27,11 +27,12 @@ import { GET as providersGet } from "@/app/api/auth/providers/route";
 const originalEnv = { ...process.env };
 
 // Use vi.hoisted to declare mocks that can be used in vi.mock
-const { mockHandlers } = vi.hoisted(() => ({
+const { mockHandlers, mockRateLimit } = vi.hoisted(() => ({
   mockHandlers: {
     GET: vi.fn(),
     POST: vi.fn(),
   },
+  mockRateLimit: vi.fn(),
 }));
 
 // Mock the auth handlers
@@ -39,9 +40,16 @@ vi.mock("@/lib/auth", () => ({
   handlers: mockHandlers,
 }));
 
+// Mock the rate limiting utility
+vi.mock("@/lib/rate-limit", () => ({
+  applyRateLimit: mockRateLimit,
+}));
+
 describe("Authentication API Routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default mock for rate limiting - allow requests
+    mockRateLimit.mockResolvedValue({ success: true });
   });
 
   afterEach(() => {
@@ -148,6 +156,58 @@ describe("Authentication API Routes", () => {
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data).toEqual({ credentialsEnabled: false });
+    });
+
+    test("applies rate limiting and returns 429 when rate limit exceeded", async () => {
+      // Mock rate limit exceeded
+      const rateLimitResponse = {
+        status: 429,
+        json: vi.fn().mockResolvedValue({
+          error: "Rate limit exceeded",
+          message: "Too many requests. Limit: 10 requests per 60 s.",
+          retryAfter: 30,
+        }),
+        headers: {
+          get: vi.fn((header: string) => {
+            const headers = {
+              "X-RateLimit-Limit": "10",
+              "X-RateLimit-Remaining": "0",
+              "X-RateLimit-Reset": new Date(Date.now() + 30000).toISOString(),
+              "Retry-After": "30",
+            };
+            return headers[header];
+          }),
+        },
+      };
+
+      mockRateLimit.mockResolvedValue({
+        success: false,
+        response: rateLimitResponse,
+      });
+
+      const request = new NextRequest("http://localhost/api/auth/providers");
+      const response = await providersGet(request);
+
+      expect(response.status).toBe(429);
+      expect(mockRateLimit).toHaveBeenCalledWith(request, "auth");
+
+      const data = await response.json();
+      expect(data.error).toBe("Rate limit exceeded");
+      expect(data.message).toContain("Too many requests");
+      expect(data.retryAfter).toBe(30);
+    });
+
+    test("applies rate limiting but proceeds normally when within limits", async () => {
+      process.env.CREDS_PROVIDER = "true";
+
+      const request = new NextRequest("http://localhost/api/auth/providers");
+      const response = await providersGet(request);
+
+      expect(response.status).toBe(200);
+      expect(mockRateLimit).toHaveBeenCalledWith(request, "auth");
+
+      const data = await response.json();
+      expect(data).toEqual({ credentialsEnabled: true });
     });
   });
 });
