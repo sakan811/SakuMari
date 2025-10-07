@@ -481,4 +481,121 @@ describe("Dashboard Component", () => {
       });
     });
   });
+
+  describe("Tips Modal Functionality", () => {
+    test("opens tips modal when clicking tips button", async () => {
+      render(<Dashboard />);
+
+      await waitFor(() => screen.getByText("Dashboard"));
+
+      // Click the Tips button
+      await act(async () => {
+        fireEvent.click(screen.getByText("💡 Tips"));
+      });
+
+      // Tips modal should be visible
+      await waitFor(() => {
+        expect(screen.getByText("Kana Learning Tips")).toBeTruthy();
+        expect(screen.getByText("Ask me anything about learning Japanese hiragana and katakana.")).toBeTruthy();
+      });
+    });
+
+    test("closes tips modal when clicking close button", async () => {
+      render(<Dashboard />);
+
+      await waitFor(() => screen.getByText("Dashboard"));
+
+      // Open the tips modal
+      await act(async () => {
+        fireEvent.click(screen.getByText("💡 Tips"));
+      });
+
+      // Verify modal is open
+      await waitFor(() => {
+        expect(screen.getByText("Kana Learning Tips")).toBeTruthy();
+      });
+
+      // Close the modal
+      await act(async () => {
+        fireEvent.click(screen.getByLabelText("Close tips modal"));
+      });
+
+      // Modal should be closed (not in document)
+      await waitFor(() => {
+        expect(screen.queryByText("Kana Learning Tips")).toBeNull();
+      });
+    });
+  });
+
+  describe("Error Handling and Refetch", () => {
+    test("displays error message and allows retry", async () => {
+      mockFetch.mockRejectedValue(new Error("Network error"));
+
+      act(() => {
+        render(<Dashboard />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText("Failed to load progress data")).toBeTruthy();
+      });
+
+      // Verify retry button is present
+      const retryButton = screen.getByText("Try Again");
+      expect(retryButton).toBeTruthy();
+
+      // Mock a successful response after retry
+      mockFetch.mockResolvedValue(mockApiResponse(mockStats));
+
+      // Click retry button
+      await act(async () => {
+        fireEvent.click(retryButton);
+      });
+
+      // Should load successfully after retry
+      await waitFor(() => {
+        expect(screen.getByText("Your Progress")).toBeTruthy();
+        expect(screen.getByText("あ")).toBeTruthy();
+      });
+    });
+
+    test("handles refetch with different error scenarios", async () => {
+      // First call fails
+      mockFetch.mockRejectedValueOnce(new Error("API Error"));
+
+      act(() => {
+        render(<Dashboard />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText("Failed to load progress data")).toBeTruthy();
+      });
+
+      // Retry also fails with different error
+      mockFetch.mockRejectedValueOnce(new Error("Retry failed"));
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Try Again"));
+      });
+
+      // Should still show error message
+      await waitFor(() => {
+        expect(screen.getByText("Failed to load progress data")).toBeTruthy();
+      });
+    });
+  });
+
+  describe("Loading State", () => {
+    test("displays loading spinner correctly", () => {
+      mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
+
+      act(() => {
+        render(<Dashboard />);
+      });
+
+      // Should show loading spinner
+      const spinner = document.querySelector('.animate-spin');
+      expect(spinner).toBeTruthy();
+      expect(spinner).toHaveClass('border-[#d1622b]');
+    });
+  });
 });
