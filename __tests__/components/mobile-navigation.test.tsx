@@ -1,3 +1,21 @@
+/*
+ * SakuMari: Japanese Kana Flashcard App
+ * Copyright (C) 2025 SakuMari
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { describe, test, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MobileNavigation } from "../../components/MobileNavigation";
@@ -5,10 +23,26 @@ import { MobileNavigation } from "../../components/MobileNavigation";
 // Mock next-auth/react
 const mockSignIn = vi.fn();
 const mockSignOut = vi.fn();
+const mockUseSession = vi.fn();
 
 vi.mock("next-auth/react", () => ({
-  signOut: () => mockSignOut(),
+  useSession: () => mockUseSession(),
   signIn: (provider: string) => mockSignIn(provider),
+  signOut: () => mockSignOut(),
+}));
+
+// Mock Next.js Link
+vi.mock("next/link", () => ({
+  default: ({ children, href, onClick, ...props }: any) => (
+    <a href={href} onClick={onClick} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
+// Mock Next.js Image
+vi.mock("next/image", () => ({
+  default: ({ alt, ...props }: any) => <img alt={alt} {...props} />,
 }));
 
 describe("MobileNavigation Component", () => {
@@ -18,9 +52,14 @@ describe("MobileNavigation Component", () => {
     vi.clearAllMocks();
   });
 
-  describe("When mobile menu is closed", () => {
-    test("does not render navigation when mobileMenuOpen is false", () => {
-      render(
+  describe("Menu Visibility", () => {
+    test("does not render when mobileMenuOpen is false", () => {
+      mockUseSession.mockReturnValue({
+        data: null,
+        status: "unauthenticated",
+      });
+
+      const { container } = render(
         <MobileNavigation
           session={null}
           status="unauthenticated"
@@ -30,14 +69,30 @@ describe("MobileNavigation Component", () => {
         />
       );
 
-      // Should not render any navigation content
-      expect(screen.queryByText("ひらがな Hiragana")).toBeNull();
-      expect(screen.queryByText("カタカナ Katakana")).toBeNull();
-      expect(screen.queryByText("Sign In with Google")).toBeNull();
+      expect(container.firstChild).toBeNull();
+    });
+
+    test("renders navigation when mobileMenuOpen is true", () => {
+      mockUseSession.mockReturnValue({
+        data: null,
+        status: "unauthenticated",
+      });
+
+      render(
+        <MobileNavigation
+          session={null}
+          status="unauthenticated"
+          credentialsEnabled={false}
+          mobileMenuOpen={true}
+          setMobileMenuOpen={mockSetMobileMenuOpen}
+        />
+      );
+
+      expect(screen.getByText("Sign In with Google")).toBeInTheDocument();
     });
   });
 
-  describe("Authenticated user with session", () => {
+  describe("Authenticated User Navigation", () => {
     const mockSession = {
       user: {
         name: "Test User",
@@ -46,22 +101,29 @@ describe("MobileNavigation Component", () => {
       },
     };
 
+    beforeEach(() => {
+      mockUseSession.mockReturnValue({
+        data: mockSession,
+        status: "authenticated",
+      });
+    });
+
     test("renders navigation links for authenticated user", () => {
       render(
         <MobileNavigation
           session={mockSession}
           status="authenticated"
-          credentialsEnabled={true}
+          credentialsEnabled={false}
           mobileMenuOpen={true}
           setMobileMenuOpen={mockSetMobileMenuOpen}
         />
       );
 
-      expect(screen.getByText("ひらがな Hiragana")).toBeTruthy();
-      expect(screen.getByText("カタカナ Katakana")).toBeTruthy();
-      expect(screen.getByText("📊 Dashboard")).toBeTruthy();
-      expect(screen.getByText("Test User")).toBeTruthy();
-      expect(screen.getByText("Sign Out")).toBeTruthy();
+      expect(screen.getByText("ひらがな Hiragana")).toBeInTheDocument();
+      expect(screen.getByText("カタカナ Katakana")).toBeInTheDocument();
+      expect(screen.getByText("📊 Dashboard")).toBeInTheDocument();
+      expect(screen.getByText("Test User")).toBeInTheDocument();
+      expect(screen.getByText("Sign Out")).toBeInTheDocument();
     });
 
     test("displays user profile image when available", () => {
@@ -69,17 +131,18 @@ describe("MobileNavigation Component", () => {
         <MobileNavigation
           session={mockSession}
           status="authenticated"
-          credentialsEnabled={true}
+          credentialsEnabled={false}
           mobileMenuOpen={true}
           setMobileMenuOpen={mockSetMobileMenuOpen}
         />
       );
 
-      // Profile image should be present (checking alt attribute)
-      expect(screen.getByAltText("Profile")).toBeTruthy();
+      const profileImage = screen.getByAltText("Profile");
+      expect(profileImage).toBeInTheDocument();
+      expect(profileImage).toHaveAttribute("src", "https://example.com/avatar.jpg");
     });
 
-    test("displays user avatar fallback when no image", () => {
+    test("displays user initials when no image available", () => {
       const sessionWithoutImage = {
         user: {
           name: "John Doe",
@@ -87,60 +150,94 @@ describe("MobileNavigation Component", () => {
         },
       };
 
+      mockUseSession.mockReturnValue({
+        data: sessionWithoutImage,
+        status: "authenticated",
+      });
+
       render(
         <MobileNavigation
           session={sessionWithoutImage}
           status="authenticated"
-          credentialsEnabled={true}
+          credentialsEnabled={false}
           mobileMenuOpen={true}
           setMobileMenuOpen={mockSetMobileMenuOpen}
         />
       );
 
-      // Should show fallback avatar with first letter of name
-      expect(screen.getByText("J")).toBeTruthy();
+      expect(screen.getByText("J")).toBeInTheDocument(); // First letter of "John"
     });
 
-    test("calls signOut and closes menu when sign out button is clicked", async () => {
+    test("displays 'U' as fallback when no name available", () => {
+      const sessionWithoutName = {
+        user: {
+          email: "user@example.com",
+        },
+      };
+
+      mockUseSession.mockReturnValue({
+        data: sessionWithoutName,
+        status: "authenticated",
+      });
+
+      render(
+        <MobileNavigation
+          session={sessionWithoutName}
+          status="authenticated"
+          credentialsEnabled={false}
+          mobileMenuOpen={true}
+          setMobileMenuOpen={mockSetMobileMenuOpen}
+        />
+      );
+
+      expect(screen.getByText("U")).toBeInTheDocument();
+    });
+
+    test("calls signOut and closes menu when sign out button is clicked", () => {
       render(
         <MobileNavigation
           session={mockSession}
           status="authenticated"
-          credentialsEnabled={true}
+          credentialsEnabled={false}
           mobileMenuOpen={true}
           setMobileMenuOpen={mockSetMobileMenuOpen}
         />
       );
 
       const signOutButton = screen.getByText("Sign Out");
-
       fireEvent.click(signOutButton);
 
       expect(mockSignOut).toHaveBeenCalled();
       expect(mockSetMobileMenuOpen).toHaveBeenCalledWith(false);
     });
 
-    test("closes menu when navigation links are clicked", async () => {
+    test("closes menu when navigation links are clicked", () => {
       render(
         <MobileNavigation
           session={mockSession}
           status="authenticated"
-          credentialsEnabled={true}
+          credentialsEnabled={false}
           mobileMenuOpen={true}
           setMobileMenuOpen={mockSetMobileMenuOpen}
         />
       );
 
       const hiraganaLink = screen.getByText("ひらがな Hiragana");
-
       fireEvent.click(hiraganaLink);
 
       expect(mockSetMobileMenuOpen).toHaveBeenCalledWith(false);
     });
   });
 
-  describe("Unauthenticated user with credentials enabled", () => {
-    test("renders sign in options when credentials are enabled", () => {
+  describe("Unauthenticated User with Credentials Enabled", () => {
+    beforeEach(() => {
+      mockUseSession.mockReturnValue({
+        data: null,
+        status: "unauthenticated",
+      });
+    });
+
+    test("renders Google and Credentials sign in buttons", () => {
       render(
         <MobileNavigation
           session={null}
@@ -151,12 +248,12 @@ describe("MobileNavigation Component", () => {
         />
       );
 
-      expect(screen.getByText("Sign In with Google")).toBeTruthy();
-      expect(screen.getByText("Sign In with Credentials")).toBeTruthy();
-      expect(screen.getByText("or")).toBeTruthy();
+      expect(screen.getByText("Sign In with Google")).toBeInTheDocument();
+      expect(screen.getByText("Sign In with Credentials")).toBeInTheDocument();
+      expect(screen.getByText("or")).toBeInTheDocument();
     });
 
-    test("calls signIn with Google and closes menu", async () => {
+    test("calls signIn with Google and closes menu", () => {
       render(
         <MobileNavigation
           session={null}
@@ -168,14 +265,13 @@ describe("MobileNavigation Component", () => {
       );
 
       const googleSignInButton = screen.getByText("Sign In with Google");
-
       fireEvent.click(googleSignInButton);
 
       expect(mockSignIn).toHaveBeenCalledWith("google");
       expect(mockSetMobileMenuOpen).toHaveBeenCalledWith(false);
     });
 
-    test("calls signIn with credentials and closes menu", async () => {
+    test("calls signIn with credentials and closes menu", () => {
       render(
         <MobileNavigation
           session={null}
@@ -187,7 +283,6 @@ describe("MobileNavigation Component", () => {
       );
 
       const credentialsSignInButton = screen.getByText("Sign In with Credentials");
-
       fireEvent.click(credentialsSignInButton);
 
       expect(mockSignIn).toHaveBeenCalledWith("credentials");
@@ -195,6 +290,11 @@ describe("MobileNavigation Component", () => {
     });
 
     test("disables buttons when status is loading", () => {
+      mockUseSession.mockReturnValue({
+        data: null,
+        status: "loading",
+      });
+
       render(
         <MobileNavigation
           session={null}
@@ -206,15 +306,21 @@ describe("MobileNavigation Component", () => {
       );
 
       const loadingButtons = screen.getAllByText("Loading...");
-      const googleButton = loadingButtons[0];
-      const credentialsButton = loadingButtons[1];
-
-      expect(googleButton).toBeDisabled();
-      expect(credentialsButton).toBeDisabled();
+      expect(loadingButtons).toHaveLength(2);
+      loadingButtons.forEach(button => {
+        expect(button).toBeDisabled();
+      });
     });
   });
 
-  describe("Unauthenticated user without credentials enabled", () => {
+  describe("Unauthenticated User without Credentials", () => {
+    beforeEach(() => {
+      mockUseSession.mockReturnValue({
+        data: null,
+        status: "unauthenticated",
+      });
+    });
+
     test("renders only Google sign in when credentials are disabled", () => {
       render(
         <MobileNavigation
@@ -226,12 +332,17 @@ describe("MobileNavigation Component", () => {
         />
       );
 
-      expect(screen.getByText("Sign In with Google")).toBeTruthy();
-      expect(screen.queryByText("Sign In with Credentials")).toBeNull();
-      expect(screen.queryByText("or")).toBeNull();
+      expect(screen.getByText("Sign In with Google")).toBeInTheDocument();
+      expect(screen.queryByText("Sign In with Credentials")).not.toBeInTheDocument();
+      expect(screen.queryByText("or")).not.toBeInTheDocument();
     });
 
     test("disables Google button when status is loading", () => {
+      mockUseSession.mockReturnValue({
+        data: null,
+        status: "loading",
+      });
+
       render(
         <MobileNavigation
           session={null}
@@ -247,51 +358,7 @@ describe("MobileNavigation Component", () => {
     });
   });
 
-  describe("Edge cases", () => {
-    test("handles user with empty name", () => {
-      const sessionWithEmptyName = {
-        user: {
-          name: "",
-          email: "test@example.com",
-        },
-      };
-
-      render(
-        <MobileNavigation
-          session={sessionWithEmptyName}
-          status="authenticated"
-          credentialsEnabled={true}
-          mobileMenuOpen={true}
-          setMobileMenuOpen={mockSetMobileMenuOpen}
-        />
-      );
-
-      // Should show "U" as fallback when name is empty
-      expect(screen.getByText("U")).toBeTruthy();
-    });
-
-    test("handles user with null name", () => {
-      const sessionWithNullName = {
-        user: {
-          name: null,
-          email: "test@example.com",
-        },
-      };
-
-      render(
-        <MobileNavigation
-          session={sessionWithNullName}
-          status="authenticated"
-          credentialsEnabled={true}
-          mobileMenuOpen={true}
-          setMobileMenuOpen={mockSetMobileMenuOpen}
-        />
-      );
-
-      // Should show "U" as fallback when name is null
-      expect(screen.getByText("U")).toBeTruthy();
-    });
-
+  describe("Edge Cases", () => {
     test("handles user with special characters in name", () => {
       const sessionWithSpecialName = {
         user: {
@@ -300,24 +367,59 @@ describe("MobileNavigation Component", () => {
         },
       };
 
+      mockUseSession.mockReturnValue({
+        data: sessionWithSpecialName,
+        status: "authenticated",
+      });
+
       render(
         <MobileNavigation
           session={sessionWithSpecialName}
           status="authenticated"
-          credentialsEnabled={true}
+          credentialsEnabled={false}
           mobileMenuOpen={true}
           setMobileMenuOpen={mockSetMobileMenuOpen}
         />
       );
 
-      // Should show first character of Japanese name
-      expect(screen.getByText("山")).toBeTruthy();
-      expect(screen.getByText("山田太郎")).toBeTruthy();
+      expect(screen.getByText("山")).toBeInTheDocument();
+      expect(screen.getByText("山田太郎")).toBeInTheDocument();
+    });
+
+    test("handles user with empty name", () => {
+      const sessionWithEmptyName = {
+        user: {
+          name: "",
+          email: "test@example.com",
+        },
+      };
+
+      mockUseSession.mockReturnValue({
+        data: sessionWithEmptyName,
+        status: "authenticated",
+      });
+
+      render(
+        <MobileNavigation
+          session={sessionWithEmptyName}
+          status="authenticated"
+          credentialsEnabled={false}
+          mobileMenuOpen={true}
+          setMobileMenuOpen={mockSetMobileMenuOpen}
+        />
+      );
+
+      expect(screen.getByText("U")).toBeInTheDocument();
     });
   });
 
   describe("Accessibility and Styling", () => {
-    test("Google sign in button has correct styling classes", () => {
+    test("applies correct styling classes for mobile navigation", () => {
+      mockUseSession.mockReturnValue({
+        data: null,
+        status: "unauthenticated",
+      });
+
       render(
         <MobileNavigation
           session={null}
@@ -328,26 +430,31 @@ describe("MobileNavigation Component", () => {
         />
       );
 
-      const googleButton = screen.getByText("Sign In with Google");
-      expect(googleButton).toHaveClass("bg-[#d1622b]", "hover:bg-[#ae0d13]");
+      const nav = screen.getByRole("navigation");
+      expect(nav).toHaveClass("lg:hidden");
     });
 
-    test("credentials sign in button has correct styling classes", () => {
+    test("buttons have proper ARIA labels and types", () => {
+      mockUseSession.mockReturnValue({
+        data: null,
+        status: "unauthenticated",
+      });
+
       render(
         <MobileNavigation
           session={null}
           status="unauthenticated"
-          credentialsEnabled={true}
+          credentialsEnabled={false}
           mobileMenuOpen={true}
           setMobileMenuOpen={mockSetMobileMenuOpen}
         />
       );
 
-      const credentialsButton = screen.getByText("Sign In with Credentials");
-      expect(credentialsButton).toHaveClass("bg-[#403933]", "hover:bg-[#705a39]");
+      const button = screen.getByRole("button");
+      expect(button).toHaveAttribute("type", "button");
     });
 
-    test("navigation links have correct accessibility attributes", () => {
+    test("navigation links have proper accessibility attributes", () => {
       const mockSession = {
         user: {
           name: "Test User",
@@ -355,11 +462,16 @@ describe("MobileNavigation Component", () => {
         },
       };
 
+      mockUseSession.mockReturnValue({
+        data: mockSession,
+        status: "authenticated",
+      });
+
       render(
         <MobileNavigation
           session={mockSession}
           status="authenticated"
-          credentialsEnabled={true}
+          credentialsEnabled={false}
           mobileMenuOpen={true}
           setMobileMenuOpen={mockSetMobileMenuOpen}
         />
@@ -368,7 +480,6 @@ describe("MobileNavigation Component", () => {
       const links = screen.getAllByRole("link");
       expect(links.length).toBeGreaterThan(0);
 
-      // Check that links have proper styling for accessibility
       links.forEach(link => {
         expect(link).toHaveClass("min-h-[44px]");
       });

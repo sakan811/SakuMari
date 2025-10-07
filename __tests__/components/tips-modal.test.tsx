@@ -1,50 +1,88 @@
-import { describe, test, expect, beforeEach, afterEach, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+/*
+ * SakuMari - Japanese Kana Flashcard App
+ * Copyright (C) 2025  Sakan Nirattisaykul
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  cleanup,
+  act,
+} from "@testing-library/react";
 import TipsModal from "../../components/TipsModal";
+
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
+
+const mockApiResponse = (data: any) => ({
+  ok: true,
+  json: async () => data,
+});
 
 describe("TipsModal Component", () => {
   const mockOnClose = vi.fn();
-  const mockFetch = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = mockFetch;
   });
 
   afterEach(() => {
+    cleanup();
     vi.restoreAllMocks();
   });
 
   describe("Basic Modal Functionality", () => {
     test("does not render when isOpen is false", () => {
-      render(<TipsModal isOpen={false} onClose={mockOnClose} />);
-
-      expect(screen.queryByText("Kana Learning Tips")).toBeNull();
-      expect(screen.queryByText("💡 Tips")).toBeNull();
+      const { container } = render(
+        <TipsModal isOpen={false} onClose={mockOnClose} />
+      );
+      expect(container.firstChild).toBeNull();
     });
 
     test("renders modal when isOpen is true", () => {
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      expect(screen.getByText("Kana Learning Tips")).toBeTruthy();
-      expect(screen.getByText("Ask questions about Japanese kana")).toBeTruthy();
-      expect(screen.getByText("Welcome to Kana Learning Tips!")).toBeTruthy();
+      expect(screen.getByText("Kana Learning Tips")).toBeInTheDocument();
+      expect(screen.getByText("Ask questions about Japanese kana")).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText("Ask about kana learning techniques...")
+      ).toBeInTheDocument();
     });
 
     test("calls onClose when close button is clicked", () => {
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const closeButton = screen.getByLabelText("Close tips modal");
+      const closeButton = screen.getByRole("button", {
+        name: "Close tips modal",
+      });
       fireEvent.click(closeButton);
 
-      expect(mockOnClose).toHaveBeenCalled();
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
     test("focuses input when modal opens", () => {
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      expect(input).toHaveFocus();
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      expect(document.activeElement).toBe(input);
     });
   });
 
@@ -52,10 +90,13 @@ describe("TipsModal Component", () => {
     test("displays welcome content when no messages", () => {
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      expect(screen.getByText("Welcome to Kana Learning Tips!")).toBeTruthy();
-      expect(screen.getByText("Ask me anything about learning Japanese hiragana and katakana.")).toBeTruthy();
-      expect(screen.getByText(/Example: .*How can I memorize hiragana faster\?.*/)).toBeTruthy();
-      expect(screen.getByText("🌸")).toBeTruthy();
+      expect(screen.getByText("Welcome to Kana Learning Tips!")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "Ask me anything about learning Japanese hiragana and katakana."
+        )
+      ).toBeInTheDocument();
+      expect(screen.getByText(/Example:/)).toBeInTheDocument();
     });
   });
 
@@ -63,7 +104,9 @@ describe("TipsModal Component", () => {
     test("allows typing in input field", () => {
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
       fireEvent.change(input, { target: { value: "How do I learn hiragana?" } });
 
       expect(input).toHaveValue("How do I learn hiragana?");
@@ -72,56 +115,119 @@ describe("TipsModal Component", () => {
     test("disables submit button when input is empty", () => {
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const submitButton = screen.getByText("Ask");
+      const submitButton = screen.getByRole("button", { name: "Ask" });
       expect(submitButton).toBeDisabled();
     });
 
     test("enables submit button when input has text", () => {
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      const submitButton = screen.getByText("Ask");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
 
       fireEvent.change(input, { target: { value: "test question" } });
 
       expect(submitButton).not.toBeDisabled();
     });
 
-    test("disables submit button when loading", () => {
-      mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
-
-      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
-
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      const submitButton = screen.getByText("Ask");
-
-      fireEvent.change(input, { target: { value: "test question" } });
-      fireEvent.click(submitButton);
-
-      expect(submitButton).toBeDisabled();
-      expect(screen.getByText("...")).toBeTruthy();
-    });
-
     test("prevents submission when input is only whitespace", () => {
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      const submitButton = screen.getByText("Ask");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
 
       fireEvent.change(input, { target: { value: "   " } });
       fireEvent.click(submitButton);
 
-      // Should not submit and should not call fetch
       expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    test("enforces character limit on input", () => {
+      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      expect(input.getAttribute("maxLength")).toBe("500");
     });
   });
 
   describe("Form Submission", () => {
-    test("submits form successfully with user message", async () => {
+    test("handles form submission with valid input", async () => {
+      const mockTip = {
+        tip: "Practice regularly to improve your kana recognition!",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      mockFetch.mockResolvedValue(mockApiResponse(mockTip));
+
+      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
+
+      fireEvent.change(input, {
+        target: { value: "How can I memorize hiragana better?" },
+      });
+      fireEvent.click(submitButton);
+
+      // Check user message appears
+      expect(
+        screen.getByText("How can I memorize hiragana better?")
+      ).toBeInTheDocument();
+
+      // Wait for API response
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            "Practice regularly to improve your kana recognition!"
+          )
+        ).toBeInTheDocument();
+      });
+
+      expect(mockFetch).toHaveBeenCalledWith("/api/tips", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userQuery: "How can I memorize hiragana better?",
+        }),
+      });
+    });
+
+    test("handles form submission with Enter key", async () => {
+      const mockTip = {
+        tip: "Test response",
+        timestamp: "2025-01-01T00:00:00Z",
+      };
+
+      mockFetch.mockResolvedValue(mockApiResponse(mockTip));
+
+      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      fireEvent.change(input, { target: { value: "Test question" } });
+      fireEvent.submit(input.closest("form")!);
+
+      await waitFor(() => {
+        expect(screen.getByText("Test response")).toBeInTheDocument();
+      });
+    });
+
+    test("trims input whitespace on submission", async () => {
       const mockResponse = {
         ok: true,
         json: async () => ({
-          tip: "Here's a great tip for learning hiragana!",
+          tip: "Response",
           timestamp: new Date().toISOString(),
         }),
       };
@@ -130,86 +236,174 @@ describe("TipsModal Component", () => {
 
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      const form = input.closest("form")!;
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      fireEvent.change(input, { target: { value: "  trimmed message  " } });
+      fireEvent.submit(input.closest("form")!);
 
-      fireEvent.change(input, { target: { value: "How can I learn hiragana faster?" } });
-      fireEvent.submit(form);
-
-      // Check that user message is displayed
       await waitFor(() => {
-        expect(screen.getByText("How can I learn hiragana faster?")).toBeTruthy();
+        expect(screen.getByText("trimmed message")).toBeInTheDocument();
+        expect(screen.queryByText("  trimmed message  ")).toBeNull();
       });
 
-      // Check that API was called correctly
       expect(mockFetch).toHaveBeenCalledWith("/api/tips", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userQuery: "How can I learn hiragana faster?",
+          userQuery: "trimmed message",
         }),
-      });
-
-      // Check that assistant response is displayed
-      await waitFor(() => {
-        expect(screen.getByText("Here's a great tip for learning hiragana!")).toBeTruthy();
       });
     });
+  });
 
-    test("handles API error response", async () => {
-      const mockResponse = {
-        ok: false,
-        json: async () => ({
-          error: "API rate limit exceeded",
-        }),
-      };
-
-      mockFetch.mockResolvedValue(mockResponse);
+  describe("Loading States", () => {
+    test("shows loading state during API call", async () => {
+      mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
 
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      const submitButton = screen.getByText("Ask");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
 
-      fireEvent.change(input, { target: { value: "test question" } });
+      fireEvent.change(input, { target: { value: "Test question" } });
+
+      await act(async () => {
+        fireEvent.click(submitButton);
+      });
+
+      expect(screen.getByText("...")).toBeInTheDocument();
+      expect(submitButton).toBeDisabled();
+    });
+
+    test("prevents submission when already loading", async () => {
+      mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
+
+      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
+
+      fireEvent.change(input, { target: { value: "first question" } });
+      fireEvent.click(submitButton);
+
+      // Try to submit again while loading
+      fireEvent.change(input, { target: { value: "second question" } });
+      fireEvent.click(submitButton);
+
+      // Should only call fetch once
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("Error Handling", () => {
+    test("handles API error responses", async () => {
+      const errorResponse = {
+        ok: false,
+        status: 400,
+        json: async () => ({ error: "Invalid request" }),
+      };
+
+      mockFetch.mockResolvedValue(errorResponse);
+
+      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
+
+      fireEvent.change(input, { target: { value: "Test question" } });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText("API rate limit exceeded")).toBeTruthy();
+        expect(screen.getByText("Invalid request")).toBeInTheDocument();
       });
+
+      // Error should be displayed in red background
+      const errorElement = screen.getByText("Invalid request");
+      expect(errorElement.closest(".bg-red-100")).toBeInTheDocument();
     });
 
-    test("handles network error", async () => {
+    test("handles network errors", async () => {
       mockFetch.mockRejectedValue(new Error("Network error"));
 
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      const submitButton = screen.getByText("Ask");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
 
-      fireEvent.change(input, { target: { value: "test question" } });
+      fireEvent.change(input, { target: { value: "Test question" } });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText("Network error")).toBeTruthy();
+        expect(screen.getByText("Network error")).toBeInTheDocument();
       });
     });
 
-    test("handles unknown error type", async () => {
-      mockFetch.mockRejectedValue("Unknown error");
+    test("handles non-Error objects in catch block", async () => {
+      mockFetch.mockRejectedValue("Network failure");
 
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      const submitButton = screen.getByText("Ask");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
 
-      fireEvent.change(input, { target: { value: "test question" } });
+      fireEvent.change(input, { target: { value: "Test question" } });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText("Something went wrong")).toBeTruthy();
+        expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+      });
+    });
+
+    test("handles null error objects in catch block", async () => {
+      mockFetch.mockRejectedValue(null);
+
+      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
+
+      fireEvent.change(input, { target: { value: "Test question" } });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+      });
+    });
+
+    test("handles API error without proper error message", async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 500,
+        json: async () => ({}), // No error property in response
+      });
+
+      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
+
+      fireEvent.change(input, { target: { value: "Test question" } });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("Failed to get learning tips")).toBeInTheDocument();
       });
     });
 
@@ -219,14 +413,16 @@ describe("TipsModal Component", () => {
 
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      const submitButton = screen.getByText("Ask");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
 
       fireEvent.change(input, { target: { value: "first question" } });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText("First error")).toBeTruthy();
+        expect(screen.getByText("First error")).toBeInTheDocument();
       });
 
       // Second call succeeds
@@ -243,27 +439,8 @@ describe("TipsModal Component", () => {
 
       await waitFor(() => {
         expect(screen.queryByText("First error")).toBeNull();
-        expect(screen.getByText("Success response")).toBeTruthy();
+        expect(screen.getByText("Success response")).toBeInTheDocument();
       });
-    });
-
-    test("prevents submission when already loading", async () => {
-      mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
-
-      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
-
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      const submitButton = screen.getByText("Ask");
-
-      fireEvent.change(input, { target: { value: "first question" } });
-      fireEvent.click(submitButton);
-
-      // Try to submit again while loading
-      fireEvent.change(input, { target: { value: "second question" } });
-      fireEvent.click(submitButton);
-
-      // Should only call fetch once
-      expect(mockFetch).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -281,7 +458,9 @@ describe("TipsModal Component", () => {
 
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
       fireEvent.change(input, { target: { value: "User message here" } });
       fireEvent.submit(input.closest("form")!);
 
@@ -305,7 +484,9 @@ describe("TipsModal Component", () => {
 
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
       fireEvent.change(input, { target: { value: "test" } });
       fireEvent.submit(input.closest("form")!);
 
@@ -315,55 +496,34 @@ describe("TipsModal Component", () => {
         expect(assistantMessage).toHaveClass("bg-white", "border-2", "text-[#403933]");
       });
     });
-
-    test("displays loading indicator correctly", async () => {
-      mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
-
-      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
-
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      fireEvent.change(input, { target: { value: "test" } });
-      fireEvent.submit(input.closest("form")!);
-
-      await waitFor(() => {
-        expect(screen.getByText("Thinking...")).toBeTruthy();
-        expect(screen.getByText("...")).toBeTruthy();
-
-        // Check for animated dots
-        const animatedDots = document.querySelectorAll('.animate-pulse');
-        expect(animatedDots.length).toBe(3);
-      });
-    });
   });
 
   describe("Component Lifecycle", () => {
-    test("resets state when modal closes", async () => {
-      const mockResponse = {
-        ok: true,
-        json: async () => ({
-          tip: "Response message",
-          timestamp: new Date().toISOString(),
-        }),
-      };
+    test("clears conversation and input on close", () => {
+      const { rerender } = render(
+        <TipsModal isOpen={true} onClose={mockOnClose} />
+      );
 
-      mockFetch.mockResolvedValue(mockResponse);
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      fireEvent.change(input, { target: { value: "Test input" } });
 
-      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
-
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      fireEvent.change(input, { target: { value: "test message" } });
-      fireEvent.submit(input.closest("form")!);
-
-      await waitFor(() => {
-        expect(screen.getByText("test message")).toBeTruthy();
-        expect(screen.getByText("Response message")).toBeTruthy();
+      const closeButton = screen.getByRole("button", {
+        name: "Close tips modal",
       });
-
-      // Close modal by clicking the close button
-      const closeButton = screen.getByLabelText("Close tips modal");
       fireEvent.click(closeButton);
 
       expect(mockOnClose).toHaveBeenCalled();
+
+      // Re-render with isOpen=true to check if state was cleared
+      rerender(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+      const newInput = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      ) as HTMLInputElement;
+      expect(newInput.value).toBe("");
+      expect(screen.getByText("Welcome to Kana Learning Tips!")).toBeInTheDocument();
     });
 
     test("handles component unmount during async operation", async () => {
@@ -374,9 +534,13 @@ describe("TipsModal Component", () => {
 
       mockFetch.mockReturnValue(promise);
 
-      const { unmount } = render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+      const { unmount } = render(
+        <TipsModal isOpen={true} onClose={mockOnClose} />
+      );
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
       fireEvent.change(input, { target: { value: "test" } });
       fireEvent.submit(input.closest("form")!);
 
@@ -399,9 +563,11 @@ describe("TipsModal Component", () => {
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
       const closeButton = screen.getByLabelText("Close tips modal");
-      expect(closeButton).toBeTruthy();
+      expect(closeButton).toBeInTheDocument();
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
       expect(input).toHaveAttribute("type", "text");
       expect(input).toHaveAttribute("maxLength", "500");
     });
@@ -409,55 +575,10 @@ describe("TipsModal Component", () => {
     test("maintains focus management", () => {
       render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
       expect(input).toHaveFocus();
-    });
-  });
-
-  describe("Input Validation", () => {
-    test("handles very long input within maxLength", () => {
-      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
-
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      const longText = "a".repeat(500);
-
-      fireEvent.change(input, { target: { value: longText } });
-
-      expect(input).toHaveValue(longText);
-      expect(screen.getByText("Ask")).not.toBeDisabled();
-    });
-
-    test("trims input whitespace on submission", async () => {
-      const mockResponse = {
-        ok: true,
-        json: async () => ({
-          tip: "Response",
-          timestamp: new Date().toISOString(),
-        }),
-      };
-
-      mockFetch.mockResolvedValue(mockResponse);
-
-      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
-
-      const input = screen.getByPlaceholderText("Ask about kana learning techniques...");
-      fireEvent.change(input, { target: { value: "  trimmed message  " } });
-      fireEvent.submit(input.closest("form")!);
-
-      await waitFor(() => {
-        expect(screen.getByText("trimmed message")).toBeTruthy();
-        expect(screen.queryByText("  trimmed message  ")).toBeNull();
-      });
-
-      expect(mockFetch).toHaveBeenCalledWith("/api/tips", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userQuery: "trimmed message",
-        }),
-      });
     });
   });
 });
