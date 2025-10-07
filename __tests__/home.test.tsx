@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Home from "../app/page";
+import { useSession } from "next-auth/react";
 
 // Mock the next/navigation module
 vi.mock("next/navigation", () => ({
@@ -20,10 +21,7 @@ vi.mock("next/link", () => {
 
 // Mock next-auth/react
 vi.mock("next-auth/react", () => ({
-  useSession: () => ({
-    data: { user: { id: "user123", name: "Test User" } },
-    status: "authenticated",
-  }),
+  useSession: vi.fn(),
   signIn: vi.fn(),
   signOut: vi.fn(),
 }));
@@ -33,7 +31,28 @@ describe("Home Page", () => {
     vi.resetAllMocks();
   });
 
+  test("renders loading spinner when session status is loading", () => {
+    // Mock useSession to return loading status
+    vi.mocked(useSession).mockReturnValue({
+      data: null,
+      status: "loading",
+    });
+
+    render(<Home />);
+
+    // Check for loading spinner with specific Tailwind CSS classes
+    const spinner = document.querySelector('.rounded-full.border-2.sm\\:border-4.border-\\[\\#d1622b\\].border-t-transparent');
+    expect(spinner).toBeDefined();
+    expect(spinner).toHaveClass('animate-spin');
+  });
+
   test("renders all navigation cards", () => {
+    // Mock useSession to return authenticated status
+    vi.mocked(useSession).mockReturnValue({
+      data: { user: { id: "user123", name: "Test User" } },
+      status: "authenticated",
+    });
+
     render(<Home />);
 
     expect(screen.getByText(/🌸 SakuMari/)).toBeDefined();
@@ -43,6 +62,12 @@ describe("Home Page", () => {
   });
 
   test("contains correct navigation links", () => {
+    // Mock useSession to return authenticated status
+    vi.mocked(useSession).mockReturnValue({
+      data: { user: { id: "user123", name: "Test User" } },
+      status: "authenticated",
+    });
+
     render(<Home />);
 
     // Fix: Use getByText instead of getAllByText with index
