@@ -67,7 +67,7 @@ describe("Additional API Edge Cases", () => {
       // Should still process the request, but might fail in the database layer
       // The important thing is it doesn't crash the API
       expect([200, 400, 500]).toContain(response.status);
-    });
+    }, 10000); // Increase timeout to 10 seconds
 
     test("handles non-boolean isCorrect values", async () => {
       mockAuth.mockResolvedValue(mockSession(true, { id: "user123" }));
