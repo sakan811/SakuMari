@@ -8,7 +8,7 @@ async function performAuth(page: any) {
   const isMobile = page.viewportSize()?.width < 1024;
   if (isMobile) {
     await page.getByRole("button", { name: "Toggle mobile menu" }).click();
-    await page.getByRole("button", { name: "Sign In with Google" }).click();
+    await page.getByRole("button", { name: "Sign In" }).first().click();
   } else {
     await page.getByRole("button", { name: "Sign In" }).click();
   }

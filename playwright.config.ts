@@ -28,7 +28,7 @@ export default defineConfig({
     timeout: 120 * 1000, // 2 minutes
     env: {
       CREDS_PROVIDER: "true",
-      NODE_ENV: "production",
+      NODE_ENV: "production"
     },
   },
 

@@ -19,6 +19,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
+// Check if we're in a test environment
+const isTestEnvironment = () => {
+  return process.env.CREDS_PROVIDER === "true";
+};
+
 // Rate limit configuration for different endpoint types
 const RATE_LIMITS = {
   // Health endpoint - public, very permissive
@@ -40,6 +45,27 @@ const RATE_LIMITS = {
   default: { requests: 20, window: "60 s" },
 } as const;
 
+// More permissive rate limits for test environments
+const TEST_RATE_LIMITS = {
+  // Health endpoint - very permissive in tests
+  health: { requests: 200, window: "60 s" },
+
+  // Stats endpoint - very permissive in tests
+  stats: { requests: 200, window: "60 s" },
+
+  // Flashcard submission - very permissive in tests
+  flashcards: { requests: 500, window: "60 s" },
+
+  // AI tips - more permissive in tests (but still reasonable)
+  tips: { requests: 50, window: "60 s" },
+
+  // Auth endpoints - much more permissive in tests to avoid 429s
+  auth: { requests: 100, window: "60 s" },
+
+  // Default rate limit - very permissive in tests
+  default: { requests: 200, window: "60 s" },
+} as const;
+
 type EndpointType = keyof typeof RATE_LIMITS;
 
 // Create Redis client
@@ -47,11 +73,14 @@ const redis = Redis.fromEnv();
 
 // Create rate limiters for different endpoint types
 const createRateLimiter = (type: EndpointType) => {
-  const config = RATE_LIMITS[type];
+  // Use test rate limits if we're in a test environment
+  const rateLimits = isTestEnvironment() ? TEST_RATE_LIMITS : RATE_LIMITS;
+  const config = rateLimits[type];
+
   return new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(config.requests, config.window),
-    prefix: `@upstash/ratelimit:${type}`,
+    prefix: `@upstash/ratelimit:${isTestEnvironment() ? 'test:' : ''}${type}`,
     analytics: false, // Set to true if you want analytics
   });
 };
@@ -101,7 +130,7 @@ export async function applyRateLimit(
       const response = NextResponse.json(
         {
           error: "Rate limit exceeded",
-          message: `Too many requests. Limit: ${limit} requests per ${RATE_LIMITS[endpointType].window}.`,
+          message: `Too many requests. Limit: ${limit} requests per ${(isTestEnvironment() ? TEST_RATE_LIMITS : RATE_LIMITS)[endpointType].window}.`,
           retryAfter: Math.ceil((reset - Date.now()) / 1000),
         },
         {
