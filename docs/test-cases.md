@@ -1,6 +1,6 @@
 # Test Cases Overview
 
-Comprehensive test suite for the SakuMari Japanese kana learning application with 50 test files organized across unit, integration, and E2E testing.
+Comprehensive test suite for the SakuMari Japanese kana learning application with 48 test files organized across unit, integration, and E2E testing.
 
 ## Test Organization
 
@@ -17,7 +17,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 **Hooks** (`hooks/*.test.*`)
 - `useDashboardData.test.tsx` - Dashboard data fetching
 - `useFlashcardInteraction.test.tsx` - Flashcard interaction logic
-- `useFlashcardHandlers.test.tsx` - Mode selection handlers
+- `useFlashcardHandlers.test.tsx` - Mode selection handlers (moved from root `__tests__/`)
 - `useSorting.test.ts` - Table sorting functionality
 
 **API** (`api/*.test.ts`)
@@ -44,11 +44,21 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - `prisma.test.ts` - Database client utilities
 - `should-fetch-kana-data.test.ts` - Data fetching logic
 
+**Test Setup Files** (`utils/*.ts`)
+- `api-test-setup.ts` - API testing setup
+- `mock-setup.ts` - Mock configuration
+- `page-test-utils.ts` - Page testing utilities
+- `test-assertions.ts` - Custom test assertions
+- `test-helpers.ts` - Test helper functions
+
 **Libraries** (`lib/*.test.ts`)
 - `rate-limit.test.ts` - Upstash Redis rate limiting
 
 **Flashcard Provider** (`flashcard-provider/*.test.tsx`)
 - `FlashcardProvider.test.tsx` - Flashcard context provider logic
+
+### **Legacy Tests**
+- `use-flashcard-handlers.test.ts` - Legacy flashcard handlers test (moved to `hooks/` directory)
 
 ### **Integration Tests**
 

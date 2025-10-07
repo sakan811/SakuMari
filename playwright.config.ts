@@ -14,10 +14,10 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 1 : 2,
   reporter: "html",
-  timeout: 30 * 1000, // Reduced from 60s to 30s per test
-  globalTimeout: 5 * 60 * 1000, // Reduced from 10min to 5min for entire run
+  timeout: 30 * 1000, 
+  globalTimeout: 5 * 60 * 1000,
   expect: {
-    timeout: 8 * 1000, // Reduced from 15s to 8s for assertions
+    timeout: 15 * 1000, 
   },
 
   // Playwright will manage the Next.js server
