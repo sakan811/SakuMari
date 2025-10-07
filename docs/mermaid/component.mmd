@@ -5,75 +5,52 @@ config:
   layout: elk
 ---
 flowchart LR
-    %% Authentication Layer
-    SessionProviders["🔐 SessionProviders<br/>Authentication Context<br/>NextAuth.js"]
+    SessionProviders["🔐 SessionProviders"]
 
-    %% Root Application Structure
-    SessionProviders --> HomePage["🏠 HomePage<br/>Landing Page<br/>Authentication-aware"]
-    SessionProviders --> FlashcardApp["⚡ FlashcardApp<br/>Main Practice App<br/>Container"]
+    SessionProviders --> HomePage["🏠 HomePage"]
+    SessionProviders --> FlashcardApp["⚡ FlashcardApp"]
 
-    %% Core Application Components
-    FlashcardApp --> Header["📋 Header<br/>Global Navigation<br/>Authentication Controls"]
-    FlashcardApp --> FlashcardProvider["🎯 FlashcardProvider<br/>React Context<br/>Adaptive Learning"]
+    FlashcardApp --> Header["📋 Header"]
+    FlashcardApp --> FlashcardProvider["🎯 FlashcardProvider"]
 
-    %% Navigation Components
-    Header --> DesktopNavigation["🖥️ DesktopNavigation<br/>Desktop Menu<br/>Large Screen"]
-    Header --> MobileNavigation["📱 MobileNavigation<br/>Mobile Menu<br/>Responsive"]
+    Header --> DesktopNavigation["🖥️ DesktopNav"]
+    Header --> MobileNavigation["📱 MobileNav"]
 
-    %% Practice Flow Components
-    FlashcardProvider --> Flashcard["🃏 Flashcard<br/>Practice Interface<br/>Dual Input Modes"]
+    FlashcardProvider --> Flashcard["🃏 Flashcard"]
+    Flashcard --> ModeSelector["⌨️ ModeSelector"]
+    Flashcard --> MultipleChoice["📝 MultipleChoice"]
+    Flashcard --> FilterButton["🔍 FilterButton"]
 
-    Flashcard --> ModeSelector["⌨️ ModeSelector<br/>Input Mode Toggle<br/>Typing vs Multiple Choice"]
-    Flashcard --> MultipleChoice["📝 MultipleChoice<br/>Multiple Choice Interface<br/>Answer Selection"]
-    Flashcard --> FilterButton["🔍 FilterButton<br/>Character Type Filter<br/>Hiragana/Katakana/All"]
+    FlashcardApp --> Dashboard["📊 Dashboard"]
+    Dashboard --> StatsSummary["📈 StatsSummary"]
+    Dashboard --> CharacterProgressTable["📋 ProgressTable"]
+    Dashboard --> TipsModal["🤖 TipsModal"]
 
-    %% Dashboard Components
-    FlashcardApp --> Dashboard["📊 Dashboard<br/>Progress Tracking<br/>Statistics & Analytics"]
+    CharacterProgressTable --> SortableTableHeader["🔄 SortableHeader"]
+    CharacterProgressTable --> CharacterTableRow["📝 TableRow"]
 
-    Dashboard --> StatsSummary["📈 StatsSummary<br/>Progress Overview<br/>Key Metrics"]
-    Dashboard --> CharacterProgressTable["📋 CharacterProgressTable<br/>Progress Table<br/>Character Statistics"]
-    Dashboard --> TipsModal["🤖 TipsModal<br/>AI Chat Interface<br/>Learning Tips"]
+    Dashboard --> useDashboardData["🔧 useDashboardData"]
+    Dashboard --> useSorting["🔧 useSorting"]
+    Header --> useAuthStatus["🔧 useAuthStatus"]
+    Flashcard --> useFlashcardHandlers["🔧 useFlashcardHandlers"]
+    Flashcard --> useFlashcardInteraction["🔧 useFlashcardInteraction"]
 
-    %% Table Sub-Components
-    CharacterProgressTable --> SortableTableHeader["🔄 SortableTableHeader<br/>Column Sorting<br/>Dynamic Ordering"]
-    CharacterProgressTable --> CharacterTableRow["📝 CharacterTableRow<br/>Individual Stats<br/>Progress Data"]
+    Components --> EnvUtils["⚙️ env.ts"]
+    Components --> ErrorUtils["❌ api-errors.ts"]
+    Flashcard --> KanaFilter["🈁 kana-filter.ts"]
+    Flashcard --> SubmitUtils["📤 flashcard-submit-utils.ts"]
+    API --> RateLimitUtils["🚦 rate-limit.ts"]
 
-    %% Custom Hooks Integration
-    Dashboard --> useDashboardData["🔧 useDashboardData<br/>Data Fetching<br/>Progress API"]
-    Dashboard --> useSorting["🔧 useSorting<br/>Table Sorting<br/>Column Logic"]
-    Header --> useAuthStatus["🔧 useAuthStatus<br/>Authentication<br/>Session State"]
-    Flashcard --> useFlashcardHandlers["🔧 useFlashcardHandlers<br/>Mode & Choice<br/>Input Management"]
-    Flashcard --> useFlashcardInteraction["🔧 useFlashcardInteraction<br/>Interaction<br/>Card Logic"]
-
-    %% UI Components System
-    Button["🔘 Button<br/>Reusable Component<br/>Consistent UI"]
-    ButtonLink["🔗 ButtonLink<br/>Link Component<br/>Navigation"]
-    FilterButton["🔍 FilterButton<br/>Filter Component<br/>Character Type"]
-
-    %% Component Usage Relationships
-    HomePage -.-> Header
-    HomePage -.-> ButtonLink
-    Dashboard -.-> Button
-    Dashboard -.-> ButtonLink
-    Flashcard -.-> Button
-    Flashcard -.-> FilterButton
-    Dashboard -.-> FilterButton
-
-    %% Context Provider Relationships
-    FlashcardProvider -.-> Flashcard
-    SessionProviders -.-> Dashboard
-
-    %% Styling Classes
     classDef coreComponent fill:#e8f4fd,stroke:#1e40af,stroke-width:2px
     classDef practiceComponent fill:#fef3c7,stroke:#d97706,stroke-width:2px
     classDef dashboardComponent fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
-    classDef uiComponent fill:#fdf4ff,stroke:#a855f7,stroke-width:2px
     classDef contextProvider fill:#fee2e2,stroke:#dc2626,stroke-width:3px
     classDef customHook fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,stroke-dasharray: 5 5
+    classDef utilityLib fill:#f0f9ff,stroke:#0ea5e9,stroke-width:2px
 
     class SessionProviders,HomePage,FlashcardApp,Header,DesktopNavigation,MobileNavigation coreComponent
     class Flashcard,ModeSelector,MultipleChoice,FlashcardProvider practiceComponent
     class Dashboard,StatsSummary,CharacterProgressTable,SortableTableHeader,CharacterTableRow,TipsModal dashboardComponent
-    class Button,ButtonLink,FilterButton uiComponent
     class FlashcardProvider,SessionProviders contextProvider
     class useDashboardData,useSorting,useAuthStatus,useFlashcardHandlers,useFlashcardInteraction customHook
+    class EnvUtils,ErrorUtils,KanaFilter,SubmitUtils,RateLimitUtils utilityLib

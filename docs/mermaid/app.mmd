@@ -5,97 +5,49 @@ config:
   layout: elk
 ---
 flowchart LR
-    %% Root App Structure
-    AppRoot["📁 app/<br/>Next.js 15 App Router<br/>File-based Routing"]
+    AppRoot["📁 app/"]
 
-    %% Root Layout and Global Files
-    AppRoot --> RootLayout["📄 layout.tsx<br/>Root Layout<br/>Global HTML + Metadata"]
-    AppRoot --> GlobalCSS["🎨 globals.css<br/>Global Styles<br/>Tailwind CSS"]
-    AppRoot --> Middleware["🛡️ middleware.ts<br/>Route Protection<br/>Auth Middleware"]
-    AppRoot --> SitemapTS["🗺️ sitemap.ts<br/>Dynamic Sitemap<br/>SEO"]
-    AppRoot --> RobotsTS["🤖 robots.ts<br/>Robots.txt<br/>Search Engine Rules"]
+    AppRoot --> RootLayout["📄 layout.tsx"]
+    AppRoot --> Middleware["🛡️ middleware.ts"]
+    AppRoot --> GlobalCSS["🎨 globals.css"]
 
-    %% Page Routes
-    AppRoot --> HomePage["🏠 page.tsx<br/>Home Page<br/>Landing"]
-    AppRoot --> DashboardDir["📁 dashboard/<br/>Dashboard<br/>Protected"]
-    AppRoot --> HiraganaDir["📁 hiragana/<br/>Hiragana Practice<br/>Protected"]
-    AppRoot --> KatakanaDir["📁 katakana/<br/>Katakana Practice<br/>Protected"]
+    AppRoot --> Pages["📄 Pages"]
+    Pages --> HomePage["🏠 page.tsx"]
+    Pages --> Dashboard["📊 dashboard/page.tsx"]
+    Pages --> Hiragana["ひ hiragana/page.tsx"]
+    Pages --> Katakana["カ katakana/page.tsx"]
 
-    %% Page Route Files
-    DashboardDir --> DashboardPage["📄 page.tsx<br/>Dashboard<br/>Progress UI"]
-    HiraganaDir --> HiraganaPage["📄 page.tsx<br/>Hiragana<br/>Practice Session"]
-    KatakanaDir --> KatakanaPage["📄 page.tsx<br/>Katakana<br/>Practice Session"]
+    AppRoot --> API["🔌 api/"]
+    API --> AuthAPI["🔐 auth/"]
+    AuthAPI --> NextAuth["📄 [...nextauth]/route.ts"]
+    AuthAPI --> Providers["📄 providers/route.ts"]
 
-    %% API Routes Structure
-    AppRoot --> APIRoot["📁 api/<br/>API Routes<br/>Server-side Endpoints"]
+    API --> AppAPI["⚡ App APIs"]
+    AppAPI --> SubmitAPI["📤 flashcards/submit/route.ts"]
+    AppAPI --> StatsAPI["📈 stats/route.ts"]
+    AppAPI --> TipsAPI["🤖 tips/route.ts"]
+    AppAPI --> HealthAPI["❤️ health/route.ts"]
 
-    %% Authentication API Routes
-    APIRoot --> AuthDir["📁 auth/<br/>Authentication<br/>NextAuth.js"]
-    AuthDir --> NextAuthRoute["📁 [...nextauth]/<br/>Dynamic Auth<br/>OAuth + Sessions"]
-    NextAuthRoute --> NextAuthFile["📄 route.ts<br/>NextAuth Handler<br/>Login/Logout"]
-    AuthDir --> ProvidersRoute["📁 providers/<br/>Auth Providers<br/>Login Methods"]
-    ProvidersRoute --> ProvidersFile["📄 route.ts<br/>Providers API<br/>OAuth Config"]
+    AppRoot --> SEO["🔍 SEO"]
+    SEO --> Sitemap["🗺️ sitemap.ts"]
+    SEO --> Robots["🤖 robots.ts"]
+    SEO --> Favicon["🖼️ favicon.ico"]
 
-    %% Application API Routes
-    APIRoot --> FlashcardsDir["📁 flashcards/<br/>Flashcard APIs<br/>Practice Data"]
-    FlashcardsDir --> SubmitDir["📁 submit/<br/>Answer Submission<br/>Progress"]
-    SubmitDir --> SubmitFile["📄 route.ts<br/>Submit API<br/>Answer Processing"]
+    Middleware -.-> Dashboard
+    Middleware -.-> Hiragana
+    Middleware -.-> Katakana
+    Middleware -.-> SubmitAPI
+    Middleware -.-> StatsAPI
+    Middleware -.-> TipsAPI
 
-    APIRoot --> StatsDir["📁 stats/<br/>Statistics<br/>User Progress"]
-    StatsDir --> StatsFile["📄 route.ts<br/>Stats API<br/>Dashboard Data"]
-
-    APIRoot --> TipsDir["📁 tips/<br/>AI Tips<br/>Personalized Learning"]
-    TipsDir --> TipsFile["📄 route.ts<br/>Tips API<br/>Gemini AI"]
-
-    APIRoot --> HealthDir["📁 health/<br/>Health Check<br/>System Monitoring"]
-    HealthDir --> HealthFile["📄 route.ts<br/>Health API<br/>DB Connectivity"]
-
-    %% Middleware Protection Flow
-    Middleware -.-> DashboardPage
-    Middleware -.-> HiraganaPage
-    Middleware -.-> KatakanaPage
-    Middleware -.-> SubmitFile
-    Middleware -.-> StatsFile
-    Middleware -.-> TipsFile
-
-    %% Layout Inheritance Flow
-    RootLayout -.-> HomePage
-    RootLayout -.-> DashboardPage
-    RootLayout -.-> HiraganaPage
-    RootLayout -.-> KatakanaPage
-
-    %% API Route Usage by Pages
-    HomePage -.-> NextAuthFile
-    HomePage -.-> ProvidersFile
-    DashboardPage -.-> StatsFile
-    DashboardPage -.-> TipsFile
-    HiraganaPage -.-> SubmitFile
-    KatakanaPage -.-> SubmitFile
-
-    %% Metadata and SEO Integration
-    SitemapTS -.-> HomePage
-    SitemapTS -.-> DashboardPage
-    SitemapTS -.-> HiraganaPage
-    SitemapTS -.-> KatakanaPage
-    RobotsTS -.-> SitemapTS
-
-    %% Component Integration
-    HomePage --> HomePageComponent["🧩 HomePage Component<br/>Landing<br/>Auth State"]
-    DashboardPage --> DashboardComponent["🧩 Dashboard Component<br/>Statistics<br/>Progress"]
-    HiraganaPage --> FlashcardAppComponent["🧩 FlashcardApp Component<br/>Practice<br/>Adaptive Learning"]
-    KatakanaPage --> FlashcardAppComponent
-
-    %% Styling
     classDef rootStructure fill:#e8f4fd,stroke:#1e40af,stroke-width:3px
     classDef pageRoute fill:#fef3c7,stroke:#d97706,stroke-width:2px
     classDef apiRoute fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
     classDef authRoute fill:#fdf4ff,stroke:#a855f7,stroke-width:2px
     classDef globalFile fill:#fee2e2,stroke:#dc2626,stroke-width:2px
-    classDef component fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,stroke-dasharray: 5 5
 
     class AppRoot,RootLayout rootStructure
-    class HomePage,DashboardDir,DashboardPage,HiraganaDir,HiraganaPage,KatakanaDir,KatakanaPage pageRoute
-    class APIRoot,FlashcardsDir,SubmitDir,SubmitFile,StatsDir,StatsFile,TipsDir,TipsFile,HealthDir,HealthFile apiRoute
-    class AuthDir,NextAuthRoute,NextAuthFile,ProvidersRoute,ProvidersFile authRoute
-    class SitemapTS,RobotsTS,Middleware globalFile
-    class HomePageComponent,DashboardComponent,FlashcardAppComponent component
+    class HomePage,Dashboard,Hiragana,Katakana pageRoute
+    class SubmitAPI,StatsAPI,TipsAPI,HealthAPI apiRoute
+    class NextAuth,Providers authRoute
+    class Middleware,GlobalCSS,Sitemap,Robots,Favicon globalFile
