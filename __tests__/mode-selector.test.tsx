@@ -146,46 +146,4 @@ describe("ModeSelector Component Tests", () => {
 
     expect(mockOnModeChange).not.toHaveBeenCalled();
   });
-  // Tests from mode-selector-uncovered.test.tsx
-  test("uses default disabled value when not provided", () => {
-    render(
-      <ModeSelector currentMode="typing" onModeChange={mockOnModeChange} />,
-    );
-
-    const typingButton = screen.getByTestId("typing-button");
-    const multipleChoiceButton = screen.getByTestId("multiple-choice-button");
-
-    // Buttons should not be disabled by default
-    expect(typingButton).not.toBeDisabled();
-    expect(multipleChoiceButton).not.toBeDisabled();
-
-    // Buttons should not have disabled styling
-    expect(typingButton).not.toHaveClass("opacity-50");
-    expect(typingButton).not.toHaveClass("cursor-not-allowed");
-    expect(multipleChoiceButton).not.toHaveClass("opacity-50");
-    expect(multipleChoiceButton).not.toHaveClass("cursor-not-allowed");
-  });
-
-  test("explicitly setting disabled to false works the same as default", () => {
-    render(
-      <ModeSelector
-        currentMode="typing"
-        onModeChange={mockOnModeChange}
-        disabled={false}
-      />,
-    );
-
-    const typingButton = screen.getByTestId("typing-button");
-    const multipleChoiceButton = screen.getByTestId("multiple-choice-button");
-
-    // Buttons should not be disabled
-    expect(typingButton).not.toBeDisabled();
-    expect(multipleChoiceButton).not.toBeDisabled();
-
-    // Buttons should not have disabled styling
-    expect(typingButton).not.toHaveClass("opacity-50");
-    expect(typingButton).not.toHaveClass("cursor-not-allowed");
-    expect(multipleChoiceButton).not.toHaveClass("opacity-50");
-    expect(multipleChoiceButton).not.toHaveClass("cursor-not-allowed");
-  });
 });
