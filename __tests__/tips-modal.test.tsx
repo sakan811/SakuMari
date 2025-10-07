@@ -348,7 +348,7 @@ describe("TipsModal", () => {
   test("does not submit form when input is empty", async () => {
     render(<TipsModal isOpen={true} onClose={mockOnClose} />);
 
-    const submitButton = screen.getByRole("button", { name: /send/i });
+    const submitButton = screen.getByRole("button", { name: /ask/i });
     fireEvent.click(submitButton);
 
     // Should not call fetch since input is empty
@@ -364,7 +364,7 @@ describe("TipsModal", () => {
     const input = screen.getByPlaceholderText(
       "Ask about kana learning techniques...",
     );
-    const submitButton = screen.getByRole("button", { name: /send/i });
+    const submitButton = screen.getByRole("button", { name: /ask/i });
 
     fireEvent.change(input, { target: { value: "First question" } });
     fireEvent.click(submitButton);
@@ -393,7 +393,7 @@ describe("TipsModal", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("Failed to get learning tip. Please try again."),
+        screen.getByText("API Error")
       ).toBeInTheDocument();
     });
   });

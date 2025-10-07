@@ -36,3 +36,4 @@ describe("Katakana Page", () => {
     expect(flashcardApp).toBeInTheDocument();
     expect(flashcardApp).toHaveAttribute("data-kana-type", "katakana");
   });
+});
