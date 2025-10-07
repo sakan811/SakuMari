@@ -4,7 +4,7 @@
 
 ![System Architecture](mermaid/system.svg)
 
-**Core Stack:** Next.js 15.5.4 App Router + React 19.2.0 + NextAuth.js v5.0.0-beta.29 + PostgreSQL 17 + Google Gemini AI v0.24.1
+**Core Stack:** Next.js 15.5.4 App Router + React 19.2.0 + NextAuth.js v5.0.0-beta.29 + PostgreSQL 17 + Google Gemini AI v0.24.1 + Upstash Redis Rate Limiting
 
 **Key Components:**
 
@@ -13,6 +13,7 @@
 - **State Management:** FlashcardProvider with confidence-weighted adaptive learning
 - **Data Layer:** Prisma ORM 6.16.3 with PostgreSQL 17
 - **AI Integration:** Google Gemini AI v0.24.1 for personalized learning recommendations
+- **Rate Limiting:** Upstash Redis with @upstash/ratelimit v2.0.6 for API protection
 - **Styling:** Tailwind CSS v4.1.14 with mobile-first responsive design
 - **Testing:** Vitest v3.2.4 + Playwright v1.55.1 for comprehensive testing
 - **Code Quality:** ESLint 9.36.0 + Prettier with React and TypeScript plugins
@@ -35,6 +36,7 @@
 - **UI Components:** Modular `/components/ui/` directory with Button, ButtonLink, FilterButton
 - **Error Handling:** API utilities (`lib/api-errors.ts`) for constraint violations and proper responses
 - **Kana Filtering:** Character filtering utilities (`lib/kana-filter.ts`) for hiragana/katakana selection
+- **Rate Limiting:** Upstash Redis utilities (`lib/rate-limit.ts`) for API endpoint protection
 
 **Component Groups:**
 
@@ -68,12 +70,12 @@
 
 **API Endpoints:**
 
-- `GET /api/stats` - Progress data (protected)
-- `POST /api/flashcards/submit` - Answer processing (protected)
-- `POST /api/tips` - AI learning tips (protected)
-- `GET /api/auth/providers` - Available login options
-- `POST /api/auth/[...nextauth]` - Authentication session management
-- `GET /api/health` - System health monitoring (public)
+- `GET /api/stats` - Progress data (protected, rate limited: 30/min)
+- `POST /api/flashcards/submit` - Answer processing (protected, rate limited: 100/min)
+- `POST /api/tips` - AI learning tips (protected, rate limited: 10/min)
+- `GET /api/auth/providers` - Available login options (rate limited: 10/min)
+- `POST /api/auth/[...nextauth]` - Authentication session management (rate limited: 10/min)
+- `GET /api/health` - System health monitoring (public, rate limited: 60/min)
 
 **Route Protection:**
 - Protected: `/hiragana`, `/katakana`, `/dashboard`, `/api/stats`, `/api/flashcards/*`, `/api/tips`
@@ -95,6 +97,7 @@
 - **Performance:** Automatic code splitting, SSR, and static generation with React 19.2.0
 - **Health Monitoring:** Database connectivity endpoint (`/api/health`)
 - **Middleware Protection:** Enforcement for practice and progress APIs
+- **Rate Limiting:** Upstash Redis-based protection with fail-open error handling
 - **Type Safety:** TypeScript 5.9.3 with dedicated `/types/` directory
 
 ## Project Structure
@@ -132,6 +135,7 @@ lib/
 ├── kana-filter.ts              # Character filtering
 ├── flashcard-utils.ts          # Flashcard helpers
 └── flashcard-submit-utils.ts   # Submission utilities
+└── rate-limit.ts               # Upstash Redis rate limiting
 ```
 
 **Custom Hooks:**
