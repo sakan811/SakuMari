@@ -2,7 +2,7 @@
 
 Learn Japanese Hiragana and Katakana with an intelligent flashcard system that adapts to your learning progress.
 
-**Updated**: October 2025
+**Updated**: v9.11.0 (October 2025)
 
 ## 🌸 Core Features
 
@@ -70,16 +70,16 @@ Learn Japanese Hiragana and Katakana with an intelligent flashcard system that a
 ## 🔒 Technical Features
 
 ### API Security
-- **Rate Limiting**: Prevents abuse while ensuring fair usage
-- **User Authentication**: Secure sessions with NextAuth.js
-- **Data Protection**: Row-level security in PostgreSQL database
-- **Performance Monitoring**: Health checks for system reliability
+- **Rate Limiting**: Upstash Redis-based protection with configurable limits per endpoint (increased limits for testing)
+- **User Authentication**: Secure sessions with NextAuth.js v5.0.0-beta.29
+- **Data Protection**: Row-level security in PostgreSQL 17 database
+- **Performance Monitoring**: Health checks for system reliability at /api/health
 
 ### Learning Algorithm
-- **Weighted Selection**: Characters appear based on your confidence level
-- **Performance Tracking**: Records attempts and accuracy over time
-- **Mastery Detection**: Identifies characters you've learned well
-- **Balanced Practice**: Ensures neglected characters get attention
+- **Confidence-Weighted Selection**: Characters appear based on your confidence level using adaptive learning
+- **Performance Tracking**: Records attempts and accuracy over time with real-time updates
+- **Mastery Detection**: Identifies characters you've learned well through accuracy thresholds
+- **Balanced Practice**: Ensures neglected characters get attention through weighted distribution
 
 ---
 

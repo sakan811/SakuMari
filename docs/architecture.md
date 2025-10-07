@@ -4,7 +4,7 @@
 
 ![System Architecture](mermaid/system.svg)
 
-**Core Stack:** Next.js 15.5.4 App Router + React 19.2.0 + NextAuth.js v5.0.0-beta.29 + PostgreSQL 17 + Google Gemini AI v0.24.1 + Upstash Redis Rate Limiting
+**Core Stack:** Next.js 15.5.4 App Router + React 19.2.0 + NextAuth.js v5.0.0-beta.29 + PostgreSQL 17 + Google Gemini AI v0.24.1 + Upstash Redis Rate Limiting + TypeScript 5.9.3
 
 **Key Components:**
 
@@ -15,8 +15,8 @@
 - **AI Integration:** Google Gemini AI v0.24.1 for personalized learning recommendations
 - **Rate Limiting:** Upstash Redis with @upstash/ratelimit v2.0.6 for API protection
 - **Styling:** Tailwind CSS v4.1.14 with mobile-first responsive design
-- **Testing:** Vitest v3.2.4 + Playwright v1.55.1 for comprehensive testing
-- **Code Quality:** ESLint 9.36.0 + Prettier with React and TypeScript plugins
+- **Testing:** Vitest v3.2.4 + Playwright v1.55.1 for comprehensive testing (unit, integration, E2E)
+- **Code Quality:** ESLint 9.36.0 + Prettier with React, Import, and TypeScript plugins
 
 ## Component Architecture
 
@@ -34,8 +34,9 @@
 - **SessionProviders:** NextAuth.js authentication context
 - **Custom Hooks:** `useDashboardData`, `useSorting`, `useAuthStatus`, `useFlashcardInteraction`, `useFlashcardHandlers`
 - **UI Components:** Modular `/components/ui/` directory with Button, ButtonLink, FilterButton
-- **Error Handling:** API utilities (`lib/api-errors.ts`) for constraint violations and proper responses
+- **Error Handling:** API utilities (`lib/api-errors.ts`) and middleware (`lib/api-middleware.ts`) for constraint violations and proper responses
 - **Kana Filtering:** Character filtering utilities (`lib/kana-filter.ts`) for hiragana/katakana selection
+- **Flashcard Utils:** Helper functions (`lib/flashcard-utils.ts`) and submission utilities (`lib/flashcard-submit-utils.ts`) for improved testability
 - **Rate Limiting:** Upstash Redis utilities (`lib/rate-limit.ts`) for API endpoint protection
 
 **Component Groups:**
@@ -70,12 +71,12 @@
 
 **API Endpoints:**
 
-- `GET /api/stats` - Progress data (protected, rate limited: 30/min)
-- `POST /api/flashcards/submit` - Answer processing (protected, rate limited: 100/min)
-- `POST /api/tips` - AI learning tips (protected, rate limited: 10/min)
-- `GET /api/auth/providers` - Available login options (rate limited: 10/min)
-- `POST /api/auth/[...nextauth]` - Authentication session management (rate limited: 10/min)
-- `GET /api/health` - System health monitoring (public, rate limited: 60/min)
+- `GET /api/stats` - Progress data (protected, rate limited: 30/min, 200/min in tests)
+- `POST /api/flashcards/submit` - Answer processing (protected, rate limited: 100/min, 500/min in tests)
+- `POST /api/tips` - AI learning tips (protected, rate limited: 10/min, 50/min in tests)
+- `GET /api/auth/providers` - Available login options (rate limited: 10/min, 200/min in tests)
+- `POST /api/auth/[...nextauth]` - Authentication session management (rate limited: 10/min, 200/min in tests)
+- `GET /api/health` - System health monitoring (public, rate limited: 60/min, 200/min in tests)
 
 **Route Protection:**
 - Protected: `/hiragana`, `/katakana`, `/dashboard`, `/api/stats`, `/api/flashcards/*`, `/api/tips`
@@ -131,11 +132,14 @@ lib/
 ├── prisma.ts                   # Database client
 ├── env.ts                      # Environment variables
 ├── api-errors.ts               # API error handling
+├── api-middleware.ts           # API middleware functions
+├── backgrounds.ts              # Background management utilities
 ├── metadata.ts                 # SEO & metadata
 ├── kana-filter.ts              # Character filtering
 ├── flashcard-utils.ts          # Flashcard helpers
-└── flashcard-submit-utils.ts   # Submission utilities
-└── rate-limit.ts               # Upstash Redis rate limiting
+├── flashcard-submit-utils.ts   # Submission utilities
+├── rate-limit.ts               # Upstash Redis rate limiting
+└── should-fetch-kana-data.ts   # Data fetching utilities
 ```
 
 **Custom Hooks:**
