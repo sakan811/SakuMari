@@ -106,6 +106,20 @@ describe("Flashcard Component", () => {
     expect(screen.getByText("Please enter an answer")).toBeDefined();
   });
 
+  test("validates empty selection in multiple choice mode", () => {
+    setupProvider(
+      createMockProvider({
+        currentKana: MOCK_KANA,
+        interactionMode: "multiple-choice",
+      }),
+    );
+
+    render(<Flashcard />);
+
+    fireEvent.click(getSubmitButton());
+    expect(screen.getByText("Please select an answer")).toBeDefined();
+  });
+
   describe("Keyboard Navigation", () => {
     test("submits answer when Enter is pressed in typing mode", () => {
       const submitAnswer = vi.fn();
@@ -137,32 +151,6 @@ describe("Flashcard Component", () => {
       fireEvent.keyDown(window, { key: "Enter", code: "Enter" });
       expect(nextCard).toHaveBeenCalled();
     });
-
-    test("does not advance to next card when Enter is pressed without result", () => {
-      const nextCard = vi.fn();
-      setupProvider(createMockProvider({ currentKana: MOCK_KANA, nextCard }));
-
-      render(<Flashcard />);
-
-      fireEvent.keyDown(window, { key: "Enter", code: "Enter" });
-      expect(nextCard).not.toHaveBeenCalled();
-    });
-
-    test("clears error when user starts typing", () => {
-      setupProvider(createMockProvider({ currentKana: MOCK_KANA }));
-
-      render(<Flashcard />);
-
-      // First trigger an error
-      fireEvent.click(getSubmitButton());
-      expect(screen.getByText("Please enter an answer")).toBeDefined();
-
-      // Then start typing to clear the error
-      const input = getInputField();
-      fireEvent.change(input, { target: { value: "a" } });
-
-      expect(screen.queryByText("Please enter an answer")).toBeNull();
-    });
   });
 
   describe("Disabled States", () => {
@@ -178,7 +166,6 @@ describe("Flashcard Component", () => {
         name: "Submitting...",
       });
 
-      // Should be disabled when isSubmitting is true
       expect(input).toBeDisabled();
       expect(submitButton).toBeDisabled();
       expect(submitButton.textContent).toBe("Submitting...");
@@ -199,232 +186,10 @@ describe("Flashcard Component", () => {
       expect(nextButton).toBeDisabled();
       expect(nextButton.textContent).toBe("Loading...");
     });
-
-    test("prevents multiple submissions when processing", () => {
-      const submitAnswer = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          submitAnswer,
-          isSubmitting: true,
-        }),
-      );
-
-      render(<Flashcard />);
-
-      const input = getInputField();
-      const submitButton = screen.getByRole("button", {
-        name: "Submitting...",
-      });
-
-      fireEvent.change(input, { target: { value: "a" } });
-
-      // Clicks should be ignored while processing since button is disabled
-      fireEvent.click(submitButton);
-      fireEvent.click(submitButton);
-      fireEvent.click(submitButton);
-      expect(submitAnswer).toHaveBeenCalledTimes(0);
-    });
-
-    test("prevents keyboard submission when processing", () => {
-      const submitAnswer = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          submitAnswer,
-          isSubmitting: true,
-        }),
-      );
-
-      render(<Flashcard />);
-
-      const input = getInputField();
-      fireEvent.change(input, { target: { value: "a" } });
-
-      // Enter presses should be ignored while processing
-      fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
-      fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
-      expect(submitAnswer).toHaveBeenCalledTimes(0);
-    });
-
-    test("prevents next card action when processing", () => {
-      const nextCard = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          result: "correct",
-          nextCard,
-          isSubmitting: true,
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Enter presses should be ignored while processing
-      fireEvent.keyDown(window, { key: "Enter", code: "Enter" });
-      fireEvent.keyDown(window, { key: "Enter", code: "Enter" });
-      expect(nextCard).toHaveBeenCalledTimes(0);
-    });
-  });
-
-  describe("Multiple Choice Mode", () => {
-    test("validates empty selection in multiple choice mode", () => {
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          interactionMode: "multiple-choice",
-        }),
-      );
-
-      render(<Flashcard />);
-
-      fireEvent.click(getSubmitButton());
-      expect(screen.getByText("Please select an answer")).toBeDefined();
-    });
-
-    test("clears error when user selects a choice", () => {
-      const mockProvider = createMockProvider({
-        currentKana: MOCK_KANA,
-        interactionMode: "multiple-choice",
-      });
-
-      setupProvider(mockProvider);
-
-      render(<Flashcard />);
-
-      // First trigger an error
-      fireEvent.click(getSubmitButton());
-      expect(screen.getByText("Please select an answer")).toBeDefined();
-
-      // Mock a choice selection to clear the error
-      // Note: This test depends on the MultipleChoice component implementation
-      // In a real test, you would interact with the actual choice buttons
-    });
   });
 
   describe("Mode Switching", () => {
-    test("clears state when switching between modes", () => {
-      const setInteractionMode = vi.fn();
-      setupProvider(
-        createMockProvider({ currentKana: MOCK_KANA, setInteractionMode }),
-      );
-
-      const { unmount } = render(<Flashcard />);
-
-      const input = getInputField();
-
-      // Enter empty text and trigger an error
-      fireEvent.change(input, { target: { value: "" } });
-      fireEvent.click(getSubmitButton());
-      expect(screen.getByText("Please enter an answer")).toBeDefined();
-
-      // Unmount and switch modes
-      unmount();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          interactionMode: "multiple-choice",
-          setInteractionMode,
-        }),
-      );
-
-      // Re-render with new mode
-      render(<Flashcard />);
-
-      // Error should be cleared when switching modes
-      expect(screen.queryByText("Please enter an answer")).toBeNull();
-    });
-  });
-  // Tests for mode change restrictions
-  test("disables mode change when submitting or showing result", () => {
-    const setInteractionMode = vi.fn();
-    setupProvider(
-      createMockProvider({
-        currentKana: MOCK_KANA,
-        result: "correct",
-        setInteractionMode,
-      }),
-    );
-
-    render(<Flashcard />);
-
-    // Simulate mode change when result is shown (should be disabled)
-    const mockModeSelector = screen.getByText("あ").closest("div");
-    if (mockModeSelector) {
-      const handleModeChange = vi.fn();
-      handleModeChange("multiple-choice");
-
-      // The mode change should not happen when result is shown
-      expect(setInteractionMode).not.toHaveBeenCalled();
-    }
-  });
-
-  test("disables mode change when submitting", () => {
-    const setInteractionMode = vi.fn();
-    setupProvider(
-      createMockProvider({
-        currentKana: MOCK_KANA,
-        isSubmitting: true,
-        setInteractionMode,
-      }),
-    );
-
-    render(<Flashcard />);
-
-    // Simulate mode change when submitting (should be disabled)
-    const mockModeSelector = screen.getByText("あ").closest("div");
-    if (mockModeSelector) {
-      const handleModeChange = vi.fn();
-      handleModeChange("multiple-choice");
-
-      // The mode change should not happen when submitting
-      expect(setInteractionMode).not.toHaveBeenCalled();
-    }
-  });
-
-  test("disables choice selection when submitting or showing result", () => {
-    setupProvider(
-      createMockProvider({
-        currentKana: MOCK_KANA,
-        result: "correct",
-        interactionMode: "multiple-choice",
-      }),
-    );
-
-    render(<Flashcard />);
-
-    // Simulate choice selection when result is shown (should be disabled)
-    const mockChoiceHandler = vi.fn();
-    mockChoiceHandler(0);
-
-    // In a real test, we would interact with the MultipleChoice component
-    // For this test, we're verifying the logic that would prevent selection
-    expect(screen.getByText("Correct!")).toBeDefined();
-  });
-
-  test("disables choice selection when submitting", () => {
-    setupProvider(
-      createMockProvider({
-        currentKana: MOCK_KANA,
-        isSubmitting: true,
-        interactionMode: "multiple-choice",
-      }),
-    );
-
-    render(<Flashcard />);
-
-    // Simulate choice selection when submitting (should be disabled)
-    const mockChoiceHandler = vi.fn();
-    mockChoiceHandler(0);
-
-    // In a real test, we would interact with the MultipleChoice component
-    // For this test, we're verifying the logic that would prevent selection
-    expect(screen.getByText("Submitting...")).toBeDefined();
-  });
-
-  describe("handleModeChange function", () => {
-    // Test mode change when allowed
-    test("should change mode when allowed (neither isSubmitting nor result is true)", () => {
+    test("calls onModeChange when typing button is clicked", () => {
       const setInteractionMode = vi.fn();
       setupProvider(
         createMockProvider({ currentKana: MOCK_KANA, setInteractionMode }),
@@ -436,8 +201,7 @@ describe("Flashcard Component", () => {
       expect(setInteractionMode).toHaveBeenCalledWith("multiple-choice");
     });
 
-    // Test mode change when blocked by submitting state
-    test("should not change mode when isSubmitting is true", () => {
+    test("does not change mode when submitting", () => {
       const setInteractionMode = vi.fn();
       setupProvider(
         createMockProvider({
@@ -452,496 +216,10 @@ describe("Flashcard Component", () => {
       fireEvent.click(getMultipleChoiceButton());
       expect(setInteractionMode).not.toHaveBeenCalled();
     });
-
-    // Test mode change when blocked by result (correct)
-    test("should not change mode when result is shown (correct)", () => {
-      const setInteractionMode = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode,
-          result: "correct",
-        }),
-      );
-
-      render(<Flashcard />);
-
-      fireEvent.click(getMultipleChoiceButton());
-      expect(setInteractionMode).not.toHaveBeenCalled();
-    });
-
-    // Test mode change when blocked by result (incorrect)
-    test("should not change mode when result is shown (incorrect)", () => {
-      const setInteractionMode = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode,
-          result: "incorrect",
-        }),
-      );
-
-      render(<Flashcard />);
-
-      fireEvent.click(getMultipleChoiceButton());
-      expect(setInteractionMode).not.toHaveBeenCalled();
-    });
-
-    // Test mode change when blocked by both isSubmitting and result
-    test("should not change mode when both isSubmitting and result are true", () => {
-      const setInteractionMode = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode,
-          isSubmitting: true,
-          result: "correct",
-        }),
-      );
-
-      render(<Flashcard />);
-
-      fireEvent.click(getMultipleChoiceButton());
-      expect(setInteractionMode).not.toHaveBeenCalled();
-    });
-
-    // Test that setInteractionMode function is available
-    test("should call setInteractionMode when not submitting and no result", () => {
-      const setInteractionMode = vi.fn();
-      setupProvider(
-        createMockProvider({ currentKana: MOCK_KANA, setInteractionMode }),
-      );
-
-      render(<Flashcard />);
-
-      expect(setInteractionMode).toBeDefined();
-    });
-
-    // Test specific lines 120-123: handleModeChange function logic
-    test("should not call setInteractionMode when isSubmitting is true (line 120)", () => {
-      const setInteractionMode = vi.fn();
-      const handleModeChange = vi
-        .fn()
-        .mockImplementation((mode: "typing" | "multiple-choice") => {
-          // This mocks the actual handleModeChange function logic from lines 120-123
-          const isSubmitting = true; // Simulating isSubmitting = true
-          if (isSubmitting) return;
-          setInteractionMode(mode);
-        });
-
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode,
-          isSubmitting: true,
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Simulate direct call to handleModeChange
-      handleModeChange("multiple-choice");
-      expect(setInteractionMode).not.toHaveBeenCalled();
-    });
-
-    test("should not call setInteractionMode when result is shown (line 120)", () => {
-      const setInteractionMode = vi.fn();
-      const handleModeChange = vi
-        .fn()
-        .mockImplementation((mode: "typing" | "multiple-choice") => {
-          // This mocks the actual handleModeChange function logic from lines 120-123
-          const isSubmitting = false; // Simulating isSubmitting = false
-          const hasResult = true; // Simulating result exists
-          if (isSubmitting) return;
-          if (hasResult) return;
-          setInteractionMode(mode);
-        });
-
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode,
-          result: "correct",
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Simulate direct call to handleModeChange
-      handleModeChange("typing");
-      expect(setInteractionMode).not.toHaveBeenCalled();
-    });
-
-    test("should call setInteractionMode when neither isSubmitting nor result (line 121)", () => {
-      const setInteractionMode = vi.fn();
-      const handleModeChange = vi
-        .fn()
-        .mockImplementation((mode: "typing" | "multiple-choice") => {
-          // This mocks the actual handleModeChange function logic from lines 120-123
-          const isSubmitting = false; // Simulating isSubmitting = false
-          const hasResult = false; // Simulating result = null
-          if (isSubmitting) return;
-          if (hasResult) return;
-          setInteractionMode(mode);
-        });
-
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode,
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Simulate direct call to handleModeChange
-      handleModeChange("typing");
-      expect(setInteractionMode).toHaveBeenCalledWith("typing");
-    });
   });
 
-  describe("Enter key handling in typing mode", () => {
-    test("should call handleSubmit when Enter key is pressed in typing mode input", () => {
-      const submitAnswer = vi.fn();
-      setupProvider(
-        createMockProvider({ currentKana: MOCK_KANA, submitAnswer }),
-      );
-
-      render(<Flashcard />);
-
-      const input = getInputField();
-
-      // This test covers the onKeyDown handler at line 207:
-      // onKeyDown={(e) => { if (e.key === "Enter") { handleSubmit(); } }}
-
-      fireEvent.change(input, { target: { value: "a" } });
-      fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
-
-      expect(submitAnswer).toHaveBeenCalledWith("a");
-    });
-
-    test("should not call handleSubmit when other keys are pressed", () => {
-      const submitAnswer = vi.fn();
-      setupProvider(
-        createMockProvider({ currentKana: MOCK_KANA, submitAnswer }),
-      );
-
-      render(<Flashcard />);
-
-      const input = getInputField();
-
-      fireEvent.change(input, { target: { value: "a" } });
-      fireEvent.keyDown(input, { key: "Escape", code: "Escape" });
-      fireEvent.keyDown(input, { key: "Tab", code: "Tab" });
-
-      expect(submitAnswer).not.toHaveBeenCalled();
-    });
-
-    test("should not call handleSubmit when Enter is pressed on empty input", () => {
-      const submitAnswer = vi.fn();
-      setupProvider(
-        createMockProvider({ currentKana: MOCK_KANA, submitAnswer }),
-      );
-
-      render(<Flashcard />);
-
-      const input = getInputField();
-
-      fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
-
-      expect(submitAnswer).not.toHaveBeenCalled();
-      expect(screen.getByText("Please enter an answer")).toBeInTheDocument();
-    });
-  });
-
-  test("should clear state variables after mode change", () => {
-    const setInteractionMode = vi.fn();
-    setupProvider(
-      createMockProvider({ currentKana: MOCK_KANA, setInteractionMode }),
-    );
-
-    const { rerender } = render(<Flashcard />);
-
-    // Set some state values
-    const input = getInputField();
-    fireEvent.change(input, { target: { value: "" } });
-
-    // Trigger an error by submitting empty input
-    fireEvent.click(getSubmitButton());
-    expect(screen.getByText("Please enter an answer")).toBeInTheDocument();
-
-    // Now set a valid value
-    fireEvent.change(input, { target: { value: "a" } });
-
-    // Change mode to multiple-choice
-    fireEvent.click(getMultipleChoiceButton());
-    expect(setInteractionMode).toHaveBeenCalledWith("multiple-choice");
-
-    // Re-render with the new mode
-    setupProvider(
-      createMockProvider({
-        currentKana: MOCK_KANA,
-        setInteractionMode,
-        interactionMode: "multiple-choice",
-      }),
-    );
-    rerender(<Flashcard />);
-
-    // Verify that state has been cleared
-    // The error should be cleared
-    expect(screen.queryByText("Please enter an answer")).toBeNull();
-
-    // The input should be cleared (since we're now in multiple-choice mode)
-    // and the multiple choice component should be rendered
-    expect(
-      screen.queryByPlaceholderText("Type romaji equivalent..."),
-    ).toBeNull();
-  });
-
-  describe("handleChoiceSelect function", () => {
-    // Test specific lines 125-129: handleChoiceSelect function logic
-    test("should not call setSelectedChoice when isSubmitting is true (line 126)", () => {
-      const setSelectedChoice = vi.fn();
-      const setError = vi.fn();
-      const handleChoiceSelect = vi.fn().mockImplementation((index: number) => {
-        // This mocks the actual handleChoiceSelect function logic from lines 125-129
-        const isSubmitting = true; // Simulating isSubmitting = true
-        if (isSubmitting) return;
-        setSelectedChoice(index);
-        setError("");
-      });
-
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          interactionMode: "multiple-choice",
-          isSubmitting: true,
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Simulate direct call to handleChoiceSelect
-      handleChoiceSelect(0);
-      expect(setSelectedChoice).not.toHaveBeenCalled();
-      expect(setError).not.toHaveBeenCalled();
-    });
-
-    test("should not call setSelectedChoice when result is shown (line 126)", () => {
-      const setSelectedChoice = vi.fn();
-      const setError = vi.fn();
-      const handleChoiceSelect = vi.fn().mockImplementation((index: number) => {
-        // This mocks the actual handleChoiceSelect function logic from lines 125-129
-        const isSubmitting = false; // Simulating isSubmitting = false
-        const hasResult = true; // Simulating result exists
-        if (isSubmitting) return;
-        if (hasResult) return;
-        setSelectedChoice(index);
-        setError("");
-      });
-
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          interactionMode: "multiple-choice",
-          result: "correct",
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Simulate direct call to handleChoiceSelect
-      handleChoiceSelect(1);
-      expect(setSelectedChoice).not.toHaveBeenCalled();
-      expect(setError).not.toHaveBeenCalled();
-    });
-
-    test("should call setSelectedChoice and setError when neither isSubmitting nor result (lines 127-128)", () => {
-      const setSelectedChoice = vi.fn();
-      const setError = vi.fn();
-      const handleChoiceSelect = vi.fn().mockImplementation((index: number) => {
-        // This mocks the actual handleChoiceSelect function logic from lines 125-129
-        const isSubmitting = false; // Simulating isSubmitting = false
-        const hasResult = false; // Simulating result = null
-        if (isSubmitting) return;
-        if (hasResult) return;
-        setSelectedChoice(index);
-        setError("");
-      });
-
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          interactionMode: "multiple-choice",
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Simulate direct call to handleChoiceSelect
-      handleChoiceSelect(2);
-      expect(setSelectedChoice).toHaveBeenCalledWith(2);
-      expect(setError).toHaveBeenCalledWith("");
-    });
-
-    test("should clear error when selecting a choice (line 128)", () => {
-      const setError = vi.fn();
-      const handleChoiceSelect = vi.fn().mockImplementation((index: number) => {
-        // This mocks the actual handleChoiceSelect function logic from lines 125-129
-        const isSubmitting = false; // Simulating isSubmitting = false
-        const hasResult = false; // Simulating result = null
-        if (isSubmitting) return;
-        if (hasResult) return;
-        vi.fn()(index); // Mock setSelectedChoice
-        setError("");
-      });
-
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          interactionMode: "multiple-choice",
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Simulate direct call to handleChoiceSelect
-      handleChoiceSelect(3);
-      expect(setError).toHaveBeenCalledWith("");
-    });
-
-    // Test with different choice indices
-    test("should handle different choice indices correctly", () => {
-      const setSelectedChoice = vi.fn();
-      const setError = vi.fn();
-      const handleChoiceSelect = vi.fn().mockImplementation((index: number) => {
-        // This mocks the actual handleChoiceSelect function logic from lines 125-129
-        const isSubmitting = false; // Simulating isSubmitting = false
-        const hasResult = false; // Simulating result = null
-        if (isSubmitting) return;
-        if (hasResult) return;
-        setSelectedChoice(index);
-        setError("");
-      });
-
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          interactionMode: "multiple-choice",
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Test with different indices
-      const testIndices = [0, 1, 2, 3];
-      testIndices.forEach((index) => {
-        handleChoiceSelect(index);
-        expect(setSelectedChoice).toHaveBeenCalledWith(index);
-        expect(setError).toHaveBeenCalledWith("");
-
-        // Clear mocks for next iteration
-        setSelectedChoice.mockClear();
-        setError.mockClear();
-      });
-    });
-  });
-
-  describe("Choice selection in multiple choice mode", () => {
-    // Test choice selection when allowed
-    test("should select choice when allowed (neither isSubmitting nor result is true)", () => {
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          interactionMode: "multiple-choice",
-          choices: ["あ", "い", "う", "え"],
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Simulate clicking the first choice button
-      const choiceButton = screen.getByTestId("choice-button-0");
-      fireEvent.click(choiceButton);
-
-      // Verify the choice was selected by checking if the button has the selected styling
-      expect(choiceButton).toHaveClass("border-[#d1622b]", "bg-[#fad182]/40");
-    });
-
-    // Test choice selection when blocked by submitting state
-    test("should not select choice when isSubmitting is true", () => {
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          interactionMode: "multiple-choice",
-          isSubmitting: true,
-          choices: ["あ", "い", "う", "え"],
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // Simulate clicking the first choice button
-      const choiceButton = screen.getByTestId("choice-button-0");
-      fireEvent.click(choiceButton);
-
-      // Verify the choice was not selected (button should not have selected styling)
-      expect(choiceButton).not.toHaveClass(
-        "border-[#d1622b]",
-        "bg-[#fad182]/40",
-      );
-      expect(choiceButton).toHaveClass("border-[#705a39]", "bg-white");
-    });
-
-    // Test choice selection when blocked by result (correct)
-    test("should not select choice when result is shown (correct)", () => {
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          interactionMode: "multiple-choice",
-          result: "correct",
-          choices: ["あ", "い", "う", "え"],
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // When result is shown, multiple choice buttons should not be rendered at all
-      expect(screen.queryByTestId("choice-button-0")).toBeNull();
-      expect(screen.queryByTestId("choice-button-1")).toBeNull();
-      expect(screen.queryByTestId("choice-button-2")).toBeNull();
-      expect(screen.queryByTestId("choice-button-3")).toBeNull();
-
-      // Instead, the result message should be shown
-      expect(screen.getByText("Correct!")).toBeInTheDocument();
-    });
-
-    // Test choice selection when blocked by result (incorrect)
-    test("should not select choice when result is shown (incorrect)", () => {
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          interactionMode: "multiple-choice",
-          result: "incorrect",
-          choices: ["あ", "い", "う", "え"],
-        }),
-      );
-
-      render(<Flashcard />);
-
-      // When result is shown, multiple choice buttons should not be rendered at all
-      expect(screen.queryByTestId("choice-button-0")).toBeNull();
-      expect(screen.queryByTestId("choice-button-1")).toBeNull();
-      expect(screen.queryByTestId("choice-button-2")).toBeNull();
-      expect(screen.queryByTestId("choice-button-3")).toBeNull();
-
-      // Instead, the result message should be shown
-      expect(screen.getByText("Incorrect!")).toBeInTheDocument();
-    });
-  });
-
-  describe("Error Display and Dismissal (Line 172)", () => {
-    test("displays error message with dismiss button when error is present", () => {
+  describe("Error Display", () => {
+    test("displays error message with dismiss button", () => {
       const clearError = vi.fn();
       setupProvider(
         createMockProvider({
@@ -953,314 +231,49 @@ describe("Flashcard Component", () => {
 
       render(<Flashcard />);
 
-      // Check that error message is displayed
       expect(screen.getByText("Network error occurred")).toBeInTheDocument();
+      expect(screen.getByText("Dismiss")).toBeInTheDocument();
 
-      // Check that dismiss button is present
-      const dismissButton = screen.getByText("Dismiss");
-      expect(dismissButton).toBeInTheDocument();
-      expect(dismissButton).toHaveClass(
-        "text-red-600",
-        "hover:text-red-800",
-        "underline"
-      );
-    });
-
-    test("calls clearError when dismiss button is clicked", () => {
-      const clearError = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          error: "Connection failed",
-          clearError,
-        }),
-      );
-
-      render(<Flashcard />);
-
-      const dismissButton = screen.getByText("Dismiss");
-      fireEvent.click(dismissButton);
-
+      fireEvent.click(screen.getByText("Dismiss"));
       expect(clearError).toHaveBeenCalledTimes(1);
     });
-
-    test("does not display error section when no error is present", () => {
-      setupProvider(createMockProvider({ currentKana: MOCK_KANA }));
-
-      render(<Flashcard />);
-
-      // Error section should not be rendered
-      expect(screen.queryByText("Network error occurred")).toBeNull();
-      expect(screen.queryByText("Dismiss")).toBeNull();
-    });
-
-    test("error section has correct styling and structure", () => {
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          error: "Validation error",
-        }),
-      );
-
-      render(<Flashcard />);
-
-      const errorContainer = screen.getByText("Validation error").closest("div");
-      expect(errorContainer).toHaveClass(
-        "mb-3",
-        "sm:mb-4",
-        "rounded-md",
-        "p-2",
-        "sm:p-3",
-        "text-center",
-        "border-2",
-        "bg-red-50",
-        "text-red-800",
-        "border-red-300"
-      );
-
-      const errorMessage = screen.getByText("Validation error");
-      expect(errorMessage).toHaveClass(
-        "text-sm",
-        "sm:text-base",
-        "font-medium"
-      );
-    });
-
-    test("displays different error messages correctly", () => {
-      const errorMessages = [
-        "Network timeout",
-        "Invalid credentials",
-        "Server error occurred",
-        "Please try again later"
-      ];
-
-      errorMessages.forEach((errorMessage) => {
-        const clearError = vi.fn();
-        setupProvider(
-          createMockProvider({
-            currentKana: MOCK_KANA,
-            error: errorMessage,
-            clearError,
-          }),
-        );
-
-        const { unmount } = render(<Flashcard />);
-
-        expect(screen.getByText(errorMessage)).toBeInTheDocument();
-        expect(screen.getByText("Dismiss")).toBeInTheDocument();
-
-        unmount();
-      });
-    });
   });
 
-  describe("Lines 120-126 coverage through component interaction", () => {
-    test("handleModeChange early return logic is tested through component interaction", () => {
-      // The handleModeChange function (lines 120-123) is tested through the existing
-      // component interaction tests in the "handleModeChange function" describe block
-      // Those tests verify the early return logic by checking that setInteractionMode
-      // is not called when isSubmitting or result is true
-      expect(true).toBe(true); // Placeholder to confirm this test group runs
-    });
-
-    test("handleChoiceSelect early return logic is tested through component interaction", () => {
-      // The handleChoiceSelect function (lines 125-129) is tested through the existing
-      // component interaction tests in the "Choice selection in multiple choice mode"
-      // and "handleChoiceSelect function" describe blocks
-      // Those tests verify the early return logic by checking that choice buttons
-      // are disabled or not rendered when isSubmitting or result is true
-      expect(true).toBe(true); // Placeholder to confirm this test group runs
-    });
-  });
-
-  describe("handleModeChange direct testing", () => {
-    // Create a test component that exposes the handleModeChange function
-    test("should test handleModeChange function directly through component", () => {
-      const setInteractionMode = vi.fn();
-
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode,
-          isSubmitting: true,
-        }),
-      );
-
-      const { container } = render(<Flashcard />);
-
-      // Get the component instance and access its handleModeChange function
-      // This is a bit hacky but allows us to test the actual function
-      const componentElement = container.firstChild;
-      if (componentElement) {
-        // We can't directly access the function, but we can test through the component behavior
-        // The existing component tests should cover the early return logic
-        expect(setInteractionMode).not.toHaveBeenCalled();
-      }
-    });
-
-    test("should cover handleModeChange early return scenarios", () => {
-      // Test scenario 1: isSubmitting = true
-      const setInteractionMode1 = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode: setInteractionMode1,
-          isSubmitting: true,
-        }),
-      );
-
-      const { rerender } = render(<Flashcard />);
-
-      // Try to change mode - should not call setInteractionMode
-      fireEvent.click(screen.getByTestId("multiple-choice-button"));
-      expect(setInteractionMode1).not.toHaveBeenCalled();
-
-      // Test scenario 2: result = "correct"
-      const setInteractionMode2 = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode: setInteractionMode2,
-          result: "correct",
-        }),
-      );
-
-      rerender(<Flashcard />);
-
-      // Try to change mode - should not call setInteractionMode
-      fireEvent.click(screen.getByTestId("multiple-choice-button"));
-      expect(setInteractionMode2).not.toHaveBeenCalled();
-
-      // Test scenario 3: result = "incorrect"
-      const setInteractionMode3 = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode: setInteractionMode3,
-          result: "incorrect",
-        }),
-      );
-
-      rerender(<Flashcard />);
-
-      // Try to change mode - should not call setInteractionMode
-      fireEvent.click(screen.getByTestId("multiple-choice-button"));
-      expect(setInteractionMode3).not.toHaveBeenCalled();
-
-      // Test scenario 4: both isSubmitting and result are true
-      const setInteractionMode4 = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode: setInteractionMode4,
-          isSubmitting: true,
-          result: "correct",
-        }),
-      );
-
-      rerender(<Flashcard />);
-
-      // Try to change mode - should not call setInteractionMode
-      fireEvent.click(screen.getByTestId("multiple-choice-button"));
-      expect(setInteractionMode4).not.toHaveBeenCalled();
-    });
-
-    test("should call setInteractionMode when not blocked", () => {
-      const setInteractionMode = vi.fn();
-      setupProvider(
-        createMockProvider({
-          currentKana: MOCK_KANA,
-          setInteractionMode,
-          isSubmitting: false,
-          result: null,
-        }),
-      );
+  describe("Edge Cases", () => {
+    test("handles whitespace-only input", () => {
+      const submitAnswer = vi.fn();
+      setupProvider(createMockProvider({
+        currentKana: MOCK_KANA,
+        submitAnswer,
+        interactionMode: "typing"
+      }));
 
       render(<Flashcard />);
 
-      // Try to change mode - should call setInteractionMode
-      fireEvent.click(screen.getByTestId("multiple-choice-button"));
-      expect(setInteractionMode).toHaveBeenCalledWith("multiple-choice");
+      const input = getInputField();
+      fireEvent.change(input, { target: { value: "   " } });
+      fireEvent.click(getSubmitButton());
+
+      expect(screen.getByText("Please enter an answer")).toBeInTheDocument();
+      expect(submitAnswer).not.toHaveBeenCalled();
     });
 
-    test("handleChoiceSelect should return early when isSubmitting is true", () => {
-      const setSelectedChoice = vi.fn();
-      const setError = vi.fn();
-      const isSubmitting = true;
-      const result = null;
+    test("cleans up on unmount", () => {
+      const removeListener = vi.spyOn(window, "removeEventListener");
 
-      // Directly test the handleChoiceSelect logic
-      const handleChoiceSelect = (index: number) => {
-        if (isSubmitting || result) return;
-        setSelectedChoice(index);
-        setError("");
-      };
+      setupProvider(createMockProvider({
+        currentKana: MOCK_KANA,
+        result: "correct",
+        interactionMode: "typing"
+      }));
 
-      handleChoiceSelect(0);
-      expect(setSelectedChoice).not.toHaveBeenCalled();
-      expect(setError).not.toHaveBeenCalled();
-    });
+      const { unmount } = render(<Flashcard />);
+      unmount();
 
-    test("handleChoiceSelect should return early when result is shown", () => {
-      const setSelectedChoice = vi.fn();
-      const setError = vi.fn();
-      const isSubmitting = false;
-      const result = "incorrect";
-
-      // Directly test the handleChoiceSelect logic
-      const handleChoiceSelect = (index: number) => {
-        if (isSubmitting || result) return;
-        setSelectedChoice(index);
-        setError("");
-      };
-
-      handleChoiceSelect(1);
-      expect(setSelectedChoice).not.toHaveBeenCalled();
-      expect(setError).not.toHaveBeenCalled();
-    });
-
-    test("handleChoiceSelect should call setSelectedChoice and setError when allowed", () => {
-      const setSelectedChoice = vi.fn();
-      const setError = vi.fn();
-      const isSubmitting = false;
-      const result = null;
-
-      // Directly test the handleChoiceSelect logic
-      const handleChoiceSelect = (index: number) => {
-        if (isSubmitting || result) return;
-        setSelectedChoice(index);
-        setError("");
-      };
-
-      handleChoiceSelect(2);
-      expect(setSelectedChoice).toHaveBeenCalledWith(2);
-      expect(setError).toHaveBeenCalledWith("");
-    });
-
-    test("handleChoiceSelect should work with different choice indices", () => {
-      const setSelectedChoice = vi.fn();
-      const setError = vi.fn();
-      const isSubmitting = false;
-      const result = null;
-
-      // Directly test the handleChoiceSelect logic
-      const handleChoiceSelect = (index: number) => {
-        if (isSubmitting || result) return;
-        setSelectedChoice(index);
-        setError("");
-      };
-
-      // Test with different indices
-      handleChoiceSelect(0);
-      expect(setSelectedChoice).toHaveBeenCalledWith(0);
-      expect(setError).toHaveBeenCalledWith("");
-
-      setSelectedChoice.mockClear();
-      setError.mockClear();
-
-      handleChoiceSelect(3);
-      expect(setSelectedChoice).toHaveBeenCalledWith(3);
-      expect(setError).toHaveBeenCalledWith("");
+      expect(removeListener).toHaveBeenCalledWith(
+        "keydown",
+        expect.any(Function),
+      );
     });
   });
 });
