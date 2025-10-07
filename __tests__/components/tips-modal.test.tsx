@@ -30,7 +30,7 @@ import TipsModal from "../../components/TipsModal";
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
-const mockApiResponse = (data: any) => ({
+const mockApiResponse = (data: { tip: string; timestamp: string }) => ({
   ok: true,
   json: async () => data,
 });
@@ -153,6 +153,72 @@ describe("TipsModal Component", () => {
         "Ask about kana learning techniques..."
       );
       expect(input.getAttribute("maxLength")).toBe("500");
+    });
+
+    test("prevents submission when loading and input is empty", () => {
+      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+      const submitButton = screen.getByRole("button", { name: "Ask" });
+      fireEvent.click(submitButton);
+
+      // Should not call fetch due to empty input (line 69: !inputValue.trim() || isLoading)
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    test("prevents submission when input is only whitespace (covers line 69)", () => {
+      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const submitButton = screen.getByRole("button", { name: "Ask" });
+
+      fireEvent.change(input, { target: { value: "   " } });
+      fireEvent.click(submitButton);
+
+      // Should not call fetch due to !inputValue.trim() condition (line 69)
+      expect(mockFetch).not.toHaveBeenCalled();
+      expect(input).toHaveValue("   "); // Input remains unchanged
+    });
+
+    test("explicitly tests both conditions of line 69 guard clause", async () => {
+      render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+      const input = screen.getByPlaceholderText(
+        "Ask about kana learning techniques..."
+      );
+      const form = input.closest("form")!;
+
+      // Test condition 1: !inputValue.trim() (empty string) - directly trigger form submission
+      fireEvent.change(input, { target: { value: "" } });
+      fireEvent.submit(form);
+      expect(mockFetch).not.toHaveBeenCalled();
+
+      // Test condition 2: !inputValue.trim() (whitespace only)
+      fireEvent.change(input, { target: { value: "   \t\n   " } });
+      fireEvent.submit(form);
+      expect(mockFetch).not.toHaveBeenCalled();
+
+      // Test condition 3: isLoading state - mock a loading state
+      mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
+
+      fireEvent.change(input, { target: { value: "valid input" } });
+
+      // Start loading
+      await act(async () => {
+        fireEvent.submit(form);
+      });
+
+      // Verify loading state is active
+      expect(screen.getByText("...")).toBeInTheDocument();
+
+      // Try to submit again while loading - this should hit line 69's isLoading condition
+      mockFetch.mockClear();
+      fireEvent.change(input, { target: { value: "another input" } });
+      fireEvent.submit(form);
+
+      // Should not call fetch again due to isLoading condition (line 69)
+      expect(mockFetch).not.toHaveBeenCalled();
     });
   });
 
