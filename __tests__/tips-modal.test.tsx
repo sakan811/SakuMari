@@ -397,4 +397,97 @@ describe("TipsModal", () => {
       ).toBeInTheDocument();
     });
   });
+
+  test("prevents submission when input is empty or whitespace only (covers line 69)", async () => {
+    render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const input = screen.getByPlaceholderText(
+      "Ask about kana learning techniques...",
+    );
+    const submitButton = screen.getByRole("button", { name: /ask/i });
+
+    // Test with empty input
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.click(submitButton);
+    expect(mockFetch).not.toHaveBeenCalled();
+
+    // Test with whitespace only
+    fireEvent.change(input, { target: { value: "   " } });
+    fireEvent.click(submitButton);
+    expect(mockFetch).not.toHaveBeenCalled();
+
+    // Test with actual content - should proceed
+    mockFetch.mockResolvedValue(mockApiResponse({
+      tip: "Test response",
+      timestamp: "2025-01-01T00:00:00Z",
+    }));
+
+    fireEvent.change(input, { target: { value: "Valid question" } });
+    fireEvent.click(submitButton);
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  test("handles API error without proper error message (covers line 95)", async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => ({}), // No error property in response
+    });
+
+    render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const input = screen.getByPlaceholderText(
+      "Ask about kana learning techniques...",
+    );
+    const submitButton = screen.getByRole("button", { name: /ask/i });
+
+    fireEvent.change(input, { target: { value: "Test question" } });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      // Should show the fallback error message
+      expect(screen.getByText("Failed to get learning tips")).toBeInTheDocument();
+    });
+  });
+
+  test("handles non-Error objects in catch block (covers line 110)", async () => {
+    // Mock fetch to reject with a string instead of an Error object
+    mockFetch.mockRejectedValue("Network failure");
+
+    render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const input = screen.getByPlaceholderText(
+      "Ask about kana learning techniques...",
+    );
+    const submitButton = screen.getByRole("button", { name: /ask/i });
+
+    fireEvent.change(input, { target: { value: "Test question" } });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      // Should show the fallback error message for non-Error objects
+      expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+    });
+  });
+
+  test("handles null error objects in catch block", async () => {
+    // Mock fetch to reject with null
+    mockFetch.mockRejectedValue(null);
+
+    render(<TipsModal isOpen={true} onClose={mockOnClose} />);
+
+    const input = screen.getByPlaceholderText(
+      "Ask about kana learning techniques...",
+    );
+    const submitButton = screen.getByRole("button", { name: /ask/i });
+
+    fireEvent.change(input, { target: { value: "Test question" } });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      // Should show the fallback error message for null error objects
+      expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+    });
+  });
 });

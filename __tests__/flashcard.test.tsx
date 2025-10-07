@@ -319,5 +319,27 @@ describe("Flashcard Component", () => {
       // Local error should be cleared
       expect(screen.queryByText("Please enter an answer")).not.toBeInTheDocument();
     });
+
+    test("submits selected choice in multiple choice mode", () => {
+      const submitAnswer = vi.fn();
+      setupProvider(createMockProvider({
+        currentKana: MOCK_KANA,
+        submitAnswer,
+        interactionMode: "multiple-choice",
+        choices: ["a", "i", "u", "e"]
+      }));
+
+      render(<Flashcard />);
+
+      // First select a choice
+      const choiceButtons = screen.getAllByTestId(/choice-button-/);
+      fireEvent.click(choiceButtons[1]); // Select the second choice ("i")
+
+      const submitButton = getSubmitButton();
+      fireEvent.click(submitButton);
+
+      // Should call submitAnswer with the selected choice value
+      expect(submitAnswer).toHaveBeenCalledWith("i");
+    });
   });
 });
