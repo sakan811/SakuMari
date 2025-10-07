@@ -1,20 +1,30 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { GET, HEAD } from "../../app/api/health/route";
+import { NextRequest } from "next/server";
 
 // Use vi.hoisted to declare mocks that can be used in vi.mock
-const { mockPrisma } = vi.hoisted(() => ({
+const { mockPrisma, mockApplyRateLimit } = vi.hoisted(() => ({
   mockPrisma: {
     $queryRaw: vi.fn(),
   },
+  mockApplyRateLimit: vi.fn(),
 }));
 
 vi.mock("@/lib/prisma", () => ({
   prisma: mockPrisma,
 }));
 
+vi.mock("@/lib/rate-limit", () => ({
+  applyRateLimit: mockApplyRateLimit,
+}));
+
 describe("Health API Route", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default mock implementation for rate limiting (success)
+    mockApplyRateLimit.mockResolvedValue({
+      success: true,
+    });
   });
 
   afterEach(() => {
@@ -22,12 +32,55 @@ describe("Health API Route", () => {
   });
 
   describe("GET /api/health", () => {
+    test("returns 429 when rate limit is exceeded", async () => {
+      // Create a mock request
+      const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
+      // Mock rate limit exceeded response
+      mockApplyRateLimit.mockResolvedValueOnce({
+        success: false,
+        response: {
+          status: 429,
+          json: async () => ({
+            error: "Rate limit exceeded",
+            message: "Too many requests. Limit: 60 requests per 60 s.",
+            retryAfter: 30,
+          }),
+          headers: new Headers({
+            "X-RateLimit-Limit": "60",
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": new Date(Date.now() + 30000).toISOString(),
+            "Retry-After": "30",
+          }),
+        },
+      });
+
+      const response = await GET(mockRequest);
+      const data = await response.json();
+
+      expect(response.status).toBe(429);
+      expect(data).toEqual({
+        error: "Rate limit exceeded",
+        message: "Too many requests. Limit: 60 requests per 60 s.",
+        retryAfter: 30,
+      });
+      expect(response.headers.get("X-RateLimit-Limit")).toBe("60");
+      expect(response.headers.get("X-RateLimit-Remaining")).toBe("0");
+      expect(response.headers.get("Retry-After")).toBe("30");
+
+      // Verify that applyRateLimit was called with correct parameters
+      expect(mockApplyRateLimit).toHaveBeenCalledWith(mockRequest, "health");
+    });
+
     test("returns healthy status when database is connected", async () => {
       // Mock successful database query
       mockPrisma.$queryRaw.mockResolvedValue([1]);
 
+      // Create a mock request
+      const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
       // Mock environment variables through vitest config
-      const response = await GET();
+      const response = await GET(mockRequest);
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -53,8 +106,11 @@ describe("Health API Route", () => {
         new Error("Database connection failed"),
       );
 
+      // Create a mock request
+      const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
       // Mock environment variables through vitest config
-      const response = await GET();
+      const response = await GET(mockRequest);
       const data = await response.json();
 
       expect(response.status).toBe(503);
@@ -78,7 +134,9 @@ describe("Health API Route", () => {
       // Mock successful database query
       mockPrisma.$queryRaw.mockResolvedValue([1]);
 
-      const response = await GET();
+      const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
+      const response = await GET(mockRequest);
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -93,7 +151,9 @@ describe("Health API Route", () => {
       const originalVersion = process.env.npm_package_version;
       delete process.env.npm_package_version;
 
-      const response = await GET();
+      const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
+      const response = await GET(mockRequest);
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -107,7 +167,9 @@ describe("Health API Route", () => {
       // Mock failed database query with a non-Error object
       mockPrisma.$queryRaw.mockRejectedValue("String error message");
 
-      const response = await GET();
+      const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
+      const response = await GET(mockRequest);
       const data = await response.json();
 
       expect(response.status).toBe(503);
@@ -125,7 +187,9 @@ describe("Health API Route", () => {
       // Mock successful database query
       mockPrisma.$queryRaw.mockResolvedValue([1]);
 
-      const response = await GET();
+      const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
+      const response = await GET(mockRequest);
       const data = await response.json();
 
       // Check all required fields are present
@@ -149,7 +213,9 @@ describe("Health API Route", () => {
       // Mock failed database query
       mockPrisma.$queryRaw.mockRejectedValue(new Error("Connection timeout"));
 
-      const response = await GET();
+      const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
+      const response = await GET(mockRequest);
       const data = await response.json();
 
       // Check all required fields are present
@@ -171,11 +237,48 @@ describe("Health API Route", () => {
   });
 
   describe("HEAD /api/health", () => {
+    test("returns 429 when rate limit is exceeded", async () => {
+      // Create a mock request
+      const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
+      // Mock rate limit exceeded response
+      mockApplyRateLimit.mockResolvedValueOnce({
+        success: false,
+        response: {
+          status: 429,
+          json: async () => ({
+            error: "Rate limit exceeded",
+            message: "Too many requests. Limit: 60 requests per 60 s.",
+            retryAfter: 30,
+          }),
+          headers: new Headers({
+            "X-RateLimit-Limit": "60",
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": new Date(Date.now() + 30000).toISOString(),
+            "Retry-After": "30",
+          }),
+        },
+      });
+
+      const response = await HEAD(mockRequest);
+
+      expect(response.status).toBe(429);
+      expect(response.headers.get("X-RateLimit-Limit")).toBe("60");
+      expect(response.headers.get("X-RateLimit-Remaining")).toBe("0");
+      expect(response.headers.get("Retry-After")).toBe("30");
+
+      // Verify that applyRateLimit was called with correct parameters
+      expect(mockApplyRateLimit).toHaveBeenCalledWith(mockRequest, "health");
+    });
+
     test("returns 200 status when database is connected", async () => {
       // Mock successful database query
       mockPrisma.$queryRaw.mockResolvedValue([1]);
 
-      const response = await HEAD();
+      // Create a mock request
+      const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
+      const response = await HEAD(mockRequest);
 
       expect(response.status).toBe(200);
       // HEAD requests should have no body
@@ -188,7 +291,10 @@ describe("Health API Route", () => {
         new Error("Database connection failed"),
       );
 
-      const response = await HEAD();
+      // Create a mock request
+      const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
+      const response = await HEAD(mockRequest);
 
       expect(response.status).toBe(503);
       // HEAD requests should have no body
@@ -200,7 +306,9 @@ describe("Health API Route", () => {
     // Mock successful database query
     mockPrisma.$queryRaw.mockResolvedValue([1]);
 
-    await GET();
+    const mockRequest = new Request("http://localhost/api/health") as NextRequest;
+
+    await GET(mockRequest);
 
     // Verify that the database query was called
     expect(mockPrisma.$queryRaw).toHaveBeenCalledWith(["SELECT 1"]);

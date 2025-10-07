@@ -16,7 +16,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { applyRateLimit, getEndpointType } from "@/lib/rate-limit";
+import { applyRateLimit, getEndpointType, getClientIP } from "@/lib/rate-limit";
 import { NextRequest } from "next/server";
 import { Ratelimit } from "@upstash/ratelimit";
 
@@ -63,6 +63,96 @@ describe("Rate Limit Library", () => {
       expect(getEndpointType("/api/tips")).toBe("tips");
       expect(getEndpointType("/api/auth/providers")).toBe("auth");
       expect(getEndpointType("/api/unknown")).toBe("default");
+    });
+  });
+
+  describe("getClientIP", () => {
+    it("should extract IP from x-forwarded-for header with single IP", () => {
+      const request = new Request("http://localhost", {
+        headers: { "x-forwarded-for": "192.168.1.100" },
+      }) as unknown as NextRequest;
+
+      expect(getClientIP(request)).toBe("192.168.1.100");
+    });
+
+    it("should extract first IP from x-forwarded-for header with multiple IPs", () => {
+      const request = new Request("http://localhost", {
+        headers: { "x-forwarded-for": "203.0.113.1, 192.168.1.100, 10.0.0.1" },
+      }) as unknown as NextRequest;
+
+      expect(getClientIP(request)).toBe("203.0.113.1");
+    });
+
+    it("should handle x-forwarded-for header with spaces and trim", () => {
+      const request = new Request("http://localhost", {
+        headers: { "x-forwarded-for": "  203.0.113.1  " },
+      }) as unknown as NextRequest;
+
+      expect(getClientIP(request)).toBe("203.0.113.1");
+    });
+
+    it("should fall back to x-real-ip header when x-forwarded-for is missing", () => {
+      const request = new Request("http://localhost", {
+        headers: { "x-real-ip": "198.51.100.50" },
+      }) as unknown as NextRequest;
+
+      expect(getClientIP(request)).toBe("198.51.100.50");
+    });
+
+    it("should fall back to x-client-ip header when other headers are missing", () => {
+      const request = new Request("http://localhost", {
+        headers: { "x-client-ip": "192.0.2.75" },
+      }) as unknown as NextRequest;
+
+      expect(getClientIP(request)).toBe("192.0.2.75");
+    });
+
+    it("should fall back to default IP when no IP headers are present", () => {
+      const request = new Request("http://localhost") as unknown as NextRequest;
+
+      expect(getClientIP(request)).toBe("127.0.0.1");
+    });
+
+    it("should prioritize headers in correct order: x-forwarded-for > x-real-ip > x-client-ip", () => {
+      const request = new Request("http://localhost", {
+        headers: {
+          "x-client-ip": "192.0.2.75",
+          "x-real-ip": "198.51.100.50",
+          "x-forwarded-for": "203.0.113.1"
+        },
+      }) as unknown as NextRequest;
+
+      expect(getClientIP(request)).toBe("203.0.113.1");
+    });
+
+    it("should handle empty x-forwarded-for header and fall back to other headers", () => {
+      const request = new Request("http://localhost", {
+        headers: {
+          "x-forwarded-for": "",
+          "x-real-ip": "198.51.100.50"
+        },
+      }) as unknown as NextRequest;
+
+      expect(getClientIP(request)).toBe("198.51.100.50");
+    });
+
+    it("should handle whitespace-only x-forwarded-for header and fall back", () => {
+      const request = new Request("http://localhost", {
+        headers: {
+          "x-forwarded-for": "   ",
+          "x-real-ip": "198.51.100.50"
+        },
+      }) as unknown as NextRequest;
+
+      expect(getClientIP(request)).toBe("198.51.100.50");
+    });
+
+    it("should handle comma-separated IPs with varying whitespace", () => {
+      const request = new Request("http://localhost", {
+        headers: { "x-forwarded-for": "203.0.113.1 ,192.168.1.100, 10.0.0.1" },
+      }) as unknown as NextRequest;
+
+      expect(getClientIP(request)).toBe("203.0.113.1");
     });
   });
 
