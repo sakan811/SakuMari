@@ -22,7 +22,7 @@ export default defineConfig({
 
   // Playwright will manage the Next.js server
   webServer: {
-    command: "cross-env CREDS_PROVIDER=true NODE_ENV=production pnpm start",
+    command: "pnpm exec cross-env CREDS_PROVIDER=true NODE_ENV=production pnpm start",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000, // 2 minutes
