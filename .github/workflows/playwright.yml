@@ -45,6 +45,8 @@ jobs:
           echo "CREDS_PROVIDER=true" >> .env
           echo "POSTGRES_HOST=localhost" >> .env
           echo "POSTGRES_DB=sakumari" >> .env
+          echo "UPSTASH_REDIS_REST_URL=${{ secrets.UPSTASH_REDIS_REST_URL }}" >> .env
+          echo "UPSTASH_REDIS_REST_TOKEN=${{ secrets.UPSTASH_REDIS_REST_TOKEN }}" >> .env
 
       - name: Generate Prisma client and setup database
         env:
@@ -71,6 +73,4 @@ jobs:
         env:
           CREDS_PROVIDER: true
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sakumari
-          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
         run: pnpm exec playwright test
