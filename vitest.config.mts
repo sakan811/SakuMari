@@ -30,7 +30,8 @@ export default defineConfig({
         ".next/",
         "generated/",
         "coverage-db/lcov-report",
-        "types/common.ts"
+        "types/common.ts",
+        "app/globals.css"
       ],
     },
   },

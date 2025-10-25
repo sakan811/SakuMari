@@ -1,8 +1,5 @@
 module.exports = {
   output: "standalone",
-  eslint: {
-    dirs: ["app"],
-  },
   images: {
     remotePatterns: [
       {
