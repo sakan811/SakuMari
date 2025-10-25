@@ -31,7 +31,7 @@ _For detailed technical documentation, see [docs/features.md](docs/features.md)_
 
 ## Architecture
 
-**Tech Stack:** Next.js 15 + PostgreSQL 17 + NextAuth.js v5 + Google Gemini AI
+**Tech Stack:** Next.js 16 + PostgreSQL 17 + NextAuth.js v5 + Google Gemini AI
 
 **Key Components:** Adaptive FlashcardProvider → Practice/Dashboard Pages → API Layer → Database
 

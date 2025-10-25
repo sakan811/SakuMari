@@ -4,19 +4,19 @@
 
 ![System Architecture](mermaid/system.svg)
 
-**Core Stack:** Next.js 15.5.4 App Router + React 19.2.0 + NextAuth.js v5.0.0-beta.29 + PostgreSQL 17 + Google Gemini AI v0.24.1 + Upstash Redis Rate Limiting + TypeScript 5.9.3
+**Core Stack:** Next.js 16.0.0 App Router + React 19.2.0 + NextAuth.js v5.0.0-beta.29 + PostgreSQL 17 + Google Gemini AI v0.24.1 + Upstash Redis Rate Limiting + TypeScript 5.9.3
 
 **Key Components:**
 
 - **Authentication:** Google OAuth + test credentials with 30-day JWT cookies
 - **Pages:** HomePage, Practice (Hiragana/Katakana), Dashboard
 - **State Management:** FlashcardProvider with confidence-weighted adaptive learning
-- **Data Layer:** Prisma ORM 6.16.3 with PostgreSQL 17
+- **Data Layer:** Prisma ORM 6.18.0 with PostgreSQL 17
 - **AI Integration:** Google Gemini AI v0.24.1 for personalized learning recommendations
 - **Rate Limiting:** Upstash Redis with @upstash/ratelimit v2.0.6 for API protection
-- **Styling:** Tailwind CSS v4.1.14 with mobile-first responsive design
-- **Testing:** Vitest v3.2.4 + Playwright v1.55.1 for comprehensive testing (unit, integration, E2E)
-- **Code Quality:** ESLint 9.36.0 + Prettier with React, Import, and TypeScript plugins
+- **Styling:** Tailwind CSS v4.1.16 with mobile-first responsive design
+- **Testing:** Vitest v4.0.3 + Playwright v1.56.1 for comprehensive testing (unit, integration, E2E)
+- **Code Quality:** ESLint 9.38.0 + Prettier with React, Import, and TypeScript plugins
 
 ## Component Architecture
 
@@ -42,6 +42,7 @@
 **Component Groups:**
 
 ### Core Components
+
 - **HomePage** - Landing page with auth-aware content
 - **FlashcardApp** - Main practice session container
 - **FlashcardProvider** - Adaptive learning context
@@ -49,22 +50,26 @@
 - **SessionProviders** - Authentication wrapper
 
 ### Practice Components
+
 - **Flashcard** - Dual input modes (typing/multiple-choice) with adaptive learning
 - **ModeSelector** - Input mode toggle
 - **MultipleChoice** - Multiple-choice interface
 - **FilterButton** - Character type filtering (hiragana/katakana/all)
 
 ### Dashboard Components
+
 - **Dashboard** - Progress tracking overview
 - **StatsSummary** - Statistics cards
 - **CharacterProgressTable** - Sortable/filterable progress data
 - **TipsModal** - AI chat interface
 
 ### Navigation Components
+
 - **DesktopNavigation** - Desktop navigation menu
 - **MobileNavigation** - Mobile navigation menu
 
 ### UI Components
+
 - **Button** - Consistent button interface (`/components/ui/`)
 - **ButtonLink** - Link-style button component (`/components/ui/`)
 - **FilterButton** - Character type selection (`/components/ui/`)
@@ -79,6 +84,7 @@
 - `GET /api/health` - System health monitoring (public, rate limited: 60/min, 200/min in tests)
 
 **Route Protection:**
+
 - Protected: `/hiragana`, `/katakana`, `/dashboard`, `/api/stats`, `/api/flashcards/*`, `/api/tips`
 - Public: `/`, `/api/auth/*`, `/api/health`
 - Middleware enforces authentication for practice and progress APIs
@@ -87,7 +93,7 @@
 
 ![App Architecture](mermaid/app.svg)
 
-**Next.js 15 App Router** - File-system based routing with enhanced SSR capabilities
+**Next.js 16 App Router** - File-system based routing with enhanced SSR capabilities
 
 **Key Features:**
 
@@ -172,12 +178,14 @@ __tests__/
 ### Application Tables
 
 **Kana Table**
+
 - `id` (UUID) - Primary key
 - `character` (String, unique) - Hiragana/Katakana character
 - `romaji` (String) - Romanized pronunciation
 - `progress` (relation) - One-to-many relationship to KanaProgress
 
 **KanaProgress Table**
+
 - `id` (UUID) - Primary key
 - `kana_id` (String) - Foreign key to Kana table
 - `user_id` (String) - Foreign key to User table
@@ -189,6 +197,7 @@ __tests__/
 ### Authentication Tables (NextAuth.js)
 
 **User Table**
+
 - `id` (String, cuid) - Primary key
 - `name` (String, nullable) - Display name
 - `email` (String, unique, nullable) - Email address
@@ -199,6 +208,7 @@ __tests__/
 - `kanaProgress` (relation) - One-to-many to KanaProgress
 
 **Account Table**
+
 - `id` (String, cuid) - Primary key
 - `userId` (String) - Foreign key to User
 - `type` (String) - OAuth provider type
@@ -209,12 +219,14 @@ __tests__/
 - Unique constraint on (provider, providerAccountId)
 
 **Session Table**
+
 - `id` (String, cuid) - Primary key
 - `sessionToken` (String, unique) - JWT session token
 - `userId` (String) - Foreign key to User
 - `expires` (DateTime) - Session expiration
 
 **VerificationToken Table**
+
 - `identifier` (String) - Email address or user identifier
 - `token` (String, unique) - Verification token
 - `expires` (DateTime) - Token expiration
@@ -242,9 +254,11 @@ __tests__/
 | `kanaprogress` | Learning progress | Application-filtered |
 
 **Public Tables:**
+
 - `kana` - Reference data (Hiragana/Katakana characters) - no RLS needed
 
 **Security Implementation:**
+
 - Permissive policies with `USING (true)` for application-level control
 - Prisma ORM handles access control logic
 - Migration history with security fixes in 2025-10-06
