@@ -40,7 +40,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 **Utilities** (`utils/*.test.ts`)
 
 - `api-errors.test.ts` - Error handling utilities
-- `api-middleware.test.ts` - API middleware
+- `api-middleware.test.ts` - API proxy
 - `backgrounds.test.ts` - Background management
 - `env.test.ts` - Environment variables
 - `flashcard-utils.test.ts` - Flashcard algorithms
@@ -81,7 +81,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 **Application** (`*.test.tsx`)
 
 - `integration.test.tsx` - Cross-component integration
-- `middleware.test.ts` - Route protection middleware
+- `proxy.test.ts` - Route protection proxy
 
 **SEO** (`seo/*.test.tsx`)
 
@@ -101,8 +101,8 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 
 - Google OAuth and test credentials authentication
 - Session persistence and JWT token management
-- Protected route enforcement and middleware
-- API authentication middleware verification
+- Protected route enforcement and proxy
+- API authentication proxy verification
 - Row Level Security (RLS) configuration
 
 ### Learning Functionality

@@ -34,7 +34,7 @@
 - **SessionProviders:** NextAuth.js authentication context
 - **Custom Hooks:** `useDashboardData`, `useSorting`, `useAuthStatus`, `useFlashcardInteraction`, `useFlashcardHandlers`
 - **UI Components:** Modular `/components/ui/` directory with Button, ButtonLink, FilterButton
-- **Error Handling:** API utilities (`lib/api-errors.ts`) and middleware (`lib/api-middleware.ts`) for constraint violations and proper responses
+- **Error Handling:** API utilities (`lib/api-errors.ts`) and proxy utilities (`lib/api-middleware.ts`) for constraint violations and proper responses
 - **Kana Filtering:** Character filtering utilities (`lib/kana-filter.ts`) for hiragana/katakana selection
 - **Flashcard Utils:** Helper functions (`lib/flashcard-utils.ts`) and submission utilities (`lib/flashcard-submit-utils.ts`) for improved testability
 - **Rate Limiting:** Upstash Redis utilities (`lib/rate-limit.ts`) for API endpoint protection
@@ -87,7 +87,7 @@
 
 - Protected: `/hiragana`, `/katakana`, `/dashboard`, `/api/stats`, `/api/flashcards/*`, `/api/tips`
 - Public: `/`, `/api/auth/*`, `/api/health`
-- Middleware enforces authentication for practice and progress APIs
+- Proxy enforces authentication for practice and progress APIs
 
 ## App Architecture
 
@@ -103,7 +103,7 @@
 - **SEO Optimized:** Dynamic `sitemap.ts`, `robots.ts`, and page-level metadata
 - **Performance:** Automatic code splitting, SSR, and static generation with React 19.2.0
 - **Health Monitoring:** Database connectivity endpoint (`/api/health`)
-- **Middleware Protection:** Enforcement for practice and progress APIs
+- **Proxy Protection:** Enforcement for practice and progress APIs
 - **Rate Limiting:** Upstash Redis-based protection with fail-open error handling
 - **Type Safety:** TypeScript 5.9.3 with dedicated `/types/` directory
 
@@ -127,7 +127,7 @@ app/
 │   ├── flashcards/       # Flashcard APIs (protected)
 │   ├── tips/             # AI learning tips (protected)
 │   └── health/           # System health monitoring
-└── middleware.ts         # Route protection
+└── proxy.ts              # Route protection
 ```
 
 **Core Libraries:**
@@ -138,7 +138,7 @@ lib/
 ├── prisma.ts                   # Database client
 ├── env.ts                      # Environment variables
 ├── api-errors.ts               # API error handling
-├── api-middleware.ts           # API middleware functions
+├── api-middleware.ts           # API proxy functions
 ├── backgrounds.ts              # Background management utilities
 ├── metadata.ts                 # SEO & metadata
 ├── kana-filter.ts              # Character filtering
