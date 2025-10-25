@@ -7,6 +7,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 ### **Unit Tests** (`*.test.*`)
 
 **Components** (`*.test.tsx`)
+
 - **Core UI**: button, button-link, header, layout
 - **Learning**: flashcard, flashcard-app, flashcard-interaction, multiple-choice, mode-selector
 - **Pages**: home, hiragana-page, katakana-page, dashboard
@@ -15,12 +16,14 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - **Providers**: SessionProviders
 
 **Hooks** (`hooks/*.test.*`)
+
 - `useDashboardData.test.tsx` - Dashboard data fetching
 - `useFlashcardInteraction.test.tsx` - Flashcard interaction logic
 - `useFlashcardHandlers.test.tsx` - Mode selection handlers (moved from root `__tests__/`)
 - `useSorting.test.ts` - Table sorting functionality
 
 **API** (`api/*.test.ts`)
+
 - `health.test.ts` - System health checks
 - `stats.test.ts` - Progress statistics
 - `tips.test.ts` - AI learning recommendations
@@ -28,12 +31,14 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - `additional-edge-cases.test.ts` - Edge case handling
 
 **Authentication** (`auth/*.test.*`)
+
 - `auth-config.test.ts` - NextAuth.js configuration
 - `auth.test.tsx` - Login/logout flows
 - `auth-routes.test.ts` - Route protection
 - `api-authentication.test.ts` - API authentication
 
 **Utilities** (`utils/*.test.ts`)
+
 - `api-errors.test.ts` - Error handling utilities
 - `api-middleware.test.ts` - API middleware
 - `backgrounds.test.ts` - Background management
@@ -45,6 +50,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - `should-fetch-kana-data.test.ts` - Data fetching logic
 
 **Test Setup Files** (`utils/*.ts`)
+
 - `api-test-setup.ts` - API testing setup
 - `mock-setup.ts` - Mock configuration
 - `page-test-utils.ts` - Page testing utilities
@@ -52,27 +58,33 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - `test-helpers.ts` - Test helper functions
 
 **Libraries** (`lib/*.test.ts`)
+
 - `rate-limit.test.ts` - Upstash Redis rate limiting
 
 **Flashcard Provider** (`flashcard-provider/*.test.tsx`)
+
 - `FlashcardProvider.test.tsx` - Flashcard context provider logic
 
 ### **Legacy Tests**
+
 - `use-flashcard-handlers.test.ts` - Legacy flashcard handlers test (moved to `hooks/` directory)
 
 ### **Integration Tests**
 
 **Database** (`db/*.test.ts`)
+
 - `kana-progress.test.ts` - Progress tracking
 - `concurrent-operations.test.ts` - Parallel operations
 - `rls.test.ts` - Row Level Security verification
 - `user-data.test.ts` - User data management
 
 **Application** (`*.test.tsx`)
+
 - `integration.test.tsx` - Cross-component integration
 - `middleware.test.ts` - Route protection middleware
 
 **SEO** (`seo/*.test.tsx`)
+
 - `seo.test.tsx` - SEO metadata validation
 
 ### **E2E Tests** (`e2e/*.spec.ts`)
@@ -86,6 +98,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 ## Key Test Scenarios
 
 ### Authentication & Security
+
 - Google OAuth and test credentials authentication
 - Session persistence and JWT token management
 - Protected route enforcement and middleware
@@ -93,6 +106,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - Row Level Security (RLS) configuration
 
 ### Learning Functionality
+
 - Flashcard display and adaptive algorithm
 - Multiple choice and typing practice modes
 - Character filtering (hiragana/katakana)
@@ -100,6 +114,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - AI-powered learning tips generation
 
 ### Data Management
+
 - User progress persistence with concurrent operations
 - Database transactions and error handling
 - Environment variable configuration
@@ -108,6 +123,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - Rate limiting with Upstash Redis
 
 ### User Experience
+
 - Responsive design across devices
 - Navigation flows and accessibility
 - SEO metadata validation
