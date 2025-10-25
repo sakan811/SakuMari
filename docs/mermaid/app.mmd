@@ -8,7 +8,7 @@ flowchart LR
     AppRoot["📁 app/"]
 
     AppRoot --> RootLayout["📄 layout.tsx"]
-    AppRoot --> Middleware["🛡️ middleware.ts"]
+    AppRoot --> Proxy["🛡️ proxy.ts"]
     AppRoot --> GlobalCSS["🎨 globals.css"]
 
     AppRoot --> Pages["📄 Pages"]
@@ -33,12 +33,12 @@ flowchart LR
     SEO --> Robots["🤖 robots.ts"]
     SEO --> Favicon["🖼️ favicon.ico"]
 
-    Middleware -.-> Dashboard
-    Middleware -.-> Hiragana
-    Middleware -.-> Katakana
-    Middleware -.-> SubmitAPI
-    Middleware -.-> StatsAPI
-    Middleware -.-> TipsAPI
+    Proxy -.-> Dashboard
+    Proxy -.-> Hiragana
+    Proxy -.-> Katakana
+    Proxy -.-> SubmitAPI
+    Proxy -.-> StatsAPI
+    Proxy -.-> TipsAPI
 
     classDef rootStructure fill:#e8f4fd,stroke:#1e40af,stroke-width:3px
     classDef pageRoute fill:#fef3c7,stroke:#d97706,stroke-width:2px
@@ -50,4 +50,4 @@ flowchart LR
     class HomePage,Dashboard,Hiragana,Katakana pageRoute
     class SubmitAPI,StatsAPI,TipsAPI,HealthAPI apiRoute
     class NextAuth,Providers authRoute
-    class Middleware,GlobalCSS,Sitemap,Robots,Favicon globalFile
+    class Proxy,GlobalCSS,Sitemap,Robots,Favicon globalFile

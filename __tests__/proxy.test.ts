@@ -22,11 +22,11 @@ vi.mock("next/server", async () => {
   };
 });
 
-// Import the actual middleware function
-let middleware: unknown;
+// Import the actual proxy function
+let proxy: unknown;
 let config: { matcher: string[] };
 
-// Mock the auth function to allow actual middleware execution
+// Mock the auth function to allow actual proxy execution
 vi.mock("@/lib/auth", () => ({
   auth: vi.fn((handler: (req: NextRequest) => NextResponse) => {
     // Return a function that directly calls the handler and returns a resolved promise
@@ -42,13 +42,13 @@ vi.mock("@/lib/auth", () => ({
 
 import { auth } from "@/lib/auth";
 
-describe("Middleware", () => {
+describe("Proxy", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
-    // Import the actual middleware function for each test to ensure fresh state
-    const middlewareModule = await import("../middleware");
-    middleware = middlewareModule.default;
-    config = middlewareModule.config;
+    // Import the actual proxy function for each test to ensure fresh state
+    const proxyModule = await import("../proxy");
+    proxy = proxyModule.default;
+    config = proxyModule.config;
   });
 
   describe("Protected route redirection", () => {
@@ -68,9 +68,9 @@ describe("Middleware", () => {
       const mockRedirect = vi.mocked(NextResponse.redirect);
       mockRedirect.mockReturnValue({} as NextResponse);
 
-      // Call the actual middleware function with the mock request
+      // Call the actual proxy function with the mock request
       await (
-        middleware as (
+        proxy as (
           req: NextRequest,
           context: { params: Promise<Record<string, string>> },
         ) => Promise<NextResponse>
@@ -95,9 +95,9 @@ describe("Middleware", () => {
         const mockNext = vi.mocked(NextResponse.next);
         mockNext.mockReturnValue({} as NextResponse);
 
-        // Call the actual middleware function with the mock request
+        // Call the actual proxy function with the mock request
         await (
-          middleware as (
+          proxy as (
             req: NextRequest,
             context: { params: Promise<Record<string, string>> },
           ) => Promise<NextResponse>
@@ -123,9 +123,9 @@ describe("Middleware", () => {
       const mockNext = vi.mocked(NextResponse.next);
       mockNext.mockReturnValue({} as NextResponse);
 
-      // Call the actual middleware function with the mock request
+      // Call the actual proxy function with the mock request
       await (
-        middleware as (
+        proxy as (
           req: NextRequest,
           context: { params: Promise<Record<string, string>> },
         ) => Promise<NextResponse>
@@ -156,9 +156,9 @@ describe("Middleware", () => {
         const mockNext = vi.mocked(NextResponse.next);
         mockNext.mockReturnValue({} as NextResponse);
 
-        // Call the actual middleware function with the mock request
+        // Call the actual proxy function with the mock request
         await (
-          middleware as (
+          proxy as (
             req: NextRequest,
             context: { params: Promise<Record<string, string>> },
           ) => Promise<NextResponse>
@@ -180,8 +180,8 @@ describe("Middleware", () => {
         const mockRedirect = vi.mocked(NextResponse.redirect);
         mockRedirect.mockReturnValue({} as NextResponse);
 
-        // Test the middleware logic directly
-        const middlewareHandler = auth((req) => {
+        // Test the proxy logic directly
+        const proxyHandler = auth((req) => {
           if (
             (!req.auth ||
               (typeof req.auth === "object" &&
@@ -193,8 +193,8 @@ describe("Middleware", () => {
           return NextResponse.next();
         });
 
-        // Call the middleware handler with the mock request and context with params
-        await middlewareHandler(mockRequest, { params: Promise.resolve({}) });
+        // Call the proxy handler with the mock request and context with params
+        await proxyHandler(mockRequest, { params: Promise.resolve({}) });
 
         expect(mockRedirect).toHaveBeenCalledWith(
           new URL("/", "http://localhost:3000/protected-route"),
@@ -219,9 +219,9 @@ describe("Middleware", () => {
       const mockRedirect = vi.mocked(NextResponse.redirect);
       mockRedirect.mockReturnValue({} as NextResponse);
 
-      // Call the actual middleware function with the mock request
+      // Call the actual proxy function with the mock request
       await (
-        middleware as (
+        proxy as (
           req: NextRequest,
           context: { params: Promise<Record<string, string>> },
         ) => Promise<NextResponse>
@@ -279,9 +279,9 @@ describe("Middleware", () => {
           const mockRedirect = vi.mocked(NextResponse.redirect);
           mockRedirect.mockReturnValue({} as NextResponse);
 
-          // Call the actual middleware function with the mock request
+          // Call the actual proxy function with the mock request
           await (
-            middleware as (
+            proxy as (
               req: NextRequest,
               context: { params: Promise<Record<string, string>> },
             ) => Promise<NextResponse>
@@ -316,9 +316,9 @@ describe("Middleware", () => {
           const mockNext = vi.mocked(NextResponse.next);
           mockNext.mockReturnValue({} as NextResponse);
 
-          // Call the actual middleware function with the mock request
+          // Call the actual proxy function with the mock request
           await (
-            middleware as (
+            proxy as (
               req: NextRequest,
               context: { params: Promise<Record<string, string>> },
             ) => Promise<NextResponse>
@@ -352,9 +352,9 @@ describe("Middleware", () => {
           const mockNext = vi.mocked(NextResponse.next);
           mockNext.mockReturnValue({} as NextResponse);
 
-          // Call the actual middleware function with the mock request
+          // Call the actual proxy function with the mock request
           await (
-            middleware as (
+            proxy as (
               req: NextRequest,
               context: { params: Promise<Record<string, string>> },
             ) => Promise<NextResponse>

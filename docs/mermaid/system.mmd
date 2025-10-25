@@ -9,7 +9,7 @@ flowchart TD
 
     Browser --> Auth["🔐 NextAuth.js"]
     Auth --> Session["📝 Session Management"]
-    Auth --> Middleware["🛡️ Route Protection"]
+    Auth --> Proxy["🛡️ Route Protection"]
 
     Browser --> Pages["📄 Pages"]
     Pages --> Home["🏠 Home (Public)"]
@@ -52,4 +52,4 @@ flowchart TD
     class User,Browser userLayer
     class Home,Practice,Dashboard,Provider,Components,API,Hooks,Utils appLayer
     class Prisma,DB dataLayer
-    class Auth,Session,Gemini,Middleware,RateLimit,Redis aiLayer
+    class Auth,Session,Gemini,Proxy,RateLimit,Redis aiLayer

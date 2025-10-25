@@ -107,7 +107,7 @@ function getIdentifier(request: NextRequest, userId?: string): string {
   return `ip:${ip}`;
 }
 
-// Rate limiting middleware function
+// Rate limiting proxy function
 export async function applyRateLimit(
   request: NextRequest,
   endpointType: EndpointType,
