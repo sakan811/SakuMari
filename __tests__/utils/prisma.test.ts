@@ -16,28 +16,32 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { PrismaClient } from "@/generated/prisma_client";
 
 // Store original environment variables
 const originalEnv = { ...process.env };
 
-// Mock the PrismaClient and adapter
+const mockPrismaClient = vi.fn(function(config: any) {
+  this.config = config;
+  this.$connect = vi.fn();
+  this.$disconnect = vi.fn();
+});
+
 vi.mock("@/generated/prisma_client", () => ({
-  PrismaClient: vi.fn().mockImplementation((config) => ({
-    $connect: vi.fn(),
-    $disconnect: vi.fn(),
-    config,
-  })),
+  PrismaClient: mockPrismaClient,
 }));
 
 vi.mock("@prisma/adapter-pg", () => ({
-  PrismaPg: vi.fn().mockImplementation((config) => ({
-    adapterName: "@prisma/adapter-pg",
-    config,
-    externalPool: null,
-    options: undefined,
-    provider: "postgres",
-  })),
+  PrismaPg: class {
+    config: any;
+    adapterName = "@prisma/adapter-pg";
+    externalPool = null;
+    options = undefined;
+    provider = "postgres";
+
+    constructor(config: any) {
+      this.config = config;
+    }
+  },
 }));
 
 // Mock the getDatabaseUrls function
@@ -86,7 +90,7 @@ describe("Prisma Client Configuration", () => {
     expect(mockGetDatabaseUrls).toHaveBeenCalled();
 
     // Verify PrismaClient was instantiated with adapter
-    expect(PrismaClient).toHaveBeenCalledWith({
+    expect(mockPrismaClient).toHaveBeenCalledWith({
       adapter: expect.objectContaining({
         adapterName: "@prisma/adapter-pg",
         config: {
@@ -105,12 +109,15 @@ describe("Prisma Client Configuration", () => {
   });
 
   it("should use existing global prisma client when available", async () => {
+    // Clear mock calls before the test
+    mockPrismaClient.mockClear();
+
     // Create a mock prisma client
-    const mockPrismaClient = { $connect: vi.fn(), $disconnect: vi.fn() };
+    const mockPrismaInstance = { $connect: vi.fn(), $disconnect: vi.fn() };
 
     // Set the global prisma client
-    (global as unknown as { prisma: typeof mockPrismaClient }).prisma =
-      mockPrismaClient;
+    (global as unknown as { prisma: typeof mockPrismaInstance }).prisma =
+      mockPrismaInstance;
 
     // Import the module after setting up mocks
     const { prisma } = await import("@/lib/prisma");
@@ -119,10 +126,10 @@ describe("Prisma Client Configuration", () => {
     expect(mockGetDatabaseUrls).toHaveBeenCalled();
 
     // Verify PrismaClient was NOT instantiated again
-    expect(PrismaClient).not.toHaveBeenCalled();
+    expect(mockPrismaClient).not.toHaveBeenCalled();
 
     // Verify the returned prisma instance is the global one
-    expect(prisma).toBe(mockPrismaClient);
+    expect(prisma).toBe(mockPrismaInstance);
   });
 
   it("should configure development log levels when NODE_ENV is development", async () => {
@@ -133,7 +140,7 @@ describe("Prisma Client Configuration", () => {
     await import("@/lib/prisma");
 
     // Verify PrismaClient was instantiated with development log levels
-    expect(PrismaClient).toHaveBeenCalledWith({
+    expect(mockPrismaClient).toHaveBeenCalledWith({
       adapter: expect.objectContaining({
         adapterName: "@prisma/adapter-pg",
         config: {
@@ -156,7 +163,7 @@ describe("Prisma Client Configuration", () => {
     await import("@/lib/prisma");
 
     // Verify PrismaClient was instantiated with production log levels
-    expect(PrismaClient).toHaveBeenCalledWith({
+    expect(mockPrismaClient).toHaveBeenCalledWith({
       adapter: expect.objectContaining({
         adapterName: "@prisma/adapter-pg",
         config: {
@@ -179,7 +186,7 @@ describe("Prisma Client Configuration", () => {
     await import("@/lib/prisma");
 
     // Verify PrismaClient was instantiated with production log levels
-    expect(PrismaClient).toHaveBeenCalledWith({
+    expect(mockPrismaClient).toHaveBeenCalledWith({
       adapter: expect.objectContaining({
         adapterName: "@prisma/adapter-pg",
         config: {
@@ -239,7 +246,7 @@ describe("Prisma Client Configuration", () => {
     await import("@/lib/prisma");
 
     // Verify PrismaClient was instantiated with the custom URL
-    expect(PrismaClient).toHaveBeenCalledWith({
+    expect(mockPrismaClient).toHaveBeenCalledWith({
       adapter: expect.objectContaining({
         adapterName: "@prisma/adapter-pg",
         config: {
@@ -254,20 +261,23 @@ describe("Prisma Client Configuration", () => {
   });
 
   it("should handle global prisma object with prisma property", async () => {
+    // Clear mock calls before the test
+    mockPrismaClient.mockClear();
+
     // Create a mock prisma client
-    const mockPrismaClient = { $connect: vi.fn(), $disconnect: vi.fn() };
+    const mockPrismaInstance = { $connect: vi.fn(), $disconnect: vi.fn() };
 
     // Set the global prisma client with the expected structure
-    (global as unknown as { prisma: typeof mockPrismaClient }).prisma =
-      mockPrismaClient;
+    (global as unknown as { prisma: typeof mockPrismaInstance }).prisma =
+      mockPrismaInstance;
 
     // Import the module after setting up mocks
     const { prisma } = await import("@/lib/prisma");
 
     // Verify the returned prisma instance is the global one
-    expect(prisma).toBe(mockPrismaClient);
+    expect(prisma).toBe(mockPrismaInstance);
 
     // Verify PrismaClient was NOT instantiated again
-    expect(PrismaClient).not.toHaveBeenCalled();
+    expect(mockPrismaClient).not.toHaveBeenCalled();
   });
 });
