@@ -53,8 +53,19 @@ const mockGenerateContent = vi.fn();
 const mockGetGenerativeModel = vi.fn();
 const mockGoogleGenerativeAI = vi.fn();
 
+// Use dynamic import mocking for the package
 vi.mock("@google/generative-ai", () => ({
-  GoogleGenerativeAI: mockGoogleGenerativeAI,
+  GoogleGenerativeAI: class {
+    constructor(apiKey: string) {
+      // Mock constructor - can throw error for testing
+      if ((global as any).__throwAIError) {
+        throw new Error("Failed to initialize AI service");
+      }
+    }
+    getGenerativeModel() {
+      return mockGetGenerativeModel();
+    }
+  },
 }));
 
 describe("Tips API Route", async () => {
@@ -82,16 +93,14 @@ describe("Tips API Route", async () => {
     mockGetGenerativeModel.mockReturnValue({
       generateContent: mockGenerateContent,
     });
-
-    mockGoogleGenerativeAI.mockImplementation(() => ({
-      getGenerativeModel: mockGetGenerativeModel,
-    }));
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
     delete process.env.GEMINI_API_KEY;
     delete process.env.MODEL_NAME;
+    // Clean up global flags
+    (global as any).__throwAIError = false;
   });
 
   describe("POST /api/tips", () => {
@@ -466,11 +475,8 @@ describe("Tips API Route", async () => {
       (auth as Mock).mockResolvedValue(mockSession(true, { id: "user123" }));
       vi.mocked(prisma.kanaProgress.findMany).mockResolvedValue([]);
 
-      // Temporarily override the mock to throw an error during import
-      const originalMock = mockGoogleGenerativeAI;
-      mockGoogleGenerativeAI.mockImplementation(() => {
-        throw new Error("Failed to initialize AI service");
-      });
+      // Set flag to trigger AI error
+      (global as any).__throwAIError = true;
 
       // Spy on console.error
       const consoleErrorSpy = vi
@@ -497,9 +503,9 @@ describe("Tips API Route", async () => {
         expect.any(Error),
       );
 
-      // Restore console.error and original mock
+      // Restore console.error and clear flag
       consoleErrorSpy.mockRestore();
-      mockGoogleGenerativeAI.mockImplementation(originalMock);
+      (global as any).__throwAIError = false;
     });
 
     test("includes progressing kana in AI prompt when user has kana with accuracy between 0.7 and 0.9", async () => {

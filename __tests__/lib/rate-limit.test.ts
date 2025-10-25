@@ -33,18 +33,24 @@ vi.mock("@upstash/redis", () => ({
 
 // Mock the Ratelimit module
 vi.mock("@upstash/ratelimit", () => {
-  const mockRatelimit = {
-    limit: vi.fn().mockResolvedValue({
-      success: true,
-      limit: 10,
-      remaining: 9,
-      reset: Date.now() + 60000,
-    }),
-  };
-  const mockSlidingWindow = vi.fn(() => mockRatelimit);
+  const mockLimit = vi.fn().mockResolvedValue({
+    success: true,
+    limit: 10,
+    remaining: 9,
+    reset: Date.now() + 60000,
+  });
+
+  // Export the mockLimit for use in tests
+  (global as any).__mockLimit = mockLimit;
+
+  class MockRatelimit {
+    limit = mockLimit;
+  }
+
+  const mockSlidingWindow = vi.fn(() => new MockRatelimit());
 
   return {
-    Ratelimit: Object.assign(vi.fn(() => mockRatelimit), {
+    Ratelimit: Object.assign(MockRatelimit, {
       slidingWindow: mockSlidingWindow,
     }),
   };
@@ -174,8 +180,7 @@ describe("Rate Limit Library", () => {
 
     it("should deny requests exceeding limit", async () => {
       // Mock rate limit exceeded
-      const mockLimit = vi.mocked(Ratelimit().limit);
-      mockLimit.mockResolvedValueOnce({
+      (global.__mockLimit as any).mockResolvedValueOnce({
         success: false,
         limit: 10,
         remaining: 0,
@@ -192,8 +197,7 @@ describe("Rate Limit Library", () => {
 
     it("should handle errors gracefully and fail open", async () => {
       // Mock error in rate limiting
-      const mockLimit = vi.mocked(Ratelimit().limit);
-      mockLimit.mockRejectedValueOnce(new Error("Redis connection failed"));
+      (global.__mockLimit as any).mockRejectedValueOnce(new Error("Redis connection failed"));
 
       const request = createMockRequest("192.168.1.1");
       const result = await applyRateLimit(request, "stats");
@@ -206,19 +210,17 @@ describe("Rate Limit Library", () => {
       const request = createMockRequest("192.168.1.1");
       const userId = "test-user-123";
 
-      const mockLimit = vi.mocked(Ratelimit().limit);
       await applyRateLimit(request, "stats", userId);
 
-      expect(mockLimit).toHaveBeenCalledWith("user:test-user-123");
+      expect(global.__mockLimit).toHaveBeenCalledWith("user:test-user-123");
     });
 
     it("should use IP address for unauthenticated requests", async () => {
       const request = createMockRequest("192.168.1.2");
 
-      const mockLimit = vi.mocked(Ratelimit().limit);
       await applyRateLimit(request, "health");
 
-      expect(mockLimit).toHaveBeenCalledWith("ip:192.168.1.2");
+      expect(global.__mockLimit).toHaveBeenCalledWith("ip:192.168.1.2");
     });
   });
 });
