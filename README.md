@@ -55,20 +55,13 @@ Visit: <https://pnpm.io/installation>
 
 More details: <https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid>
 
-## Upstash Rate Limiting Setup
-
-1. Go to [Upstash Console](https://console.upstash.com/)
-2. Create/select a database > "Details" tab
-3. Copy REST URL and REST Token to `.env` file
-4. Single region setup recommended for optimal performance
-
 ## Environment Setup
 
 Copy `.env.example` to `.env` and configure:
 
 ```bash
 # Required - Generate at https://auth-secret-gen.vercel.app/
-AUTH_SECRET=your_generated_secret_here
+AUTH_SECRET=your_random_secret_here
 
 # Database (localhost is default for local dev and E2E tests)
 POSTGRES_DB=sakumari
@@ -78,7 +71,7 @@ POSTGRES_PASSWORD=postgres
 POSTGRES_PORT=5432
 
 # Database URLs
-POSTGRES_PRISMA_URL=postgresql://postgres:postgres@localhost:5432/sakumari?pgbouncer=true&connection_limit=1
+POSTGRES_PRISMA_URL=postgresql://postgres:postgres@localhost:5432/sakumari
 POSTGRES_URL_NON_POOLING=postgresql://postgres:postgres@localhost:5432/sakumari
 
 # Google OAuth
@@ -89,9 +82,11 @@ AUTH_GOOGLE_SECRET=your_google_client_secret
 GEMINI_API_KEY=your_gemini_api_key_here
 MODEL_NAME=gemini-2.5-flash-lite
 
-# Rate Limiting (Upstash Redis)
-UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url
-UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token
+# Local Redis for Rate Limiting
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
 
 # E2E test credentials only
 CREDS_PROVIDER=true
@@ -123,10 +118,10 @@ git clone https://github.com/sakan811/SakuMari.git
 cd SakuMari
 pnpm install
 
-# Start database
+# Start database and Redis
 pnpm run docker:db
 
-# Setup database
+# Setup database (migrations + seed)
 pnpm run db:setup
 
 # Start development server
@@ -151,7 +146,7 @@ pnpm install
 ### Setup Steps
 
 ```bash
-# Start full stack (Docker automatically configures database host)
+# Start full stack (Docker automatically configures database and Redis hosts)
 pnpm run docker:dev-up
 
 # Setup database
@@ -168,7 +163,7 @@ pnpm run docker:down      # Stop all services
 pnpm run docker:clean     # Remove all containers + volumes
 ```
 
-**Note**: Docker Compose automatically overrides `POSTGRES_HOST=db` for containerized services. No manual `.env` editing required.
+**Note**: Docker Compose automatically overrides `POSTGRES_HOST=db` and `REDIS_HOST=redis` for containerized services. No manual `.env` editing required.
 
 ## E2E Test Setup
 
