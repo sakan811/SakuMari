@@ -26,6 +26,8 @@
     "test:db:watch": "vitest --config vitest.config.db.mts",
     "test:db:clean": "cross-env NODE_ENV=test && (rm -f __tests__/db/test.db || del __tests__\\db\\test.db 2>nul || true)",
     "test:db:full": "pnpm run test:db:setup && pnpm run test:db",
+    "test:integration": "vitest run --config vitest.config.integration.mts",
+    "test:integration:coverage": "vitest run --config vitest.config.integration.mts --coverage",
     "test:e2e": "pnpm exec playwright test",
     "test:e2e:setup": "pnpm run docker:db && pnpm run prisma:generate && POSTGRES_HOST=localhost pnpm run prisma:migrate:deploy && POSTGRES_HOST=localhost CREDS_PROVIDER=true pnpm run db:seed",
     "test:e2e:build": "cross-env CREDS_PROVIDER=true pnpm run build",

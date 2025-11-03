@@ -1,0 +1,47 @@
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
+import tsconfigPaths from "vite-tsconfig-paths";
+
+export default defineConfig({
+  plugins: [tsconfigPaths(), react()],
+  test: {
+    environment: "happy-dom",
+    globals: true,
+    testTimeout: 10000,
+    setupFiles: ["./__tests__/setup.integration.ts"],
+    include: ["__tests__/lib/rate-limit.test.ts"],
+    exclude: ["node_modules", "dist", ".next", "__tests__/db"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "lcov"],
+      reportsDirectory: "./coverage-integration",
+      exclude: [
+        "node_modules/",
+        "__tests__/",
+        "**/*.d.ts",
+        "next.config.js",
+        "vitest.config.db.mts",
+        "prisma/",
+        "scripts/",
+        "public/",
+        "styles/",
+        "eslint.config.mjs",
+        "**.config.{js,ts,mts,mjs}",
+        ".next/",
+        "generated/",
+        "coverage-db/lcov-report",
+        "types/common.ts",
+        "app/globals.css"
+      ],
+    },
+  },
+  define: {
+    "process.env.NEXTAUTH_URL": '"http://localhost:3000"',
+    "process.env.NEXTAUTH_SECRET": '"test-secret"',
+    "process.env.CREDS_PROVIDER": '"true"',
+    "process.env.REDIS_HOST": '"localhost"',
+    "process.env.REDIS_PORT": '"6379"',
+    "process.env.REDIS_PASSWORD": '""',
+    "process.env.REDIS_DB": '"1"',
+  },
+});
