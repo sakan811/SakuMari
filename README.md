@@ -215,6 +215,10 @@ pnpm run test:db:setup    # Setup database test environment
 pnpm run test:db:full     # Database tests with fresh setup
 pnpm run test:db:clean    # Clean database test artifacts
 
+# Integration Tests
+pnpm run test:integration           # Integration tests (rate limiting)
+pnpm run test:integration:coverage  # Integration tests with coverage
+
 # E2E Tests
 pnpm run test:e2e:setup   # Setup E2E test environment
 pnpm run test:e2e:build   # Build app for E2E testing
