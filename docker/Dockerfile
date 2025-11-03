@@ -1,5 +1,5 @@
 # Build stage
-FROM node:24.9-alpine AS build
+FROM node:25-alpine AS build
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -22,7 +22,7 @@ RUN --mount=type=cache,id=nextjs,target=/.next/cache \
     pnpm build
 
 # Production stage
-FROM node:24.9-alpine AS runner
+FROM node:25-alpine AS runner
 
 # Create non-root user for security (Alpine syntax)
 RUN addgroup -g 1001 -S nodejs && \
