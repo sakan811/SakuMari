@@ -7,6 +7,12 @@ process.env.CREDS_TEST_EMAIL =
 process.env.CREDS_TEST_PASSWORD =
   process.env.CREDS_TEST_PASSWORD || "TestPassword123!";
 
+// Configure Redis for E2E testing (local Redis instance)
+process.env.REDIS_HOST = process.env.REDIS_HOST || "localhost";
+process.env.REDIS_PORT = process.env.REDIS_PORT || "6379";
+process.env.REDIS_PASSWORD = process.env.REDIS_PASSWORD || "";
+process.env.REDIS_DB = process.env.REDIS_DB || "1"; // Use separate DB for tests
+
 export default defineConfig({
   testDir: "./__tests__/e2e",
   fullyParallel: true,
@@ -28,7 +34,11 @@ export default defineConfig({
     timeout: 120 * 1000, // 2 minutes
     env: {
       CREDS_PROVIDER: "true",
-      NODE_ENV: "production"
+      NODE_ENV: "production",
+      REDIS_HOST: process.env.REDIS_HOST || "localhost",
+      REDIS_PORT: process.env.REDIS_PORT || "6379",
+      REDIS_PASSWORD: process.env.REDIS_PASSWORD || "",
+      REDIS_DB: process.env.REDIS_DB || "1",
     },
   },
 
