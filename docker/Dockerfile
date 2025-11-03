@@ -2,7 +2,10 @@
 FROM node:25-alpine AS build
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+# Install corepack globally since Node.js 25 removed it by default
+# Use --force to overwrite existing yarn installation
+RUN npm install -g corepack@latest --force && \
+    corepack enable
 
 WORKDIR /usr/src/app
 
