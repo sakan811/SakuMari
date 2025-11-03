@@ -10,7 +10,7 @@ export default defineConfig({
     testTimeout: 10000,
     setupFiles: ["./__tests__/setup.ts"],
     include: ["__tests__/**/*.test.{ts,tsx}"],
-    exclude: ["node_modules", "dist", ".next", "__tests__/db"],
+    exclude: ["node_modules", "dist", ".next", "__tests__/db", "__tests__/lib/rate-limit.test.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov"],

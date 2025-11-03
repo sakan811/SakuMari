@@ -18,7 +18,9 @@
 import { vi } from "vitest";
 
 // Set up integration test environment
-process.env.NODE_ENV = "test";
+if (process.env.NODE_ENV !== "test") {
+  (process as any).env.NODE_ENV = "test";
+}
 process.env.CREDS_PROVIDER = "true";
 process.env.REDIS_HOST = "localhost";
 process.env.REDIS_PORT = "6379";
@@ -62,6 +64,14 @@ const mockRedis = {
 };
 
 // Export helper functions globally for tests
+declare global {
+  var setMockPipeline: (pipeline: any) => void;
+  var setMockRedis: (redis: any) => void;
+  var getMockRedis: () => any;
+  var getErrorHandler: () => any;
+  var getConnectHandler: () => any;
+}
+
 (global as any).setMockPipeline = (pipeline: any) => {
   mockPipeline = pipeline;
   mockRedis.pipeline = vi.fn(() => mockPipeline);
