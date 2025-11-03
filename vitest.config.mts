@@ -5,7 +5,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   plugins: [tsconfigPaths(), react()],
   test: {
-    environment: "jsdom",
+    environment: "happy-dom",
     globals: true,
     testTimeout: 10000,
     setupFiles: ["./__tests__/setup.ts"],
@@ -38,5 +38,10 @@ export default defineConfig({
   define: {
     "process.env.NEXTAUTH_URL": '"http://localhost:3000"',
     "process.env.NEXTAUTH_SECRET": '"test-secret"',
+    "process.env.CREDS_PROVIDER": '"true"',
+    "process.env.REDIS_HOST": '"localhost"',
+    "process.env.REDIS_PORT": '"6379"',
+    "process.env.REDIS_PASSWORD": '""',
+    "process.env.REDIS_DB": '"1"',
   },
 });

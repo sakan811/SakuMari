@@ -16,8 +16,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import Redis from "ioredis";
 
 // Check if we're in a test environment
 const isTestEnvironment = () => {
@@ -69,20 +68,126 @@ const TEST_RATE_LIMITS = {
 type EndpointType = keyof typeof RATE_LIMITS;
 
 // Create Redis client
-const redis = Redis.fromEnv();
+let redis: Redis | null = null;
+
+const getRedisClient = (): Redis => {
+  if (!redis) {
+    redis = new Redis({
+      host: process.env.REDIS_HOST || "localhost",
+      port: parseInt(process.env.REDIS_PORT || "6379"),
+      password: process.env.REDIS_PASSWORD || undefined,
+      db: parseInt(process.env.REDIS_DB || "0"),
+      retryDelayOnFailover: 100,
+      maxRetriesPerRequest: 3,
+      lazyConnect: true,
+    });
+
+    // Handle connection errors gracefully
+    redis.on("error", (error: Error) => {
+      console.error("Redis connection error:", error);
+    });
+
+    redis.on("connect", () => {
+      console.log("Connected to Redis");
+    });
+  }
+  return redis;
+};
+
+// Custom sliding window rate limiter implementation
+class SlidingWindowRateLimiter {
+  private redis: Redis;
+  private prefix: string;
+  private requests: number;
+  private window: number; // window in seconds
+
+  constructor(redis: Redis, prefix: string, requests: number, window: string) {
+    this.redis = redis;
+    this.prefix = prefix;
+    this.requests = requests;
+    this.window = this.parseWindow(window);
+  }
+
+  private parseWindow(window: string): number {
+    // Parse window strings like "60 s", "1 m", "1 h" into seconds
+    const match = window.match(/^(\d+)\s*([smh])$/);
+    if (!match) {
+      throw new Error(`Invalid window format: ${window}`);
+    }
+    const [, value, unit] = match;
+    const multiplier = unit === 's' ? 1 : unit === 'm' ? 60 : unit === 'h' ? 3600 : 1;
+    return parseInt(value) * multiplier;
+  }
+
+  async limit(identifier: string): Promise<{
+    success: boolean;
+    limit: number;
+    remaining: number;
+    reset: number;
+  }> {
+    const now = Math.floor(Date.now() / 1000);
+    const windowStart = now - this.window;
+    const key = `${this.prefix}:${identifier}`;
+
+    try {
+      // Use a pipeline for atomic operations
+      const pipeline = this.redis.pipeline();
+
+      // Remove expired entries
+      pipeline.zremrangebyscore(key, '-inf', windowStart);
+
+      // Add current request
+      pipeline.zadd(key, now, `${now}-${Math.random()}`);
+
+      // Count current requests in window
+      pipeline.zcard(key);
+
+      // Set expiration on the key
+      pipeline.expire(key, this.window);
+
+      const results = await pipeline.exec();
+
+      if (!results) {
+        throw new Error("Pipeline execution failed");
+      }
+
+      const currentCount = results[2][1] as number;
+      const success = currentCount <= this.requests;
+      const remaining = Math.max(0, this.requests - currentCount);
+      const reset = now + this.window;
+
+      return {
+        success,
+        limit: this.requests,
+        remaining,
+        reset: reset * 1000, // Convert to milliseconds
+      };
+    } catch (error) {
+      console.error("Rate limiting error:", error);
+      // Fail open - allow request if rate limiting fails
+      return {
+        success: true,
+        limit: this.requests,
+        remaining: this.requests,
+        reset: (now + this.window) * 1000,
+      };
+    }
+  }
+}
 
 // Create rate limiters for different endpoint types
 const createRateLimiter = (type: EndpointType) => {
   // Use test rate limits if we're in a test environment
   const rateLimits = isTestEnvironment() ? TEST_RATE_LIMITS : RATE_LIMITS;
   const config = rateLimits[type];
+  const redisClient = getRedisClient();
 
-  return new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(config.requests, config.window),
-    prefix: `@upstash/ratelimit:${isTestEnvironment() ? 'test:' : ''}${type}`,
-    analytics: false, // Set to true if you want analytics
-  });
+  return new SlidingWindowRateLimiter(
+    redisClient,
+    `ratelimit:${isTestEnvironment() ? 'test:' : ''}${type}`,
+    config.requests,
+    config.window
+  );
 };
 
 // Get client IP address from request
