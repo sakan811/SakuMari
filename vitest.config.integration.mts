@@ -36,8 +36,8 @@ export default defineConfig({
     },
   },
   define: {
-    "process.env.NEXTAUTH_URL": '"http://localhost:3000"',
-    "process.env.NEXTAUTH_SECRET": '"test-secret"',
+    "process.env.AUTH_URL": '"http://localhost:3000"',
+    "process.env.AUTH_SECRET": '"test-secret"',
     "process.env.CREDS_PROVIDER": '"true"',
     "process.env.REDIS_HOST": '"localhost"',
     "process.env.REDIS_PORT": '"6379"',
