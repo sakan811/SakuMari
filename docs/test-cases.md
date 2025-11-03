@@ -1,6 +1,6 @@
 # Test Cases Overview
 
-Comprehensive test suite for the SakuMari Japanese kana learning application with 50+ test files organized across unit, integration, and E2E testing.
+Comprehensive test suite for the SakuMari Japanese kana learning application with 49 test files organized across unit, integration, database, and E2E testing.
 
 ## Test Organization
 
@@ -59,7 +59,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 
 **Libraries** (`__tests__/lib/*.test.ts`)
 
-- `rate-limit.test.ts` - Custom ioredis rate limiting
+- `rate-limit.test.ts` - Custom ioredis rate limiting (integration tests)
 
 **Flashcard Provider** (`__tests__/flashcard-provider/*.test.tsx`)
 
@@ -90,18 +90,22 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - `mobile-navigation.test.tsx` - Mobile navigation
 - `tips-modal.test.tsx` - Tips modal component
 
-### **Integration Tests**
-
-**Database** (`__tests__/db/*.test.ts`)
+### **Database Tests** (`__tests__/db/*.test.ts`)
 
 - `kana-progress.test.ts` - Progress tracking
 - `concurrent-operations.test.ts` - Parallel operations
 - `rls.test.ts` - Row Level Security verification
 - `user-data.test.ts` - User data management
 
-**SEO** (`__tests__/seo/*.test.tsx`)
+### **SEO Tests** (`__tests__/seo/*.test.tsx`)
 
 - `seo.test.tsx` - SEO metadata validation
+
+### **Integration Tests**
+
+**Rate Limiting** (`__tests__/lib/*.test.ts`)
+
+- `rate-limit.test.ts` - Custom ioredis rate limiting with Redis integration
 
 ### **E2E Tests** (`__tests__/e2e/*.spec.ts`)
 
@@ -148,11 +152,12 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 
 ## Testing Framework
 
-**Unit & Integration:** Vitest + React Testing Library
-**Database:** Isolated SQLite environment with custom schema
-**E2E:** Playwright with cross-browser support
-**API Mocking:** MSW (Mock Service Worker)
-**Authentication:** Comprehensive NextAuth.js mocking
+**Unit Tests:** Vitest + React Testing Library + Happy DOM
+**Database Tests:** Vitest with Node.js environment + isolated SQLite
+**Integration Tests:** Vitest with separate configuration for rate limiting
+**E2E Tests:** Playwright with cross-browser support and authentication setup
+**API Mocking:** MSW (Mock Service Worker) for unit tests
+**Authentication:** Comprehensive NextAuth.js mocking with credentials provider
 
 ## Running Tests
 
@@ -167,12 +172,18 @@ pnpm test:db:full       # Fresh setup + run
 pnpm test:db            # Run once (watch mode: test:db:watch)
 pnpm test:db:coverage   # With coverage
 pnpm test:db:clean      # Cleanup test database
+pnpm test:db:setup      # Setup database test environment
+
+# Integration tests (rate limiting)
+pnpm test:integration           # Run once
+pnpm test:integration:coverage  # With coverage
 
 # E2E tests (requires Docker setup)
 pnpm test:e2e:full      # Complete workflow (setup + build + run)
 pnpm test:e2e:setup     # Setup environment
 pnpm test:e2e:build     # Build for E2E testing
 pnpm test:e2e:clean     # Cleanup environment
+pnpm test:e2e           # Run E2E tests (requires setup)
 
 # All tests + quality checks
 pnpm test:all           # Run lint, format, typecheck, and all tests
@@ -180,8 +191,9 @@ pnpm test:all           # Run lint, format, typecheck, and all tests
 
 ## Test Environment
 
-- **Database**: Isolated SQLite (`__tests__/db/test.db`) with custom Prisma schema
-- **Authentication**: Mocked NextAuth.js with test credentials provider
-- **API**: MSW for comprehensive API mocking
-- **Rate Limiting**: Mocked ioredis for testing
-- **Cleanup**: Automatic isolation and cleanup between tests
+- **Unit Tests**: Happy DOM environment with MSW for API mocking and Redis simulation
+- **Database**: Isolated SQLite (`__tests__/db/test.db`) with custom Prisma schema for sequential execution
+- **Integration**: Separate Vitest configuration for rate limiting tests with Redis integration
+- **Authentication**: Mocked NextAuth.js with test credentials provider across all test types
+- **E2E**: Playwright with setup/teardown projects, cross-browser testing (Chrome, Firefox, Safari), and credentials provider
+- **Cleanup**: Automatic isolation and cleanup between tests with proper Redis database separation
