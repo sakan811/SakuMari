@@ -34,7 +34,7 @@
     "test:all": "pnpm run lint && pnpm run format && pnpm run test:run && pnpm run test:db:full && pnpm run test:e2e:full",
     "docker": "docker compose -f docker/docker-compose.yml",
     "docker:db": "pnpm run docker up -d db redis",
-    "docker:dev-up": "pnpm run docker up -d db app --build",
+    "docker:dev-up": "pnpm run docker up -d db app redis --build",
     "docker:logs": "pnpm run docker logs -f",
     "docker:logs-app": "pnpm run docker logs -f app",
     "docker:status": "pnpm run docker ps",
