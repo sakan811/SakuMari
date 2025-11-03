@@ -4,7 +4,7 @@
 
 ![System Architecture](mermaid/system.svg)
 
-**Core Stack:** Next.js 16.0.0 App Router + React 19.2.0 + NextAuth.js v5.0.0-beta.29 + PostgreSQL 17 + Google Gemini AI v0.24.1 + Upstash Redis Rate Limiting + TypeScript 5.9.3
+**Core Stack:** Next.js 16.0.1 App Router + React 19.2.0 + NextAuth.js v5.0.0-beta.29 + PostgreSQL 17 + Google Gemini AI v0.24.1 + ioredis Rate Limiting + TypeScript 5.9.3
 
 **Key Components:**
 
@@ -13,10 +13,10 @@
 - **State Management:** FlashcardProvider with confidence-weighted adaptive learning
 - **Data Layer:** Prisma ORM 6.18.0 with PostgreSQL 17
 - **AI Integration:** Google Gemini AI v0.24.1 for personalized learning recommendations
-- **Rate Limiting:** Upstash Redis with @upstash/ratelimit v2.0.6 for API protection
+- **Rate Limiting:** ioredis v5.8.2 with custom rate limiting for API protection
 - **Styling:** Tailwind CSS v4.1.16 with mobile-first responsive design
-- **Testing:** Vitest v4.0.3 + Playwright v1.56.1 for comprehensive testing (unit, integration, E2E)
-- **Code Quality:** ESLint 9.38.0 + Prettier with React, Import, and TypeScript plugins
+- **Testing:** Vitest v4.0.6 + Playwright v1.56.1 for comprehensive testing (unit, integration, E2E)
+- **Code Quality:** ESLint 9.39.0 + Prettier with React, Import, and TypeScript plugins
 
 ## Component Architecture
 
@@ -37,7 +37,7 @@
 - **Error Handling:** API utilities (`lib/api-errors.ts`) and proxy utilities (`lib/api-middleware.ts`) for constraint violations and proper responses
 - **Kana Filtering:** Character filtering utilities (`lib/kana-filter.ts`) for hiragana/katakana selection
 - **Flashcard Utils:** Helper functions (`lib/flashcard-utils.ts`) and submission utilities (`lib/flashcard-submit-utils.ts`) for improved testability
-- **Rate Limiting:** Upstash Redis utilities (`lib/rate-limit.ts`) for API endpoint protection
+- **Rate Limiting:** Custom ioredis utilities (`lib/rate-limit.ts`) for API endpoint protection
 
 **Component Groups:**
 
@@ -60,7 +60,7 @@
 
 - **Dashboard** - Progress tracking overview
 - **StatsSummary** - Statistics cards
-- **CharacterProgressTable** - Sortable/filterable progress data
+- **CharacterProgressTable** - Sortable/filterable progress data with CharacterTableRow and SortableTableHeader
 - **TipsModal** - AI chat interface
 
 ### Navigation Components
@@ -104,7 +104,7 @@
 - **Performance:** Automatic code splitting, SSR, and static generation with React 19.2.0
 - **Health Monitoring:** Database connectivity endpoint (`/api/health`)
 - **Proxy Protection:** Enforcement for practice and progress APIs
-- **Rate Limiting:** Upstash Redis-based protection with fail-open error handling
+- **Rate Limiting:** ioredis-based protection with fail-open error handling
 - **Type Safety:** TypeScript 5.9.3 with dedicated `/types/` directory
 
 ## Project Structure
@@ -144,7 +144,7 @@ lib/
 ├── kana-filter.ts              # Character filtering
 ├── flashcard-utils.ts          # Flashcard helpers
 ├── flashcard-submit-utils.ts   # Submission utilities
-├── rate-limit.ts               # Upstash Redis rate limiting
+├── rate-limit.ts               # ioredis rate limiting
 └── should-fetch-kana-data.ts   # Data fetching utilities
 ```
 
@@ -165,10 +165,12 @@ hooks/
 __tests__/
 ├── api/                        # API endpoint tests
 ├── auth/                       # Authentication flow tests
+├── components/                 # Component tests
 ├── db/                         # Database tests (SQLite)
 ├── e2e/                        # End-to-end Playwright tests
-├── hooks/                      # Custom hooks tests
 ├── flashcard-provider/         # Provider logic tests
+├── hooks/                      # Custom hooks tests
+├── lib/                        # Library tests
 ├── seo/                        # SEO and metadata tests
 └── utils/                      # Test utilities
 ```

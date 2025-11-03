@@ -80,7 +80,7 @@ Learn Japanese Hiragana and Katakana with an intelligent flashcard system that a
 
 ### API Security
 
-- **Rate Limiting**: Upstash Redis-based protection with configurable limits per endpoint (increased limits for testing)
+- **Rate Limiting**: Custom ioredis-based protection with configurable limits per endpoint (increased limits for testing)
 - **User Authentication**: Secure sessions with NextAuth.js v5.0.0-beta.29
 - **Data Protection**: Row-level security in PostgreSQL 17 database
 - **Performance Monitoring**: Health checks for system reliability at /api/health

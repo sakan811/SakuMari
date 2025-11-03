@@ -1,6 +1,6 @@
 # Test Cases Overview
 
-Comprehensive test suite for the SakuMari Japanese kana learning application with 48 test files organized across unit, integration, and E2E testing.
+Comprehensive test suite for the SakuMari Japanese kana learning application with 50+ test files organized across unit, integration, and E2E testing.
 
 ## Test Organization
 
@@ -15,14 +15,14 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - **UI**: stats-summary, tips-modal
 - **Providers**: SessionProviders
 
-**Hooks** (`hooks/*.test.*`)
+**Hooks** (`__tests__/hooks/*.test.*`)
 
 - `useDashboardData.test.tsx` - Dashboard data fetching
 - `useFlashcardInteraction.test.tsx` - Flashcard interaction logic
-- `useFlashcardHandlers.test.tsx` - Mode selection handlers (moved from root `__tests__/`)
+- `useFlashcardHandlers.test.tsx` - Mode selection handlers
 - `useSorting.test.ts` - Table sorting functionality
 
-**API** (`api/*.test.ts`)
+**API** (`__tests__/api/*.test.ts`)
 
 - `health.test.ts` - System health checks
 - `stats.test.ts` - Progress statistics
@@ -30,14 +30,14 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - `flashcard-submit.test.ts` - Answer submission
 - `additional-edge-cases.test.ts` - Edge case handling
 
-**Authentication** (`auth/*.test.*`)
+**Authentication** (`__tests__/auth/*.test.*`)
 
 - `auth-config.test.ts` - NextAuth.js configuration
 - `auth.test.tsx` - Login/logout flows
 - `auth-routes.test.ts` - Route protection
 - `api-authentication.test.ts` - API authentication
 
-**Utilities** (`utils/*.test.ts`)
+**Utilities** (`__tests__/utils/*.test.ts`)
 
 - `api-errors.test.ts` - Error handling utilities
 - `api-middleware.test.ts` - API proxy
@@ -49,7 +49,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - `prisma.test.ts` - Database client utilities
 - `should-fetch-kana-data.test.ts` - Data fetching logic
 
-**Test Setup Files** (`utils/*.ts`)
+**Test Setup Files** (`__tests__/utils/*.ts`)
 
 - `api-test-setup.ts` - API testing setup
 - `mock-setup.ts` - Mock configuration
@@ -57,37 +57,53 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - `test-assertions.ts` - Custom test assertions
 - `test-helpers.ts` - Test helper functions
 
-**Libraries** (`lib/*.test.ts`)
+**Libraries** (`__tests__/lib/*.test.ts`)
 
-- `rate-limit.test.ts` - Upstash Redis rate limiting
+- `rate-limit.test.ts` - Custom ioredis rate limiting
 
-**Flashcard Provider** (`flashcard-provider/*.test.tsx`)
+**Flashcard Provider** (`__tests__/flashcard-provider/*.test.tsx`)
 
 - `FlashcardProvider.test.tsx` - Flashcard context provider logic
 
-### **Legacy Tests**
+### **Root Level Tests** (`__tests__/*.test.*`)
 
-- `use-flashcard-handlers.test.ts` - Legacy flashcard handlers test (moved to `hooks/` directory)
+- `button.test.tsx` - Button component
+- `button-link.test.tsx` - Button link component
+- `dashboard.test.tsx` - Dashboard page
+- `flashcard.test.tsx` - Flashcard component
+- `flashcard-app.test.tsx` - Flashcard application
+- `header.test.tsx` - Header component
+- `hiragana-page.test.tsx` - Hiragana practice page
+- `home.test.tsx` - Homepage
+- `integration.test.tsx` - Cross-component integration
+- `katakana-page.test.tsx` - Katakana practice page
+- `layout.test.tsx` - Root layout
+- `mode-selector.test.tsx` - Learning mode selector
+- `multiple-choice.test.tsx` - Multiple choice component
+- `desktop-navigation.test.tsx` - Desktop navigation
+- `proxy.test.ts` - Route protection proxy
+- `stats-summary.test.tsx` - Statistics summary component
+
+### **Component Tests** (`__tests__/components/*.test.tsx`)
+
+- `SessionProviders.test.tsx` - Session providers
+- `mobile-navigation.test.tsx` - Mobile navigation
+- `tips-modal.test.tsx` - Tips modal component
 
 ### **Integration Tests**
 
-**Database** (`db/*.test.ts`)
+**Database** (`__tests__/db/*.test.ts`)
 
 - `kana-progress.test.ts` - Progress tracking
 - `concurrent-operations.test.ts` - Parallel operations
 - `rls.test.ts` - Row Level Security verification
 - `user-data.test.ts` - User data management
 
-**Application** (`*.test.tsx`)
-
-- `integration.test.tsx` - Cross-component integration
-- `proxy.test.ts` - Route protection proxy
-
-**SEO** (`seo/*.test.tsx`)
+**SEO** (`__tests__/seo/*.test.tsx`)
 
 - `seo.test.tsx` - SEO metadata validation
 
-### **E2E Tests** (`e2e/*.spec.ts`)
+### **E2E Tests** (`__tests__/e2e/*.spec.ts`)
 
 - `critical-flows.spec.ts` - Complete user journeys
 - `essential-core.spec.ts` - Core functionality
@@ -120,7 +136,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - Environment variable configuration
 - API endpoint validation and error handling
 - Prisma client utility functions
-- Rate limiting with Upstash Redis
+- Rate limiting with custom ioredis implementation
 
 ### User Experience
 
@@ -146,18 +162,20 @@ pnpm test:run           # Run once
 pnpm test               # Watch mode
 pnpm test:coverage      # With coverage
 
-# Database tests
-pnpm test:db:run        # Run once
-pnpm test:db:watch      # Watch mode
+# Database tests (isolated SQLite)
 pnpm test:db:full       # Fresh setup + run
+pnpm test:db            # Run once (watch mode: test:db:watch)
+pnpm test:db:coverage   # With coverage
+pnpm test:db:clean      # Cleanup test database
 
-# E2E tests
-pnpm test:e2e:full      # Complete workflow
+# E2E tests (requires Docker setup)
+pnpm test:e2e:full      # Complete workflow (setup + build + run)
 pnpm test:e2e:setup     # Setup environment
+pnpm test:e2e:build     # Build for E2E testing
 pnpm test:e2e:clean     # Cleanup environment
 
-# All tests
-pnpm test:all           # Run all tests + quality checks
+# All tests + quality checks
+pnpm test:all           # Run lint, format, typecheck, and all tests
 ```
 
 ## Test Environment
@@ -165,5 +183,5 @@ pnpm test:all           # Run all tests + quality checks
 - **Database**: Isolated SQLite (`__tests__/db/test.db`) with custom Prisma schema
 - **Authentication**: Mocked NextAuth.js with test credentials provider
 - **API**: MSW for comprehensive API mocking
-- **Rate Limiting**: Mocked Upstash Redis for testing
+- **Rate Limiting**: Mocked ioredis for testing
 - **Cleanup**: Automatic isolation and cleanup between tests
