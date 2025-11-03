@@ -26,6 +26,16 @@ jobs:
         ports:
           - 5432:5432
 
+      redis:
+        image: redis:latest
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
     steps:
       - uses: actions/checkout@v4
 
@@ -45,8 +55,8 @@ jobs:
           echo "CREDS_PROVIDER=true" >> .env
           echo "POSTGRES_HOST=localhost" >> .env
           echo "POSTGRES_DB=sakumari" >> .env
-          echo "UPSTASH_REDIS_REST_URL=${{ secrets.UPSTASH_REDIS_REST_URL }}" >> .env
-          echo "UPSTASH_REDIS_REST_TOKEN=${{ secrets.UPSTASH_REDIS_REST_TOKEN }}" >> .env
+          echo "REDIS_HOST=localhost" >> .env
+          echo "REDIS_PORT=6379" >> .env
 
       - name: Generate Prisma client and setup database
         env:
