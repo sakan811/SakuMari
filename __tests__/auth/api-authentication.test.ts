@@ -7,7 +7,7 @@ import { NextRequest } from "next/server";
 import { mockSession } from "../utils/mock-setup";
 
 // Use vi.hoisted to declare mocks that can be used in vi.mock
-const { mockAuth, mockPrisma } = vi.hoisted(() => ({
+const { mockAuth, mockPrisma, mockRateLimit } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
   mockPrisma: {
     kana: { findMany: vi.fn() },
@@ -15,15 +15,19 @@ const { mockAuth, mockPrisma } = vi.hoisted(() => ({
     user: { findUnique: vi.fn() },
     $executeRaw: vi.fn(),
   },
+  mockRateLimit: vi.fn(),
 }));
 
-// Mock auth and prisma at top level
+// Mock auth, prisma, and rate limit at top level
 vi.mock("@/lib/auth", () => ({ auth: mockAuth }));
 vi.mock("@/lib/prisma", () => ({ prisma: mockPrisma }));
+vi.mock("@/lib/rate-limit", () => ({ applyRateLimit: mockRateLimit }));
 
 describe("API Authentication", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default: allow rate limiting
+    mockRateLimit.mockResolvedValue({ success: true });
   });
 
   describe("GET /api/stats", () => {
