@@ -31,6 +31,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -69,3 +71,9 @@ jobs:
           PRISMA_ENGINES_MIRROR: https://registry.npmmirror.com/-/binary/prisma
           PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
         run: pnpm run test:db:setup && pnpm run test:db && pnpm test:integration
+
+      - name: SonarQubeScan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
