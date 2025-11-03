@@ -17,6 +17,17 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      redis:
+        image: redis:latest
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,6 +52,15 @@ jobs:
           PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
         run: pnpm prisma generate
 
+      - name: Setup environment
+        run: |
+          cp .env.example .env
+          echo "CREDS_PROVIDER=true" >> .env
+          echo "POSTGRES_HOST=localhost" >> .env
+          echo "POSTGRES_DB=sakumari" >> .env
+          echo "REDIS_HOST=localhost" >> .env
+          echo "REDIS_PORT=6379" >> .env
+
       - name: Run tests
         run: pnpm test
 
@@ -48,4 +68,4 @@ jobs:
         env:
           PRISMA_ENGINES_MIRROR: https://registry.npmmirror.com/-/binary/prisma
           PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
-        run: pnpm run test:db:setup && pnpm run test:db
+        run: pnpm run test:db:setup && pnpm run test:db && pnpm test:integration
