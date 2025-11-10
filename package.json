@@ -57,7 +57,7 @@
     "@auth/prisma-adapter": "^2.11.1",
     "@google/generative-ai": "^0.24.1",
     "@prisma/adapter-pg": "^6.18.0",
-    "@prisma/client": "6.18.0",
+    "@prisma/client": "6.19.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
