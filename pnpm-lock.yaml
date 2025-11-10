@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@auth/prisma-adapter':
         specifier: ^2.11.1
-        version: 2.11.1(@prisma/client@6.18.0(prisma@6.19.0(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))
+        version: 2.11.1(@prisma/client@6.19.0(prisma@6.19.0(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))
       '@google/generative-ai':
         specifier: ^0.24.1
         version: 0.24.1
@@ -18,8 +18,8 @@ importers:
         specifier: ^6.18.0
         version: 6.18.0
       '@prisma/client':
-        specifier: 6.18.0
-        version: 6.18.0(prisma@6.19.0(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
+        specifier: 6.19.0
+        version: 6.19.0(prisma@6.19.0(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
       eslint-plugin-import:
         specifier: ^2.32.0
         version: 2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
@@ -780,8 +780,8 @@ packages:
   '@prisma/adapter-pg@6.18.0':
     resolution: {integrity: sha512-eBtBOL1z2Sh0Rc2hwa4dmwoNeFs5T69tsA62AkhBvnzNfTcr/YfLeJae/wjNmvRttYDPmdiuhqZCRPNY1+8fOA==}
 
-  '@prisma/client@6.18.0':
-    resolution: {integrity: sha512-jnL2I9gDnPnw4A+4h5SuNn8Gc+1mL1Z79U/3I9eE2gbxJG1oSA+62ByPW4xkeDgwE0fqMzzpAZ7IHxYnLZ4iQA==}
+  '@prisma/client@6.19.0':
+    resolution: {integrity: sha512-QXFT+N/bva/QI2qoXmjBzL7D6aliPffIwP+81AdTGq0FXDoLxLkWivGMawG8iM5B9BKfxLIXxfWWAF6wbuJU6g==}
     engines: {node: '>=18.18'}
     peerDependencies:
       prisma: '*'
@@ -3508,10 +3508,10 @@ snapshots:
       preact: 10.24.3
       preact-render-to-string: 6.5.11(preact@10.24.3)
 
-  '@auth/prisma-adapter@2.11.1(@prisma/client@6.18.0(prisma@6.19.0(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))':
+  '@auth/prisma-adapter@2.11.1(@prisma/client@6.19.0(prisma@6.19.0(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3))':
     dependencies:
       '@auth/core': 0.41.1
-      '@prisma/client': 6.18.0(prisma@6.19.0(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
+      '@prisma/client': 6.19.0(prisma@6.19.0(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)
     transitivePeerDependencies:
       - '@simplewebauthn/browser'
       - '@simplewebauthn/server'
@@ -4004,7 +4004,7 @@ snapshots:
     transitivePeerDependencies:
       - pg-native
 
-  '@prisma/client@6.18.0(prisma@6.19.0(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)':
+  '@prisma/client@6.19.0(prisma@6.19.0(magicast@0.3.5)(typescript@5.9.3))(typescript@5.9.3)':
     optionalDependencies:
       prisma: 6.19.0(magicast@0.3.5)(typescript@5.9.3)
       typescript: 5.9.3
