@@ -1,6 +1,12 @@
 # Test Cases Overview
 
-Comprehensive test suite for the SakuMari Japanese kana learning application with 49 test files organized across unit, integration, database, and E2E testing.
+Comprehensive test suite for the SakuMari Japanese kana learning application with **53 test files** organized across unit, integration, database, and E2E testing. This represents a significant expansion from the previous 49 test files, with enhanced coverage for API endpoints, authentication flows, rate limiting with Upstash Redis, and comprehensive E2E scenarios.
+
+**Test Distribution:**
+- **48 Unit Tests**: Comprehensive component, hook, API, and utility testing
+- **5 E2E Tests**: Cross-browser testing with mobile and desktop scenarios
+- **Database Tests**: 4 SQLite-based tests with full isolation
+- **Integration Tests**: Upstash Redis rate limiting with comprehensive coverage
 
 ## Test Organization
 
@@ -15,39 +21,39 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - **UI**: stats-summary, tips-modal
 - **Providers**: SessionProviders
 
-**Hooks** (`__tests__/hooks/*.test.*`)
+**Hooks** (`__tests__/hooks/*.test.*` - 4 test files)
 
-- `useDashboardData.test.tsx` - Dashboard data fetching
-- `useFlashcardInteraction.test.tsx` - Flashcard interaction logic
-- `useFlashcardHandlers.test.tsx` - Mode selection handlers
-- `useSorting.test.ts` - Table sorting functionality
+- `useDashboardData.test.tsx` - Dashboard data fetching and error handling
+- `useFlashcardInteraction.test.tsx` - Flashcard interaction logic with confidence algorithm
+- `useFlashcardHandlers.test.tsx` - Mode selection handlers and choice management
+- `useSorting.test.ts` - Table sorting functionality with multiple criteria
 
-**API** (`__tests__/api/*.test.ts`)
+**API** (`__tests__/api/*.test.ts` - 5 test files)
 
-- `health.test.ts` - System health checks
-- `stats.test.ts` - Progress statistics
-- `tips.test.ts` - AI learning recommendations
-- `flashcard-submit.test.ts` - Answer submission
-- `additional-edge-cases.test.ts` - Edge case handling
+- `health.test.ts` - System health checks with database connectivity
+- `stats.test.ts` - Progress statistics API endpoint
+- `tips.test.ts` - AI learning recommendations with Gemini integration
+- `flashcard-submit.test.ts` - Answer submission with rate limiting
+- `additional-edge-cases.test.ts` - Edge case handling and error scenarios
 
-**Authentication** (`__tests__/auth/*.test.*`)
+**Authentication** (`__tests__/auth/*.test.*` - 4 test files)
 
-- `auth-config.test.ts` - NextAuth.js configuration
-- `auth.test.tsx` - Login/logout flows
-- `auth-routes.test.ts` - Route protection
-- `api-authentication.test.ts` - API authentication
+- `auth-config.test.ts` - NextAuth.js v5 configuration with providers
+- `auth.test.tsx` - Login/logout flows with session management
+- `auth-routes.test.ts` - Route protection and middleware enforcement
+- `api-authentication.test.ts` - API authentication with protected endpoints
 
-**Utilities** (`__tests__/utils/*.test.ts`)
+**Utilities** (`__tests__/utils/*.test.ts` - 9 test files)
 
-- `api-errors.test.ts` - Error handling utilities
-- `api-middleware.test.ts` - API proxy
-- `backgrounds.test.ts` - Background management
-- `env.test.ts` - Environment variables
-- `flashcard-utils.test.ts` - Flashcard algorithms
-- `flashcard-submit-utils.test.ts` - Submission helpers
-- `kana-filter.test.ts` - Character filtering
-- `prisma.test.ts` - Database client utilities
-- `should-fetch-kana-data.test.ts` - Data fetching logic
+- `api-errors.test.ts` - Error handling utilities with consistent error responses
+- `api-middleware.test.ts` - API middleware functions for request processing
+- `backgrounds.test.ts` - Background management utilities for responsive design
+- `env.test.ts` - Environment variable validation and configuration
+- `flashcard-utils.test.ts` - Flashcard algorithms with confidence-weighted selection
+- `flashcard-submit-utils.test.ts` - Submission helpers with improved testability
+- `kana-filter.test.ts` - Character filtering utilities for hiragana/katakana
+- `prisma.test.ts` - Database client utilities with custom client management
+- `should-fetch-kana-data.test.ts` - Data fetching logic with caching strategies
 
 **Test Setup Files** (`__tests__/utils/*.ts`)
 
@@ -59,43 +65,43 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 
 **Libraries** (`__tests__/lib/*.test.ts`)
 
-- `rate-limit.test.ts` - Custom ioredis rate limiting (integration tests)
+- `rate-limit.test.ts` - Upstash Redis-based rate limiting utilities with comprehensive testing
 
 **Flashcard Provider** (`__tests__/flashcard-provider/*.test.tsx`)
 
 - `FlashcardProvider.test.tsx` - Flashcard context provider logic
 
-### **Root Level Tests** (`__tests__/*.test.*`)
+### **Root Level Tests** (`__tests__/*.test.*` - 16 test files)
 
-- `button.test.tsx` - Button component
-- `button-link.test.tsx` - Button link component
-- `dashboard.test.tsx` - Dashboard page
-- `flashcard.test.tsx` - Flashcard component
-- `flashcard-app.test.tsx` - Flashcard application
-- `header.test.tsx` - Header component
-- `hiragana-page.test.tsx` - Hiragana practice page
-- `home.test.tsx` - Homepage
-- `integration.test.tsx` - Cross-component integration
-- `katakana-page.test.tsx` - Katakana practice page
-- `layout.test.tsx` - Root layout
-- `mode-selector.test.tsx` - Learning mode selector
-- `multiple-choice.test.tsx` - Multiple choice component
-- `desktop-navigation.test.tsx` - Desktop navigation
-- `proxy.test.ts` - Route protection proxy
-- `stats-summary.test.tsx` - Statistics summary component
+- `button.test.tsx` - Button UI component with accessibility
+- `button-link.test.tsx` - Button link component with navigation
+- `dashboard.test.tsx` - Dashboard page with progress analytics
+- `flashcard.test.tsx` - Core flashcard component with interactions
+- `flashcard-app.test.tsx` - Main flashcard application logic
+- `header.test.tsx` - Application header with navigation
+- `hiragana-page.test.tsx` - Hiragana practice page with mode switching
+- `home.test.tsx` - Homepage with SEO and metadata
+- `integration.test.tsx` - Cross-component integration testing
+- `katakana-page.test.tsx` - Katakana practice page with character filtering
+- `layout.test.tsx` - Root layout with metadata providers
+- `mode-selector.test.tsx` - Learning mode selector with state management
+- `multiple-choice.test.tsx` - Multiple choice component with answer validation
+- `desktop-navigation.test.tsx` - Desktop navigation with responsive design
+- `proxy.test.ts` - Route protection proxy with authentication
+- `stats-summary.test.tsx` - Statistics summary component with data visualization
 
-### **Component Tests** (`__tests__/components/*.test.tsx`)
+### **Component Tests** (`__tests__/components/*.test.tsx` - 3 test files)
 
-- `SessionProviders.test.tsx` - Session providers
-- `mobile-navigation.test.tsx` - Mobile navigation
-- `tips-modal.test.tsx` - Tips modal component
+- `SessionProviders.test.tsx` - NextAuth.js session providers with wrapper components
+- `mobile-navigation.test.tsx` - Mobile navigation with responsive interactions
+- `tips-modal.test.tsx` - AI-powered tips modal with markdown rendering
 
-### **Database Tests** (`__tests__/db/*.test.ts`)
+### **Database Tests** (`__tests__/db/*.test.ts` - 4 test files)
 
-- `kana-progress.test.ts` - Progress tracking
-- `concurrent-operations.test.ts` - Parallel operations
-- `rls.test.ts` - Row Level Security verification
-- `user-data.test.ts` - User data management
+- `kana-progress.test.ts` - Progress tracking with accuracy calculations
+- `concurrent-operations.test.ts` - Parallel operations and transaction handling
+- `rls.test.ts` - Row Level Security verification with policy testing
+- `user-data.test.ts` - User data management with foreign key constraints
 
 ### **SEO Tests** (`__tests__/seo/*.test.tsx`)
 
@@ -105,7 +111,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 
 **Rate Limiting** (`__tests__/lib/*.test.ts`)
 
-- `rate-limit.test.ts` - Custom ioredis rate limiting with Redis integration
+- `rate-limit.test.ts` - Upstash Redis-based rate limiting with comprehensive integration testing
 
 ### **E2E Tests** (`__tests__/e2e/*.spec.ts`)
 
@@ -140,7 +146,7 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 - Environment variable configuration
 - API endpoint validation and error handling
 - Prisma client utility functions
-- Rate limiting with custom ioredis implementation
+- Upstash Redis-based rate limiting with automatic fail-open functionality
 
 ### User Experience
 
@@ -152,12 +158,13 @@ Comprehensive test suite for the SakuMari Japanese kana learning application wit
 
 ## Testing Framework
 
-**Unit Tests:** Vitest + React Testing Library + Happy DOM
-**Database Tests:** Vitest with Node.js environment + isolated SQLite
-**Integration Tests:** Vitest with separate configuration for rate limiting
-**E2E Tests:** Playwright with cross-browser support and authentication setup
-**API Mocking:** MSW (Mock Service Worker) for unit tests
-**Authentication:** Comprehensive NextAuth.js mocking with credentials provider
+**Unit Tests:** Vitest v4.0.9 + React Testing Library v16.3.0 + Happy DOM v20.0.10
+**Database Tests:** Vitest v4.0.9 with Node.js environment + isolated SQLite with sequential execution
+**Integration Tests:** Vitest v4.0.9 with separate configuration for rate limiting (vitest.config.integration.mts)
+**E2E Tests:** Playwright v1.56.1 with cross-browser support (Chrome, Firefox, Safari) and authentication setup
+**API Mocking:** MSW (Mock Service Worker) for unit tests with comprehensive API mocking
+**Authentication:** Comprehensive NextAuth.js v5 mocking with credentials provider across all test types
+**Coverage:** V8 provider with separate coverage reports for different test types (unit, db, integration)
 
 ## Running Tests
 
@@ -174,26 +181,63 @@ pnpm test:db:coverage   # With coverage
 pnpm test:db:clean      # Cleanup test database
 pnpm test:db:setup      # Setup database test environment
 
-# Integration tests (rate limiting)
+# Integration tests (rate limiting with Upstash Redis)
 pnpm test:integration           # Run once
 pnpm test:integration:coverage  # With coverage
 
-# E2E tests (requires Docker setup)
+# E2E tests (requires Docker setup with PostgreSQL + Redis)
 pnpm test:e2e:full      # Complete workflow (setup + build + run)
-pnpm test:e2e:setup     # Setup environment
+pnpm test:e2e:setup     # Setup environment with Docker containers
 pnpm test:e2e:build     # Build for E2E testing
-pnpm test:e2e:clean     # Cleanup environment
+pnpm test:e2e:clean     # Cleanup Docker environment
 pnpm test:e2e           # Run E2E tests (requires setup)
 
+# Docker support for local testing
+pnpm docker:db          # Start PostgreSQL + Redis containers
+pnpm docker:dev-up      # Start full stack (DB + App + Redis)
+pnpm docker:down        # Stop all containers
+
 # All tests + quality checks
-pnpm test:all           # Run lint, format, typecheck, and all tests
+pnpm test:all           # Run lint, format, and all tests
 ```
 
 ## Test Environment
 
-- **Unit Tests**: Happy DOM environment with MSW for API mocking and Redis simulation
-- **Database**: Isolated SQLite (`__tests__/db/test.db`) with custom Prisma schema for sequential execution
-- **Integration**: Separate Vitest configuration for rate limiting tests with Redis integration
-- **Authentication**: Mocked NextAuth.js with test credentials provider across all test types
-- **E2E**: Playwright with setup/teardown projects, cross-browser testing (Chrome, Firefox, Safari), and credentials provider
-- **Cleanup**: Automatic isolation and cleanup between tests with proper Redis database separation
+- **Unit Tests**: Happy DOM v20.0.10 environment with MSW for API mocking and Redis simulation
+- **Database Tests**: Isolated SQLite (`__tests__/db/test.db`) with custom Prisma schema (`__tests__/db/schema.prisma`) for sequential execution with full isolation
+- **Integration Tests**: Separate Vitest configuration (`vitest.config.integration.mts`) for Upstash Redis rate limiting tests with real Redis integration
+- **Authentication**: Comprehensive NextAuth.js v5 mocking with test credentials provider across all test types, supporting both Google OAuth and credentials provider
+- **E2E Tests**: Playwright v1.56.1 with setup/teardown projects, cross-browser testing (Chrome, Firefox, Safari, mobile), and credentials provider with PostgreSQL + Redis containers
+- **Docker Support**: Docker Compose configuration with PostgreSQL 17 and Redis containers for isolated testing environments
+- **Cleanup**: Automatic test isolation and cleanup between tests with proper Redis database separation and SQLite database recreation
+- **Coverage**: Separate coverage reports for different test types using V8 provider with meaningful exclusions
+
+## Test Configurations
+
+### Vitest Configurations
+
+- **Unit Tests**: `vitest.config.mts` - Happy DOM environment with React plugin and path aliases
+- **Database Tests**: `vitest.config.db.mts` - Node.js environment with SQLite database and sequential execution
+- **Integration Tests**: `vitest.config.integration.mts` - Happy DOM environment with Redis integration setup
+
+### Playwright Configuration
+
+- **E2E Tests**: `playwright.config.ts` - Multi-project setup with:
+  - Setup/teardown projects for authentication state management
+  - Cross-browser testing (Chrome, Firefox, Safari)
+  - Mobile device simulation (iPhone 12)
+  - Separate test matching for different test categories
+  - PostgreSQL + Redis container integration
+  - Optimized timeouts and performance settings
+
+### Database Configuration
+
+- **Test Database**: SQLite with custom schema (`__tests__/db/schema.prisma`) for isolated testing
+- **Production Database**: PostgreSQL 17 with Row Level Security (RLS)
+- **Docker Integration**: PostgreSQL 17 Alpine container for consistent testing environments
+
+### Rate Limiting Configuration
+
+- **Production**: Upstash Redis with endpoint-specific limits
+- **Testing**: Increased limits for automated tests with local Redis fallback
+- **Fail-Open**: Automatic Redis failure handling to prevent service disruption
