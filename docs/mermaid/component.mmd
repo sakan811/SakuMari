@@ -26,20 +26,20 @@ flowchart LR
     Dashboard --> CharacterProgressTable["📋 ProgressTable"]
     Dashboard --> TipsModal["🤖 TipsModal"]
 
-    CharacterProgressTable --> SortableTableHeader["🔄 SortableHeader"]
-    CharacterProgressTable --> CharacterTableRow["📝 TableRow"]
+    CharacterProgressTable --> SortableHeader["🔄 Header"]
+    CharacterProgressTable --> TableRow["📝 Row"]
 
-    Dashboard --> useDashboardData["🔧 useDashboardData"]
-    Dashboard --> useSorting["🔧 useSorting"]
-    Header --> useAuthStatus["🔧 useAuthStatus"]
-    Flashcard --> useFlashcardHandlers["🔧 useFlashcardHandlers"]
-    Flashcard --> useFlashcardInteraction["🔧 useFlashcardInteraction"]
+    Dashboard --> useDashboardData["🔧 Dashboard"]
+    Dashboard --> useSorting["🔧 Sorting"]
+    Header --> useAuthStatus["🔧 Auth"]
+    Flashcard --> useFlashcardHandlers["🔧 Handlers"]
+    Flashcard --> useFlashcardInteraction["🔧 Interaction"]
 
     Components --> EnvUtils["⚙️ env.ts"]
-    Components --> ErrorUtils["❌ api-errors.ts"]
-    Flashcard --> KanaFilter["🈁 kana-filter.ts"]
-    Flashcard --> SubmitUtils["📤 flashcard-submit-utils.ts"]
-    API --> RateLimitUtils["🚦 rate-limit.ts"]
+    Components --> ErrorUtils["❌ errors.ts"]
+    Flashcard --> KanaFilter["🈁 kana-filter"]
+    Flashcard --> SubmitUtils["📤 submit-utils"]
+    API --> RateLimitUtils["🚦 rate-limit"]
 
     classDef coreComponent fill:#e8f4fd,stroke:#1e40af,stroke-width:2px
     classDef practiceComponent fill:#fef3c7,stroke:#d97706,stroke-width:2px
@@ -50,7 +50,7 @@ flowchart LR
 
     class SessionProviders,HomePage,FlashcardApp,Header,DesktopNavigation,MobileNavigation coreComponent
     class Flashcard,ModeSelector,MultipleChoice,FlashcardProvider practiceComponent
-    class Dashboard,StatsSummary,CharacterProgressTable,SortableTableHeader,CharacterTableRow,TipsModal dashboardComponent
+    class Dashboard,StatsSummary,CharacterProgressTable,SortableHeader,TableRow,TipsModal dashboardComponent
     class FlashcardProvider,SessionProviders contextProvider
     class useDashboardData,useSorting,useAuthStatus,useFlashcardHandlers,useFlashcardInteraction customHook
     class EnvUtils,ErrorUtils,KanaFilter,SubmitUtils,RateLimitUtils utilityLib
