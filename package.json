@@ -45,7 +45,8 @@
     "license": "node scripts/manage-license-headers.js",
     "license:add": "pnpm run license add",
     "license:remove": "pnpm run license remove",
-    "license:check": "pnpm run license check"
+    "license:check": "pnpm run license check",
+    "mermaid:generate": "find docs/mermaid -name '*.mmd' -exec sh -c 'mmdc -q -i \"$1\" -o \"${1%.mmd}.svg\"' _ {} \\;"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -73,6 +74,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.39.0",
+    "@mermaid-js/mermaid-cli": "^11.12.0",
     "@next/eslint-plugin-next": "^16.0.1",
     "@playwright/test": "^1.56.1",
     "@tailwindcss/postcss": "^4.1.17",
