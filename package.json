@@ -46,7 +46,7 @@
     "license:add": "pnpm run license add",
     "license:remove": "pnpm run license remove",
     "license:check": "pnpm run license check",
-    "mermaid:generate": "find docs/mermaid -name '*.mmd' -exec sh -c 'mmdc -q -i \"$1\" -o \"${1%.mmd}.svg\"' _ {} \\;"
+    "mermaid:generate": "node scripts/generate-mermaid.js"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -57,13 +57,13 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
     "@google/generative-ai": "^0.24.1",
-    "@prisma/adapter-pg": "^6.18.0",
+    "@prisma/adapter-pg": "^6.19.0",
     "@prisma/client": "6.19.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "ioredis": "^5.8.2",
-    "next": "^16.0.1",
+    "next": "^16.0.3",
     "next-auth": "5.0.0-beta.30",
     "pg": "^8.16.3",
     "react": "^19.2.0",
@@ -73,22 +73,22 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.39.0",
+    "@eslint/js": "^9.39.1",
     "@mermaid-js/mermaid-cli": "^11.12.0",
-    "@next/eslint-plugin-next": "^16.0.1",
+    "@next/eslint-plugin-next": "^16.0.3",
     "@playwright/test": "^1.56.1",
     "@tailwindcss/postcss": "^4.1.17",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
-    "@types/node": "^24.10.0",
-    "@types/react": "19.2.2",
-    "@vitejs/plugin-react": "^5.1.0",
-    "@vitest/coverage-istanbul": "^4.0.6",
-    "@vitest/coverage-v8": "^4.0.6",
+    "@types/node": "^24.10.1",
+    "@types/react": "19.2.4",
+    "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/coverage-istanbul": "^4.0.9",
+    "@vitest/coverage-v8": "^4.0.9",
     "cross-env": "^10.1.0",
     "eslint": "9.39.1",
-    "eslint-config-next": "16.0.1",
+    "eslint-config-next": "16.0.3",
     "eslint-config-prettier": "^10.1.8",
     "happy-dom": "^20.0.10",
     "postcss": "^8.5.6",
@@ -98,6 +98,6 @@
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^4.0.6"
+    "vitest": "^4.0.9"
   }
 }

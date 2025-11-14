@@ -1,25 +1,29 @@
 ---
 config:
   theme: 'forest'
-  defaultRenderer: "elk"
+  look: handDrawn
+  displayMode: compact
   layout: elk
+  elk:
+    mergeEdges: true
+    nodePlacementStrategy: LINEAR_SEGMENTS
 ---
 flowchart TD
-    User([👤 User]) --> Browser["🌐 Next.js App Router"]
+    User([User]) --> Browser["Next.js App Router"]
 
-    Browser --> Auth["🔐 NextAuth.js"]
-    Auth --> Session["📝 Session Management"]
-    Auth --> Proxy["🛡️ Route Protection"]
+    Browser --> Auth["NextAuth.js"]
+    Auth --> Session["Session Management"]
+    Auth --> Proxy["Route Protection"]
 
-    Browser --> Pages["📄 Pages"]
-    Pages --> Home["🏠 Home (Public)"]
-    Pages --> Practice["⚡ Practice"]
-    Pages --> Dashboard["📊 Dashboard"]
+    Browser --> Pages["Pages"]
+    Pages --> Home["Home (Public)"]
+    Pages --> Practice["Practice"]
+    Pages --> Dashboard["Dashboard"]
 
-    Practice --> Provider["🎯 FlashcardProvider"]
-    Provider --> Components["🃏 UI Components"]
+    Practice --> Provider["FlashcardProvider"]
+    Provider --> Components["UI Components"]
 
-    Components --> API["🔌 API Routes"]
+    Components --> API["API Routes"]
     Dashboard --> API
 
     API --> Stats["/stats"]
@@ -27,21 +31,21 @@ flowchart TD
     API --> Tips["/tips"]
     API --> Health["/health"]
 
-    Stats --> Prisma["🗄️ Prisma ORM"]
+    Stats --> Prisma["Prisma ORM"]
     Submit --> Prisma
     Tips --> Prisma
     Auth --> Prisma
-    Prisma --> DB[(🐘 PostgreSQL)]
+    Prisma --> DB[(PostgreSQL)]
 
-    Tips --> Gemini["🤖 Google Gemini AI"]
+    Tips --> Gemini["Google Gemini AI"]
 
-    Components --> Hooks["⚡ React Hooks"]
+    Components --> Hooks["React Hooks"]
     Dashboard --> Hooks
 
-    API --> RateLimit["🚦 Rate Limiting"]
-    API --> Utils["🔧 Utility Libraries"]
+    API --> RateLimit["Rate Limiting"]
+    API --> Utils["Utility Libraries"]
 
-    RateLimit --> Redis[(🔴 Redis)]
+    RateLimit --> Redis[(Redis)]
 
     classDef userLayer fill:#e8f4fd,stroke:#1e40af,stroke-width:2px
     classDef appLayer fill:#fef3c7,stroke:#d97706,stroke-width:2px

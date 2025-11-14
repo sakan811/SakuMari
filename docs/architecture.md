@@ -2,7 +2,7 @@
 
 ## System Architecture
 
-![System Architecture](mermaid/system.svg)
+![System Architecture](mermaid/system.png)
 
 **Core Stack:** Next.js 16.0.1 App Router + React 19.2.0 + NextAuth.js v5.0.0-beta.29 + PostgreSQL 17 + Google Gemini AI v0.24.1 + ioredis Rate Limiting + TypeScript 5.9.3
 
@@ -20,7 +20,7 @@
 
 ## Component Architecture
 
-![Component Architecture](mermaid/component.svg)
+![Component Architecture](mermaid/component.png)
 
 **Design Principles:**
 
@@ -91,7 +91,7 @@
 
 ## App Architecture
 
-![App Architecture](mermaid/app.svg)
+![App Architecture](mermaid/app.png)
 
 **Next.js 16 App Router** - File-system based routing with enhanced SSR capabilities
 

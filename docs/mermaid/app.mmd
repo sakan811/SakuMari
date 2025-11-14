@@ -1,37 +1,40 @@
 ---
 config:
   theme: 'forest'
-  defaultRenderer: "elk"
+  look: handDrawn
   layout: elk
+  elk:
+    mergeEdges: true
+    nodePlacementStrategy: LINEAR_SEGMENTS
 ---
 flowchart LR
-    AppRoot["📁 app/"]
+    AppRoot["app/"]
 
-    AppRoot --> RootLayout[<br/>📄<br/>Root<br/>Layout<br/>]
-    AppRoot --> Proxy["🛡️ proxy.ts"]
-    AppRoot --> GlobalCSS["🎨 Global<br/>CSS"]
+    AppRoot --> RootLayout["Root Layout"]
+    AppRoot --> Proxy["proxy.ts"]
+    AppRoot --> GlobalCSS["Global CSS"]
 
-    AppRoot --> Pages["📄 Pages"]
-    Pages --> HomePage["🏠 Home<br/>Page"]
-    Pages --> Dashboard["📊 dashboard/"]
-    Pages --> Hiragana["ひ Hiragana<br/>Page"]
-    Pages --> Katakana["カ Katakana<br/>Page"]
+    AppRoot --> Pages["Pages"]
+    Pages --> HomePage["Home Page"]
+    Pages --> Dashboard["dashboard/"]
+    Pages --> Hiragana["Hiragana Page"]
+    Pages --> Katakana["Katakana Page"]
 
-    AppRoot --> API["🔌 api/"]
-    API --> AuthAPI["🔐 auth/"]
-    AuthAPI --> NextAuth[<br/>📄<br/>NextAuth<br/>Route<br/>]
-    AuthAPI --> Providers[<br/>📄<br/>Auth<br/>Providers<br/>]
+    AppRoot --> API["api/"]
+    API --> AuthAPI["auth/"]
+    AuthAPI --> NextAuth["NextAuth Route"]
+    AuthAPI --> Providers["Auth Providers"]
 
-    API --> AppAPI["⚡ App APIs"]
-    AppAPI --> SubmitAPI["📤 Submit<br/>API"]
-    AppAPI --> StatsAPI["📈 stats/"]
-    AppAPI --> TipsAPI["🤖 tips/"]
-    AppAPI --> HealthAPI["❤️ Health<br/>API"]
+    API --> AppAPI["App APIs"]
+    AppAPI --> SubmitAPI["Submit API"]
+    AppAPI --> StatsAPI["stats/"]
+    AppAPI --> TipsAPI["tips/"]
+    AppAPI --> HealthAPI["Health API"]
 
-    AppRoot --> SEO["🔍 SEO"]
-    SEO --> Sitemap["🗺️ Sitemap<br/>File"]
-    SEO --> Robots["🤖 Robots<br/>File"]
-    SEO --> Favicon["🖼️ Favicon<br/>Icon"]
+    AppRoot --> SEO["SEO"]
+    SEO --> Sitemap["Sitemap File"]
+    SEO --> Robots["Robots File"]
+    SEO --> Favicon["Favicon Icon"]
 
     Proxy -.-> Dashboard
     Proxy -.-> Hiragana
@@ -45,22 +48,6 @@ flowchart LR
     classDef apiRoute fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
     classDef authRoute fill:#fdf4ff,stroke:#a855f7,stroke-width:2px
     classDef globalFile fill:#fee2e2,stroke:#dc2626,stroke-width:2px
-    classDef wideNode padding:15px,font-size:14px
-
-    %% Individual node styles for problematic text
-    style AppRoot fill:#e8f4fd,stroke:#1e40af,stroke-width:3px,padding:15px
-    style RootLayout fill:#e8f4fd,stroke:#1e40af,stroke-width:3px,padding:15px
-    style GlobalCSS fill:#fee2e2,stroke:#dc2626,stroke-width:2px,padding:12px
-    style HomePage fill:#fef3c7,stroke:#d97706,stroke-width:2px,padding:12px
-    style Hiragana fill:#fef3c7,stroke:#d97706,stroke-width:2px,padding:12px
-    style Katakana fill:#fef3c7,stroke:#d97706,stroke-width:2px,padding:12px
-    style NextAuth fill:#fdf4ff,stroke:#a855f7,stroke-width:2px,padding:12px
-    style Providers fill:#fdf4ff,stroke:#a855f7,stroke-width:2px,padding:12px
-    style SubmitAPI fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,padding:12px
-    style HealthAPI fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,padding:12px
-    style Sitemap fill:#fee2e2,stroke:#dc2626,stroke-width:2px,padding:12px
-    style Robots fill:#fee2e2,stroke:#dc2626,stroke-width:2px,padding:12px
-    style Favicon fill:#fee2e2,stroke:#dc2626,stroke-width:2px,padding:12px
 
     class AppRoot,RootLayout rootStructure
     class HomePage,Dashboard,Hiragana,Katakana pageRoute
