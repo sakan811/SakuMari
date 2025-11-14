@@ -5,41 +5,41 @@ config:
   layout: elk
 ---
 flowchart LR
-    SessionProviders["🔐 SessionProviders"]
+    SessionProviders["🔐<br/>Session<br/>Providers"]
 
     SessionProviders --> HomePage["🏠 HomePage"]
     SessionProviders --> FlashcardApp["⚡ FlashcardApp"]
 
     FlashcardApp --> Header["📋 Header"]
-    FlashcardApp --> FlashcardProvider["🎯 FlashcardProvider"]
+    FlashcardApp --> FlashcardProvider["🎯<br/>Flashcard<br/>Provider"]
 
-    Header --> DesktopNavigation["🖥️ DesktopNav"]
-    Header --> MobileNavigation["📱 MobileNav"]
+    Header --> DesktopNavigation["🖥️ Desktop<br/>Navigation"]
+    Header --> MobileNavigation["📱 Mobile<br/>Navigation"]
 
     FlashcardProvider --> Flashcard["🃏 Flashcard"]
     Flashcard --> ModeSelector["⌨️ ModeSelector"]
-    Flashcard --> MultipleChoice["📝 MultipleChoice"]
-    Flashcard --> FilterButton["🔍 FilterButton"]
+    Flashcard --> MultipleChoice["📝 Multiple<br/>Choice"]
+    Flashcard --> FilterButton["🔍 Filter<br/>Button"]
 
     FlashcardApp --> Dashboard["📊 Dashboard"]
-    Dashboard --> StatsSummary["📈 StatsSummary"]
+    Dashboard --> StatsSummary["📈 Stats<br/>Summary"]
     Dashboard --> CharacterProgressTable["📋 ProgressTable"]
-    Dashboard --> TipsModal["🤖 TipsModal"]
+    Dashboard --> TipsModal["🤖 Tips<br/>Modal"]
 
-    CharacterProgressTable --> SortableHeader["🔄 Header"]
+    CharacterProgressTable --> SortableHeader["🔄 Sortable<br/>Header"]
     CharacterProgressTable --> TableRow["📝 Row"]
 
-    Dashboard --> useDashboardData["🔧 Dashboard"]
+    Dashboard --> useDashboardData["🔧 Dashboard<br/>Data"]
     Dashboard --> useSorting["🔧 Sorting"]
     Header --> useAuthStatus["🔧 Auth"]
     Flashcard --> useFlashcardHandlers["🔧 Handlers"]
-    Flashcard --> useFlashcardInteraction["🔧 Interaction"]
+    Flashcard --> useFlashcardInteraction["🔧<br/>Flashcard<br/>Interaction"]
 
     Components --> EnvUtils["⚙️ env.ts"]
-    Components --> ErrorUtils["❌ errors.ts"]
+    Components --> ErrorUtils["❌ Error<br/>Utils"]
     Flashcard --> KanaFilter["🈁 kana-filter"]
     Flashcard --> SubmitUtils["📤 submit-utils"]
-    API --> RateLimitUtils["🚦 rate-limit"]
+    API --> RateLimitUtils["🚦<br/>Rate<br/>Limit Utils"]
 
     classDef coreComponent fill:#e8f4fd,stroke:#1e40af,stroke-width:2px
     classDef practiceComponent fill:#fef3c7,stroke:#d97706,stroke-width:2px
@@ -47,6 +47,21 @@ flowchart LR
     classDef contextProvider fill:#fee2e2,stroke:#dc2626,stroke-width:3px
     classDef customHook fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,stroke-dasharray: 5 5
     classDef utilityLib fill:#f0f9ff,stroke:#0ea5e9,stroke-width:2px
+
+    %% Individual node styles for problematic text
+    style SessionProviders fill:#fee2e2,stroke:#dc2626,stroke-width:3px,padding:15px
+    style FlashcardProvider fill:#fef3c7,stroke:#d97706,stroke-width:2px,padding:15px
+    style DesktopNavigation fill:#e8f4fd,stroke:#1e40af,stroke-width:2px,padding:12px
+    style MobileNavigation fill:#e8f4fd,stroke:#1e40af,stroke-width:2px,padding:12px
+    style MultipleChoice fill:#fef3c7,stroke:#d97706,stroke-width:2px,padding:12px
+    style FilterButton fill:#fef3c7,stroke:#d97706,stroke-width:2px,padding:12px
+    style StatsSummary fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,padding:12px
+    style TipsModal fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,padding:12px
+    style SortableHeader fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,padding:12px
+    style useDashboardData fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,padding:12px
+    style useFlashcardInteraction fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,padding:12px
+    style ErrorUtils fill:#f0f9ff,stroke:#0ea5e9,stroke-width:2px,padding:12px
+    style RateLimitUtils fill:#f0f9ff,stroke:#0ea5e9,stroke-width:2px,padding:12px
 
     class SessionProviders,HomePage,FlashcardApp,Header,DesktopNavigation,MobileNavigation coreComponent
     class Flashcard,ModeSelector,MultipleChoice,FlashcardProvider practiceComponent

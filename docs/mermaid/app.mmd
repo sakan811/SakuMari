@@ -7,31 +7,31 @@ config:
 flowchart LR
     AppRoot["📁 app/"]
 
-    AppRoot --> RootLayout["📄 layout.tsx"]
+    AppRoot --> RootLayout[<br/>📄<br/>Root<br/>Layout<br/>]
     AppRoot --> Proxy["🛡️ proxy.ts"]
-    AppRoot --> GlobalCSS["🎨 globals.css"]
+    AppRoot --> GlobalCSS["🎨 Global<br/>CSS"]
 
     AppRoot --> Pages["📄 Pages"]
-    Pages --> HomePage["🏠 page.tsx"]
+    Pages --> HomePage["🏠 Home<br/>Page"]
     Pages --> Dashboard["📊 dashboard/"]
-    Pages --> Hiragana["ひ hiragana/"]
-    Pages --> Katakana["カ katakana/"]
+    Pages --> Hiragana["ひ Hiragana<br/>Page"]
+    Pages --> Katakana["カ Katakana<br/>Page"]
 
     AppRoot --> API["🔌 api/"]
     API --> AuthAPI["🔐 auth/"]
-    AuthAPI --> NextAuth["📄 [...nextauth]/"]
-    AuthAPI --> Providers["📄 providers/"]
+    AuthAPI --> NextAuth[<br/>📄<br/>NextAuth<br/>Route<br/>]
+    AuthAPI --> Providers[<br/>📄<br/>Auth<br/>Providers<br/>]
 
     API --> AppAPI["⚡ App APIs"]
-    AppAPI --> SubmitAPI["📤 flashcards/submit/"]
+    AppAPI --> SubmitAPI["📤 Submit<br/>API"]
     AppAPI --> StatsAPI["📈 stats/"]
     AppAPI --> TipsAPI["🤖 tips/"]
-    AppAPI --> HealthAPI["❤️ health/"]
+    AppAPI --> HealthAPI["❤️ Health<br/>API"]
 
     AppRoot --> SEO["🔍 SEO"]
-    SEO --> Sitemap["🗺️ sitemap.ts"]
-    SEO --> Robots["🤖 robots.ts"]
-    SEO --> Favicon["🖼️ favicon.ico"]
+    SEO --> Sitemap["🗺️ Sitemap<br/>File"]
+    SEO --> Robots["🤖 Robots<br/>File"]
+    SEO --> Favicon["🖼️ Favicon<br/>Icon"]
 
     Proxy -.-> Dashboard
     Proxy -.-> Hiragana
@@ -45,6 +45,22 @@ flowchart LR
     classDef apiRoute fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
     classDef authRoute fill:#fdf4ff,stroke:#a855f7,stroke-width:2px
     classDef globalFile fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    classDef wideNode padding:15px,font-size:14px
+
+    %% Individual node styles for problematic text
+    style AppRoot fill:#e8f4fd,stroke:#1e40af,stroke-width:3px,padding:15px
+    style RootLayout fill:#e8f4fd,stroke:#1e40af,stroke-width:3px,padding:15px
+    style GlobalCSS fill:#fee2e2,stroke:#dc2626,stroke-width:2px,padding:12px
+    style HomePage fill:#fef3c7,stroke:#d97706,stroke-width:2px,padding:12px
+    style Hiragana fill:#fef3c7,stroke:#d97706,stroke-width:2px,padding:12px
+    style Katakana fill:#fef3c7,stroke:#d97706,stroke-width:2px,padding:12px
+    style NextAuth fill:#fdf4ff,stroke:#a855f7,stroke-width:2px,padding:12px
+    style Providers fill:#fdf4ff,stroke:#a855f7,stroke-width:2px,padding:12px
+    style SubmitAPI fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,padding:12px
+    style HealthAPI fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,padding:12px
+    style Sitemap fill:#fee2e2,stroke:#dc2626,stroke-width:2px,padding:12px
+    style Robots fill:#fee2e2,stroke:#dc2626,stroke-width:2px,padding:12px
+    style Favicon fill:#fee2e2,stroke:#dc2626,stroke-width:2px,padding:12px
 
     class AppRoot,RootLayout rootStructure
     class HomePage,Dashboard,Hiragana,Katakana pageRoute
