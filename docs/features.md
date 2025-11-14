@@ -2,8 +2,6 @@
 
 Learn Japanese Hiragana and Katakana with an intelligent flashcard system that adapts to your learning progress.
 
-**Updated**: v9.11.0 (October 2025)
-
 ## 🌸 Core Features
 
 ### Google Account Integration
@@ -91,7 +89,3 @@ Learn Japanese Hiragana and Katakana with an intelligent flashcard system that a
 - **Performance Tracking**: Records attempts and accuracy over time with real-time updates
 - **Mastery Detection**: Identifies characters you've learned well through accuracy thresholds
 - **Balanced Practice**: Ensures neglected characters get attention through weighted distribution
-
----
-
-*SakuMari combines modern web technology with proven learning methods to make Japanese kana mastery accessible and enjoyable.*

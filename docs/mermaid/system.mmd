@@ -13,8 +13,8 @@ flowchart TD
 
     Browser --> Pages["📄 Pages"]
     Pages --> Home["🏠 Home (Public)"]
-    Pages --> Practice["⚡ Practice (Protected)"]
-    Pages --> Dashboard["📊 Dashboard (Protected)"]
+    Pages --> Practice["⚡ Practice"]
+    Pages --> Dashboard["📊 Dashboard"]
 
     Practice --> Provider["🎯 FlashcardProvider"]
     Provider --> Components["🃏 UI Components"]
@@ -22,10 +22,10 @@ flowchart TD
     Components --> API["🔌 API Routes"]
     Dashboard --> API
 
-    API --> Stats["/api/stats"]
-    API --> Submit["/api/flashcards/submit"]
-    API --> Tips["/api/tips"]
-    API --> Health["/api/health"]
+    API --> Stats["/stats"]
+    API --> Submit["/flashcards"]
+    API --> Tips["/tips"]
+    API --> Health["/health"]
 
     Stats --> Prisma["🗄️ Prisma ORM"]
     Submit --> Prisma
