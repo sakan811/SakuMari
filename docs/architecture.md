@@ -22,13 +22,13 @@
 
 ![Component Architecture](mermaid/component.png)
 
-**Design Principles:**
+### **Design Principles:**
 
 - **Separation of Concerns:** Clear boundaries between presentation and business logic
 - **Component Composition:** Container → Presentation → Layout hierarchy
 - **Context-Driven State:** React Context for global state, custom hooks for data fetching
 
-**State Management:**
+### **State Management:**
 
 - **FlashcardProvider:** Confidence-weighted adaptive learning algorithm + flashcard state
 - **SessionProviders:** NextAuth.js authentication context
@@ -39,9 +39,9 @@
 - **Flashcard Utils:** Helper functions (`lib/flashcard-utils.ts`) and submission utilities (`lib/flashcard-submit-utils.ts`) for improved testability
 - **Rate Limiting:** Custom ioredis utilities (`lib/rate-limit.ts`) for API endpoint protection
 
-**Component Groups:**
+### **Component Groups:**
 
-### Core Components
+#### Core Components
 
 - **HomePage** - Landing page with auth-aware content
 - **FlashcardApp** - Main practice session container
@@ -49,32 +49,32 @@
 - **Header** - Global navigation + auth controls
 - **SessionProviders** - Authentication wrapper
 
-### Practice Components
+#### Practice Components
 
 - **Flashcard** - Dual input modes (typing/multiple-choice) with adaptive learning
 - **ModeSelector** - Input mode toggle
 - **MultipleChoice** - Multiple-choice interface
 - **FilterButton** - Character type filtering (hiragana/katakana/all)
 
-### Dashboard Components
+#### Dashboard Components
 
 - **Dashboard** - Progress tracking overview
 - **StatsSummary** - Statistics cards
 - **CharacterProgressTable** - Sortable/filterable progress data with CharacterTableRow and SortableTableHeader
 - **TipsModal** - AI chat interface
 
-### Navigation Components
+#### Navigation Components
 
 - **DesktopNavigation** - Desktop navigation menu
 - **MobileNavigation** - Mobile navigation menu
 
-### UI Components
+#### UI Components
 
 - **Button** - Consistent button interface (`/components/ui/`)
 - **ButtonLink** - Link-style button component (`/components/ui/`)
 - **FilterButton** - Character type selection (`/components/ui/`)
 
-**API Endpoints:**
+### **API Endpoints:**
 
 - `GET /api/stats` - Progress data (protected, rate limited: 30/min, 200/min in tests)
 - `POST /api/flashcards/submit` - Answer processing (protected, rate limited: 100/min, 500/min in tests)
@@ -83,7 +83,7 @@
 - `POST /api/auth/[...nextauth]` - Authentication session management (rate limited: 10/min, 200/min in tests)
 - `GET /api/health` - System health monitoring (public, rate limited: 60/min, 200/min in tests)
 
-**Route Protection:**
+### **Route Protection:**
 
 - Protected: `/hiragana`, `/katakana`, `/dashboard`, `/api/stats`, `/api/flashcards/*`, `/api/tips`
 - Public: `/`, `/api/auth/*`, `/api/health`
