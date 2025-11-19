@@ -11,8 +11,6 @@
 
 A modern web application for learning Japanese Hiragana and Katakana characters through interactive flashcards with adaptive learning, comprehensive progress tracking, and AI-powered personalized learning tips.
 
-🚀 **[Try it live](https://sakumari.fukudev.org/)** - No setup required!
-
 ## Features
 
 🔐 **Secure Login** - Sign in with Google, practice safely
